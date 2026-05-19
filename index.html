@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="pt-PT">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Remover Fundo em Lote</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="brand-panel" aria-labelledby="app-title">
+        <div class="brand-top">
+          <div class="brand-mark">RF</div>
+          <label class="language-switch">
+            <span data-i18n="languageLabel">Idioma</span>
+            <select id="languageSelect" aria-label="Idioma">
+              <option value="pt">PT</option>
+              <option value="en">EN</option>
+              <option value="es">ES</option>
+              <option value="fr">FR</option>
+              <option value="de">DE</option>
+              <option value="it">IT</option>
+              <option value="nl">NL</option>
+              <option value="pl">PL</option>
+              <option value="sv">SV</option>
+              <option value="da">DA</option>
+              <option value="no">NO</option>
+              <option value="fi">FI</option>
+            </select>
+          </label>
+        </div>
+
+        <p class="eyebrow" data-i18n="eyebrow">Remoção de fundo em massa</p>
+        <h1 id="app-title" data-i18n="title">Remover Fundo em Lote</h1>
+        <p class="lead" data-i18n="lead">
+          Remova o fundo de várias fotos ao mesmo tempo e exporte imagens prontas
+          para lojas online, catálogos e redes sociais.
+        </p>
+        <div class="proof-strip" data-i18n-aria="benefitsLabel" aria-label="Vantagens do serviço">
+          <span data-i18n="benefitBatch">Feito para muitas fotos</span>
+          <span data-i18n="benefitPng">PNG transparente</span>
+          <span data-i18n="benefitZip">ZIP organizado</span>
+        </div>
+        <p class="trust-copy" data-i18n="trustText">
+          Ideal para lojas online, catálogos, marketplaces e equipas que tratam muitas imagens.
+        </p>
+        <a class="policy-link" href="./privacidade.html" data-i18n="privacyLink">Privacidade e termos</a>
+      </section>
+
+      <section class="workspace" data-i18n-aria="uploadLabel" aria-label="Carregar fotos">
+        <div class="tool-header">
+          <div>
+            <p class="section-kicker" data-i18n="startNow">Começar agora</p>
+            <h2 data-i18n="uploadTitle">Carregue as suas fotos</h2>
+          </div>
+          <button class="ghost-button" id="clearButton" type="button" disabled>
+            <span data-i18n="clear">Limpar</span>
+          </button>
+        </div>
+
+        <label class="dropzone" id="dropzone">
+          <input
+            id="fileInput"
+            type="file"
+            accept="image/*,.jpg,.jpeg,.jfif,.pjpeg,.pjp,.png,.apng,.webp,.avif,.gif,.bmp,.tif,.tiff,.svg,.heic,.heif,.ico,.cur"
+            multiple
+          />
+          <span class="dropzone-icon" aria-hidden="true">+</span>
+          <span class="dropzone-title" data-i18n="selectPhotos">Selecionar várias fotos</span>
+          <span class="dropzone-meta" data-i18n="fileTypes">JPG, PNG ou WebP em lote</span>
+        </label>
+
+        <div class="info-list">
+          <p data-i18n="privacyNote">
+            As imagens são processadas no seu dispositivo e não são carregadas para os nossos servidores.
+          </p>
+          <p data-i18n="formatNote">
+            Alguns formatos podem depender do suporte do navegador.
+          </p>
+          <p data-i18n="batchLimitNote">
+            Para garantir estabilidade, processe até 50 imagens por lote.
+          </p>
+        </div>
+
+        <div class="actions">
+          <button id="processButton" type="button" disabled data-i18n="removeBackgrounds">
+            Remover fundos
+          </button>
+          <button id="pngButton" type="button" disabled data-i18n="downloadPng">
+            Descarregar PNG
+          </button>
+          <button id="zipButton" type="button" disabled data-i18n="downloadZip">
+            Descarregar ZIP
+          </button>
+        </div>
+
+        <div class="status-panel" aria-live="polite">
+          <span id="statusText">A aguardar fotos</span>
+          <progress id="progressBar" value="0" max="100"></progress>
+        </div>
+      </section>
+
+      <section class="results" data-i18n-aria="resultsLabel" aria-label="Fotos processadas">
+        <div class="results-header">
+          <h2 data-i18n="queueTitle">Fila de imagens</h2>
+          <span id="countText">0 fotos</span>
+        </div>
+        <div class="empty-state" id="emptyState">
+          <p data-i18n="emptyState">As imagens aparecem aqui depois da seleção.</p>
+        </div>
+        <div class="grid" id="imageGrid"></div>
+      </section>
+    </main>
+
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>
