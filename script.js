@@ -8,6 +8,7 @@ const processButton = document.querySelector("#processButton");
 const pngButton = document.querySelector("#pngButton");
 const zipButton = document.querySelector("#zipButton");
 const clearButton = document.querySelector("#clearButton");
+const paidAccessLink = document.querySelector("#paidAccessLink");
 const imageGrid = document.querySelector("#imageGrid");
 const emptyState = document.querySelector("#emptyState");
 const statusText = document.querySelector("#statusText");
@@ -546,6 +547,10 @@ const translations = {
 const translatedAddons = {
   pt: {
     trustText: "Ideal para lojas online, catálogos, marketplaces e equipas que tratam muitas imagens.",
+    paidKicker: "Acesso pago em breve",
+    paidTitle: "Precisa de processar imagens todas as semanas?",
+    paidText: "Estamos a preparar planos para lojas e equipas que precisam de remover fundos em volume.",
+    paidButton: "Pedir acesso pago",
     privacyNote: "As imagens são processadas no seu dispositivo e não são carregadas para os nossos servidores.",
     formatNote: "Alguns formatos podem depender do suporte do navegador.",
     batchLimitNote: "Para garantir estabilidade, processe até 50 imagens por lote.",
@@ -558,6 +563,10 @@ const translatedAddons = {
   },
   en: {
     trustText: "Ideal for online stores, catalogues, marketplaces, and teams handling many images.",
+    paidKicker: "Paid access coming soon",
+    paidTitle: "Need to process images every week?",
+    paidText: "We are preparing plans for stores and teams that need background removal at volume.",
+    paidButton: "Request paid access",
     privacyNote: "Images are processed on your device and are not uploaded to our servers.",
     formatNote: "Some formats may depend on browser support.",
     batchLimitNote: "For stability, process up to 50 images per batch.",
@@ -570,6 +579,10 @@ const translatedAddons = {
   },
   es: {
     trustText: "Ideal para tiendas online, catálogos, marketplaces y equipos que gestionan muchas imágenes.",
+    paidKicker: "Acceso de pago próximamente",
+    paidTitle: "¿Necesitas procesar imágenes cada semana?",
+    paidText: "Estamos preparando planes para tiendas y equipos que necesitan quitar fondos en volumen.",
+    paidButton: "Solicitar acceso de pago",
     privacyNote: "Las imágenes se procesan en tu dispositivo y no se suben a nuestros servidores.",
     formatNote: "Algunos formatos pueden depender del soporte del navegador.",
     batchLimitNote: "Para garantizar estabilidad, procesa hasta 50 imágenes por lote.",
@@ -582,6 +595,10 @@ const translatedAddons = {
   },
   fr: {
     trustText: "Idéal pour les boutiques en ligne, les catalogues, les marketplaces et les équipes qui traitent beaucoup d'images.",
+    paidKicker: "Accès payant bientôt disponible",
+    paidTitle: "Vous traitez des images chaque semaine ?",
+    paidText: "Nous préparons des offres pour les boutiques et les équipes qui doivent supprimer des arrière-plans en volume.",
+    paidButton: "Demander un accès payant",
     privacyNote: "Les images sont traitées sur votre appareil et ne sont pas envoyées à nos serveurs.",
     formatNote: "Certains formats peuvent dépendre de la prise en charge du navigateur.",
     batchLimitNote: "Pour garantir la stabilité, traitez jusqu'à 50 images par lot.",
@@ -594,6 +611,10 @@ const translatedAddons = {
   },
   de: {
     trustText: "Ideal für Online-Shops, Kataloge, Marktplätze und Teams, die viele Bilder bearbeiten.",
+    paidKicker: "Bezahlter Zugang bald verfügbar",
+    paidTitle: "Müssen Sie jede Woche Bilder bearbeiten?",
+    paidText: "Wir bereiten Tarife für Shops und Teams vor, die Hintergründe in großem Umfang entfernen müssen.",
+    paidButton: "Bezahlten Zugang anfragen",
     privacyNote: "Bilder werden auf Ihrem Gerät verarbeitet und nicht auf unsere Server hochgeladen.",
     formatNote: "Einige Formate können von der Browser-Unterstützung abhängen.",
     batchLimitNote: "Für stabile Ergebnisse bis zu 50 Bilder pro Stapel verarbeiten.",
@@ -606,6 +627,10 @@ const translatedAddons = {
   },
   it: {
     trustText: "Ideale per negozi online, cataloghi, marketplace e team che gestiscono molte immagini.",
+    paidKicker: "Accesso a pagamento in arrivo",
+    paidTitle: "Devi elaborare immagini ogni settimana?",
+    paidText: "Stiamo preparando piani per negozi e team che devono rimuovere sfondi in volume.",
+    paidButton: "Richiedi accesso a pagamento",
     privacyNote: "Le immagini vengono elaborate sul tuo dispositivo e non vengono caricate sui nostri server.",
     formatNote: "Alcuni formati possono dipendere dal supporto del browser.",
     batchLimitNote: "Per garantire stabilità, elabora fino a 50 immagini per lotto.",
@@ -618,6 +643,10 @@ const translatedAddons = {
   },
   nl: {
     trustText: "Ideaal voor webshops, catalogi, marketplaces en teams die veel afbeeldingen verwerken.",
+    paidKicker: "Betaalde toegang binnenkort",
+    paidTitle: "Moet je elke week afbeeldingen verwerken?",
+    paidText: "We bereiden plannen voor winkels en teams die achtergronden op volume moeten verwijderen.",
+    paidButton: "Vraag betaalde toegang aan",
     privacyNote: "Afbeeldingen worden op je apparaat verwerkt en niet naar onze servers geüpload.",
     formatNote: "Sommige formaten zijn afhankelijk van browserondersteuning.",
     batchLimitNote: "Verwerk voor stabiliteit maximaal 50 afbeeldingen per batch.",
@@ -630,6 +659,10 @@ const translatedAddons = {
   },
   pl: {
     trustText: "Idealne dla sklepów online, katalogów, marketplace'ów i zespołów przetwarzających wiele zdjęć.",
+    paidKicker: "Płatny dostęp już wkrótce",
+    paidTitle: "Przetwarzasz obrazy co tydzień?",
+    paidText: "Przygotowujemy plany dla sklepów i zespołów, które usuwają tła na większą skalę.",
+    paidButton: "Poproś o płatny dostęp",
     privacyNote: "Obrazy są przetwarzane na Twoim urządzeniu i nie są przesyłane na nasze serwery.",
     formatNote: "Niektóre formaty mogą zależeć od obsługi w przeglądarce.",
     batchLimitNote: "Dla stabilności przetwarzaj do 50 obrazów na partię.",
@@ -642,6 +675,10 @@ const translatedAddons = {
   },
   sv: {
     trustText: "Perfekt för webbutiker, kataloger, marknadsplatser och team som hanterar många bilder.",
+    paidKicker: "Betald åtkomst kommer snart",
+    paidTitle: "Behöver du bearbeta bilder varje vecka?",
+    paidText: "Vi förbereder planer för butiker och team som behöver ta bort bakgrunder i volym.",
+    paidButton: "Begär betald åtkomst",
     privacyNote: "Bilderna bearbetas på din enhet och laddas inte upp till våra servrar.",
     formatNote: "Vissa format kan bero på webbläsarens stöd.",
     batchLimitNote: "För stabilitet, bearbeta upp till 50 bilder per batch.",
@@ -654,6 +691,10 @@ const translatedAddons = {
   },
   da: {
     trustText: "Ideel til webshops, kataloger, markedspladser og teams, der behandler mange billeder.",
+    paidKicker: "Betalt adgang kommer snart",
+    paidTitle: "Skal du behandle billeder hver uge?",
+    paidText: "Vi forbereder planer til butikker og teams, der skal fjerne baggrunde i stort omfang.",
+    paidButton: "Anmod om betalt adgang",
     privacyNote: "Billederne behandles på din enhed og uploades ikke til vores servere.",
     formatNote: "Nogle formater kan afhænge af browserunderstøttelse.",
     batchLimitNote: "For stabilitet, behandl op til 50 billeder pr. batch.",
@@ -666,6 +707,10 @@ const translatedAddons = {
   },
   no: {
     trustText: "Ideelt for nettbutikker, kataloger, markedsplasser og team som håndterer mange bilder.",
+    paidKicker: "Betalt tilgang kommer snart",
+    paidTitle: "Trenger du å behandle bilder hver uke?",
+    paidText: "Vi forbereder planer for butikker og team som må fjerne bakgrunner i stort volum.",
+    paidButton: "Be om betalt tilgang",
     privacyNote: "Bildene behandles på enheten din og lastes ikke opp til serverne våre.",
     formatNote: "Noen formater kan avhenge av nettleserstøtte.",
     batchLimitNote: "For stabilitet, behandle opptil 50 bilder per batch.",
@@ -678,6 +723,10 @@ const translatedAddons = {
   },
   fi: {
     trustText: "Ihanteellinen verkkokaupoille, katalogeille, markkinapaikoille ja tiimeille, jotka käsittelevät paljon kuvia.",
+    paidKicker: "Maksullinen käyttö tulossa pian",
+    paidTitle: "Käsitteletkö kuvia joka viikko?",
+    paidText: "Valmistelemme paketteja kaupoille ja tiimeille, jotka poistavat taustoja suurina määrinä.",
+    paidButton: "Pyydä maksullista käyttöä",
     privacyNote: "Kuvat käsitellään laitteellasi eikä niitä ladata palvelimillemme.",
     formatNote: "Jotkin muodot voivat riippua selaimen tuesta.",
     batchLimitNote: "Vakauden vuoksi käsittele enintään 50 kuvaa erässä.",
@@ -980,6 +1029,7 @@ processButton.addEventListener("click", processImages);
 pngButton.addEventListener("click", downloadSinglePng);
 zipButton.addEventListener("click", downloadZip);
 clearButton.addEventListener("click", clearAll);
+paidAccessLink.addEventListener("click", () => trackEvent("paid_access_requested"));
 
 for (const eventName of ["dragenter", "dragover"]) {
   dropzone.addEventListener(eventName, (event) => {
