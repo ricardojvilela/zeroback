@@ -567,3 +567,51 @@ progress::-moz-progress-bar {
     font-size: clamp(2.8rem, 8vw, 4.2rem);
   }
 }
+
+
+.paid-access {
+  margin-top: 22px;
+  border: 1px solid rgba(81, 215, 198, 0.28);
+  border-radius: 8px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.paid-kicker {
+  margin: 0 0 8px;
+  color: #51d7c6;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.paid-access h2 {
+  margin-bottom: 8px;
+  color: #fff;
+  font-size: 1.05rem;
+  line-height: 1.25;
+}
+
+.paid-access p:not(.paid-kicker) {
+  margin-bottom: 14px;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.paid-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  width: 100%;
+  border-radius: 8px;
+  background: #51d7c6;
+  color: #0d1722;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.paid-button:hover {
+  background: #ffffff;
+}
