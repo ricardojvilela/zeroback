@@ -615,3 +615,5 @@ progress::-moz-progress-bar {
 .paid-button:hover {
   background: #ffffff;
 }
+
+.paid-access{display:none!important;}
