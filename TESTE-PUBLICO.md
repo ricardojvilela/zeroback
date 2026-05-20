@@ -1,4 +1,4 @@
-# Teste público - Remover Fundo em Lote
+# Teste público - BatchCutout
 
 Use este guião quando enviar o link de teste a utilizadores reais.
 
@@ -28,4 +28,3 @@ Use este guião quando enviar o link de teste a utilizadores reais.
 - Testar em Chrome e Edge.
 - Testar em janela anónima para simular primeira utilização.
 - Não ativar pagamentos nesta fase.
-
