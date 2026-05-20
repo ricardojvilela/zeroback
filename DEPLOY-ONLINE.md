@@ -1,4 +1,4 @@
-# Publicar o Remover Fundo em Lote online
+# Publicar o BatchCutout online
 
 Esta versão pode ser publicada como site estático para teste. As imagens são processadas no navegador do utilizador e não são enviadas para um servidor próprio.
 
@@ -52,4 +52,3 @@ Existem duas formas de evoluir:
    - Exige armazenamento temporário seguro e políticas claras sobre imagens.
 
 Para teste público inicial, manter processamento no navegador é suficiente.
-
