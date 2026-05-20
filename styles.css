@@ -553,3 +553,17 @@ progress::-moz-progress-bar {
     width: 100%;
   }
 }
+
+
+.brand-panel h1 {
+  max-width: 100%;
+  font-size: clamp(2.55rem, 3.7vw, 3.15rem);
+  line-height: 1;
+  overflow-wrap: normal;
+}
+
+@media (max-width: 1040px) {
+  .brand-panel h1 {
+    font-size: clamp(2.8rem, 8vw, 4.2rem);
+  }
+}
