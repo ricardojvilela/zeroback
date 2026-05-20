@@ -1,5 +1,5 @@
 {
-  "name": "remover-fundo-em-lote",
+  "name": "batchcutout",
   "version": "0.1.0",
   "private": true,
   "type": "module",
