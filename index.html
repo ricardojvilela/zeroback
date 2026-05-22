@@ -124,6 +124,40 @@
           <span id="statusText">A aguardar fotos</span>
           <progress id="progressBar" value="0" max="100"></progress>
         </div>
+
+        <section class="pro-interest" aria-labelledby="pro-title">
+          <p class="section-kicker" data-i18n="proKicker">Para equipas e lojas</p>
+          <h2 id="pro-title" data-i18n="proTitle">Precisa de processar centenas de fotos?</h2>
+          <p data-i18n="proLead">
+            Estamos a preparar acesso Pro para volumes maiores, suporte prioritário e fluxos pensados para catálogos.
+          </p>
+          <form class="pro-form" id="proForm">
+            <input
+              id="proEmail"
+              type="email"
+              autocomplete="email"
+              required
+              data-i18n-placeholder="proEmailPlaceholder"
+              placeholder="O seu email"
+            />
+            <input
+              id="proCompany"
+              type="text"
+              autocomplete="organization"
+              data-i18n-placeholder="proCompanyPlaceholder"
+              placeholder="Loja ou empresa"
+            />
+            <select id="proVolume" data-i18n-aria="proVolumeLabel" aria-label="Volume mensal estimado">
+              <option value="100-500">100-500</option>
+              <option value="500-2000">500-2.000</option>
+              <option value="2000+">2.000+</option>
+            </select>
+            <button type="submit" data-i18n="proCta">Quero acesso Pro</button>
+          </form>
+          <p class="pro-message hidden" id="proMessage" data-i18n="proMessage">
+            Obrigado. Vamos abrir uma mensagem de email para registar o seu interesse.
+          </p>
+        </section>
       </section>
 
       <section class="results" data-i18n-aria="resultsLabel" aria-label="Fotos processadas">

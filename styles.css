@@ -33,7 +33,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -360,6 +361,64 @@ h2 {
   margin-top: 18px;
   color: var(--muted);
   font-size: 0.92rem;
+}
+
+.pro-interest {
+  margin-top: 22px;
+  border: 1px solid rgba(38, 70, 216, 0.16);
+  border-radius: 8px;
+  padding: 18px;
+  background: linear-gradient(180deg, #f8fbff, #f4faf8);
+}
+
+.pro-interest h2 {
+  font-size: 1.15rem;
+}
+
+.pro-interest p {
+  margin: 10px 0 0;
+  color: #52606d;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.pro-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.pro-form input,
+.pro-form select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: #fff;
+  color: var(--ink);
+}
+
+.pro-form input:focus,
+.pro-form select:focus {
+  border-color: var(--blue);
+  outline: 3px solid rgba(38, 70, 216, 0.14);
+}
+
+.pro-form button {
+  background: var(--charcoal);
+}
+
+.pro-form button:hover:not(:disabled) {
+  background: #0c1117;
+}
+
+.pro-message {
+  min-height: 20px;
+}
+
+.hidden {
+  display: none;
 }
 
 progress {

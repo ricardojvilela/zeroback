@@ -13,6 +13,11 @@ const emptyState = document.querySelector("#emptyState");
 const statusText = document.querySelector("#statusText");
 const progressBar = document.querySelector("#progressBar");
 const countText = document.querySelector("#countText");
+const proForm = document.querySelector("#proForm");
+const proEmail = document.querySelector("#proEmail");
+const proCompany = document.querySelector("#proCompany");
+const proVolume = document.querySelector("#proVolume");
+const proMessage = document.querySelector("#proMessage");
 
 const maxFilesPerBatch = 50;
 
@@ -694,6 +699,37 @@ for (const [language, values] of Object.entries(translatedAddons)) {
   Object.assign(translations[language], values);
 }
 
+const proTranslations = {
+  pt: {
+    proKicker: "Para equipas e lojas",
+    proTitle: "Precisa de processar centenas de fotos?",
+    proLead: "Estamos a preparar acesso Pro para volumes maiores, suporte priorit\u00e1rio e fluxos pensados para cat\u00e1logos.",
+    proEmailPlaceholder: "O seu email",
+    proCompanyPlaceholder: "Loja ou empresa",
+    proVolumeLabel: "Volume mensal estimado",
+    proCta: "Quero acesso Pro",
+    proMessage: "Obrigado. Vamos abrir uma mensagem de email para registar o seu interesse.",
+    proEmailSubject: "Interesse no BatchCutout Pro",
+    proEmailBody: "Tenho interesse no acesso Pro do BatchCutout.%0A%0AEmail: {email}%0AEmpresa: {company}%0AVolume mensal estimado: {volume} imagens%0AIdioma: {language}",
+  },
+  en: {
+    proKicker: "For teams and stores",
+    proTitle: "Need to process hundreds of photos?",
+    proLead: "We are preparing Pro access for larger volumes, priority support, and workflows built for catalogues.",
+    proEmailPlaceholder: "Your email",
+    proCompanyPlaceholder: "Store or company",
+    proVolumeLabel: "Estimated monthly volume",
+    proCta: "I want Pro access",
+    proMessage: "Thank you. We will open an email message to register your interest.",
+    proEmailSubject: "Interest in BatchCutout Pro",
+    proEmailBody: "I am interested in BatchCutout Pro access.%0A%0AEmail: {email}%0ACompany: {company}%0AEstimated monthly volume: {volume} images%0ALanguage: {language}",
+  },
+};
+
+for (const language of Object.keys(translations)) {
+  Object.assign(translations[language], proTranslations[language] || proTranslations.en);
+}
+
 let items = [];
 let currentLanguage = localStorage.getItem("language") || detectLanguage();
 let engineHasLoaded = false;
@@ -750,6 +786,10 @@ function applyLanguage() {
 
   for (const element of document.querySelectorAll("[data-i18n-aria]")) {
     element.setAttribute("aria-label", t(element.dataset.i18nAria));
+  }
+
+  for (const element of document.querySelectorAll("[data-i18n-placeholder]")) {
+    element.setAttribute("placeholder", t(element.dataset.i18nPlaceholder));
   }
 
   languageSelect.value = currentLanguage;
@@ -969,6 +1009,50 @@ function clearAll() {
   render();
 }
 
+function submitProInterest(event) {
+  event.preventDefault();
+
+  if (!proEmail.checkValidity()) {
+    proEmail.reportValidity();
+    return;
+  }
+
+  const email = proEmail.value.trim();
+  const company = proCompany.value.trim() || "-";
+  const volume = proVolume.value;
+  const lead = {
+    email,
+    company,
+    volume,
+    language: currentLanguage,
+    submittedAt: new Date().toISOString(),
+  };
+
+  localStorage.setItem("batchcutoutProLead", JSON.stringify(lead));
+  trackEvent("pro_interest_submitted", {
+    volume,
+    hasCompany: company !== "-",
+    language: currentLanguage,
+  });
+  window.gtag?.("event", "generate_lead", {
+    event_category: "commercial_intent",
+    event_label: volume,
+  });
+
+  proMessage.classList.remove("hidden");
+  proMessage.textContent = t("proMessage");
+
+  const subject = encodeURIComponent(t("proEmailSubject"));
+  const body = t("proEmailBody", {
+    email: encodeURIComponent(email),
+    company: encodeURIComponent(company),
+    volume: encodeURIComponent(volume),
+    language: encodeURIComponent(currentLanguage),
+  });
+
+  window.location.href = `mailto:ricardojvilela@gmail.com?subject=${subject}&body=${body}`;
+}
+
 languageSelect.addEventListener("change", (event) => {
   currentLanguage = event.target.value;
   localStorage.setItem("language", currentLanguage);
@@ -980,6 +1064,7 @@ processButton.addEventListener("click", processImages);
 pngButton.addEventListener("click", downloadSinglePng);
 zipButton.addEventListener("click", downloadZip);
 clearButton.addEventListener("click", clearAll);
+proForm.addEventListener("submit", submitProInterest);
 
 for (const eventName of ["dragenter", "dragover", "dragleave", "drop"]) {
   document.addEventListener(eventName, (event) => {
