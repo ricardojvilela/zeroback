@@ -60,10 +60,13 @@ button:disabled {
 
 .app-shell {
   display: grid;
-  grid-template-columns: minmax(280px, 360px) minmax(320px, 430px) minmax(0, 1fr);
-  gap: 18px;
-  width: min(1240px, calc(100% - 32px));
-  margin: 24px auto;
+  grid-template-areas:
+    "brand workspace"
+    "results results";
+  grid-template-columns: minmax(320px, 390px) minmax(520px, 1fr);
+  gap: 20px;
+  width: min(1180px, calc(100% - 32px));
+  margin: 22px auto 32px;
 }
 
 .brand-panel,
@@ -75,8 +78,11 @@ button:disabled {
 }
 
 .brand-panel {
+  grid-area: brand;
   align-self: start;
-  min-height: calc(100vh - 48px);
+  position: sticky;
+  top: 22px;
+  min-height: calc(100vh - 44px);
   padding: 26px;
   background:
     linear-gradient(150deg, rgba(23, 32, 42, 0.96), rgba(21, 37, 59, 0.94)),
@@ -283,8 +289,9 @@ h2 {
 }
 
 .workspace {
+  grid-area: workspace;
   align-self: start;
-  padding: 22px;
+  padding: 26px;
 }
 
 .tool-header,
@@ -311,10 +318,11 @@ h2 {
 }
 
 .dropzone {
+  position: relative;
   display: grid;
   place-items: center;
-  min-height: 278px;
-  margin-top: 24px;
+  min-height: 330px;
+  margin-top: 22px;
   border: 2px dashed rgba(15, 139, 124, 0.58);
   border-radius: 8px;
   background:
@@ -331,6 +339,7 @@ h2 {
   background-size: 24px 24px;
   cursor: pointer;
   text-align: center;
+  outline: 8px solid rgba(15, 139, 124, 0.05);
   transition:
     border-color 160ms ease,
     background-color 160ms ease,
@@ -353,16 +362,29 @@ h2 {
   pointer-events: none;
 }
 
+.dropzone-badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: #ffffff;
+  color: var(--accent-strong);
+  font-size: 0.78rem;
+  font-weight: 900;
+  box-shadow: 0 8px 22px rgba(26, 39, 57, 0.1);
+}
+
 .dropzone-icon {
   display: grid;
   place-items: center;
-  width: 62px;
-  height: 62px;
-  margin-bottom: 14px;
+  width: 74px;
+  height: 74px;
+  margin-bottom: 16px;
   border-radius: 999px;
   background: var(--blue);
   color: white;
-  font-size: 2.2rem;
+  font-size: 2.6rem;
   font-weight: 700;
   box-shadow: 0 12px 26px rgba(38, 70, 216, 0.28);
 }
@@ -373,18 +395,20 @@ h2 {
 }
 
 .dropzone-title {
-  font-size: 1.2rem;
+  font-size: 1.45rem;
   font-weight: 950;
 }
 
 .dropzone-meta {
-  margin-top: 4px;
+  max-width: 30rem;
+  margin-top: 7px;
   color: var(--muted);
-  font-size: 0.92rem;
+  font-size: 0.98rem;
 }
 
 .info-list {
   display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   margin-top: 14px;
 }
@@ -401,7 +425,7 @@ h2 {
 
 .actions {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(180px, 1.4fr) 1fr 1fr;
   margin-top: 18px;
 }
 
@@ -449,6 +473,7 @@ h2 {
 
 .audience-list {
   display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 10px;
   margin-top: 14px;
 }
@@ -493,8 +518,13 @@ h2 {
 
 .pro-form {
   display: grid;
+  grid-template-columns: 1.2fr 1fr 0.9fr;
   gap: 10px;
   margin-top: 14px;
+}
+
+.pro-form button {
+  grid-column: 1 / -1;
 }
 
 .pro-form input,
@@ -562,7 +592,8 @@ progress::-moz-progress-bar {
 }
 
 .results {
-  min-height: calc(100vh - 48px);
+  grid-area: results;
+  min-height: 420px;
   padding: 22px;
 }
 
@@ -577,11 +608,34 @@ progress::-moz-progress-bar {
 }
 
 .empty-state {
+  position: relative;
   display: grid;
-  min-height: 300px;
+  min-height: 220px;
   place-items: center;
   color: var(--muted);
   text-align: center;
+}
+
+.empty-state::before {
+  display: block;
+  width: 86px;
+  height: 86px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background-color: #f1f5f7;
+  background-image:
+    linear-gradient(45deg, #dfe7ec 25%, transparent 25%),
+    linear-gradient(-45deg, #dfe7ec 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #dfe7ec 75%),
+    linear-gradient(-45deg, transparent 75%, #dfe7ec 75%);
+  background-position:
+    0 0,
+    0 8px,
+    8px -8px,
+    -8px 0;
+  background-size: 16px 16px;
+  box-shadow: inset 0 0 0 1px var(--line);
+  content: "";
 }
 
 .empty-state.hidden {
@@ -792,11 +846,15 @@ progress::-moz-progress-bar {
 
 @media (max-width: 1040px) {
   .app-shell {
-    grid-template-columns: minmax(280px, 420px) minmax(0, 1fr);
+    grid-template-areas:
+      "brand"
+      "workspace"
+      "results";
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .brand-panel {
-    grid-column: 1 / -1;
+    position: static;
     min-height: auto;
   }
 
@@ -818,6 +876,52 @@ progress::-moz-progress-bar {
 
   .results {
     min-height: 320px;
+  }
+
+  .brand-panel,
+  .workspace,
+  .results {
+    padding: 20px;
+  }
+
+  .brand-top {
+    margin-bottom: 16px;
+  }
+
+  .brand-panel h1 {
+    margin-bottom: 10px;
+    font-size: 2.45rem;
+  }
+
+  .lead {
+    margin-bottom: 16px;
+    font-size: 0.96rem;
+  }
+
+  .proof-strip {
+    gap: 7px;
+    margin-top: 18px;
+  }
+
+  .proof-strip span {
+    padding: 8px 10px;
+    font-size: 0.88rem;
+  }
+
+  .trust-copy,
+  .demo-showcase {
+    display: none;
+  }
+
+  .dropzone {
+    min-height: 270px;
+  }
+
+  .info-list,
+  .actions,
+  .audience-list,
+  .pro-form {
+    grid-template-columns: 1fr;
   }
 
   .tool-header,
