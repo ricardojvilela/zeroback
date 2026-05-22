@@ -794,9 +794,32 @@ let items = [];
 let currentLanguage = localStorage.getItem("language") || detectLanguage();
 let engineHasLoaded = false;
 
+const analyticsEvents = {
+  brand_cta_clicked: { category: "engagement", label: "start_free" },
+  photos_selected: { category: "upload", label: "photos_selected" },
+  upload_rejected: { category: "upload", label: "upload_rejected" },
+  background_removal_started: { category: "processing", label: "started" },
+  background_removal_finished: { category: "processing", label: "finished" },
+  png_downloaded: { category: "download", label: "single_png" },
+  zip_downloaded: { category: "download", label: "zip" },
+  pro_interest_prompt_clicked: { category: "commercial_intent", label: "pro_interest" },
+  pro_lead_submitted: { category: "commercial_intent", label: "pro_lead" },
+};
+
 function trackEvent(name, detail = {}) {
+  const config = analyticsEvents[name] || { category: "interaction", label: name };
+  const numericValue = Number(detail.count || detail.totalInQueue || detail.accepted || detail.value || 0);
+  const eventParams = {
+    event_category: config.category,
+    event_label: detail.reason || detail.volume || config.label,
+    value: Number.isFinite(numericValue) ? numericValue : 0,
+    language: currentLanguage,
+    ...detail,
+  };
+
   window.dispatchEvent(new CustomEvent("rfel:analytics", { detail: { name, ...detail } }));
   window.dataLayer?.push({ event: name, ...detail });
+  window.gtag?.("event", name, eventParams);
 }
 
 function detectLanguage() {
@@ -1104,10 +1127,6 @@ function trackLeadConversion(volume, hasCompany) {
     language: currentLanguage,
   });
   window.gtag?.("event", "generate_lead", {
-    event_category: "commercial_intent",
-    event_label: volume,
-  });
-  window.gtag?.("event", "pro_lead_submitted", {
     event_category: "commercial_intent",
     event_label: volume,
   });
