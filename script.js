@@ -1158,6 +1158,7 @@ async function submitProInterest(event) {
     proMessage.classList.remove("hidden");
     proMessage.textContent = t("proMessage");
     proForm.reset();
+    window.location.href = "./obrigado.html";
   } catch (error) {
     console.error(error);
     trackLeadConversion(volume, hasCompany);

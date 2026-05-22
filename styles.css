@@ -739,6 +739,57 @@ progress::-moz-progress-bar {
   color: var(--accent-strong);
 }
 
+.thanks-page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px;
+}
+
+.thanks-panel {
+  width: min(640px, 100%);
+  border: 1px solid rgba(219, 227, 238, 0.9);
+  border-radius: 8px;
+  padding: 34px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: var(--shadow);
+}
+
+.thanks-panel h1 {
+  margin-bottom: 16px;
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  line-height: 1;
+}
+
+.thanks-panel p:not(.section-kicker) {
+  color: #52606d;
+  line-height: 1.65;
+}
+
+.thanks-panel .brand-mark {
+  margin-bottom: 22px;
+  background: var(--charcoal);
+  color: #fff;
+}
+
+.thanks-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  margin-top: 18px;
+  border-radius: 8px;
+  padding: 0 18px;
+  background: var(--blue);
+  color: #fff;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.thanks-button:hover {
+  background: var(--blue-strong);
+}
+
 @media (max-width: 1040px) {
   .app-shell {
     grid-template-columns: minmax(280px, 420px) minmax(0, 1fr);
