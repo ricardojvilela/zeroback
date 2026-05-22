@@ -363,6 +363,18 @@ h2 {
   font-size: 0.92rem;
 }
 
+.status-pro-button {
+  min-height: 36px;
+  padding: 0 12px;
+  background: var(--charcoal);
+  font-size: 0.84rem;
+  white-space: nowrap;
+}
+
+.status-pro-button:hover:not(:disabled) {
+  background: #0c1117;
+}
+
 .pro-interest {
   margin-top: 22px;
   border: 1px solid rgba(38, 70, 216, 0.16);

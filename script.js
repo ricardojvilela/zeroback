@@ -11,6 +11,7 @@ const clearButton = document.querySelector("#clearButton");
 const imageGrid = document.querySelector("#imageGrid");
 const emptyState = document.querySelector("#emptyState");
 const statusText = document.querySelector("#statusText");
+const proPromptButton = document.querySelector("#proPromptButton");
 const progressBar = document.querySelector("#progressBar");
 const countText = document.querySelector("#countText");
 const proForm = document.querySelector("#proForm");
@@ -19,7 +20,7 @@ const proCompany = document.querySelector("#proCompany");
 const proVolume = document.querySelector("#proVolume");
 const proMessage = document.querySelector("#proMessage");
 
-const maxFilesPerBatch = 50;
+const maxFilesPerBatch = 20;
 
 const supportedExtensions = [
   ".jpg",
@@ -553,9 +554,9 @@ const translatedAddons = {
     trustText: "Ideal para lojas online, catálogos, marketplaces e equipas que tratam muitas imagens.",
     privacyNote: "As imagens são processadas no seu dispositivo e não são carregadas para os nossos servidores.",
     formatNote: "Alguns formatos podem depender do suporte do navegador.",
-    batchLimitNote: "Para garantir estabilidade, processe até 50 imagens por lote.",
+    batchLimitNote: "O modo gratuito permite até 20 imagens por lote.",
     privacyLink: "Privacidade e termos",
-    statusTooManyFiles: "Limite de 50 imagens por lote. Foram adicionadas {count}.",
+    statusTooManyFiles: "O modo gratuito permite até 20 imagens por lote. Para volumes maiores, peça acesso Pro.",
     statusNoSupportedFiles: "Nenhum ficheiro de imagem suportado foi encontrado.",
     statusEngineLoading: "A carregar o motor de remoção. A primeira vez pode demorar mais.",
     statusError: "não foi possível processar. Experimente JPG, PNG ou WebP.",
@@ -565,9 +566,9 @@ const translatedAddons = {
     trustText: "Ideal for online stores, catalogues, marketplaces, and teams handling many images.",
     privacyNote: "Images are processed on your device and are not uploaded to our servers.",
     formatNote: "Some formats may depend on browser support.",
-    batchLimitNote: "For stability, process up to 50 images per batch.",
+    batchLimitNote: "Free mode allows up to 20 images per batch.",
     privacyLink: "Privacy and terms",
-    statusTooManyFiles: "Limit of 50 images per batch. {count} were added.",
+    statusTooManyFiles: "Free mode allows up to 20 images per batch. For larger volumes, request Pro access.",
     statusNoSupportedFiles: "No supported image file was found.",
     statusEngineLoading: "Loading the removal engine. The first run may take longer.",
     statusError: "could not be processed. Try JPG, PNG, or WebP.",
@@ -577,9 +578,9 @@ const translatedAddons = {
     trustText: "Ideal para tiendas online, catálogos, marketplaces y equipos que gestionan muchas imágenes.",
     privacyNote: "Las imágenes se procesan en tu dispositivo y no se suben a nuestros servidores.",
     formatNote: "Algunos formatos pueden depender del soporte del navegador.",
-    batchLimitNote: "Para garantizar estabilidad, procesa hasta 50 imágenes por lote.",
+    batchLimitNote: "El modo gratuito permite hasta 20 imágenes por lote.",
     privacyLink: "Privacidad y términos",
-    statusTooManyFiles: "Límite de 50 imágenes por lote. Se añadieron {count}.",
+    statusTooManyFiles: "El modo gratuito permite hasta 20 imágenes por lote. Para más volumen, solicita acceso Pro.",
     statusNoSupportedFiles: "No se encontró ningún archivo de imagen compatible.",
     statusEngineLoading: "Cargando el motor de eliminación. La primera vez puede tardar más.",
     statusError: "no se pudo procesar. Prueba JPG, PNG o WebP.",
@@ -589,9 +590,9 @@ const translatedAddons = {
     trustText: "Idéal pour les boutiques en ligne, les catalogues, les marketplaces et les équipes qui traitent beaucoup d'images.",
     privacyNote: "Les images sont traitées sur votre appareil et ne sont pas envoyées à nos serveurs.",
     formatNote: "Certains formats peuvent dépendre de la prise en charge du navigateur.",
-    batchLimitNote: "Pour garantir la stabilité, traitez jusqu'à 50 images par lot.",
+    batchLimitNote: "Le mode gratuit permet jusqu'à 20 images par lot.",
     privacyLink: "Confidentialité et conditions",
-    statusTooManyFiles: "Limite de 50 images par lot. {count} ont été ajoutées.",
+    statusTooManyFiles: "Le mode gratuit permet jusqu'à 20 images par lot. Pour plus de volume, demandez l'accès Pro.",
     statusNoSupportedFiles: "Aucun fichier image compatible n'a été trouvé.",
     statusEngineLoading: "Chargement du moteur de suppression. La première fois peut prendre plus de temps.",
     statusError: "n'a pas pu être traité. Essayez JPG, PNG ou WebP.",
@@ -601,9 +602,9 @@ const translatedAddons = {
     trustText: "Ideal für Online-Shops, Kataloge, Marktplätze und Teams, die viele Bilder bearbeiten.",
     privacyNote: "Bilder werden auf Ihrem Gerät verarbeitet und nicht auf unsere Server hochgeladen.",
     formatNote: "Einige Formate können von der Browser-Unterstützung abhängen.",
-    batchLimitNote: "Für stabile Ergebnisse bis zu 50 Bilder pro Stapel verarbeiten.",
+    batchLimitNote: "Der kostenlose Modus erlaubt bis zu 20 Bilder pro Stapel.",
     privacyLink: "Datenschutz und Bedingungen",
-    statusTooManyFiles: "Limit von 50 Bildern pro Stapel. {count} wurden hinzugefügt.",
+    statusTooManyFiles: "Der kostenlose Modus erlaubt bis zu 20 Bilder pro Stapel. Für größere Mengen Pro-Zugang anfragen.",
     statusNoSupportedFiles: "Keine unterstützte Bilddatei gefunden.",
     statusEngineLoading: "Entfernungsmodul wird geladen. Der erste Lauf kann länger dauern.",
     statusError: "konnte nicht verarbeitet werden. Versuchen Sie JPG, PNG oder WebP.",
@@ -613,9 +614,9 @@ const translatedAddons = {
     trustText: "Ideale per negozi online, cataloghi, marketplace e team che gestiscono molte immagini.",
     privacyNote: "Le immagini vengono elaborate sul tuo dispositivo e non vengono caricate sui nostri server.",
     formatNote: "Alcuni formati possono dipendere dal supporto del browser.",
-    batchLimitNote: "Per garantire stabilità, elabora fino a 50 immagini per lotto.",
+    batchLimitNote: "La modalità gratuita consente fino a 20 immagini per lotto.",
     privacyLink: "Privacy e termini",
-    statusTooManyFiles: "Limite di 50 immagini per lotto. Ne sono state aggiunte {count}.",
+    statusTooManyFiles: "La modalità gratuita consente fino a 20 immagini per lotto. Per volumi maggiori, richiedi l'accesso Pro.",
     statusNoSupportedFiles: "Nessun file immagine supportato trovato.",
     statusEngineLoading: "Caricamento del motore di rimozione. La prima volta può richiedere più tempo.",
     statusError: "non è stato possibile elaborarla. Prova JPG, PNG o WebP.",
@@ -625,9 +626,9 @@ const translatedAddons = {
     trustText: "Ideaal voor webshops, catalogi, marketplaces en teams die veel afbeeldingen verwerken.",
     privacyNote: "Afbeeldingen worden op je apparaat verwerkt en niet naar onze servers geüpload.",
     formatNote: "Sommige formaten zijn afhankelijk van browserondersteuning.",
-    batchLimitNote: "Verwerk voor stabiliteit maximaal 50 afbeeldingen per batch.",
+    batchLimitNote: "De gratis modus staat maximaal 20 afbeeldingen per batch toe.",
     privacyLink: "Privacy en voorwaarden",
-    statusTooManyFiles: "Limiet van 50 afbeeldingen per batch. {count} zijn toegevoegd.",
+    statusTooManyFiles: "De gratis modus staat maximaal 20 afbeeldingen per batch toe. Vraag Pro-toegang aan voor grotere volumes.",
     statusNoSupportedFiles: "Geen ondersteund afbeeldingsbestand gevonden.",
     statusEngineLoading: "Verwijderingsengine laden. De eerste keer kan langer duren.",
     statusError: "kon niet worden verwerkt. Probeer JPG, PNG of WebP.",
@@ -637,9 +638,9 @@ const translatedAddons = {
     trustText: "Idealne dla sklepów online, katalogów, marketplace'ów i zespołów przetwarzających wiele zdjęć.",
     privacyNote: "Obrazy są przetwarzane na Twoim urządzeniu i nie są przesyłane na nasze serwery.",
     formatNote: "Niektóre formaty mogą zależeć od obsługi w przeglądarce.",
-    batchLimitNote: "Dla stabilności przetwarzaj do 50 obrazów na partię.",
+    batchLimitNote: "Tryb darmowy pozwala przetworzyć do 20 obrazów na partię.",
     privacyLink: "Prywatność i warunki",
-    statusTooManyFiles: "Limit 50 obrazów na partię. Dodano {count}.",
+    statusTooManyFiles: "Tryb darmowy pozwala przetworzyć do 20 obrazów na partię. Przy większych wolumenach poproś o dostęp Pro.",
     statusNoSupportedFiles: "Nie znaleziono obsługiwanego pliku obrazu.",
     statusEngineLoading: "Ładowanie silnika usuwania. Pierwsze uruchomienie może potrwać dłużej.",
     statusError: "nie można było przetworzyć. Spróbuj JPG, PNG lub WebP.",
@@ -649,9 +650,9 @@ const translatedAddons = {
     trustText: "Perfekt för webbutiker, kataloger, marknadsplatser och team som hanterar många bilder.",
     privacyNote: "Bilderna bearbetas på din enhet och laddas inte upp till våra servrar.",
     formatNote: "Vissa format kan bero på webbläsarens stöd.",
-    batchLimitNote: "För stabilitet, bearbeta upp till 50 bilder per batch.",
+    batchLimitNote: "Gratisläget tillåter upp till 20 bilder per batch.",
     privacyLink: "Integritet och villkor",
-    statusTooManyFiles: "Gräns på 50 bilder per batch. {count} lades till.",
+    statusTooManyFiles: "Gratisläget tillåter upp till 20 bilder per batch. För större volymer, begär Pro-åtkomst.",
     statusNoSupportedFiles: "Ingen bildfil som stöds hittades.",
     statusEngineLoading: "Laddar borttagningsmotorn. Första gången kan ta längre tid.",
     statusError: "kunde inte bearbetas. Prova JPG, PNG eller WebP.",
@@ -661,9 +662,9 @@ const translatedAddons = {
     trustText: "Ideel til webshops, kataloger, markedspladser og teams, der behandler mange billeder.",
     privacyNote: "Billederne behandles på din enhed og uploades ikke til vores servere.",
     formatNote: "Nogle formater kan afhænge af browserunderstøttelse.",
-    batchLimitNote: "For stabilitet, behandl op til 50 billeder pr. batch.",
+    batchLimitNote: "Gratis tilstand tillader op til 20 billeder pr. batch.",
     privacyLink: "Privatliv og vilkår",
-    statusTooManyFiles: "Grænse på 50 billeder pr. batch. {count} blev tilføjet.",
+    statusTooManyFiles: "Gratis tilstand tillader op til 20 billeder pr. batch. Ved større mængder kan du anmode om Pro-adgang.",
     statusNoSupportedFiles: "Ingen understøttet billedfil blev fundet.",
     statusEngineLoading: "Indlæser fjernelsesmotoren. Første gang kan tage længere tid.",
     statusError: "kunne ikke behandles. Prøv JPG, PNG eller WebP.",
@@ -673,9 +674,9 @@ const translatedAddons = {
     trustText: "Ideelt for nettbutikker, kataloger, markedsplasser og team som håndterer mange bilder.",
     privacyNote: "Bildene behandles på enheten din og lastes ikke opp til serverne våre.",
     formatNote: "Noen formater kan avhenge av nettleserstøtte.",
-    batchLimitNote: "For stabilitet, behandle opptil 50 bilder per batch.",
+    batchLimitNote: "Gratisversjonen tillater opptil 20 bilder per batch.",
     privacyLink: "Personvern og vilkår",
-    statusTooManyFiles: "Grense på 50 bilder per batch. {count} ble lagt til.",
+    statusTooManyFiles: "Gratisversjonen tillater opptil 20 bilder per batch. For større volum, be om Pro-tilgang.",
     statusNoSupportedFiles: "Ingen støttet bildefil ble funnet.",
     statusEngineLoading: "Laster fjerningsmotoren. Første gang kan ta lengre tid.",
     statusError: "kunne ikke behandles. Prøv JPG, PNG eller WebP.",
@@ -685,9 +686,9 @@ const translatedAddons = {
     trustText: "Ihanteellinen verkkokaupoille, katalogeille, markkinapaikoille ja tiimeille, jotka käsittelevät paljon kuvia.",
     privacyNote: "Kuvat käsitellään laitteellasi eikä niitä ladata palvelimillemme.",
     formatNote: "Jotkin muodot voivat riippua selaimen tuesta.",
-    batchLimitNote: "Vakauden vuoksi käsittele enintään 50 kuvaa erässä.",
+    batchLimitNote: "Ilmainen tila sallii enintään 20 kuvaa erässä.",
     privacyLink: "Tietosuoja ja ehdot",
-    statusTooManyFiles: "Raja on 50 kuvaa erässä. Lisättiin {count}.",
+    statusTooManyFiles: "Ilmainen tila sallii enintään 20 kuvaa erässä. Suurempia määriä varten pyydä Pro-käyttöoikeutta.",
     statusNoSupportedFiles: "Tuettua kuvatiedostoa ei löytynyt.",
     statusEngineLoading: "Ladataan poistomoottoria. Ensimmäinen kerta voi kestää pidempään.",
     statusError: "ei voitu käsitellä. Kokeile JPG-, PNG- tai WebP-muotoa.",
@@ -708,6 +709,7 @@ const proTranslations = {
     proCompanyPlaceholder: "Loja ou empresa",
     proVolumeLabel: "Volume mensal estimado",
     proCta: "Quero acesso Pro",
+    proLimitCta: "Pedir acesso Pro",
     proMessage: "Obrigado. Vamos abrir uma mensagem de email para registar o seu interesse.",
     proEmailSubject: "Interesse no BatchCutout Pro",
     proEmailBody: "Tenho interesse no acesso Pro do BatchCutout.%0A%0AEmail: {email}%0AEmpresa: {company}%0AVolume mensal estimado: {volume} imagens%0AIdioma: {language}",
@@ -720,6 +722,7 @@ const proTranslations = {
     proCompanyPlaceholder: "Store or company",
     proVolumeLabel: "Estimated monthly volume",
     proCta: "I want Pro access",
+    proLimitCta: "Request Pro access",
     proMessage: "Thank you. We will open an email message to register your interest.",
     proEmailSubject: "Interest in BatchCutout Pro",
     proEmailBody: "I am interested in BatchCutout Pro access.%0A%0AEmail: {email}%0ACompany: {company}%0AEstimated monthly volume: {volume} images%0ALanguage: {language}",
@@ -768,6 +771,7 @@ function setStatus(key, progress = 0, params = {}) {
   statusText.dataset.statusParams = JSON.stringify(params);
   statusText.textContent = t(key, params);
   progressBar.value = progress;
+  proPromptButton.classList.toggle("hidden", key !== "statusTooManyFiles");
 }
 
 function refreshStatusText() {
@@ -881,6 +885,9 @@ function addFiles(fileList) {
       count: items.length,
     });
     render();
+    if (imageFiles.length) {
+      showProInterest("batch_limit");
+    }
     trackEvent("upload_rejected", { reason: imageFiles.length ? "batch_limit" : "unsupported_files" });
     return;
   }
@@ -898,6 +905,9 @@ function addFiles(fileList) {
   setStatus(rejectedByLimit ? "statusTooManyFiles" : "statusLoaded", 0, {
     count: acceptedFiles.length,
   });
+  if (rejectedByLimit) {
+    showProInterest("batch_limit");
+  }
   trackEvent("photos_selected", { count: acceptedFiles.length, totalInQueue: items.length });
   render();
 }
@@ -1009,6 +1019,12 @@ function clearAll() {
   render();
 }
 
+function showProInterest(reason = "manual") {
+  document.querySelector("#pro-title")?.scrollIntoView({ behavior: "smooth", block: "center" });
+  proEmail.focus({ preventScroll: true });
+  trackEvent("pro_interest_prompt_clicked", { reason, totalInQueue: items.length });
+}
+
 function submitProInterest(event) {
   event.preventDefault();
 
@@ -1064,6 +1080,7 @@ processButton.addEventListener("click", processImages);
 pngButton.addEventListener("click", downloadSinglePng);
 zipButton.addEventListener("click", downloadZip);
 clearButton.addEventListener("click", clearAll);
+proPromptButton.addEventListener("click", () => showProInterest("status_limit_cta"));
 proForm.addEventListener("submit", submitProInterest);
 
 for (const eventName of ["dragenter", "dragover", "dragleave", "drop"]) {
