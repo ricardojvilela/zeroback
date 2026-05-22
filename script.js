@@ -23,6 +23,7 @@ const proErrorMessage = document.querySelector("#proErrorMessage");
 
 const maxFilesPerBatch = 20;
 const leadEndpoint = "https://formsubmit.co/ajax/ricardojvilela@gmail.com";
+const proLeadConversionId = "AW-18177126609/nCaxCPrw1rEcENHhw9tD";
 
 const supportedExtensions = [
   ".jpg",
@@ -1095,6 +1096,11 @@ function trackLeadConversion(volume, hasCompany) {
   window.gtag?.("event", "pro_lead_submitted", {
     event_category: "commercial_intent",
     event_label: volume,
+  });
+  window.gtag?.("event", "conversion", {
+    send_to: proLeadConversionId,
+    value: 1.0,
+    currency: "EUR",
   });
 }
 
