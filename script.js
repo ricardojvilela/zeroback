@@ -714,7 +714,7 @@ const proTranslations = {
     proLimitCta: "Pedir acesso Pro",
     proNoCommitment: "Sem compromisso. Serve apenas para avisar quando o acesso Pro estiver disponível.",
     proMessage: "Pedido registado. Vamos contactar quando o acesso Pro estiver disponível.",
-    proErrorMessage: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
+    proErrorMessage: "O envio automático ainda não está ativo. Vamos abrir uma mensagem de email.",
     proEmailSubject: "Interesse no BatchCutout Pro",
     proEmailBody: "Tenho interesse no acesso Pro do BatchCutout.\n\nEmail: {email}\nEmpresa: {company}\nVolume mensal estimado: {volume} imagens\nIdioma: {language}",
     demoBefore: "Antes",
@@ -747,7 +747,7 @@ const proTranslations = {
     proLimitCta: "Request Pro access",
     proNoCommitment: "No commitment. This only lets us notify you when Pro access is available.",
     proMessage: "Request registered. We will contact you when Pro access is available.",
-    proErrorMessage: "Automatic submission failed. We will open an email message instead.",
+    proErrorMessage: "Automatic submission is not active yet. We will open an email message instead.",
     proEmailSubject: "Interest in BatchCutout Pro",
     proEmailBody: "I am interested in BatchCutout Pro access.\n\nEmail: {email}\nCompany: {company}\nEstimated monthly volume: {volume} images\nLanguage: {language}",
     demoBefore: "Before",
@@ -1142,7 +1142,9 @@ async function submitProInterest(event) {
       }),
     });
 
-    if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok || (data.success !== true && data.success !== "true")) {
       throw new Error("Lead submission failed");
     }
 
