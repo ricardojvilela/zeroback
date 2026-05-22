@@ -167,8 +167,12 @@
             Sem compromisso. Serve apenas para avisar quando o acesso Pro estiver disponível.
           </p>
           <form class="pro-form" id="proForm">
+            <input type="hidden" name="_subject" value="Novo lead BatchCutout Pro" />
+            <input type="hidden" name="_template" value="table" />
+            <input type="text" name="_honey" class="honeypot-field" tabindex="-1" autocomplete="off" />
             <input
               id="proEmail"
+              name="email"
               type="email"
               autocomplete="email"
               required
@@ -177,18 +181,22 @@
             />
             <input
               id="proCompany"
+              name="company"
               type="text"
               autocomplete="organization"
               data-i18n-placeholder="proCompanyPlaceholder"
               placeholder="Loja ou empresa"
             />
-            <select id="proVolume" data-i18n-aria="proVolumeLabel" aria-label="Volume mensal estimado">
+            <select id="proVolume" name="volume" data-i18n-aria="proVolumeLabel" aria-label="Volume mensal estimado">
               <option value="100-500">100-500</option>
               <option value="500-2000">500-2.000</option>
               <option value="2000+">2.000+</option>
             </select>
             <button type="submit" data-i18n="proCta">Quero acesso Pro</button>
           </form>
+          <p class="pro-message hidden" id="proErrorMessage" data-i18n="proErrorMessage">
+            Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.
+          </p>
           <p class="pro-message hidden" id="proMessage" data-i18n="proMessage">
             Obrigado. Vamos abrir uma mensagem de email para registar o seu interesse.
           </p>

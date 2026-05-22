@@ -19,8 +19,10 @@ const proEmail = document.querySelector("#proEmail");
 const proCompany = document.querySelector("#proCompany");
 const proVolume = document.querySelector("#proVolume");
 const proMessage = document.querySelector("#proMessage");
+const proErrorMessage = document.querySelector("#proErrorMessage");
 
 const maxFilesPerBatch = 20;
+const leadEndpoint = "https://formsubmit.co/ajax/ricardojvilela@gmail.com";
 
 const supportedExtensions = [
   ".jpg",
@@ -711,9 +713,10 @@ const proTranslations = {
     proCta: "Quero acesso Pro",
     proLimitCta: "Pedir acesso Pro",
     proNoCommitment: "Sem compromisso. Serve apenas para avisar quando o acesso Pro estiver disponível.",
-    proMessage: "Obrigado. Vamos abrir uma mensagem de email para registar o seu interesse.",
+    proMessage: "Pedido registado. Vamos contactar quando o acesso Pro estiver disponível.",
+    proErrorMessage: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
     proEmailSubject: "Interesse no BatchCutout Pro",
-    proEmailBody: "Tenho interesse no acesso Pro do BatchCutout.%0A%0AEmail: {email}%0AEmpresa: {company}%0AVolume mensal estimado: {volume} imagens%0AIdioma: {language}",
+    proEmailBody: "Tenho interesse no acesso Pro do BatchCutout.\n\nEmail: {email}\nEmpresa: {company}\nVolume mensal estimado: {volume} imagens\nIdioma: {language}",
     demoBefore: "Antes",
     demoAfter: "Depois",
     audienceKicker: "Criado para volume",
@@ -743,9 +746,10 @@ const proTranslations = {
     proCta: "I want Pro access",
     proLimitCta: "Request Pro access",
     proNoCommitment: "No commitment. This only lets us notify you when Pro access is available.",
-    proMessage: "Thank you. We will open an email message to register your interest.",
+    proMessage: "Request registered. We will contact you when Pro access is available.",
+    proErrorMessage: "Automatic submission failed. We will open an email message instead.",
     proEmailSubject: "Interest in BatchCutout Pro",
-    proEmailBody: "I am interested in BatchCutout Pro access.%0A%0AEmail: {email}%0ACompany: {company}%0AEstimated monthly volume: {volume} images%0ALanguage: {language}",
+    proEmailBody: "I am interested in BatchCutout Pro access.\n\nEmail: {email}\nCompany: {company}\nEstimated monthly volume: {volume} images\nLanguage: {language}",
     demoBefore: "Before",
     demoAfter: "After",
     audienceKicker: "Built for volume",
@@ -1066,7 +1070,35 @@ function showProInterest(reason = "manual") {
   trackEvent("pro_interest_prompt_clicked", { reason, totalInQueue: items.length });
 }
 
-function submitProInterest(event) {
+function openLeadEmail({ email, company, volume }) {
+  const subject = encodeURIComponent(t("proEmailSubject"));
+  const body = encodeURIComponent(t("proEmailBody", {
+    email,
+    company,
+    volume,
+    language: currentLanguage,
+  }));
+
+  window.location.href = `mailto:ricardojvilela@gmail.com?subject=${subject}&body=${body}`;
+}
+
+function trackLeadConversion(volume, hasCompany) {
+  trackEvent("pro_lead_submitted", {
+    volume,
+    hasCompany,
+    language: currentLanguage,
+  });
+  window.gtag?.("event", "generate_lead", {
+    event_category: "commercial_intent",
+    event_label: volume,
+  });
+  window.gtag?.("event", "pro_lead_submitted", {
+    event_category: "commercial_intent",
+    event_label: volume,
+  });
+}
+
+async function submitProInterest(event) {
   event.preventDefault();
 
   if (!proEmail.checkValidity()) {
@@ -1077,6 +1109,7 @@ function submitProInterest(event) {
   const email = proEmail.value.trim();
   const company = proCompany.value.trim() || "-";
   const volume = proVolume.value;
+  const hasCompany = company !== "-";
   const lead = {
     email,
     company,
@@ -1086,28 +1119,46 @@ function submitProInterest(event) {
   };
 
   localStorage.setItem("batchcutoutProLead", JSON.stringify(lead));
-  trackEvent("pro_interest_submitted", {
-    volume,
-    hasCompany: company !== "-",
-    language: currentLanguage,
-  });
-  window.gtag?.("event", "generate_lead", {
-    event_category: "commercial_intent",
-    event_label: volume,
-  });
+  proMessage.classList.add("hidden");
+  proErrorMessage.classList.add("hidden");
+  proForm.querySelector("button").disabled = true;
 
-  proMessage.classList.remove("hidden");
-  proMessage.textContent = t("proMessage");
+  try {
+    const response = await fetch(leadEndpoint, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        _subject: "Novo lead BatchCutout Pro",
+        _template: "table",
+        email,
+        company,
+        volume,
+        language: currentLanguage,
+        source: window.location.href,
+        submittedAt: lead.submittedAt,
+      }),
+    });
 
-  const subject = encodeURIComponent(t("proEmailSubject"));
-  const body = t("proEmailBody", {
-    email: encodeURIComponent(email),
-    company: encodeURIComponent(company),
-    volume: encodeURIComponent(volume),
-    language: encodeURIComponent(currentLanguage),
-  });
+    if (!response.ok) {
+      throw new Error("Lead submission failed");
+    }
 
-  window.location.href = `mailto:ricardojvilela@gmail.com?subject=${subject}&body=${body}`;
+    trackLeadConversion(volume, hasCompany);
+    proMessage.classList.remove("hidden");
+    proMessage.textContent = t("proMessage");
+    proForm.reset();
+  } catch (error) {
+    console.error(error);
+    trackLeadConversion(volume, hasCompany);
+    proErrorMessage.classList.remove("hidden");
+    proErrorMessage.textContent = t("proErrorMessage");
+    openLeadEmail({ email, company, volume });
+  } finally {
+    proForm.querySelector("button").disabled = false;
+  }
 }
 
 languageSelect.addEventListener("change", (event) => {

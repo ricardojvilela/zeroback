@@ -522,6 +522,11 @@ h2 {
   background: #0c1117;
 }
 
+.honeypot-field {
+  position: absolute;
+  left: -9999px;
+}
+
 .pro-message {
   min-height: 20px;
 }
