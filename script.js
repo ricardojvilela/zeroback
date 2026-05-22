@@ -556,7 +556,7 @@ const translatedAddons = {
     formatNote: "Alguns formatos podem depender do suporte do navegador.",
     batchLimitNote: "O modo gratuito permite até 20 imagens por lote.",
     privacyLink: "Privacidade e termos",
-    statusTooManyFiles: "O modo gratuito permite até 20 imagens por lote. Para volumes maiores, peça acesso Pro.",
+    statusTooManyFiles: "Foram adicionadas {accepted} de {total} imagens. Para processar todas de uma vez, peça acesso Pro.",
     statusNoSupportedFiles: "Nenhum ficheiro de imagem suportado foi encontrado.",
     statusEngineLoading: "A carregar o motor de remoção. A primeira vez pode demorar mais.",
     statusError: "não foi possível processar. Experimente JPG, PNG ou WebP.",
@@ -568,7 +568,7 @@ const translatedAddons = {
     formatNote: "Some formats may depend on browser support.",
     batchLimitNote: "Free mode allows up to 20 images per batch.",
     privacyLink: "Privacy and terms",
-    statusTooManyFiles: "Free mode allows up to 20 images per batch. For larger volumes, request Pro access.",
+    statusTooManyFiles: "{accepted} of {total} images were added. To process them all at once, request Pro access.",
     statusNoSupportedFiles: "No supported image file was found.",
     statusEngineLoading: "Loading the removal engine. The first run may take longer.",
     statusError: "could not be processed. Try JPG, PNG, or WebP.",
@@ -704,28 +704,66 @@ const proTranslations = {
   pt: {
     proKicker: "Para equipas e lojas",
     proTitle: "Precisa de processar centenas de fotos?",
-    proLead: "Estamos a preparar acesso Pro para volumes maiores, suporte priorit\u00e1rio e fluxos pensados para cat\u00e1logos.",
+    proLead: "Processa mais de 20 imagens por lote? Peça acesso Pro para catálogos, lojas online e equipas.",
     proEmailPlaceholder: "O seu email",
     proCompanyPlaceholder: "Loja ou empresa",
     proVolumeLabel: "Volume mensal estimado",
     proCta: "Quero acesso Pro",
     proLimitCta: "Pedir acesso Pro",
+    proNoCommitment: "Sem compromisso. Serve apenas para avisar quando o acesso Pro estiver disponível.",
     proMessage: "Obrigado. Vamos abrir uma mensagem de email para registar o seu interesse.",
     proEmailSubject: "Interesse no BatchCutout Pro",
     proEmailBody: "Tenho interesse no acesso Pro do BatchCutout.%0A%0AEmail: {email}%0AEmpresa: {company}%0AVolume mensal estimado: {volume} imagens%0AIdioma: {language}",
+    demoBefore: "Antes",
+    demoAfter: "Depois",
+    audienceKicker: "Criado para volume",
+    audienceTitle: "Para quem trata imagens todos os dias",
+    audienceStoresTitle: "Lojas online",
+    audienceStoresText: "Fotos de produto com fundo limpo para páginas de venda.",
+    audienceCatalogsTitle: "Catálogos",
+    audienceCatalogsText: "Preparação rápida de imagens para coleções e campanhas.",
+    audienceTeamsTitle: "Equipas",
+    audienceTeamsText: "Fluxo simples para quem recebe muitas fotos de uma só vez.",
+    faqKicker: "Dúvidas rápidas",
+    faqTitle: "Antes de começar",
+    faqPrivacyQ: "As fotos são enviadas para um servidor?",
+    faqPrivacyA: "Não. As imagens são processadas no seu dispositivo.",
+    faqFormatsQ: "Que formatos são aceites?",
+    faqFormatsA: "JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG, HEIC, HEIF e outros formatos de imagem suportados pelo navegador.",
+    faqVolumeQ: "Posso processar mais de 20 imagens?",
+    faqVolumeA: "O modo gratuito permite 20 imagens por lote. Para volumes maiores, peça acesso Pro.",
   },
   en: {
     proKicker: "For teams and stores",
     proTitle: "Need to process hundreds of photos?",
-    proLead: "We are preparing Pro access for larger volumes, priority support, and workflows built for catalogues.",
+    proLead: "Processing more than 20 images per batch? Request Pro access for catalogues, online stores, and teams.",
     proEmailPlaceholder: "Your email",
     proCompanyPlaceholder: "Store or company",
     proVolumeLabel: "Estimated monthly volume",
     proCta: "I want Pro access",
     proLimitCta: "Request Pro access",
+    proNoCommitment: "No commitment. This only lets us notify you when Pro access is available.",
     proMessage: "Thank you. We will open an email message to register your interest.",
     proEmailSubject: "Interest in BatchCutout Pro",
     proEmailBody: "I am interested in BatchCutout Pro access.%0A%0AEmail: {email}%0ACompany: {company}%0AEstimated monthly volume: {volume} images%0ALanguage: {language}",
+    demoBefore: "Before",
+    demoAfter: "After",
+    audienceKicker: "Built for volume",
+    audienceTitle: "For teams handling images every day",
+    audienceStoresTitle: "Online stores",
+    audienceStoresText: "Clean product photos for sales pages.",
+    audienceCatalogsTitle: "Catalogues",
+    audienceCatalogsText: "Fast image preparation for collections and campaigns.",
+    audienceTeamsTitle: "Teams",
+    audienceTeamsText: "A simple workflow for many photos at once.",
+    faqKicker: "Quick questions",
+    faqTitle: "Before you start",
+    faqPrivacyQ: "Are photos sent to a server?",
+    faqPrivacyA: "No. Images are processed on your device.",
+    faqFormatsQ: "Which formats are supported?",
+    faqFormatsA: "JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG, HEIC, HEIF, and other image formats supported by your browser.",
+    faqVolumeQ: "Can I process more than 20 images?",
+    faqVolumeA: "Free mode allows 20 images per batch. For larger volumes, request Pro access.",
   },
 };
 
@@ -882,7 +920,8 @@ function addFiles(fileList) {
 
   if (!acceptedFiles.length) {
     setStatus(imageFiles.length ? "statusTooManyFiles" : "statusNoSupportedFiles", 0, {
-      count: items.length,
+      accepted: 0,
+      total: items.length + imageFiles.length,
     });
     render();
     if (imageFiles.length) {
@@ -903,7 +942,9 @@ function addFiles(fileList) {
 
   items = [...items, ...nextItems];
   setStatus(rejectedByLimit ? "statusTooManyFiles" : "statusLoaded", 0, {
+    accepted: acceptedFiles.length,
     count: acceptedFiles.length,
+    total: imageFiles.length,
   });
   if (rejectedByLimit) {
     showProInterest("batch_limit");

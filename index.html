@@ -70,6 +70,16 @@
         <p class="trust-copy" data-i18n="trustText">
           Ideal para lojas online, catálogos, marketplaces e equipas que tratam muitas imagens.
         </p>
+        <div class="demo-showcase" aria-label="Exemplo antes e depois">
+          <div class="demo-card before-card">
+            <span data-i18n="demoBefore">Antes</span>
+            <div class="demo-product"></div>
+          </div>
+          <div class="demo-card after-card">
+            <span data-i18n="demoAfter">Depois</span>
+            <div class="demo-product"></div>
+          </div>
+        </div>
         <a class="policy-link" href="./privacidade.html" data-i18n="privacyLink">Privacidade e termos</a>
       </section>
 
@@ -128,11 +138,33 @@
           <progress id="progressBar" value="0" max="100"></progress>
         </div>
 
+        <section class="audience-section" aria-labelledby="audience-title">
+          <p class="section-kicker" data-i18n="audienceKicker">Criado para volume</p>
+          <h2 id="audience-title" data-i18n="audienceTitle">Para quem trata imagens todos os dias</h2>
+          <div class="audience-list">
+            <article>
+              <strong data-i18n="audienceStoresTitle">Lojas online</strong>
+              <span data-i18n="audienceStoresText">Fotos de produto com fundo limpo para páginas de venda.</span>
+            </article>
+            <article>
+              <strong data-i18n="audienceCatalogsTitle">Catálogos</strong>
+              <span data-i18n="audienceCatalogsText">Preparação rápida de imagens para coleções e campanhas.</span>
+            </article>
+            <article>
+              <strong data-i18n="audienceTeamsTitle">Equipas</strong>
+              <span data-i18n="audienceTeamsText">Fluxo simples para quem recebe muitas fotos de uma só vez.</span>
+            </article>
+          </div>
+        </section>
+
         <section class="pro-interest" aria-labelledby="pro-title">
           <p class="section-kicker" data-i18n="proKicker">Para equipas e lojas</p>
           <h2 id="pro-title" data-i18n="proTitle">Precisa de processar centenas de fotos?</h2>
           <p data-i18n="proLead">
             Estamos a preparar acesso Pro para volumes maiores, suporte prioritário e fluxos pensados para catálogos.
+          </p>
+          <p class="pro-note" data-i18n="proNoCommitment">
+            Sem compromisso. Serve apenas para avisar quando o acesso Pro estiver disponível.
           </p>
           <form class="pro-form" id="proForm">
             <input
@@ -172,6 +204,22 @@
           <p data-i18n="emptyState">As imagens aparecem aqui depois da seleção.</p>
         </div>
         <div class="grid" id="imageGrid"></div>
+        <section class="faq-section" aria-labelledby="faq-title">
+          <p class="section-kicker" data-i18n="faqKicker">Dúvidas rápidas</p>
+          <h2 id="faq-title" data-i18n="faqTitle">Antes de começar</h2>
+          <details>
+            <summary data-i18n="faqPrivacyQ">As fotos são enviadas para um servidor?</summary>
+            <p data-i18n="faqPrivacyA">Não. As imagens são processadas no seu dispositivo.</p>
+          </details>
+          <details>
+            <summary data-i18n="faqFormatsQ">Que formatos são aceites?</summary>
+            <p data-i18n="faqFormatsA">JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG, HEIC, HEIF e outros formatos de imagem suportados pelo navegador.</p>
+          </details>
+          <details>
+            <summary data-i18n="faqVolumeQ">Posso processar mais de 20 imagens?</summary>
+            <p data-i18n="faqVolumeA">O modo gratuito permite 20 imagens por lote. Para volumes maiores, peça acesso Pro.</p>
+          </details>
+        </section>
       </section>
     </main>
 
