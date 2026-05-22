@@ -62,6 +62,9 @@
           Remova o fundo de várias fotos ao mesmo tempo e exporte imagens prontas
           para lojas online, catálogos e redes sociais.
         </p>
+        <button class="brand-cta" id="brandCta" type="button" data-i18n="brandCta">
+          Começar grátis
+        </button>
         <div class="proof-strip" data-i18n-aria="benefitsLabel" aria-label="Vantagens do serviço">
           <span data-i18n="benefitBatch">Feito para muitas fotos</span>
           <span data-i18n="benefitPng">PNG transparente</span>
@@ -70,14 +73,11 @@
         <p class="trust-copy" data-i18n="trustText">
           Ideal para lojas online, catálogos, marketplaces e equipas que tratam muitas imagens.
         </p>
-        <div class="demo-showcase" aria-label="Exemplo antes e depois">
-          <div class="demo-card before-card">
+        <div class="demo-showcase" data-i18n-aria="demoLabel" aria-label="Exemplo antes e depois">
+          <img src="./assets/product-before-after.png" alt="" loading="eager" decoding="async" />
+          <div class="demo-labels" aria-hidden="true">
             <span data-i18n="demoBefore">Antes</span>
-            <div class="demo-product"></div>
-          </div>
-          <div class="demo-card after-card">
             <span data-i18n="demoAfter">Depois</span>
-            <div class="demo-product"></div>
           </div>
         </div>
         <a class="policy-link" href="./privacidade.html" data-i18n="privacyLink">Privacidade e termos</a>
@@ -106,6 +106,9 @@
           <span class="dropzone-title" data-i18n="selectPhotos">Arraste ou selecione várias fotos</span>
           <span class="dropzone-meta" data-i18n="fileTypes">JPG, PNG ou WebP em lote</span>
         </label>
+        <button class="inline-pro-cta" id="inlineProCta" type="button" data-i18n="inlineProCta">
+          Mais de 20 imagens? Peça acesso Pro
+        </button>
 
         <div class="info-list">
           <p data-i18n="privacyNote">
@@ -210,7 +213,8 @@
           <span id="countText">0 fotos</span>
         </div>
         <div class="empty-state" id="emptyState">
-          <p data-i18n="emptyState">As imagens aparecem aqui depois da seleção.</p>
+          <strong data-i18n="emptyTitle">Os seus PNGs transparentes aparecem aqui</strong>
+          <p data-i18n="emptyState">Depois pode descarregar uma imagem ou exportar tudo em ZIP.</p>
         </div>
         <div class="grid" id="imageGrid"></div>
         <section class="faq-section" aria-labelledby="faq-title">

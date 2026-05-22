@@ -4,6 +4,7 @@ import { removeBackground } from "https://cdn.jsdelivr.net/npm/@imgly/background
 const fileInput = document.querySelector("#fileInput");
 const dropzone = document.querySelector("#dropzone");
 const languageSelect = document.querySelector("#languageSelect");
+const brandCta = document.querySelector("#brandCta");
 const processButton = document.querySelector("#processButton");
 const pngButton = document.querySelector("#pngButton");
 const zipButton = document.querySelector("#zipButton");
@@ -12,6 +13,7 @@ const imageGrid = document.querySelector("#imageGrid");
 const emptyState = document.querySelector("#emptyState");
 const statusText = document.querySelector("#statusText");
 const proPromptButton = document.querySelector("#proPromptButton");
+const inlineProCta = document.querySelector("#inlineProCta");
 const progressBar = document.querySelector("#progressBar");
 const countText = document.querySelector("#countText");
 const proForm = document.querySelector("#proForm");
@@ -718,6 +720,11 @@ const proTranslations = {
     proErrorMessage: "O envio automático ainda não está ativo. Vamos abrir uma mensagem de email.",
     proEmailSubject: "Interesse no BatchCutout Pro",
     proEmailBody: "Tenho interesse no acesso Pro do BatchCutout.\n\nEmail: {email}\nEmpresa: {company}\nVolume mensal estimado: {volume} imagens\nIdioma: {language}",
+    brandCta: "Começar grátis",
+    inlineProCta: "Mais de 20 imagens? Peça acesso Pro",
+    emptyTitle: "Os seus PNGs transparentes aparecem aqui",
+    emptyState: "Depois pode descarregar uma imagem ou exportar tudo em ZIP.",
+    demoLabel: "Exemplo antes e depois",
     demoBefore: "Antes",
     demoAfter: "Depois",
     freeLimitBadge: "20 imagens grátis por lote",
@@ -752,6 +759,11 @@ const proTranslations = {
     proErrorMessage: "Automatic submission is not active yet. We will open an email message instead.",
     proEmailSubject: "Interest in BatchCutout Pro",
     proEmailBody: "I am interested in BatchCutout Pro access.\n\nEmail: {email}\nCompany: {company}\nEstimated monthly volume: {volume} images\nLanguage: {language}",
+    brandCta: "Start free",
+    inlineProCta: "More than 20 images? Request Pro access",
+    emptyTitle: "Your transparent PNGs appear here",
+    emptyState: "Then download one image or export everything as a ZIP.",
+    demoLabel: "Before and after example",
     demoBefore: "Before",
     demoAfter: "After",
     freeLimitBadge: "20 free images per batch",
@@ -1184,6 +1196,12 @@ pngButton.addEventListener("click", downloadSinglePng);
 zipButton.addEventListener("click", downloadZip);
 clearButton.addEventListener("click", clearAll);
 proPromptButton.addEventListener("click", () => showProInterest("status_limit_cta"));
+brandCta.addEventListener("click", () => {
+  dropzone.scrollIntoView({ behavior: "smooth", block: "center" });
+  fileInput.focus({ preventScroll: true });
+  trackEvent("brand_cta_clicked");
+});
+inlineProCta.addEventListener("click", () => showProInterest("inline_pro_cta"));
 proForm.addEventListener("submit", submitProInterest);
 
 for (const eventName of ["dragenter", "dragover", "dragleave", "drop"]) {
