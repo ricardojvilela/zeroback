@@ -281,6 +281,8 @@ h2 {
   grid-area: workspace;
   align-self: start;
   padding: 26px;
+  background:
+    linear-gradient(180deg, #ffffff 0%, #f7fbff 58%, #eef8f5 100%);
 }
 
 .tool-header,
@@ -310,9 +312,9 @@ h2 {
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 330px;
+  min-height: 310px;
   margin-top: 22px;
-  border: 2px dashed rgba(15, 139, 124, 0.58);
+  border: 2px dashed rgba(15, 139, 124, 0.72);
   border-radius: 8px;
   background:
     linear-gradient(45deg, rgba(15, 139, 124, 0.08) 25%, transparent 25%),
@@ -328,7 +330,7 @@ h2 {
   background-size: 24px 24px;
   cursor: pointer;
   text-align: center;
-  outline: 8px solid rgba(15, 139, 124, 0.05);
+  outline: 8px solid rgba(15, 139, 124, 0.08);
   transition:
     border-color 160ms ease,
     background-color 160ms ease,
@@ -384,8 +386,10 @@ h2 {
 }
 
 .dropzone-title {
-  font-size: 1.45rem;
+  max-width: 24rem;
+  font-size: 1.55rem;
   font-weight: 950;
+  line-height: 1.08;
 }
 
 .dropzone-meta {
@@ -398,7 +402,7 @@ h2 {
 .info-list {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 10px;
   margin-top: 14px;
 }
 
@@ -418,13 +422,27 @@ h2 {
 }
 
 .info-list p {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
   margin: 0;
-  border-left: 3px solid var(--accent);
-  padding: 9px 10px;
-  background: #f5fbf9;
-  color: #52606d;
+  border: 1px solid rgba(15, 139, 124, 0.18);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #ffffff;
+  color: var(--accent-strong);
   font-size: 0.86rem;
-  line-height: 1.35;
+  font-weight: 900;
+  line-height: 1.2;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(26, 39, 57, 0.06);
+}
+
+.info-list p::before {
+  margin-right: 7px;
+  color: var(--accent);
+  content: "✓";
 }
 
 .actions {
@@ -468,11 +486,19 @@ h2 {
 }
 
 .audience-section {
-  margin-top: 22px;
+  margin-top: 20px;
+  border-radius: 8px;
+  padding: 18px;
+  background: #17202a;
+  color: #ffffff;
 }
 
 .audience-section h2 {
   font-size: 1.15rem;
+}
+
+.audience-section .section-kicker {
+  color: #51d7c6;
 }
 
 .audience-list {
@@ -485,10 +511,10 @@ h2 {
 .audience-list article {
   display: grid;
   gap: 3px;
-  border: 1px solid rgba(15, 139, 124, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
   padding: 12px;
-  background: #f8fbff;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .audience-list strong {
@@ -496,25 +522,30 @@ h2 {
 }
 
 .audience-list span {
-  color: #52606d;
+  color: rgba(255, 255, 255, 0.72);
   font-size: 0.84rem;
   line-height: 1.35;
 }
 
 .pro-interest {
   margin-top: 22px;
-  border: 1px solid rgba(38, 70, 216, 0.16);
+  border: 1px solid rgba(38, 70, 216, 0.26);
   border-radius: 8px;
-  padding: 18px;
-  background: linear-gradient(180deg, #f8fbff, #f4faf8);
+  padding: 20px;
+  background:
+    linear-gradient(135deg, rgba(38, 70, 216, 0.1), rgba(15, 139, 124, 0.12)),
+    #ffffff;
+  box-shadow: 0 16px 38px rgba(26, 39, 57, 0.1);
 }
 
 .pro-interest h2 {
-  font-size: 1.15rem;
+  max-width: 34rem;
+  font-size: 1.35rem;
 }
 
 .pro-interest p {
-  margin: 10px 0 0;
+  max-width: 38rem;
+  margin: 8px 0 0;
   color: #52606d;
   font-size: 0.9rem;
   line-height: 1.45;
@@ -522,7 +553,7 @@ h2 {
 
 .pro-form {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 0.9fr;
+  grid-template-columns: 1.2fr 1fr 0.8fr;
   gap: 10px;
   margin-top: 14px;
 }
@@ -549,11 +580,11 @@ h2 {
 }
 
 .pro-form button {
-  background: var(--charcoal);
+  background: var(--blue);
 }
 
 .pro-form button:hover:not(:disabled) {
-  background: #0c1117;
+  background: var(--blue-strong);
 }
 
 .honeypot-field {
