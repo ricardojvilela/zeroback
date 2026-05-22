@@ -62,7 +62,7 @@ button:disabled {
   display: grid;
   grid-template-areas:
     "brand workspace"
-    "results results";
+    ". results";
   grid-template-columns: minmax(320px, 390px) minmax(520px, 1fr);
   gap: 20px;
   width: min(1180px, calc(100% - 32px));
