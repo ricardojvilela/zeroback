@@ -820,6 +820,12 @@ const analyticsEvents = {
   brand_cta_clicked: { category: "engagement", label: "start_free" },
   photos_selected: { category: "upload", label: "photos_selected" },
   upload_rejected: { category: "upload", label: "upload_rejected" },
+  upload: { category: "funnel", label: "upload", step: 1 },
+  processar: { category: "funnel", label: "processar", step: 2 },
+  download_png: { category: "funnel", label: "download_png", step: 3 },
+  download_zip: { category: "funnel", label: "download_zip", step: 3 },
+  limite_20: { category: "funnel", label: "limite_20", step: 4 },
+  lead_pro: { category: "funnel", label: "lead_pro", step: 5 },
   background_removal_started: { category: "processing", label: "started" },
   background_removal_finished: { category: "processing", label: "finished" },
   png_downloaded: { category: "download", label: "single_png" },
@@ -835,13 +841,14 @@ function trackEvent(name, detail = {}) {
   const eventParams = {
     event_category: config.category,
     event_label: detail.reason || detail.volume || config.label,
+    funnel_step: config.step || detail.funnel_step || undefined,
     value: Number.isFinite(numericValue) ? numericValue : 0,
     language: currentLanguage,
     ...detail,
   };
 
   window.dispatchEvent(new CustomEvent("rfel:analytics", { detail: { name, ...detail } }));
-  window.dataLayer?.push({ event: name, ...detail });
+  window.dataLayer?.push({ event: name, ...eventParams });
   window.gtag?.("event", name, eventParams);
 }
 
@@ -1062,6 +1069,12 @@ function addFiles(fileList) {
     render();
     if (imageFiles.length) {
       showProInterest("batch_limit");
+      trackEvent("limite_20", {
+        accepted: 0,
+        attempted: imageFiles.length,
+        totalInQueue: items.length,
+        reason: "batch_limit",
+      });
     }
     trackEvent("upload_rejected", { reason: imageFiles.length ? "batch_limit" : "unsupported_files" });
     return;
@@ -1084,13 +1097,22 @@ function addFiles(fileList) {
   });
   if (rejectedByLimit) {
     showProInterest("batch_limit");
+    trackEvent("limite_20", {
+      accepted: acceptedFiles.length,
+      attempted: imageFiles.length,
+      rejected: rejectedByLimit,
+      totalInQueue: items.length,
+      reason: "batch_limit",
+    });
   }
   trackEvent("photos_selected", { count: acceptedFiles.length, totalInQueue: items.length });
+  trackEvent("upload", { count: acceptedFiles.length, totalInQueue: items.length });
   render();
 }
 
 async function processImages() {
   trackEvent("background_removal_started", { count: items.length });
+  trackEvent("processar", { count: items.length });
   processButton.disabled = true;
   pngButton.disabled = true;
   zipButton.disabled = true;
@@ -1165,6 +1187,7 @@ async function downloadZip() {
   URL.revokeObjectURL(url);
   setStatus("statusZipReady", 100);
   trackEvent("zip_downloaded", { count: readyItems.length });
+  trackEvent("download_zip", { count: readyItems.length });
 }
 
 function downloadSinglePng() {
@@ -1183,6 +1206,7 @@ function downloadSinglePng() {
   URL.revokeObjectURL(url);
   setStatus("statusPngReady", 100);
   trackEvent("png_downloaded", { count: 1 });
+  trackEvent("download_png", { count: 1 });
 }
 
 function clearAll() {
@@ -1232,6 +1256,11 @@ function openLeadEmail({ email, company, volume }) {
 
 function trackLeadConversion(volume, hasCompany) {
   trackEvent("pro_lead_submitted", {
+    volume,
+    hasCompany,
+    language: currentLanguage,
+  });
+  trackEvent("lead_pro", {
     volume,
     hasCompany,
     language: currentLanguage,
