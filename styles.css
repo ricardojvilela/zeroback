@@ -1150,6 +1150,62 @@ progress::-moz-progress-bar {
   line-height: 1.5;
 }
 
+.seo-links-section {
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.seo-links-section h2 {
+  margin-bottom: 12px;
+  color: var(--charcoal);
+  font-size: 1.08rem;
+}
+
+.seo-link-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.seo-link-grid a {
+  display: block;
+  border: 1px solid rgba(202, 213, 226, 0.82);
+  border-radius: 8px;
+  padding: 12px;
+  background: #ffffff;
+  color: var(--charcoal);
+  text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.seo-link-grid a:hover {
+  border-color: rgba(15, 139, 124, 0.58);
+  box-shadow: 0 10px 24px rgba(26, 39, 57, 0.1);
+  transform: translateY(-1px);
+}
+
+.seo-link-grid strong,
+.seo-link-grid span {
+  display: block;
+}
+
+.seo-link-grid strong {
+  margin-bottom: 5px;
+  font-size: 0.92rem;
+}
+
+.seo-link-grid span {
+  color: #52606d;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
 .tool-results {
   margin-top: 18px;
   border: 1px solid var(--line);
@@ -1355,6 +1411,7 @@ progress::-moz-progress-bar {
   .info-list,
   .actions,
   .audience-list,
+  .seo-link-grid,
   .feedback-options,
   .pro-form {
     grid-template-columns: 1fr;
