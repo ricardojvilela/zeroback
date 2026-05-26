@@ -30,6 +30,7 @@ const minExportSide = 1200;
 const leadEndpoint = "https://formsubmit.co/ajax/ricardojvilela@gmail.com";
 const proLeadConversionId = "AW-18177126609/riWOCOiI67McENHhw9tD";
 const downloadZipConversionId = "AW-18177126609/2EdRCMzF7bMcENHhw9tD";
+const limit20ConversionId = "AW-18177126609/prPXCPXD8LMcENHhw9tD";
 const consentStorageKey = "batchcutout_consent";
 const feedbackStorageKey = "batchcutout_feedback_goal";
 
@@ -862,6 +863,11 @@ function trackGoogleAdsConversion(sendTo, { value = 1.0, currency = "EUR" } = {}
   });
 }
 
+function trackLimit20(detail = {}) {
+  trackEvent("limite_20", detail);
+  trackGoogleAdsConversion(limit20ConversionId);
+}
+
 function updateConsent(consent) {
   const granted = consent === "accepted";
   localStorage.setItem(consentStorageKey, consent);
@@ -1079,7 +1085,7 @@ function addFiles(fileList) {
     render();
     if (imageFiles.length) {
       showProInterest("batch_limit");
-      trackEvent("limite_20", {
+      trackLimit20({
         accepted: 0,
         attempted: imageFiles.length,
         totalInQueue: items.length,
@@ -1107,7 +1113,7 @@ function addFiles(fileList) {
   });
   if (rejectedByLimit) {
     showProInterest("batch_limit");
-    trackEvent("limite_20", {
+    trackLimit20({
       accepted: acceptedFiles.length,
       attempted: imageFiles.length,
       rejected: rejectedByLimit,
