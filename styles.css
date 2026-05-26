@@ -60,18 +60,15 @@ button:disabled {
 
 .app-shell {
   display: grid;
-  grid-template-areas:
-    "brand workspace"
-    ". results";
-  grid-template-columns: minmax(320px, 390px) minmax(520px, 1fr);
+  grid-template-areas: "brand workspace";
+  grid-template-columns: minmax(300px, 360px) minmax(620px, 1fr);
   gap: 20px;
-  width: min(1180px, calc(100% - 32px));
+  width: min(1280px, calc(100% - 32px));
   margin: 22px auto 32px;
 }
 
 .brand-panel,
-.workspace,
-.results {
+.workspace {
   border: 1px solid rgba(219, 227, 238, 0.9);
   border-radius: 8px;
   box-shadow: var(--shadow);
@@ -272,8 +269,7 @@ h2 {
   font-weight: 800;
 }
 
-.workspace,
-.results {
+.workspace {
   background: rgba(255, 255, 255, 0.92);
 }
 
@@ -312,7 +308,7 @@ h2 {
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 310px;
+  min-height: 240px;
   margin-top: 22px;
   border: 2px dashed rgba(15, 139, 124, 0.72);
   border-radius: 8px;
@@ -1154,12 +1150,122 @@ progress::-moz-progress-bar {
   line-height: 1.5;
 }
 
+.tool-results {
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.tool-results.results {
+  min-height: 0;
+  padding: 0;
+  box-shadow: none;
+}
+
+.tool-results .results-header {
+  padding: 14px 16px;
+}
+
+.tool-results .empty-state {
+  min-height: 150px;
+}
+
+.tool-results .empty-state::before {
+  width: 58px;
+  height: 58px;
+  margin-bottom: 8px;
+}
+
+.tool-results .grid {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+  padding: 14px;
+}
+
+.tool-results .preview {
+  min-height: 128px;
+}
+
+.tool-results .preview img {
+  height: 138px;
+}
+
+.info-list {
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.info-list p {
+  display: block;
+  min-height: auto;
+  border: 0;
+  border-left: 2px solid rgba(15, 139, 124, 0.3);
+  border-radius: 0;
+  padding: 0 0 0 10px;
+  background: transparent;
+  color: #52606d;
+  font-size: 0.82rem;
+  font-weight: 650;
+  line-height: 1.35;
+  text-align: left;
+  box-shadow: none;
+}
+
+.info-list p::before {
+  content: none;
+}
+
+.inline-pro-cta {
+  width: auto;
+  min-height: 32px;
+  margin-top: 10px;
+  border: 0;
+  background: transparent;
+  color: var(--blue-strong);
+  font-size: 0.88rem;
+  text-align: left;
+  text-decoration: underline;
+}
+
+.inline-pro-cta:hover:not(:disabled) {
+  background: transparent;
+  color: var(--blue);
+}
+
+.actions {
+  margin-top: 14px;
+}
+
+.feedback-panel {
+  margin-top: 24px;
+}
+
+.feedback-options button {
+  min-height: 38px;
+  background: transparent;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.remove-image-button {
+  min-height: 30px;
+  border: 0;
+  background: transparent;
+  font-size: 0.8rem;
+  text-align: left;
+  text-decoration: underline;
+}
+
+.remove-image-button:hover:not(:disabled) {
+  background: transparent;
+}
+
 @media (max-width: 1040px) {
   .app-shell {
     grid-template-areas:
       "brand"
-      "workspace"
-      "results";
+      "workspace";
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -1193,10 +1299,19 @@ progress::-moz-progress-bar {
     min-height: 320px;
   }
 
+  .tool-results.results {
+    min-height: 0;
+    padding: 0;
+  }
+
   .brand-panel,
   .workspace,
   .results {
     padding: 20px;
+  }
+
+  .tool-results.results {
+    padding: 0;
   }
 
   .brand-top {

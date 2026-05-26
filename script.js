@@ -26,6 +26,7 @@ const feedbackOptions = document.querySelector("#feedbackOptions");
 const feedbackThanks = document.querySelector("#feedbackThanks");
 
 const maxFilesPerBatch = 20;
+const minExportSide = 1200;
 const leadEndpoint = "https://formsubmit.co/ajax/ricardojvilela@gmail.com";
 const proLeadConversionId = "AW-18177126609/nCaxCPrw1rEcENHhw9tD";
 const consentStorageKey = "batchcutout_consent";
@@ -957,6 +958,37 @@ function isSupportedImage(file) {
   return file.type.startsWith("image/") || supportedExtensions.some((extension) => lowerName.endsWith(extension));
 }
 
+async function ensureMinimumPngResolution(blob) {
+  const bitmap = await createImageBitmap(blob);
+  const currentMinSide = Math.min(bitmap.width, bitmap.height);
+
+  if (currentMinSide >= minExportSide) {
+    bitmap.close?.();
+    return blob;
+  }
+
+  const scale = minExportSide / currentMinSide;
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.ceil(bitmap.width * scale);
+  canvas.height = Math.ceil(bitmap.height * scale);
+
+  const context = canvas.getContext("2d");
+  context.imageSmoothingEnabled = true;
+  context.imageSmoothingQuality = "high";
+  context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close?.();
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((upscaledBlob) => {
+      if (upscaledBlob) {
+        resolve(upscaledBlob);
+      } else {
+        reject(new Error("PNG export failed"));
+      }
+    }, "image/png");
+  });
+}
+
 function updateControls() {
   const hasItems = items.length > 0;
   const allReady = hasItems && items.every((item) => item.outputBlob);
@@ -1079,12 +1111,13 @@ async function processImages() {
         setStatus("statusEngineLoading", progressBar.value);
       }
 
-      const output = await removeBackground(item.file, {
+      const removedBackground = await removeBackground(item.file, {
         output: {
           format: "image/png",
           quality: 1,
         },
       });
+      const output = await ensureMinimumPngResolution(removedBackground);
 
       item.outputBlob = output;
       URL.revokeObjectURL(item.previewUrl);

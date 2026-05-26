@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-PT">
   <head>
     <meta charset="UTF-8" />
@@ -58,22 +58,22 @@
           </label>
         </div>
 
-        <p class="eyebrow" data-i18n="eyebrow">Remoção de fundo em massa</p>
+        <p class="eyebrow" data-i18n="eyebrow">RemoÃ§Ã£o de fundo em massa</p>
         <h1 id="app-title" data-i18n="title">BatchCutout</h1>
         <p class="lead" data-i18n="lead">
-          Remova o fundo de várias fotos ao mesmo tempo e exporte imagens prontas
-          para lojas online, catálogos e redes sociais.
+          Remova o fundo de vÃ¡rias fotos ao mesmo tempo e exporte imagens prontas
+          para lojas online, catÃ¡logos e redes sociais.
         </p>
         <button class="brand-cta" id="brandCta" type="button" data-i18n="brandCta">
-          Começar grátis
+          ComeÃ§ar grÃ¡tis
         </button>
-        <div class="proof-strip" data-i18n-aria="benefitsLabel" aria-label="Vantagens do serviço">
+        <div class="proof-strip" data-i18n-aria="benefitsLabel" aria-label="Vantagens do serviÃ§o">
           <span data-i18n="benefitBatch">Feito para muitas fotos</span>
           <span data-i18n="benefitPng">PNG transparente</span>
           <span data-i18n="benefitZip">ZIP organizado</span>
         </div>
         <p class="trust-copy" data-i18n="trustText">
-          Ideal para lojas online, catálogos, marketplaces e equipas que tratam muitas imagens.
+          Ideal para lojas online, catÃ¡logos, marketplaces e equipas que tratam muitas imagens.
         </p>
         <div class="demo-showcase" data-i18n-aria="demoLabel" aria-label="Exemplo antes e depois">
           <img src="./assets/product-before-after.png" alt="" loading="eager" decoding="async" />
@@ -88,7 +88,7 @@
       <section class="workspace" data-i18n-aria="uploadLabel" aria-label="Carregar fotos">
         <div class="tool-header">
           <div>
-            <p class="section-kicker" data-i18n="startNow">Começar agora</p>
+            <p class="section-kicker" data-i18n="startNow">ComeÃ§ar agora</p>
             <h2 data-i18n="uploadTitle">Carregue as suas fotos</h2>
           </div>
           <button class="ghost-button" id="clearButton" type="button" disabled>
@@ -103,26 +103,23 @@
             accept="image/*,.jpg,.jpeg,.jfif,.pjpeg,.pjp,.png,.apng,.webp,.avif,.gif,.bmp,.tif,.tiff,.svg,.heic,.heif,.ico,.cur"
             multiple
           />
-          <span class="dropzone-badge" data-i18n="freeLimitBadge">20 imagens grátis por lote</span>
+          <span class="dropzone-badge" data-i18n="freeLimitBadge">20 imagens grÃ¡tis por lote</span>
           <span class="dropzone-icon" aria-hidden="true">+</span>
-          <span class="dropzone-title" data-i18n="selectPhotos">Arraste ou selecione várias fotos</span>
+          <span class="dropzone-title" data-i18n="selectPhotos">Arraste ou selecione vÃ¡rias fotos</span>
           <span class="dropzone-meta" data-i18n="fileTypes">JPG, PNG ou WebP em lote</span>
         </label>
-        <button class="inline-pro-cta" id="inlineProCta" type="button" data-i18n="inlineProCta">
-          Mais de 20 imagens? Peça acesso Pro
-        </button>
 
-        <div class="info-list">
-          <p data-i18n="privacyNote">
-            As imagens são processadas no seu dispositivo e não são carregadas para os nossos servidores.
-          </p>
-          <p data-i18n="formatNote">
-            Alguns formatos podem depender do suporte do navegador.
-          </p>
-          <p data-i18n="batchLimitNote">
-            O modo gratuito permite até 20 imagens por lote.
-          </p>
-        </div>
+        <section class="results tool-results" data-i18n-aria="resultsLabel" aria-label="Fotos processadas">
+          <div class="results-header">
+            <h2 data-i18n="queueTitle">Fila de imagens</h2>
+            <span id="countText">0 fotos</span>
+          </div>
+          <div class="empty-state" id="emptyState">
+            <strong data-i18n="emptyTitle">Os seus PNGs transparentes aparecem aqui</strong>
+            <p data-i18n="emptyState">Depois pode descarregar uma imagem ou exportar tudo em ZIP.</p>
+          </div>
+          <div class="grid" id="imageGrid"></div>
+        </section>
 
         <div class="actions">
           <button id="processButton" type="button" disabled data-i18n="removeBackgrounds">
@@ -143,6 +140,21 @@
           </button>
           <progress id="progressBar" value="0" max="100"></progress>
         </div>
+
+        <div class="info-list">
+          <p data-i18n="privacyNote">
+            As imagens são processadas no seu dispositivo e não são carregadas para os nossos servidores.
+          </p>
+          <p data-i18n="formatNote">
+            Alguns formatos podem depender do suporte do navegador.
+          </p>
+          <p data-i18n="batchLimitNote">
+            O modo gratuito permite até 20 imagens por lote.
+          </p>
+        </div>
+        <button class="inline-pro-cta" id="inlineProCta" type="button" data-i18n="inlineProCta">
+          Mais de 20 imagens? Peça acesso Pro
+        </button>
 
         <section class="feedback-panel" aria-labelledby="feedback-title">
           <p class="section-kicker" data-i18n="feedbackKicker">Ajude-nos a melhorar</p>
@@ -172,15 +184,15 @@
           <div class="audience-list">
             <article>
               <strong data-i18n="audienceStoresTitle">Lojas online</strong>
-              <span data-i18n="audienceStoresText">Fotos de produto com fundo limpo para páginas de venda.</span>
+              <span data-i18n="audienceStoresText">Fotos de produto com fundo limpo para pÃ¡ginas de venda.</span>
             </article>
             <article>
-              <strong data-i18n="audienceCatalogsTitle">Catálogos</strong>
-              <span data-i18n="audienceCatalogsText">Preparação rápida de imagens para coleções e campanhas.</span>
+              <strong data-i18n="audienceCatalogsTitle">CatÃ¡logos</strong>
+              <span data-i18n="audienceCatalogsText">PreparaÃ§Ã£o rÃ¡pida de imagens para coleÃ§Ãµes e campanhas.</span>
             </article>
             <article>
               <strong data-i18n="audienceTeamsTitle">Equipas</strong>
-              <span data-i18n="audienceTeamsText">Fluxo simples para quem recebe muitas fotos de uma só vez.</span>
+              <span data-i18n="audienceTeamsText">Fluxo simples para quem recebe muitas fotos de uma sÃ³ vez.</span>
             </article>
           </div>
         </section>
@@ -189,10 +201,10 @@
           <p class="section-kicker" data-i18n="proKicker">Para equipas e lojas</p>
           <h2 id="pro-title" data-i18n="proTitle">Precisa de processar centenas de fotos?</h2>
           <p data-i18n="proLead">
-            Estamos a preparar acesso Pro para volumes maiores, suporte prioritário e fluxos pensados para catálogos.
+            Estamos a preparar acesso Pro para volumes maiores, suporte prioritÃ¡rio e fluxos pensados para catÃ¡logos.
           </p>
           <p class="pro-note" data-i18n="proNoCommitment">
-            Sem compromisso. Serve apenas para avisar quando o acesso Pro estiver disponível.
+            Sem compromisso. Serve apenas para avisar quando o acesso Pro estiver disponÃ­vel.
           </p>
           <form class="pro-form" id="proForm">
             <input type="hidden" name="_subject" value="Novo lead BatchCutout Pro" />
@@ -223,24 +235,13 @@
             <button type="submit" data-i18n="proCta">Quero acesso Pro</button>
           </form>
           <p class="pro-message hidden" id="proErrorMessage" data-i18n="proErrorMessage">
-            Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.
+            NÃ£o foi possÃ­vel enviar automaticamente. Vamos abrir uma mensagem de email.
           </p>
           <p class="pro-message hidden" id="proMessage" data-i18n="proMessage">
             Obrigado. Vamos abrir uma mensagem de email para registar o seu interesse.
           </p>
         </section>
-      </section>
 
-      <section class="results" data-i18n-aria="resultsLabel" aria-label="Fotos processadas">
-        <div class="results-header">
-          <h2 data-i18n="queueTitle">Fila de imagens</h2>
-          <span id="countText">0 fotos</span>
-        </div>
-        <div class="empty-state" id="emptyState">
-          <strong data-i18n="emptyTitle">Os seus PNGs transparentes aparecem aqui</strong>
-          <p data-i18n="emptyState">Depois pode descarregar uma imagem ou exportar tudo em ZIP.</p>
-        </div>
-        <div class="grid" id="imageGrid"></div>
         <section class="faq-section" aria-labelledby="faq-title">
           <p class="section-kicker" data-i18n="faqKicker">Dúvidas rápidas</p>
           <h2 id="faq-title" data-i18n="faqTitle">Antes de começar</h2>
@@ -263,3 +264,4 @@
     <script type="module" src="./script.js"></script>
   </body>
 </html>
+
