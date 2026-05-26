@@ -39,5 +39,6 @@ Estado Google Ads:
 
 - A interface de conversões abriu, mas mostrou aviso de bloqueador de anúncios e impediu a configuração direta pela UI.
 - A conta mostra objetivos existentes `Inscrição` e `Visualização de página` com estado de configuração incorreta.
-- O código já envia a conversão Google Ads existente para lead Pro através de `AW-18177126609/nCaxCPrw1rEcENHhw9tD`.
-- Próximo passo manual na UI: quando o aviso de bloqueador estiver resolvido, marcar `lead_pro` como conversão principal e `download_zip`/`limite_20` como conversões secundárias ou observação, para não otimizar a campanha cedo demais para ações de baixo valor.
+- A ação principal `Lead Pro BatchCutout (1)` foi criada no Google Ads em `Inscrição`.
+- O código envia a conversão Google Ads de lead Pro através de `AW-18177126609/riWOCOiI67McENHhw9tD`.
+- Próximo passo na UI: criar `download_zip` e `limite_20` como conversões secundárias ou observação, para não otimizar a campanha cedo demais para ações de baixo valor.

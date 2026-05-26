@@ -28,7 +28,7 @@ const feedbackThanks = document.querySelector("#feedbackThanks");
 const maxFilesPerBatch = 20;
 const minExportSide = 1200;
 const leadEndpoint = "https://formsubmit.co/ajax/ricardojvilela@gmail.com";
-const proLeadConversionId = "AW-18177126609/nCaxCPrw1rEcENHhw9tD";
+const proLeadConversionId = "AW-18177126609/riWOCOiI67McENHhw9tD";
 const consentStorageKey = "batchcutout_consent";
 const feedbackStorageKey = "batchcutout_feedback_goal";
 
