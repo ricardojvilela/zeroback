@@ -222,6 +222,27 @@
           <progress id="progressBar" value="0" max="100"></progress>
         </div>
 
+        <section class="post-download-feedback hidden" id="postDownloadFeedback" aria-labelledby="post-download-title">
+          <div>
+            <p class="section-kicker" data-i18n="postDownloadKicker">Feedback rÃ¡pido</p>
+            <h2 id="post-download-title" data-i18n="postDownloadTitle">O BatchCutout ajudou nas suas fotos?</h2>
+          </div>
+          <div class="post-download-options" id="postDownloadOptions">
+            <button type="button" data-post-download-feedback="saved_time" data-i18n="postDownloadSavedTime">
+              Sim, poupou tempo
+            </button>
+            <button type="button" data-post-download-feedback="needs_quality" data-i18n="postDownloadNeedsQuality">
+              Precisa de melhor recorte
+            </button>
+            <button type="button" data-post-download-feedback="larger_batches" data-i18n="postDownloadLargerBatches">
+              Preciso de lotes maiores
+            </button>
+          </div>
+          <p class="post-download-thanks hidden" id="postDownloadThanks" data-i18n="postDownloadThanks">
+            Obrigado. A sua resposta ajuda-nos a melhorar a ferramenta.
+          </p>
+        </section>
+
         <div class="info-list">
           <p data-i18n="privacyNote">
             As imagens são processadas no seu dispositivo e não são carregadas para os nossos servidores.

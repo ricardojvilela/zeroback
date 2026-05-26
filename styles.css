@@ -524,6 +524,49 @@ h2 {
   font-weight: 850;
 }
 
+.post-download-feedback {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  border: 1px solid rgba(15, 139, 124, 0.28);
+  border-radius: 8px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(15, 139, 124, 0.1), rgba(255, 255, 255, 0.92));
+}
+
+.post-download-feedback h2 {
+  color: var(--charcoal);
+  font-size: 1.08rem;
+}
+
+.post-download-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.post-download-options button {
+  min-height: 42px;
+  border: 1px solid rgba(202, 213, 226, 0.9);
+  background: #ffffff;
+  color: var(--charcoal);
+  font-size: 0.86rem;
+  text-align: left;
+}
+
+.post-download-options button:hover,
+.post-download-options button.is-selected {
+  border-color: rgba(15, 139, 124, 0.58);
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+
+.post-download-thanks {
+  margin: 0;
+  color: var(--accent-strong);
+  font-weight: 850;
+}
+
 .audience-section {
   margin-top: 20px;
   border-radius: 8px;
@@ -1511,6 +1554,7 @@ progress::-moz-progress-bar {
   .audience-list,
   .seo-link-grid,
   .feedback-options,
+  .post-download-options,
   .pro-form {
     grid-template-columns: 1fr;
   }

@@ -24,6 +24,9 @@ const proMessage = document.querySelector("#proMessage");
 const proErrorMessage = document.querySelector("#proErrorMessage");
 const feedbackOptions = document.querySelector("#feedbackOptions");
 const feedbackThanks = document.querySelector("#feedbackThanks");
+const postDownloadFeedback = document.querySelector("#postDownloadFeedback");
+const postDownloadOptions = document.querySelector("#postDownloadOptions");
+const postDownloadThanks = document.querySelector("#postDownloadThanks");
 
 const maxFilesPerBatch = 20;
 const minExportSide = 1200;
@@ -63,6 +66,12 @@ const baseTranslation = {
   feedbackQuality: "Testar qualidade",
   feedbackCompare: "Comparar ferramentas",
   feedbackThanks: "Obrigado. Isto ajuda-nos a melhorar a ferramenta.",
+  postDownloadKicker: "Feedback rÃ¡pido",
+  postDownloadTitle: "O BatchCutout ajudou nas suas fotos?",
+  postDownloadSavedTime: "Sim, poupou tempo",
+  postDownloadNeedsQuality: "Precisa de melhor recorte",
+  postDownloadLargerBatches: "Preciso de lotes maiores",
+  postDownloadThanks: "Obrigado. A sua resposta ajuda-nos a melhorar a ferramenta.",
   benefitsLabel: "Vantagens do serviço",
   benefitPng: "PNG transparente",
   benefitZip: "ZIP organizado",
@@ -140,6 +149,12 @@ const translations = {
     feedbackQuality: "Test quality",
     feedbackCompare: "Compare tools",
     feedbackThanks: "Thanks. This helps us improve the tool.",
+    postDownloadKicker: "Quick feedback",
+    postDownloadTitle: "Did BatchCutout work for your product photos?",
+    postDownloadSavedTime: "Yes, it saved time",
+    postDownloadNeedsQuality: "Needs better cutout",
+    postDownloadLargerBatches: "I need larger batches",
+    postDownloadThanks: "Thanks. This helps us improve the tool.",
     eyebrow: "Bulk background removal",
     title: "BatchCutout",
     lead: "Remove backgrounds from multiple photos at once and export transparent PNGs ready for online stores, catalogues, and social media.",
@@ -835,6 +850,7 @@ const analyticsEvents = {
   pro_interest_prompt_clicked: { category: "commercial_intent", label: "pro_interest" },
   pro_lead_submitted: { category: "commercial_intent", label: "pro_lead" },
   feedback_goal_selected: { category: "feedback", label: "visitor_goal" },
+  post_download_feedback_selected: { category: "feedback", label: "post_download" },
 };
 
 function trackEvent(name, detail = {}) {
@@ -1221,6 +1237,7 @@ async function downloadZip() {
   trackEvent("zip_downloaded", { count: readyItems.length });
   trackEvent("download_zip", { count: readyItems.length });
   trackGoogleAdsConversion(downloadZipConversionId);
+  showPostDownloadFeedback("zip", readyItems.length);
 }
 
 function downloadSinglePng() {
@@ -1240,6 +1257,7 @@ function downloadSinglePng() {
   setStatus("statusPngReady", 100);
   trackEvent("png_downloaded", { count: 1 });
   trackEvent("download_png", { count: 1 });
+  showPostDownloadFeedback("png", 1);
 }
 
 function clearAll() {
@@ -1266,6 +1284,35 @@ function selectFeedbackGoal(goal) {
   localStorage.setItem(feedbackStorageKey, goal);
   renderFeedbackGoal(goal);
   trackEvent("feedback_goal_selected", { goal });
+}
+
+function showPostDownloadFeedback(downloadType, count) {
+  postDownloadFeedback?.classList.remove("hidden");
+  postDownloadFeedback?.setAttribute("data-download-type", downloadType);
+  postDownloadFeedback?.setAttribute("data-download-count", String(count));
+  postDownloadFeedback?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function selectPostDownloadFeedback(answer) {
+  if (!answer) return;
+
+  const downloadType = postDownloadFeedback?.getAttribute("data-download-type") || "unknown";
+  const downloadCount = Number(postDownloadFeedback?.getAttribute("data-download-count") || 0);
+
+  for (const button of postDownloadOptions?.querySelectorAll("[data-post-download-feedback]") || []) {
+    button.classList.toggle("is-selected", button.dataset.postDownloadFeedback === answer);
+  }
+
+  postDownloadThanks?.classList.remove("hidden");
+  trackEvent("post_download_feedback_selected", {
+    answer,
+    downloadType,
+    count: Number.isFinite(downloadCount) ? downloadCount : 0,
+  });
+
+  if (answer === "larger_batches") {
+    showProInterest("post_download_larger_batches");
+  }
 }
 
 function renderFeedbackGoal(goal) {
@@ -1393,6 +1440,10 @@ proForm.addEventListener("submit", submitProInterest);
 feedbackOptions?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-feedback-goal]");
   selectFeedbackGoal(button?.dataset.feedbackGoal);
+});
+postDownloadOptions?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-post-download-feedback]");
+  selectPostDownloadFeedback(button?.dataset.postDownloadFeedback);
 });
 
 for (const eventName of ["dragenter", "dragover", "dragleave", "drop"]) {
