@@ -1193,6 +1193,134 @@ progress::-moz-progress-bar {
   line-height: 1.5;
 }
 
+.pricing-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+  gap: 24px;
+  align-items: stretch;
+  border-radius: 8px;
+}
+
+.pricing-copy,
+.pricing-card,
+.pricing-proof article,
+.pricing-form-panel {
+  border: 1px solid rgba(219, 227, 238, 0.9);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: var(--shadow);
+}
+
+.pricing-copy {
+  padding: 32px;
+}
+
+.pricing-copy h1 {
+  max-width: 13ch;
+  margin-bottom: 18px;
+  color: var(--charcoal);
+  font-size: clamp(3rem, 6.5vw, 5.4rem);
+  line-height: 0.94;
+}
+
+.pricing-copy p:not(.section-kicker),
+.pricing-note,
+.pricing-form-panel p:not(.section-kicker),
+.pricing-proof p {
+  color: #52606d;
+  line-height: 1.55;
+}
+
+.pricing-card {
+  padding: 28px;
+}
+
+.pricing-card h2 {
+  margin-bottom: 8px;
+  color: var(--charcoal);
+  font-size: 2rem;
+}
+
+.pricing-card ul {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.pricing-card li {
+  border-left: 3px solid var(--accent);
+  padding: 10px 12px;
+  background: rgba(15, 139, 124, 0.08);
+  color: var(--charcoal);
+  font-weight: 850;
+}
+
+.pricing-proof {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.pricing-proof article {
+  min-height: 154px;
+  padding: 18px;
+}
+
+.pricing-proof strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--charcoal);
+}
+
+.pricing-form-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(360px, 1fr);
+  gap: 22px;
+  margin-top: 22px;
+  padding: 24px;
+}
+
+.pricing-form {
+  display: grid;
+  gap: 10px;
+}
+
+.pricing-form input,
+.pricing-form select {
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 14px;
+  background: #ffffff;
+  color: var(--charcoal);
+  font: inherit;
+}
+
+.pricing-form button {
+  min-height: 48px;
+  background: var(--blue);
+}
+
+.pricing-form button:hover:not(:disabled) {
+  background: var(--blue-strong);
+}
+
+.pricing-privacy,
+.pricing-message {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #52606d;
+  font-size: 0.9rem;
+}
+
+.pricing-message {
+  color: var(--accent-strong);
+  font-weight: 850;
+}
+
 .use-cases-hero .landing-copy h1 {
   max-width: 13ch;
 }
@@ -1480,6 +1608,9 @@ progress::-moz-progress-bar {
 
   .landing-hero,
   .landing-proof,
+  .pricing-hero,
+  .pricing-proof,
+  .pricing-form-panel,
   .use-case-grid {
     grid-template-columns: 1fr;
   }

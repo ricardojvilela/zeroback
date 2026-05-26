@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BatchCutout Pro Waitlist | Bulk Background Remover Pricing</title>
+    <meta
+      name="description"
+      content="Join the BatchCutout Pro waitlist for larger product photo batches, ecommerce workflows, ZIP exports and priority access."
+    />
+    <meta property="og:title" content="BatchCutout Pro Waitlist" />
+    <meta
+      property="og:description"
+      content="For stores and teams processing 100+ product photos and larger ecommerce catalog batches."
+    />
+    <meta property="og:url" content="https://batchcutout.com/pricing/" />
+    <meta property="og:type" content="website" />
+    <link rel="canonical" href="https://batchcutout.com/pricing/" />
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18177126609"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      const batchCutoutConsent = localStorage.getItem("batchcutout_consent");
+      const batchCutoutConsentGranted = batchCutoutConsent === "accepted";
+      gtag("consent", "default", {
+        ad_storage: batchCutoutConsentGranted ? "granted" : "denied",
+        ad_user_data: batchCutoutConsentGranted ? "granted" : "denied",
+        ad_personalization: batchCutoutConsentGranted ? "granted" : "denied",
+        analytics_storage: batchCutoutConsentGranted ? "granted" : "denied",
+      });
+      gtag("js", new Date());
+      gtag("config", "AW-18177126609");
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "BatchCutout Pro",
+        "description": "Pro access for larger product photo background removal batches and ecommerce catalog workflows.",
+        "brand": {
+          "@type": "Brand",
+          "name": "BatchCutout"
+        },
+        "offers": {
+          "@type": "Offer",
+          "availability": "https://schema.org/PreOrder",
+          "priceCurrency": "EUR",
+          "price": "0",
+          "url": "https://batchcutout.com/pricing/"
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body class="landing-page">
+    <main class="landing-shell">
+      <nav class="landing-nav" aria-label="BatchCutout">
+        <a class="landing-logo" href="/">
+          <span class="brand-mark">BC</span>
+          <span>BatchCutout</span>
+        </a>
+        <a href="/?utm_source=pricing&utm_medium=nav&utm_campaign=pro-waitlist#tool">Try free</a>
+      </nav>
+
+      <section class="pricing-hero">
+        <div class="pricing-copy">
+          <p class="section-kicker">BatchCutout Pro</p>
+          <h1>For stores and teams processing 100+ product photos</h1>
+          <p>
+            Pro access is being prepared for ecommerce teams that need larger batches, faster repeated
+            workflows and organized transparent PNG exports for catalog work.
+          </p>
+          <div class="landing-actions">
+            <a class="landing-button" href="#pro-waitlist">Join Pro waitlist</a>
+            <a class="landing-secondary" href="/?utm_source=pricing&utm_medium=hero&utm_campaign=try-free#tool">Try free batch first</a>
+          </div>
+        </div>
+
+        <aside class="pricing-card" aria-labelledby="pro-plan-title">
+          <p class="section-kicker">Planned Pro access</p>
+          <h2 id="pro-plan-title">Pro waitlist</h2>
+          <p class="pricing-note">Pricing is not active yet. Join the list to help us prioritize the first Pro release.</p>
+          <ul>
+            <li>Larger image batches</li>
+            <li>Transparent PNG and ZIP exports</li>
+            <li>Ecommerce catalog workflow</li>
+            <li>Priority access when Pro opens</li>
+            <li>Built for stores, agencies and teams</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="pricing-proof" aria-label="Who needs BatchCutout Pro">
+        <article>
+          <strong>Shopify and WooCommerce stores</strong>
+          <p>Prepare catalog images, new arrivals and product variants without repeating the same edit manually.</p>
+        </article>
+        <article>
+          <strong>Marketplace sellers</strong>
+          <p>Clean product photos for Etsy, eBay and marketplace listings where consistent images matter.</p>
+        </article>
+        <article>
+          <strong>Agencies and assistants</strong>
+          <p>Process client images in batches and export organized files that are ready to deliver.</p>
+        </article>
+      </section>
+
+      <section class="pricing-form-panel" id="pro-waitlist" aria-labelledby="waitlist-title">
+        <div>
+          <p class="section-kicker">Early access</p>
+          <h2 id="waitlist-title">Join the Pro waitlist</h2>
+          <p>
+            Tell us the volume you expect to process. This helps define the right pricing and first Pro limits.
+          </p>
+        </div>
+        <form
+          class="pricing-form"
+          action="https://formsubmit.co/ajax/ricardojvilela@gmail.com"
+          method="POST"
+        >
+          <input type="hidden" name="_subject" value="Novo lead BatchCutout Pro - Pricing" />
+          <input type="hidden" name="_template" value="table" />
+          <input type="hidden" name="source" value="pricing-page" />
+          <input type="text" name="_honey" class="honeypot-field" tabindex="-1" autocomplete="off" />
+          <input name="email" type="email" autocomplete="email" required placeholder="Email" />
+          <input name="company" type="text" autocomplete="organization" placeholder="Store or company" />
+          <select name="volume" aria-label="Estimated monthly volume">
+            <option value="100-500">100-500 images/month</option>
+            <option value="500-2000">500-2,000 images/month</option>
+            <option value="2000+">2,000+ images/month</option>
+          </select>
+          <button type="submit">Join Pro waitlist</button>
+        </form>
+        <p class="pricing-privacy">No payment now. This only registers interest in Pro access.</p>
+      </section>
+    </main>
+    <script>
+      const pricingForm = document.querySelector(".pricing-form");
+      const pricingMessage = document.createElement("p");
+      pricingMessage.className = "pricing-message hidden";
+      pricingForm.after(pricingMessage);
+
+      pricingForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const submitButton = pricingForm.querySelector("button");
+        submitButton.disabled = true;
+        pricingMessage.classList.add("hidden");
+
+        const formData = new FormData(pricingForm);
+        const email = formData.get("email");
+        const company = formData.get("company");
+        const volume = formData.get("volume");
+
+        window.gtag?.("event", "pro_waitlist_submitted", {
+          event_category: "commercial_intent",
+          event_label: volume,
+          page_path: window.location.pathname,
+        });
+        window.gtag?.("event", "generate_lead", {
+          event_category: "commercial_intent",
+          event_label: "pricing_waitlist",
+        });
+        window.gtag?.("event", "conversion", {
+          send_to: "AW-18177126609/riWOCOiI67McENHhw9tD",
+          value: 1.0,
+          currency: "EUR",
+        });
+
+        try {
+          const response = await fetch(pricingForm.action, {
+            method: "POST",
+            headers: { Accept: "application/json" },
+            body: formData,
+          });
+
+          if (!response.ok) throw new Error("Form submit failed");
+          pricingForm.reset();
+          pricingMessage.textContent = "Thanks. You are on the Pro waitlist.";
+        } catch (error) {
+          const subject = encodeURIComponent("Novo lead BatchCutout Pro - Pricing");
+          const body = encodeURIComponent(
+            `Email: ${email || ""}\nCompany: ${company || ""}\nVolume: ${volume || ""}\nSource: ${window.location.href}`,
+          );
+          pricingMessage.textContent = "We could not submit automatically. Opening an email draft instead.";
+          window.location.href = `mailto:ricardojvilela@gmail.com?subject=${subject}&body=${body}`;
+        } finally {
+          pricingMessage.classList.remove("hidden");
+          submitButton.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>
