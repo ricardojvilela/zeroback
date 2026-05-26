@@ -1150,6 +1150,63 @@ progress::-moz-progress-bar {
   line-height: 1.5;
 }
 
+.use-cases-hero .landing-copy h1 {
+  max-width: 13ch;
+}
+
+.use-cases-hero .landing-visual img {
+  object-fit: contain;
+  background: #ffffff;
+}
+
+.use-case-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.use-case-grid article {
+  min-height: 236px;
+  border: 1px solid rgba(219, 227, 238, 0.9);
+  border-radius: 8px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 14px 34px rgba(26, 39, 57, 0.08);
+}
+
+.use-case-grid span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  margin-bottom: 14px;
+  border-radius: 999px;
+  background: rgba(15, 139, 124, 0.12);
+  color: var(--accent-strong);
+  font-size: 0.78rem;
+  font-weight: 950;
+}
+
+.use-case-grid h2 {
+  margin-bottom: 8px;
+  color: var(--charcoal);
+  font-size: 1.18rem;
+}
+
+.use-case-grid p {
+  margin: 0 0 14px;
+  color: #52606d;
+  line-height: 1.5;
+}
+
+.use-case-grid a {
+  color: var(--accent-strong);
+  font-weight: 900;
+  text-decoration: none;
+}
+
 .seo-links-section {
   margin-top: 18px;
   border: 1px solid var(--line);
@@ -1204,6 +1261,46 @@ progress::-moz-progress-bar {
   color: #52606d;
   font-size: 0.82rem;
   line-height: 1.4;
+}
+
+.visual-proof-section {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.84);
+}
+
+.visual-proof-copy {
+  max-width: 720px;
+}
+
+.visual-proof-copy h2 {
+  margin-bottom: 8px;
+  color: var(--charcoal);
+  font-size: 1.22rem;
+}
+
+.visual-proof-copy p:not(.section-kicker) {
+  margin: 0;
+  color: #52606d;
+  line-height: 1.5;
+}
+
+.visual-proof-section picture {
+  display: block;
+  overflow: hidden;
+  border: 1px solid rgba(202, 213, 226, 0.8);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.visual-proof-section img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .tool-results {
@@ -1339,7 +1436,8 @@ progress::-moz-progress-bar {
   }
 
   .landing-hero,
-  .landing-proof {
+  .landing-proof,
+  .use-case-grid {
     grid-template-columns: 1fr;
   }
 }
