@@ -992,10 +992,11 @@ async function ensureMinimumPngResolution(blob) {
 function updateControls() {
   const hasItems = items.length > 0;
   const allReady = hasItems && items.every((item) => item.outputBlob);
+  const hasPendingItems = items.some((item) => !item.outputBlob);
   const singleReady = items.length === 1 && Boolean(items[0].outputBlob);
   const running = items.some((item) => item.statusKey === "statusProcessing");
 
-  processButton.disabled = !hasItems || running;
+  processButton.disabled = !hasItems || !hasPendingItems || running;
   pngButton.disabled = !singleReady || running;
   zipButton.disabled = !allReady || running;
   clearButton.disabled = !hasItems || running;

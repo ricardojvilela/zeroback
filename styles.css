@@ -482,12 +482,12 @@ h2 {
 }
 
 .feedback-panel {
-  margin-top: 18px;
-  border: 1px solid rgba(15, 139, 124, 0.18);
+  margin-top: 26px;
+  border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 18px;
-  background: #ffffff;
-  box-shadow: 0 12px 28px rgba(26, 39, 57, 0.07);
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: none;
 }
 
 .feedback-panel h2 {
@@ -502,11 +502,11 @@ h2 {
 }
 
 .feedback-options button {
-  min-height: 44px;
+  min-height: 40px;
   border: 1px solid var(--line);
-  background: #f8fbfd;
+  background: transparent;
   color: var(--ink);
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   text-align: left;
 }
 
@@ -520,7 +520,7 @@ h2 {
 .feedback-thanks {
   margin: 12px 0 0;
   color: var(--accent-strong);
-  font-size: 0.9rem;
+  font-size: 0.86rem;
   font-weight: 850;
 }
 
