@@ -840,18 +840,34 @@ const analyticsEvents = {
 function trackEvent(name, detail = {}) {
   const config = analyticsEvents[name] || { category: "interaction", label: name };
   const numericValue = Number(detail.count || detail.totalInQueue || detail.accepted || detail.value || 0);
+  const attributionParams = getAttributionParams();
   const eventParams = {
     event_category: config.category,
     event_label: detail.reason || detail.volume || config.label,
     funnel_step: config.step || detail.funnel_step || undefined,
     value: Number.isFinite(numericValue) ? numericValue : 0,
     language: currentLanguage,
+    ...attributionParams,
     ...detail,
   };
 
   window.dispatchEvent(new CustomEvent("rfel:analytics", { detail: { name, ...detail } }));
   window.dataLayer?.push({ event: name, ...eventParams });
   window.gtag?.("event", name, eventParams);
+}
+
+function getAttributionParams() {
+  const params = new URLSearchParams(window.location.search);
+  const attribution = {
+    page_path: window.location.pathname,
+    page_title: document.title,
+    page_location: window.location.href.split("#")[0],
+    utm_source: params.get("utm_source"),
+    utm_medium: params.get("utm_medium"),
+    utm_campaign: params.get("utm_campaign") || params.get("source"),
+  };
+
+  return Object.fromEntries(Object.entries(attribution).filter(([, value]) => Boolean(value)));
 }
 
 function trackGoogleAdsConversion(sendTo, { value = 1.0, currency = "EUR" } = {}) {
