@@ -605,6 +605,50 @@ h2 {
   display: none;
 }
 
+.consent-banner {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 20;
+  display: grid;
+  gap: 12px;
+  width: min(420px, calc(100% - 36px));
+  padding: 16px;
+  border: 1px solid rgba(20, 184, 166, 0.22);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+}
+
+.consent-banner p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.consent-banner div {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.consent-banner button {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 7px;
+  font-size: 0.9rem;
+}
+
+.consent-decline {
+  background: #eef4f6;
+  color: var(--ink);
+}
+
+.consent-decline:hover {
+  background: #dbe7eb;
+}
+
 progress {
   width: 42%;
   height: 10px;

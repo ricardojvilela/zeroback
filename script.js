@@ -26,6 +26,7 @@ const proErrorMessage = document.querySelector("#proErrorMessage");
 const maxFilesPerBatch = 20;
 const leadEndpoint = "https://formsubmit.co/ajax/ricardojvilela@gmail.com";
 const proLeadConversionId = "AW-18177126609/nCaxCPrw1rEcENHhw9tD";
+const consentStorageKey = "batchcutout_consent";
 
 const supportedExtensions = [
   ".jpg",
@@ -53,6 +54,9 @@ const baseTranslation = {
   benefitPng: "PNG transparente",
   benefitZip: "ZIP organizado",
   fileSuffix: "sem-fundo",
+  cookieText: "Usamos medição simples para perceber visitas e pedidos Pro. Pode aceitar ou continuar sem medição.",
+  cookieAccept: "Aceitar medição",
+  cookieDecline: "Continuar sem medição",
 };
 
 const languageNames = {
@@ -822,6 +826,45 @@ function trackEvent(name, detail = {}) {
   window.gtag?.("event", name, eventParams);
 }
 
+function updateConsent(consent) {
+  const granted = consent === "accepted";
+  localStorage.setItem(consentStorageKey, consent);
+  window.gtag?.("consent", "update", {
+    ad_storage: granted ? "granted" : "denied",
+    ad_user_data: granted ? "granted" : "denied",
+    ad_personalization: granted ? "granted" : "denied",
+    analytics_storage: granted ? "granted" : "denied",
+  });
+}
+
+function showConsentBanner() {
+  if (localStorage.getItem(consentStorageKey)) return;
+
+  const banner = document.createElement("section");
+  banner.className = "consent-banner";
+  banner.setAttribute("aria-label", "Cookie consent");
+  banner.innerHTML = `
+    <p>${t("cookieText")}</p>
+    <div>
+      <button type="button" class="consent-decline">${t("cookieDecline")}</button>
+      <button type="button" class="consent-accept">${t("cookieAccept")}</button>
+    </div>
+  `;
+
+  banner.querySelector(".consent-accept").addEventListener("click", () => {
+    updateConsent("accepted");
+    banner.remove();
+    trackEvent("measurement_consent_accepted");
+  });
+
+  banner.querySelector(".consent-decline").addEventListener("click", () => {
+    updateConsent("declined");
+    banner.remove();
+  });
+
+  document.body.appendChild(banner);
+}
+
 function detectLanguage() {
   const browserLanguages = navigator.languages?.length ? navigator.languages : [navigator.language];
 
@@ -1253,3 +1296,4 @@ dropzone.addEventListener("drop", (event) => {
 
 setStatus("statusWaiting");
 applyLanguage();
+showConsentBanner();
