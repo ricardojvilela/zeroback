@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BatchCutout for Etsy - Bulk Listing Photo Background Remover</title>
+    <meta
+      name="description"
+      content="Prepare Etsy listing photos faster. Remove backgrounds from multiple product images in bulk and export transparent PNGs or an organised ZIP."
+    />
+    <meta property="og:title" content="BatchCutout for Etsy" />
+    <meta
+      property="og:description"
+      content="Bulk background remover for Etsy product and listing photos. Process up to 20 images free in the browser."
+    />
+    <meta property="og:url" content="https://batchcutout.com/etsy" />
+    <meta property="og:type" content="website" />
+    <link rel="canonical" href="https://batchcutout.com/etsy" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18177126609"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      const batchCutoutConsent = localStorage.getItem("batchcutout_consent");
+      const batchCutoutConsentGranted = batchCutoutConsent === "accepted";
+      gtag("consent", "default", {
+        ad_storage: batchCutoutConsentGranted ? "granted" : "denied",
+        ad_user_data: batchCutoutConsentGranted ? "granted" : "denied",
+        ad_personalization: batchCutoutConsentGranted ? "granted" : "denied",
+        analytics_storage: batchCutoutConsentGranted ? "granted" : "denied",
+      });
+      gtag("js", new Date());
+      gtag("config", "AW-18177126609");
+    </script>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="landing-page">
+    <main class="landing-shell">
+      <nav class="landing-nav" aria-label="BatchCutout">
+        <a class="landing-logo" href="./">
+          <span class="brand-mark">BC</span>
+          <span>BatchCutout</span>
+        </a>
+        <a href="./?source=etsy#pro-title">Need more than 20 images?</a>
+      </nav>
+
+      <section class="landing-hero">
+        <div class="landing-copy">
+          <p class="section-kicker">For Etsy sellers</p>
+          <h1>Prepare Etsy listing photos faster</h1>
+          <p>
+            Remove backgrounds from many product photos at once. Create cleaner transparent PNGs
+            for listings, shop updates, ads and seasonal campaigns without uploading images to a server.
+          </p>
+          <div class="landing-actions">
+            <a class="landing-button" href="./?source=etsy" data-track-landing-cta="etsy">Start free</a>
+            <a class="landing-secondary" href="./?source=etsy#pro-title">Request Pro access</a>
+          </div>
+        </div>
+        <div class="landing-visual">
+          <img src="./assets/product-before-after.png" alt="Product photo before and after background removal" />
+        </div>
+      </section>
+
+      <section class="landing-proof" aria-label="Etsy use cases">
+        <article>
+          <strong>Many listings</strong>
+          <p>Process product batches for new collections, restocks and seasonal shop updates.</p>
+        </article>
+        <article>
+          <strong>Clean cutouts</strong>
+          <p>Use transparent PNGs across listing images, banners, social posts and ads.</p>
+        </article>
+        <article>
+          <strong>Fast export</strong>
+          <p>Download one PNG for a single product or export the full batch as a ZIP.</p>
+        </article>
+        <article>
+          <strong>Browser processing</strong>
+          <p>Your photos stay on your device while the background removal runs locally.</p>
+        </article>
+      </section>
+
+      <section class="landing-panel">
+        <div>
+          <p class="section-kicker">Free test</p>
+          <h2>Process up to 20 images per batch</h2>
+          <p>Use the free version to test quality. For larger Etsy shops, request Pro access.</p>
+        </div>
+        <a class="landing-button" href="./?source=etsy#dropzone" data-track-landing-cta="etsy_bottom">Try BatchCutout</a>
+      </section>
+    </main>
+    <script>
+      document.querySelectorAll("[data-track-landing-cta]").forEach(function (link) {
+        link.addEventListener("click", function () {
+          window.gtag?.("event", "landing_cta_clicked", {
+            event_category: "landing",
+            event_label: link.dataset.trackLandingCta,
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

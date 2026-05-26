@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BatchCutout for Shopify - Bulk Product Photo Background Remover</title>
+    <meta
+      name="description"
+      content="Prepare Shopify product photos faster. Remove backgrounds from multiple images in bulk and export transparent PNGs or an organised ZIP."
+    />
+    <meta property="og:title" content="BatchCutout for Shopify" />
+    <meta
+      property="og:description"
+      content="Bulk background remover for Shopify product photos. Process up to 20 images free in the browser."
+    />
+    <meta property="og:url" content="https://batchcutout.com/shopify" />
+    <meta property="og:type" content="website" />
+    <link rel="canonical" href="https://batchcutout.com/shopify" />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18177126609"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      const batchCutoutConsent = localStorage.getItem("batchcutout_consent");
+      const batchCutoutConsentGranted = batchCutoutConsent === "accepted";
+      gtag("consent", "default", {
+        ad_storage: batchCutoutConsentGranted ? "granted" : "denied",
+        ad_user_data: batchCutoutConsentGranted ? "granted" : "denied",
+        ad_personalization: batchCutoutConsentGranted ? "granted" : "denied",
+        analytics_storage: batchCutoutConsentGranted ? "granted" : "denied",
+      });
+      gtag("js", new Date());
+      gtag("config", "AW-18177126609");
+    </script>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body class="landing-page">
+    <main class="landing-shell">
+      <nav class="landing-nav" aria-label="BatchCutout">
+        <a class="landing-logo" href="./">
+          <span class="brand-mark">BC</span>
+          <span>BatchCutout</span>
+        </a>
+        <a href="./?source=shopify#pro-title">Need more than 20 images?</a>
+      </nav>
+
+      <section class="landing-hero">
+        <div class="landing-copy">
+          <p class="section-kicker">For Shopify stores</p>
+          <h1>Bulk background remover for product photos</h1>
+          <p>
+            Prepare cleaner product images for Shopify pages, collections and campaigns. Upload
+            multiple photos, remove backgrounds in the browser and export transparent PNGs or a ZIP.
+          </p>
+          <div class="landing-actions">
+            <a class="landing-button" href="./?source=shopify" data-track-landing-cta="shopify">Start free</a>
+            <a class="landing-secondary" href="./?source=shopify#pro-title">Request Pro access</a>
+          </div>
+        </div>
+        <div class="landing-visual">
+          <img src="./assets/product-before-after.png" alt="Product photo before and after background removal" />
+        </div>
+      </section>
+
+      <section class="landing-proof" aria-label="Shopify use cases">
+        <article>
+          <strong>Built for catalogues</strong>
+          <p>Handle many product photos in one batch instead of repeating the same task image by image.</p>
+        </article>
+        <article>
+          <strong>Transparent PNGs</strong>
+          <p>Export clean cutouts for product pages, ads, banners and marketplace feeds.</p>
+        </article>
+        <article>
+          <strong>ZIP export</strong>
+          <p>Download all processed images together with organised file names.</p>
+        </article>
+        <article>
+          <strong>Private by design</strong>
+          <p>Images are processed on your device and are not uploaded to our servers.</p>
+        </article>
+      </section>
+
+      <section class="landing-panel">
+        <div>
+          <p class="section-kicker">Free test</p>
+          <h2>Process up to 20 images per batch</h2>
+          <p>Use the free version to test quality. For larger Shopify catalogues, request Pro access.</p>
+        </div>
+        <a class="landing-button" href="./?source=shopify#dropzone" data-track-landing-cta="shopify_bottom">Try BatchCutout</a>
+      </section>
+    </main>
+    <script>
+      document.querySelectorAll("[data-track-landing-cta]").forEach(function (link) {
+        link.addEventListener("click", function () {
+          window.gtag?.("event", "landing_cta_clicked", {
+            event_category: "landing",
+            event_label: link.dataset.trackLandingCta,
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

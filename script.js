@@ -22,11 +22,14 @@ const proCompany = document.querySelector("#proCompany");
 const proVolume = document.querySelector("#proVolume");
 const proMessage = document.querySelector("#proMessage");
 const proErrorMessage = document.querySelector("#proErrorMessage");
+const feedbackOptions = document.querySelector("#feedbackOptions");
+const feedbackThanks = document.querySelector("#feedbackThanks");
 
 const maxFilesPerBatch = 20;
 const leadEndpoint = "https://formsubmit.co/ajax/ricardojvilela@gmail.com";
 const proLeadConversionId = "AW-18177126609/nCaxCPrw1rEcENHhw9tD";
 const consentStorageKey = "batchcutout_consent";
+const feedbackStorageKey = "batchcutout_feedback_goal";
 
 const supportedExtensions = [
   ".jpg",
@@ -50,6 +53,13 @@ const supportedExtensions = [
 ];
 
 const baseTranslation = {
+  feedbackKicker: "Ajude-nos a melhorar",
+  feedbackTitle: "O que procurava fazer hoje?",
+  feedbackBulk: "Remover fundos em lote",
+  feedbackStore: "Preparar fotos para loja",
+  feedbackQuality: "Testar qualidade",
+  feedbackCompare: "Comparar ferramentas",
+  feedbackThanks: "Obrigado. Isto ajuda-nos a melhorar a ferramenta.",
   benefitsLabel: "Vantagens do serviço",
   benefitPng: "PNG transparente",
   benefitZip: "ZIP organizado",
@@ -120,6 +130,13 @@ const translations = {
     ...baseTranslation,
     pageTitle: "BatchCutout - Bulk Background Remover",
     languageLabel: "Language",
+    feedbackKicker: "Help us improve",
+    feedbackTitle: "What were you trying to do today?",
+    feedbackBulk: "Remove backgrounds in bulk",
+    feedbackStore: "Prepare store photos",
+    feedbackQuality: "Test quality",
+    feedbackCompare: "Compare tools",
+    feedbackThanks: "Thanks. This helps us improve the tool.",
     eyebrow: "Bulk background removal",
     title: "BatchCutout",
     lead: "Remove backgrounds from multiple photos at once and export transparent PNGs ready for online stores, catalogues, and social media.",
@@ -808,6 +825,7 @@ const analyticsEvents = {
   zip_downloaded: { category: "download", label: "zip" },
   pro_interest_prompt_clicked: { category: "commercial_intent", label: "pro_interest" },
   pro_lead_submitted: { category: "commercial_intent", label: "pro_lead" },
+  feedback_goal_selected: { category: "feedback", label: "visitor_goal" },
 };
 
 function trackEvent(name, detail = {}) {
@@ -1151,6 +1169,21 @@ function showProInterest(reason = "manual") {
   trackEvent("pro_interest_prompt_clicked", { reason, totalInQueue: items.length });
 }
 
+function selectFeedbackGoal(goal) {
+  if (!goal) return;
+
+  localStorage.setItem(feedbackStorageKey, goal);
+  renderFeedbackGoal(goal);
+  trackEvent("feedback_goal_selected", { goal });
+}
+
+function renderFeedbackGoal(goal) {
+  for (const button of feedbackOptions?.querySelectorAll("[data-feedback-goal]") || []) {
+    button.classList.toggle("is-selected", button.dataset.feedbackGoal === goal);
+  }
+  feedbackThanks?.classList.remove("hidden");
+}
+
 function openLeadEmail({ email, company, volume }) {
   const subject = encodeURIComponent(t("proEmailSubject"));
   const body = encodeURIComponent(t("proEmailBody", {
@@ -1265,6 +1298,10 @@ brandCta.addEventListener("click", () => {
 });
 inlineProCta.addEventListener("click", () => showProInterest("inline_pro_cta"));
 proForm.addEventListener("submit", submitProInterest);
+feedbackOptions?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-feedback-goal]");
+  selectFeedbackGoal(button?.dataset.feedbackGoal);
+});
 
 for (const eventName of ["dragenter", "dragover", "dragleave", "drop"]) {
   document.addEventListener(eventName, (event) => {
@@ -1296,4 +1333,5 @@ dropzone.addEventListener("drop", (event) => {
 
 setStatus("statusWaiting");
 applyLanguage();
+renderFeedbackGoal(localStorage.getItem(feedbackStorageKey));
 showConsentBanner();
