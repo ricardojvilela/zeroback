@@ -29,6 +29,7 @@ const maxFilesPerBatch = 20;
 const minExportSide = 1200;
 const leadEndpoint = "https://formsubmit.co/ajax/ricardojvilela@gmail.com";
 const proLeadConversionId = "AW-18177126609/riWOCOiI67McENHhw9tD";
+const downloadZipConversionId = "AW-18177126609/2EdRCMzF7bMcENHhw9tD";
 const consentStorageKey = "batchcutout_consent";
 const feedbackStorageKey = "batchcutout_feedback_goal";
 
@@ -852,6 +853,15 @@ function trackEvent(name, detail = {}) {
   window.gtag?.("event", name, eventParams);
 }
 
+function trackGoogleAdsConversion(sendTo, { value = 1.0, currency = "EUR" } = {}) {
+  if (!sendTo) return;
+  window.gtag?.("event", "conversion", {
+    send_to: sendTo,
+    value,
+    currency,
+  });
+}
+
 function updateConsent(consent) {
   const granted = consent === "accepted";
   localStorage.setItem(consentStorageKey, consent);
@@ -1188,6 +1198,7 @@ async function downloadZip() {
   setStatus("statusZipReady", 100);
   trackEvent("zip_downloaded", { count: readyItems.length });
   trackEvent("download_zip", { count: readyItems.length });
+  trackGoogleAdsConversion(downloadZipConversionId);
 }
 
 function downloadSinglePng() {
@@ -1269,11 +1280,7 @@ function trackLeadConversion(volume, hasCompany) {
     event_category: "commercial_intent",
     event_label: volume,
   });
-  window.gtag?.("event", "conversion", {
-    send_to: proLeadConversionId,
-    value: 1.0,
-    currency: "EUR",
-  });
+  trackGoogleAdsConversion(proLeadConversionId);
 }
 
 async function submitProInterest(event) {

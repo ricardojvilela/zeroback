@@ -42,3 +42,9 @@ Estado Google Ads:
 - A ação principal `Lead Pro BatchCutout (1)` foi criada no Google Ads em `Inscrição`.
 - O código envia a conversão Google Ads de lead Pro através de `AW-18177126609/riWOCOiI67McENHhw9tD`.
 - Próximo passo na UI: criar `download_zip` e `limite_20` como conversões secundárias ou observação, para não otimizar a campanha cedo demais para ações de baixo valor.
+
+Atualização em 2026-05-26:
+
+- A ação secundária `Download ZIP BatchCutout` foi criada no Google Ads em `Visualização de página`.
+- O código envia a conversão Google Ads de download ZIP através de `AW-18177126609/2EdRCMzF7bMcENHhw9tD`.
+- A ação `limite_20` continua medida pela Google tag como evento de funil. Próximo passo na UI: criar `Limite 20 BatchCutout` como conversão secundária/observação, sem otimizar a campanha por esta ação.
