@@ -42,6 +42,7 @@ const consentStorageKey = "batchcutout_consent";
 const feedbackStorageKey = "batchcutout_feedback_goal";
 const debugMode = new URLSearchParams(window.location.search).get("debug") === "1";
 const debugEventsStorageKey = "batchcutout_debug_events";
+const attributionStorageKey = "batchcutout_attribution";
 let debugList;
 
 const supportedExtensions = [
@@ -882,6 +883,7 @@ function trackEvent(name, detail = {}) {
 
 function getAttributionParams() {
   const params = new URLSearchParams(window.location.search);
+  const storedAttribution = getStoredAttribution();
   const attribution = {
     page_path: window.location.pathname,
     page_title: document.title,
@@ -891,9 +893,67 @@ function getAttributionParams() {
     utm_source: params.get("utm_source"),
     utm_medium: params.get("utm_medium"),
     utm_campaign: params.get("utm_campaign") || params.get("source"),
+    utm_content: params.get("utm_content"),
+    utm_term: params.get("utm_term"),
+    gclid: params.get("gclid"),
+    gbraid: params.get("gbraid"),
+    wbraid: params.get("wbraid"),
+    first_source: storedAttribution.first?.source,
+    first_campaign: storedAttribution.first?.campaign,
+    first_landing_page: storedAttribution.first?.landing_page,
+    first_seen_at: storedAttribution.first?.seen_at,
+    last_source: storedAttribution.last?.source,
+    last_campaign: storedAttribution.last?.campaign,
+    last_landing_page: storedAttribution.last?.landing_page,
+    last_seen_at: storedAttribution.last?.seen_at,
   };
 
   return Object.fromEntries(Object.entries(attribution).filter(([, value]) => Boolean(value)));
+}
+
+function getStoredAttribution() {
+  try {
+    return JSON.parse(localStorage.getItem(attributionStorageKey) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function getVisitAttribution() {
+  const params = new URLSearchParams(window.location.search);
+  const referrer = document.referrer && !document.referrer.includes(window.location.hostname)
+    ? document.referrer
+    : "";
+  const source = params.get("utm_source") || params.get("source") || (params.get("gclid") ? "google" : "") || referrer || "direct";
+
+  return {
+    source,
+    medium: params.get("utm_medium") || (params.get("gclid") ? "cpc" : ""),
+    campaign: params.get("utm_campaign") || params.get("campaign") || "",
+    content: params.get("utm_content") || "",
+    term: params.get("utm_term") || "",
+    gclid: params.get("gclid") || "",
+    gbraid: params.get("gbraid") || "",
+    wbraid: params.get("wbraid") || "",
+    landing_page: window.location.href.split("#")[0],
+    referrer,
+    free_limit: maxFilesPerBatch,
+    seen_at: new Date().toISOString(),
+  };
+}
+
+function persistAttribution() {
+  const current = getVisitAttribution();
+  const stored = getStoredAttribution();
+  const hasCampaignSignal = ["utm_source", "utm_medium", "utm_campaign", "source", "gclid", "gbraid", "wbraid"]
+    .some((key) => new URLSearchParams(window.location.search).has(key));
+  const next = {
+    first: stored.first || current,
+    last: hasCampaignSignal || !stored.last ? current : stored.last,
+  };
+
+  localStorage.setItem(attributionStorageKey, JSON.stringify(next));
+  recordDebugEvent("attribution_saved", next);
 }
 
 function trackGoogleAdsConversion(sendTo, { value = 1.0, currency = "EUR" } = {}) {
@@ -1441,11 +1501,13 @@ async function submitProInterest(event) {
   const company = proCompany.value.trim() || "-";
   const volume = proVolume.value;
   const hasCompany = company !== "-";
+  const attribution = getAttributionParams();
   const lead = {
     email,
     company,
     volume,
     language: currentLanguage,
+    attribution,
     submittedAt: new Date().toISOString(),
   };
 
@@ -1469,6 +1531,18 @@ async function submitProInterest(event) {
         volume,
         language: currentLanguage,
         source: window.location.href,
+        attribution: JSON.stringify(attribution),
+        firstSource: attribution.first_source || "",
+        firstCampaign: attribution.first_campaign || "",
+        firstLandingPage: attribution.first_landing_page || "",
+        lastSource: attribution.last_source || "",
+        lastCampaign: attribution.last_campaign || "",
+        lastLandingPage: attribution.last_landing_page || "",
+        gclid: attribution.gclid || "",
+        gbraid: attribution.gbraid || "",
+        wbraid: attribution.wbraid || "",
+        freeLimit: attribution.free_limit || "",
+        limitVariant: attribution.limit_variant || "",
         submittedAt: lead.submittedAt,
       }),
     });
@@ -1552,6 +1626,7 @@ dropzone.addEventListener("drop", (event) => {
 });
 
 setStatus("statusWaiting");
+persistAttribution();
 applyLanguage();
 renderFeedbackGoal(localStorage.getItem(feedbackStorageKey));
 showConsentBanner();
