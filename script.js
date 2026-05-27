@@ -40,6 +40,9 @@ const downloadZipConversionId = "AW-18177126609/2EdRCMzF7bMcENHhw9tD";
 const limit20ConversionId = "AW-18177126609/prPXCPXD8LMcENHhw9tD";
 const consentStorageKey = "batchcutout_consent";
 const feedbackStorageKey = "batchcutout_feedback_goal";
+const debugMode = new URLSearchParams(window.location.search).get("debug") === "1";
+const debugEventsStorageKey = "batchcutout_debug_events";
+let debugList;
 
 const supportedExtensions = [
   ".jpg",
@@ -874,6 +877,7 @@ function trackEvent(name, detail = {}) {
   window.dispatchEvent(new CustomEvent("rfel:analytics", { detail: { name, ...detail } }));
   window.dataLayer?.push({ event: name, ...eventParams });
   window.gtag?.("event", name, eventParams);
+  recordDebugEvent(name, eventParams);
 }
 
 function getAttributionParams() {
@@ -899,6 +903,72 @@ function trackGoogleAdsConversion(sendTo, { value = 1.0, currency = "EUR" } = {}
     value,
     currency,
   });
+  recordDebugEvent("google_ads_conversion", { send_to: sendTo, value, currency });
+}
+
+function getDebugEvents() {
+  try {
+    return JSON.parse(localStorage.getItem(debugEventsStorageKey) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveDebugEvents(events) {
+  localStorage.setItem(debugEventsStorageKey, JSON.stringify(events.slice(-30)));
+}
+
+function renderDebugEvents() {
+  if (!debugList) return;
+
+  const events = getDebugEvents().slice(-8).reverse();
+  debugList.innerHTML = events.length
+    ? events
+        .map((event) => `
+          <li>
+            <strong>${event.name}</strong>
+            <span>${event.time}</span>
+            <code>${JSON.stringify(event.detail)}</code>
+          </li>
+        `)
+        .join("")
+    : "<li><span>No events yet.</span></li>";
+}
+
+function recordDebugEvent(name, detail = {}) {
+  if (!debugMode) return;
+
+  const events = getDebugEvents();
+  events.push({
+    name,
+    detail,
+    time: new Date().toLocaleTimeString(),
+  });
+  saveDebugEvents(events);
+  renderDebugEvents();
+}
+
+function initDebugPanel() {
+  if (!debugMode) return;
+
+  const panel = document.createElement("aside");
+  panel.className = "debug-panel";
+  panel.innerHTML = `
+    <div>
+      <strong>BatchCutout debug</strong>
+      <button type="button">Clear</button>
+    </div>
+    <ul></ul>
+  `;
+
+  debugList = panel.querySelector("ul");
+  panel.querySelector("button").addEventListener("click", () => {
+    localStorage.removeItem(debugEventsStorageKey);
+    renderDebugEvents();
+  });
+
+  document.body.append(panel);
+  renderDebugEvents();
 }
 
 function trackLimit20(detail = {}) {
@@ -1485,4 +1555,5 @@ setStatus("statusWaiting");
 applyLanguage();
 renderFeedbackGoal(localStorage.getItem(feedbackStorageKey));
 showConsentBanner();
+initDebugPanel();
 

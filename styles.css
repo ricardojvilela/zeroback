@@ -1585,6 +1585,66 @@ progress::-moz-progress-bar {
   background: transparent;
 }
 
+.debug-panel {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 50;
+  width: min(420px, calc(100vw - 32px));
+  max-height: min(520px, calc(100vh - 32px));
+  overflow: auto;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.22);
+  color: #172033;
+  font-size: 0.78rem;
+}
+
+.debug-panel > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.12);
+}
+
+.debug-panel button {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  background: #ffffff;
+  color: #172033;
+  font-size: 0.72rem;
+}
+
+.debug-panel ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  list-style: none;
+}
+
+.debug-panel li {
+  display: grid;
+  gap: 3px;
+}
+
+.debug-panel span {
+  color: #64748b;
+}
+
+.debug-panel code {
+  overflow-wrap: anywhere;
+  border-radius: 6px;
+  background: #f8fafc;
+  padding: 6px;
+  color: #334155;
+  white-space: normal;
+}
+
 @media (max-width: 1040px) {
   .app-shell {
     grid-template-areas:
