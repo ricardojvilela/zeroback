@@ -843,9 +843,9 @@ progress::-moz-progress-bar {
 }
 
 .faq-section {
-  margin-top: 24px;
+  margin-top: 18px;
   border-top: 1px solid var(--line);
-  padding-top: 18px;
+  padding-top: 16px;
 }
 
 .faq-section h2 {
@@ -1510,7 +1510,7 @@ progress::-moz-progress-bar {
 }
 
 .tool-results .empty-state {
-  min-height: 150px;
+  min-height: 132px;
 }
 
 .tool-results .empty-state::before {
@@ -1535,7 +1535,7 @@ progress::-moz-progress-bar {
 
 .info-list {
   gap: 12px;
-  margin-top: 16px;
+  margin-top: 14px;
 }
 
 .info-list p {

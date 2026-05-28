@@ -16,14 +16,6 @@ const proPromptButton = document.querySelector("#proPromptButton");
 const inlineProCta = document.querySelector("#inlineProCta");
 const progressBar = document.querySelector("#progressBar");
 const countText = document.querySelector("#countText");
-const proForm = document.querySelector("#proForm");
-const proEmail = document.querySelector("#proEmail");
-const proCompany = document.querySelector("#proCompany");
-const proVolume = document.querySelector("#proVolume");
-const proMessage = document.querySelector("#proMessage");
-const proErrorMessage = document.querySelector("#proErrorMessage");
-const feedbackOptions = document.querySelector("#feedbackOptions");
-const feedbackThanks = document.querySelector("#feedbackThanks");
 const postDownloadFeedback = document.querySelector("#postDownloadFeedback");
 const postDownloadOptions = document.querySelector("#postDownloadOptions");
 const postDownloadThanks = document.querySelector("#postDownloadThanks");
@@ -34,12 +26,9 @@ const maxFilesPerBatch = [2, 3, 5, 10, 20].includes(requestedLimit)
   ? requestedLimit
   : defaultMaxFilesPerBatch;
 const minExportSide = 1200;
-const leadEndpoint = "https://formsubmit.co/ajax/ricardojvilela@gmail.com";
-const proLeadConversionId = "AW-18177126609/riWOCOiI67McENHhw9tD";
 const downloadZipConversionId = "AW-18177126609/2EdRCMzF7bMcENHhw9tD";
 const limit20ConversionId = "AW-18177126609/prPXCPXD8LMcENHhw9tD";
 const consentStorageKey = "batchcutout_consent";
-const feedbackStorageKey = "batchcutout_feedback_goal";
 const debugMode = new URLSearchParams(window.location.search).get("debug") === "1";
 const debugEventsStorageKey = "batchcutout_debug_events";
 const attributionStorageKey = "batchcutout_attribution";
@@ -757,16 +746,8 @@ const proTranslations = {
     proKicker: "Para equipas e lojas",
     proTitle: "Precisa de processar centenas de fotos?",
     proLead: "Remova limites e prepare lotes maiores para catálogos, lojas online e equipas.",
-    proEmailPlaceholder: "O seu email",
-    proCompanyPlaceholder: "Loja ou empresa",
-    proVolumeLabel: "Volume mensal estimado",
-    proCta: "Quero acesso Pro",
     proLimitCta: "Pedir acesso Pro",
     proNoCommitment: "Sem compromisso. Primeiro acesso para quem trabalha com volume.",
-    proMessage: "Pedido registado. Vamos contactar quando o acesso Pro estiver disponível.",
-    proErrorMessage: "O envio automático ainda não está ativo. Vamos abrir uma mensagem de email.",
-    proEmailSubject: "Interesse no BatchCutout Pro",
-    proEmailBody: "Tenho interesse no acesso Pro do BatchCutout.\n\nEmail: {email}\nEmpresa: {company}\nVolume mensal estimado: {volume} imagens\nIdioma: {language}",
     brandCta: "Testar com {limit} imagens",
     inlineProCta: "Mais de {limit} imagens? Peça acesso Pro",
     emptyTitle: "Os seus PNGs transparentes aparecem aqui",
@@ -796,16 +777,8 @@ const proTranslations = {
     proKicker: "For teams and stores",
     proTitle: "Need to process hundreds of photos?",
     proLead: "Remove limits and prepare larger batches for catalogues, online stores, and teams.",
-    proEmailPlaceholder: "Your email",
-    proCompanyPlaceholder: "Store or company",
-    proVolumeLabel: "Estimated monthly volume",
-    proCta: "I want Pro access",
     proLimitCta: "Request Pro access",
     proNoCommitment: "No commitment. Early access for high-volume workflows.",
-    proMessage: "Request registered. We will contact you when Pro access is available.",
-    proErrorMessage: "Automatic submission is not active yet. We will open an email message instead.",
-    proEmailSubject: "Interest in BatchCutout Pro",
-    proEmailBody: "I am interested in BatchCutout Pro access.\n\nEmail: {email}\nCompany: {company}\nEstimated monthly volume: {volume} images\nLanguage: {language}",
     brandCta: "Test with {limit} images",
     inlineProCta: "More than {limit} images? Request Pro access",
     emptyTitle: "Your transparent PNGs appear here",
@@ -1419,14 +1392,6 @@ function showProInterest(reason = "manual") {
   window.location.href = `./pricing/?${params.toString()}#pro-waitlist`;
 }
 
-function selectFeedbackGoal(goal) {
-  if (!goal) return;
-
-  localStorage.setItem(feedbackStorageKey, goal);
-  renderFeedbackGoal(goal);
-  trackEvent("feedback_goal_selected", { goal });
-}
-
 function showPostDownloadFeedback(downloadType, count) {
   postDownloadFeedback?.classList.remove("hidden");
   postDownloadFeedback?.setAttribute("data-download-type", downloadType);
@@ -1456,123 +1421,6 @@ function selectPostDownloadFeedback(answer) {
   }
 }
 
-function renderFeedbackGoal(goal) {
-  for (const button of feedbackOptions?.querySelectorAll("[data-feedback-goal]") || []) {
-    button.classList.toggle("is-selected", button.dataset.feedbackGoal === goal);
-  }
-  feedbackThanks?.classList.remove("hidden");
-}
-
-function openLeadEmail({ email, company, volume }) {
-  const subject = encodeURIComponent(t("proEmailSubject"));
-  const body = encodeURIComponent(t("proEmailBody", {
-    email,
-    company,
-    volume,
-    language: currentLanguage,
-  }));
-
-  window.location.href = `mailto:ricardojvilela@gmail.com?subject=${subject}&body=${body}`;
-}
-
-function trackLeadConversion(volume, hasCompany) {
-  trackEvent("pro_lead_submitted", {
-    volume,
-    hasCompany,
-    language: currentLanguage,
-  });
-  trackEvent("lead_pro", {
-    volume,
-    hasCompany,
-    language: currentLanguage,
-  });
-  window.gtag?.("event", "generate_lead", {
-    event_category: "commercial_intent",
-    event_label: volume,
-  });
-  trackGoogleAdsConversion(proLeadConversionId);
-}
-
-async function submitProInterest(event) {
-  event.preventDefault();
-
-  if (!proEmail.checkValidity()) {
-    proEmail.reportValidity();
-    return;
-  }
-
-  const email = proEmail.value.trim();
-  const company = proCompany.value.trim() || "-";
-  const volume = proVolume.value;
-  const hasCompany = company !== "-";
-  const attribution = getAttributionParams();
-  const lead = {
-    email,
-    company,
-    volume,
-    language: currentLanguage,
-    attribution,
-    submittedAt: new Date().toISOString(),
-  };
-
-  localStorage.setItem("batchcutoutProLead", JSON.stringify(lead));
-  proMessage.classList.add("hidden");
-  proErrorMessage.classList.add("hidden");
-  proForm.querySelector("button").disabled = true;
-
-  try {
-    const response = await fetch(leadEndpoint, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        _subject: "Novo lead BatchCutout Pro",
-        _template: "table",
-        email,
-        company,
-        volume,
-        language: currentLanguage,
-        source: window.location.href,
-        attribution: JSON.stringify(attribution),
-        firstSource: attribution.first_source || "",
-        firstCampaign: attribution.first_campaign || "",
-        firstLandingPage: attribution.first_landing_page || "",
-        lastSource: attribution.last_source || "",
-        lastCampaign: attribution.last_campaign || "",
-        lastLandingPage: attribution.last_landing_page || "",
-        gclid: attribution.gclid || "",
-        gbraid: attribution.gbraid || "",
-        wbraid: attribution.wbraid || "",
-        freeLimit: attribution.free_limit || "",
-        limitVariant: attribution.limit_variant || "",
-        submittedAt: lead.submittedAt,
-      }),
-    });
-
-    const data = await response.json().catch(() => ({}));
-
-    if (!response.ok || (data.success !== true && data.success !== "true")) {
-      throw new Error("Lead submission failed");
-    }
-
-    trackLeadConversion(volume, hasCompany);
-    proMessage.classList.remove("hidden");
-    proMessage.textContent = t("proMessage");
-    proForm.reset();
-    window.location.href = "./obrigado.html";
-  } catch (error) {
-    console.error(error);
-    trackLeadConversion(volume, hasCompany);
-    proErrorMessage.classList.remove("hidden");
-    proErrorMessage.textContent = t("proErrorMessage");
-    openLeadEmail({ email, company, volume });
-  } finally {
-    proForm.querySelector("button").disabled = false;
-  }
-}
-
 languageSelect.addEventListener("change", (event) => {
   currentLanguage = event.target.value;
   localStorage.setItem("language", currentLanguage);
@@ -1591,11 +1439,6 @@ brandCta.addEventListener("click", () => {
   trackEvent("brand_cta_clicked");
 });
 inlineProCta.addEventListener("click", () => showProInterest("inline_pro_cta"));
-proForm.addEventListener("submit", submitProInterest);
-feedbackOptions?.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-feedback-goal]");
-  selectFeedbackGoal(button?.dataset.feedbackGoal);
-});
 postDownloadOptions?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-post-download-feedback]");
   selectPostDownloadFeedback(button?.dataset.postDownloadFeedback);
@@ -1632,6 +1475,5 @@ dropzone.addEventListener("drop", (event) => {
 setStatus("statusWaiting");
 persistAttribution();
 applyLanguage();
-renderFeedbackGoal(localStorage.getItem(feedbackStorageKey));
 showConsentBanner();
 initDebugPanel();
