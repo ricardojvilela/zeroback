@@ -212,6 +212,56 @@
         line-height: 1;
       }
 
+      .live-panel {
+        margin-bottom: 16px;
+      }
+
+      .panel-head {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .panel-head h2 {
+        margin-bottom: 4px;
+      }
+
+      .live-status {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .live-grid {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .live-card {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdff;
+        padding: 14px;
+      }
+
+      .live-card span {
+        display: block;
+        margin-bottom: 7px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 900;
+      }
+
+      .live-card strong {
+        display: block;
+        font-size: 24px;
+        line-height: 1;
+      }
+
       .layout {
         display: grid;
         grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
@@ -330,7 +380,8 @@
         }
 
         .metrics-grid,
-        .rates {
+        .rates,
+        .live-grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
         }
       }
@@ -344,6 +395,7 @@
 
         .metrics-grid,
         .rates,
+        .live-grid,
         .form-grid {
           grid-template-columns: 1fr;
         }
@@ -397,6 +449,67 @@
           <span>Leads Pro</span>
           <strong id="totalLeads">0</strong>
         </article>
+      </section>
+
+      <section class="panel live-panel" aria-label="Dados reais Supabase">
+        <div class="panel-head">
+          <div>
+            <h2>Dados reais do site</h2>
+            <p class="note">Eventos recolhidos automaticamente pelo Supabase nos ultimos 14 dias.</p>
+          </div>
+          <div class="actions">
+            <button class="secondary" type="button" id="refreshLive">Atualizar</button>
+          </div>
+        </div>
+        <div class="live-grid">
+          <article class="live-card">
+            <span>Visitantes reais</span>
+            <strong id="liveVisitors">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Uploads reais</span>
+            <strong id="liveUploads">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Limite acima de 3</span>
+            <strong id="liveLimit">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Downloads reais</span>
+            <strong id="liveDownloads">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Cliques Pro reais</span>
+            <strong id="liveProClicks">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Tentativas Pro</span>
+            <strong id="liveProAttempts">0</strong>
+          </article>
+        </div>
+        <p class="live-status" id="liveStatus">A carregar dados reais...</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Visitantes</th>
+                <th>Page views</th>
+                <th>Uploads</th>
+                <th>Imagens</th>
+                <th>Limite</th>
+                <th>Downloads</th>
+                <th>Pro</th>
+                <th>Tentativas Pro</th>
+              </tr>
+            </thead>
+            <tbody id="liveRowsBody">
+              <tr>
+                <td class="empty" colspan="9">A carregar dados reais.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <section class="layout">
@@ -515,6 +628,8 @@
       const storageKey = "batchcutout_growth_rows";
       const form = document.querySelector("#growthForm");
       const rowsBody = document.querySelector("#rowsBody");
+      const liveRowsBody = document.querySelector("#liveRowsBody");
+      const liveStatus = document.querySelector("#liveStatus");
       const csvInput = document.querySelector("#csvInput");
       const today = new Date().toISOString().slice(0, 10);
       form.date.value = today;
@@ -617,6 +732,50 @@
               `;
             }).join("")
           : `<tr><td class="empty" colspan="9">Sem leituras registadas.</td></tr>`;
+      }
+
+      function renderLiveStats(data) {
+        const totals = data.totals || {};
+        document.querySelector("#liveVisitors").textContent = totals.visitors || 0;
+        document.querySelector("#liveUploads").textContent = totals.uploadsStarted || 0;
+        document.querySelector("#liveLimit").textContent = totals.limitAttempts || 0;
+        document.querySelector("#liveDownloads").textContent = totals.downloads || 0;
+        document.querySelector("#liveProClicks").textContent = totals.proClicks || 0;
+        document.querySelector("#liveProAttempts").textContent = totals.proSubmitAttempts || 0;
+
+        liveRowsBody.innerHTML = data.rows?.length
+          ? data.rows.slice().reverse().map((row) => `
+              <tr>
+                <td>${row.date}</td>
+                <td>${row.visitors}</td>
+                <td>${row.pageViews}</td>
+                <td>${row.uploadsStarted}</td>
+                <td>${row.imagesAccepted}</td>
+                <td>${row.limitAttempts}</td>
+                <td>${row.downloads}</td>
+                <td>${row.proClicks}</td>
+                <td>${row.proSubmitAttempts}</td>
+              </tr>
+            `).join("")
+          : `<tr><td class="empty" colspan="9">Ainda nao existem eventos reais no periodo.</td></tr>`;
+
+        const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "";
+        liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Ultima atualizacao: ${generatedAt}`;
+      }
+
+      async function loadLiveStats() {
+        liveStatus.textContent = "A carregar dados reais...";
+        try {
+          const response = await fetch("/api/stats?days=14", { headers: { Accept: "application/json" } });
+          const data = await response.json();
+          if (!response.ok || !data.ok) {
+            throw new Error(data.error || "stats_failed");
+          }
+          renderLiveStats(data);
+        } catch (error) {
+          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="9">Nao foi possivel carregar dados reais.</td></tr>`;
+          liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variaveis Vercel.";
+        }
       }
 
       function rowFromForm() {
@@ -747,7 +906,10 @@
         render();
       });
 
+      document.querySelector("#refreshLive").addEventListener("click", loadLiveStats);
+
       render();
+      loadLiveStats();
     </script>
   </body>
 </html>

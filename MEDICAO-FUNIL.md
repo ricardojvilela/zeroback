@@ -128,3 +128,9 @@ Atualizacao em 2026-05-28 - recolha real de eventos:
 - Supabase ficou ativo em producao: projeto `kpsxurgxmkfwdfnyzzhj`, tabela `public.batchcutout_events`, endpoint validado com `stored: true`.
 - Variaveis Vercel configuradas em producao: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_EVENTS_TABLE`.
 - Validacao ponta a ponta: homepage enviou `tool_page_view` para o Supabase com `free_limit: 3`.
+
+Atualizacao em 2026-05-28 - painel com dados reais:
+
+- Criado endpoint `/api/stats?days=14` para agregar eventos reais do Supabase por dia.
+- A pagina `/admin` passou a mostrar visitantes reais, uploads, tentativas acima de 3, downloads, cliques Pro e tentativas Pro.
+- O painel manual continua disponivel para Google Ads, custos e notas operacionais.

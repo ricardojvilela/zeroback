@@ -76,6 +76,12 @@ Pagina Pro:
 
 ## Consultas uteis
 
+Endpoint interno de leitura agregada:
+
+- `/api/stats?days=14`
+- Usado pela pagina `/admin`
+- Devolve totais e linhas por dia sem expor a `service_role key`
+
 Eventos por dia:
 
 ```sql
