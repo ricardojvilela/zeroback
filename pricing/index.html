@@ -472,6 +472,21 @@
         });
       });
 
+      pricingForm.addEventListener("invalid", () => {
+        if (hasTrackedSubmitAttempt) return;
+        const formData = new FormData(pricingForm);
+        hasTrackedSubmitAttempt = true;
+        trackPricingEvent("pro_submit_attempt", {
+          volume: formData.get("volume"),
+          hasCompany: Boolean(formData.get("company")),
+          hasEmail: Boolean(formData.get("email")),
+          isValid: false,
+        });
+        setTimeout(() => {
+          hasTrackedSubmitAttempt = false;
+        }, 0);
+      }, true);
+
       pricingForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         const dictionary = pricingTranslations[languageSelect.value] || pricingTranslations.en;
