@@ -32,6 +32,20 @@ const consentStorageKey = "batchcutout_consent";
 const debugMode = new URLSearchParams(window.location.search).get("debug") === "1";
 const debugEventsStorageKey = "batchcutout_debug_events";
 const attributionStorageKey = "batchcutout_attribution";
+const visitorStorageKey = "batchcutout_visitor_id";
+const sessionStorageKey = "batchcutout_session_id";
+const serverEventNames = new Set([
+  "tool_page_view",
+  "tool_drag_upload_intent",
+  "tool_upload_started",
+  "tool_upload_added",
+  "batch_limit_exceeded",
+  "tool_processing_started",
+  "tool_processing_completed",
+  "tool_download_png",
+  "tool_download_zip",
+  "tool_pro_clicked",
+]);
 let debugList;
 
 const supportedExtensions = [
@@ -863,6 +877,54 @@ function trackEvent(name, detail = {}) {
   window.dataLayer?.push({ event: name, ...eventParams });
   window.gtag?.("event", name, eventParams);
   recordDebugEvent(name, eventParams);
+  sendServerEvent(name, eventParams);
+}
+
+function getStableId(storage, key) {
+  try {
+    const existing = storage.getItem(key);
+    if (existing) return existing;
+    const next = crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    storage.setItem(key, next);
+    return next;
+  } catch {
+    return "";
+  }
+}
+
+function getVisitorId() {
+  return getStableId(localStorage, visitorStorageKey);
+}
+
+function getSessionId() {
+  return getStableId(sessionStorage, sessionStorageKey);
+}
+
+function sendServerEvent(name, detail = {}) {
+  if (!serverEventNames.has(name)) return;
+
+  const payload = JSON.stringify({
+    name,
+    detail,
+    visitorId: getVisitorId(),
+    sessionId: getSessionId(),
+  });
+
+  try {
+    if (navigator.sendBeacon) {
+      const sent = navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" }));
+      if (sent) return;
+    }
+  } catch {
+    // Ignore measurement transport errors.
+  }
+
+  fetch("/api/track", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: payload,
+    keepalive: true,
+  }).catch(() => {});
 }
 
 function getAttributionParams() {

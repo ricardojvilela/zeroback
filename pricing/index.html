@@ -312,6 +312,16 @@
       const pricingSubmitButton = pricingForm.querySelector("button");
       const debugMode = new URLSearchParams(window.location.search).get("debug") === "1";
       const debugEventsStorageKey = "batchcutout_debug_events";
+      const visitorStorageKey = "batchcutout_visitor_id";
+      const sessionStorageKey = "batchcutout_session_id";
+      const serverEventNames = new Set([
+        "pro_page_view",
+        "pro_cta_clicked",
+        "pro_form_started",
+        "pro_volume_selected",
+        "pro_submit_attempt",
+        "pro_waitlist_submitted",
+      ]);
       let debugList;
       let hasTrackedFormStart = false;
       let hasTrackedSubmitAttempt = false;
@@ -372,6 +382,46 @@
         window.dataLayer?.push({ event: name, ...eventParams });
         window.gtag?.("event", name, eventParams);
         recordDebugEvent(name, eventParams);
+        sendServerEvent(name, eventParams);
+      }
+
+      function getStableId(storage, key) {
+        try {
+          const existing = storage.getItem(key);
+          if (existing) return existing;
+          const next = crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+          storage.setItem(key, next);
+          return next;
+        } catch {
+          return "";
+        }
+      }
+
+      function sendServerEvent(name, detail = {}) {
+        if (!serverEventNames.has(name)) return;
+
+        const payload = JSON.stringify({
+          name,
+          detail,
+          visitorId: getStableId(localStorage, visitorStorageKey),
+          sessionId: getStableId(sessionStorage, sessionStorageKey),
+        });
+
+        try {
+          if (navigator.sendBeacon) {
+            const sent = navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" }));
+            if (sent) return;
+          }
+        } catch {
+          // Ignore measurement transport errors.
+        }
+
+        fetch("/api/track", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload,
+          keepalive: true,
+        }).catch(() => {});
       }
 
       function initPricingDebugPanel() {

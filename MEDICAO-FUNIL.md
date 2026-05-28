@@ -118,3 +118,10 @@ Atualizacao em 2026-05-28 - painel interno:
 - O painel calcula taxas de visita para upload, upload para download, limite para Pro e custo por lead.
 - Inclui recomendacao automatica: manter teste, ajustar pagina/anuncio, melhorar experiencia, reforcar Pro, controlar custo ou escalar com cuidado.
 - A pagina tem `noindex,nofollow`, nao esta no sitemap e o `robots.txt` bloqueia `/admin.html`.
+
+Atualizacao em 2026-05-28 - recolha real de eventos:
+
+- Criado endpoint `/api/track` para receber eventos do site e guardar no Supabase quando as variaveis estiverem configuradas no Vercel.
+- A homepage envia os eventos principais do funil para o endpoint, alem de Google/Vercel/debug.
+- A pagina `/pricing/` envia eventos Pro para o mesmo endpoint.
+- Criado o guia `SUPABASE-EVENTOS.md` com SQL da tabela, variaveis do Vercel e consultas de funil.
