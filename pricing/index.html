@@ -462,7 +462,8 @@
         trackPricingEvent("pro_volume_selected", { volume: event.target.value });
       });
 
-      pricingSubmitButton.addEventListener("click", () => {
+      const trackSubmitAttemptSnapshot = () => {
+        if (hasTrackedSubmitAttempt) return;
         const formData = new FormData(pricingForm);
         hasTrackedSubmitAttempt = true;
         trackPricingEvent("pro_submit_attempt", {
@@ -471,6 +472,17 @@
           hasEmail: Boolean(formData.get("email")),
           isValid: pricingForm.checkValidity(),
         });
+        setTimeout(() => {
+          hasTrackedSubmitAttempt = false;
+        }, 1500);
+      };
+
+      pricingSubmitButton.addEventListener("pointerdown", trackSubmitAttemptSnapshot);
+      pricingSubmitButton.addEventListener("click", trackSubmitAttemptSnapshot);
+      pricingSubmitButton.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          trackSubmitAttemptSnapshot();
+        }
       });
 
       pricingForm.addEventListener("invalid", () => {
