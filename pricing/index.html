@@ -308,10 +308,12 @@
       const pricingForm = document.querySelector(".pricing-form");
       const pricingMessage = document.createElement("p");
       const languageSelect = document.querySelector("#pricingLanguage");
+      const pricingSubmitButton = pricingForm.querySelector("button");
       const debugMode = new URLSearchParams(window.location.search).get("debug") === "1";
       const debugEventsStorageKey = "batchcutout_debug_events";
       let debugList;
       let hasTrackedFormStart = false;
+      let hasTrackedSubmitAttempt = false;
       pricingMessage.className = "pricing-message hidden";
       pricingForm.after(pricingMessage);
 
@@ -459,10 +461,21 @@
         trackPricingEvent("pro_volume_selected", { volume: event.target.value });
       });
 
+      pricingSubmitButton.addEventListener("click", () => {
+        const formData = new FormData(pricingForm);
+        hasTrackedSubmitAttempt = true;
+        trackPricingEvent("pro_submit_attempt", {
+          volume: formData.get("volume"),
+          hasCompany: Boolean(formData.get("company")),
+          hasEmail: Boolean(formData.get("email")),
+          isValid: pricingForm.checkValidity(),
+        });
+      });
+
       pricingForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         const dictionary = pricingTranslations[languageSelect.value] || pricingTranslations.en;
-        const submitButton = pricingForm.querySelector("button");
+        const submitButton = pricingSubmitButton;
         submitButton.disabled = true;
         pricingMessage.classList.add("hidden");
 
@@ -470,11 +483,15 @@
         const email = formData.get("email");
         const company = formData.get("company");
         const volume = formData.get("volume");
-        trackPricingEvent("pro_submit_attempt", {
-          volume,
-          hasCompany: Boolean(company),
-          hasEmail: Boolean(email),
-        });
+        if (!hasTrackedSubmitAttempt) {
+          trackPricingEvent("pro_submit_attempt", {
+            volume,
+            hasCompany: Boolean(company),
+            hasEmail: Boolean(email),
+            isValid: true,
+          });
+        }
+        hasTrackedSubmitAttempt = false;
 
         window.gtag?.("event", "pro_waitlist_submitted", {
           event_category: "commercial_intent",
