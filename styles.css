@@ -197,6 +197,24 @@ h2 {
   color: var(--charcoal);
 }
 
+.brand-pro-link {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  margin: -10px 0 22px;
+  border: 1px solid rgba(81, 215, 198, 0.48);
+  border-radius: 8px;
+  color: #51d7c6;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.brand-pro-link:hover {
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
 .trust-copy {
   margin: 24px 0 0;
   color: rgba(255, 255, 255, 0.72);
