@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-PT">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -37,7 +37,7 @@
         "@context": "https://schema.org",
         "@type": "Product",
         "name": "BatchCutout Pro",
-        "description": "Acesso Pro para lotes maiores de remoção de fundo em fotos de produto e fluxos de catálogo ecommerce.",
+        "description": "Pro access for larger product photo background removal batches and ecommerce catalog workflows.",
         "brand": {
           "@type": "Brand",
           "name": "BatchCutout"
@@ -61,87 +61,108 @@
           <span class="brand-mark">BC</span>
           <span>BatchCutout</span>
         </a>
-        <a href="/?utm_source=pricing&utm_medium=nav&utm_campaign=pro-early-access#tool">Testar 3 imagens grátis</a>
+        <div class="pricing-nav-actions">
+          <label class="pricing-language">
+            <span data-i18n="languageLabel">Idioma</span>
+            <select id="pricingLanguage" aria-label="Idioma">
+              <option value="pt">PT</option>
+              <option value="en">EN</option>
+            </select>
+          </label>
+          <a data-i18n="navTry" href="/?utm_source=pricing&utm_medium=nav&utm_campaign=pro-early-access#tool">
+            Testar 3 imagens grátis
+          </a>
+        </div>
       </nav>
 
       <section class="pricing-hero">
         <div class="pricing-copy">
           <p class="section-kicker">BatchCutout Pro</p>
-          <h1>Remova fundos de centenas de fotos de produto</h1>
-          <p>
+          <h1 data-i18n="heroTitle">Remova fundos de centenas de fotos de produto</h1>
+          <p data-i18n="heroLead">
             O acesso antecipado é para equipas de ecommerce que precisam de limpar fotos em lote,
             exportar PNGs transparentes e receber um ZIP pronto para Shopify, Etsy, catálogos e anúncios.
           </p>
           <div class="landing-actions">
-            <a class="landing-button" href="#pro-waitlist">Pedir acesso Pro</a>
-            <a class="landing-secondary" href="/?utm_source=pricing&utm_medium=hero&utm_campaign=try-free#tool">Testar 3 imagens primeiro</a>
+            <a class="landing-button" href="#pro-waitlist" data-i18n="primaryCta">Pedir acesso Pro</a>
+            <a class="landing-secondary" href="/?utm_source=pricing&utm_medium=hero&utm_campaign=try-free#tool" data-i18n="secondaryCta">
+              Testar 3 imagens primeiro
+            </a>
           </div>
-          <div class="pro-metrics" aria-label="Resumo do acesso Pro">
-            <span><strong>3</strong> imagens grátis para testar</span>
-            <span><strong>1200px+</strong> exportação mínima</span>
-            <span><strong>ZIP</strong> pronto para catálogo</span>
+          <div class="pro-metrics" aria-label="Resumo do acesso Pro" data-i18n-aria="metricsLabel">
+            <span><strong>3</strong> <span data-i18n="metricFree">imagens grátis para testar</span></span>
+            <span><strong>1200px+</strong> <span data-i18n="metricResolution">exportação mínima</span></span>
+            <span><strong>ZIP</strong> <span data-i18n="metricZip">pronto para catálogo</span></span>
           </div>
         </div>
 
         <aside class="pricing-card" aria-labelledby="pro-plan-title">
-          <img src="../assets/product-before-after.png" alt="Exemplo antes e depois de uma foto de produto" loading="eager" decoding="async" />
-          <p class="section-kicker">Criado para volume</p>
-          <h2 id="pro-plan-title">Acesso Pro antecipado</h2>
-          <p class="pricing-note">Os preços ainda não estão ativos. A primeira versão Pro será definida com base em fluxos reais de lojas e catálogos.</p>
+          <img
+            src="../assets/product-before-after.png"
+            alt="Exemplo antes e depois de uma foto de produto"
+            data-i18n-alt="heroImageAlt"
+            loading="eager"
+            decoding="async"
+          />
+          <p class="section-kicker" data-i18n="planKicker">Criado para volume</p>
+          <h2 id="pro-plan-title" data-i18n="planTitle">Acesso Pro antecipado</h2>
+          <p class="pricing-note" data-i18n="planNote">
+            Os preços ainda não estão ativos. A primeira versão Pro será definida com base em fluxos reais de lojas e catálogos.
+          </p>
           <ul>
-            <li>Lotes maiores de imagens</li>
-            <li>PNGs transparentes com mínimo de 1200px</li>
-            <li>ZIP organizado para equipas de produto</li>
-            <li>Fluxo para Shopify, Etsy e marketplaces</li>
-            <li>Acesso prioritário quando os planos pagos abrirem</li>
+            <li data-i18n="featureBatch">Lotes maiores de imagens</li>
+            <li data-i18n="featureResolution">PNGs transparentes com mínimo de 1200px</li>
+            <li data-i18n="featureZip">ZIP organizado para equipas de produto</li>
+            <li data-i18n="featureWorkflow">Fluxo para Shopify, Etsy e marketplaces</li>
+            <li data-i18n="featurePriority">Acesso prioritário quando os planos pagos abrirem</li>
           </ul>
         </aside>
       </section>
 
-      <section class="pricing-proof" aria-label="Who needs BatchCutout Pro">
+      <section class="pricing-proof" aria-label="Quem precisa do BatchCutout Pro" data-i18n-aria="whoLabel">
         <article>
           <span>01</span>
-          <strong>Lojas Shopify e WooCommerce</strong>
-          <p>Prepare imagens de catálogo, novidades e variantes de produto sem repetir a mesma edição manualmente.</p>
+          <strong data-i18n="audienceStoresTitle">Lojas Shopify e WooCommerce</strong>
+          <p data-i18n="audienceStoresText">Prepare imagens de catálogo, novidades e variantes de produto sem repetir a mesma edição manualmente.</p>
         </article>
         <article>
           <span>02</span>
-          <strong>Vendedores em marketplaces</strong>
-          <p>Limpe fotos de produto para Etsy, eBay e outros marketplaces onde a consistência visual importa.</p>
+          <strong data-i18n="audienceMarketTitle">Vendedores em marketplaces</strong>
+          <p data-i18n="audienceMarketText">Limpe fotos de produto para Etsy, eBay e outros marketplaces onde a consistência visual importa.</p>
         </article>
         <article>
           <span>03</span>
-          <strong>Agências e assistentes</strong>
-          <p>Processe imagens de clientes em lote e exporte ficheiros organizados prontos a entregar.</p>
+          <strong data-i18n="audienceAgencyTitle">Agências e assistentes</strong>
+          <p data-i18n="audienceAgencyText">Processe imagens de clientes em lote e exporte ficheiros organizados prontos a entregar.</p>
         </article>
       </section>
 
-      <section class="pricing-proof" aria-label="How Pro fits the workflow">
+      <section class="pricing-proof" aria-label="Como o Pro encaixa no fluxo" data-i18n-aria="workflowLabel">
         <article>
-          <strong>1. Teste a qualidade</strong>
-          <p>Use a versão grátis com 3 imagens e confirme a qualidade do recorte antes de pedir Pro.</p>
+          <strong data-i18n="stepOneTitle">1. Teste a qualidade</strong>
+          <p data-i18n="stepOneText">Use a versão grátis com 3 imagens e confirme a qualidade do recorte antes de pedir Pro.</p>
         </article>
         <article>
-          <strong>2. Aumente o lote</strong>
-          <p>O Pro é pensado para vendedores que preparam dezenas ou centenas de imagens para produtos e variantes.</p>
+          <strong data-i18n="stepTwoTitle">2. Aumente o lote</strong>
+          <p data-i18n="stepTwoText">O Pro é pensado para vendedores que preparam dezenas ou centenas de imagens para produtos e variantes.</p>
         </article>
         <article>
-          <strong>3. Exporte ficheiros limpos</strong>
-          <p>Descarregue PNGs transparentes ou um ZIP mais fácil de entregar, carregar ou arquivar.</p>
+          <strong data-i18n="stepThreeTitle">3. Exporte ficheiros limpos</strong>
+          <p data-i18n="stepThreeText">Descarregue PNGs transparentes ou um ZIP mais fácil de entregar, carregar ou arquivar.</p>
         </article>
       </section>
 
       <section class="pricing-form-panel" id="pro-waitlist" aria-labelledby="waitlist-title">
         <div>
-          <p class="section-kicker">Acesso antecipado</p>
-          <h2 id="waitlist-title">Indique o seu volume mensal de fotos</h2>
-          <p>
+          <p class="section-kicker" data-i18n="formKicker">Acesso antecipado</p>
+          <h2 id="waitlist-title" data-i18n="formTitle">Indique o seu volume mensal de fotos</h2>
+          <p data-i18n="formLead">
             Isto não é um formulário de pagamento. Serve para identificar os casos de uso mais fortes e convidar primeiro os utilizadores certos.
           </p>
           <ul class="pro-form-points">
-            <li>Sem pagamento nesta fase.</li>
-            <li>Resposta direta por email quando abrirmos os primeiros acessos.</li>
-            <li>Prioridade para lojas com trabalho repetido em lote.</li>
+            <li data-i18n="formPointPayment">Sem pagamento nesta fase.</li>
+            <li data-i18n="formPointReply">Resposta direta por email quando abrirmos os primeiros acessos.</li>
+            <li data-i18n="formPointPriority">Prioridade para lojas com trabalho repetido em lote.</li>
           </ul>
         </div>
         <form
@@ -152,32 +173,191 @@
           <input type="hidden" name="_subject" value="Novo lead BatchCutout Pro - Pricing" />
           <input type="hidden" name="_template" value="table" />
           <input type="hidden" name="source" value="pricing-page" />
+          <input type="hidden" name="language" value="pt" />
           <input type="hidden" name="page_url" value="" />
           <input type="text" name="_honey" class="honeypot-field" tabindex="-1" autocomplete="off" />
           <input name="email" type="email" autocomplete="email" required placeholder="Email" />
-          <input name="company" type="text" autocomplete="organization" placeholder="Loja ou empresa" />
-          <select name="volume" aria-label="Volume mensal estimado">
-            <option value="20-100">20-100 imagens/mês</option>
-            <option value="100-500">100-500 imagens/mês</option>
-            <option value="500-2000">500-2.000 imagens/mês</option>
-            <option value="2000+">2.000+ imagens/mês</option>
+          <input name="company" type="text" autocomplete="organization" placeholder="Loja ou empresa" data-i18n-placeholder="companyPlaceholder" />
+          <select name="volume" aria-label="Volume mensal estimado" data-i18n-aria="volumeLabel">
+            <option value="20-100" data-i18n="volumeSmall">20-100 imagens/mês</option>
+            <option value="100-500" data-i18n="volumeMedium">100-500 imagens/mês</option>
+            <option value="500-2000" data-i18n="volumeLarge">500-2.000 imagens/mês</option>
+            <option value="2000+" data-i18n="volumeXL">2.000+ imagens/mês</option>
           </select>
-          <button type="submit">Pedir acesso Pro</button>
+          <button type="submit" data-i18n="formButton">Pedir acesso Pro</button>
         </form>
-        <p class="pricing-privacy">Sem pagamento agora. Usaremos estes dados apenas para o contactar sobre o acesso Pro.</p>
+        <p class="pricing-privacy" data-i18n="privacy">Sem pagamento agora. Usaremos estes dados apenas para o contactar sobre o acesso Pro.</p>
       </section>
     </main>
     <script>
+      const pricingTranslations = {
+        pt: {
+          pageTitle: "BatchCutout Pro | Remoção de fundo em lote para fotos de produto",
+          metaDescription: "Peça acesso antecipado ao BatchCutout Pro para remover fundos de fotos de produto em volume, com lotes maiores, PNGs transparentes e ZIP organizado.",
+          ogTitle: "BatchCutout Pro - Acesso antecipado",
+          ogDescription: "Para lojas online, vendedores em marketplaces e equipas que processam muitas fotos de produto de uma vez.",
+          languageLabel: "Idioma",
+          navTry: "Testar 3 imagens grátis",
+          heroTitle: "Remova fundos de centenas de fotos de produto",
+          heroLead: "O acesso antecipado é para equipas de ecommerce que precisam de limpar fotos em lote, exportar PNGs transparentes e receber um ZIP pronto para Shopify, Etsy, catálogos e anúncios.",
+          primaryCta: "Pedir acesso Pro",
+          secondaryCta: "Testar 3 imagens primeiro",
+          metricsLabel: "Resumo do acesso Pro",
+          metricFree: "imagens grátis para testar",
+          metricResolution: "exportação mínima",
+          metricZip: "pronto para catálogo",
+          heroImageAlt: "Exemplo antes e depois de uma foto de produto",
+          planKicker: "Criado para volume",
+          planTitle: "Acesso Pro antecipado",
+          planNote: "Os preços ainda não estão ativos. A primeira versão Pro será definida com base em fluxos reais de lojas e catálogos.",
+          featureBatch: "Lotes maiores de imagens",
+          featureResolution: "PNGs transparentes com mínimo de 1200px",
+          featureZip: "ZIP organizado para equipas de produto",
+          featureWorkflow: "Fluxo para Shopify, Etsy e marketplaces",
+          featurePriority: "Acesso prioritário quando os planos pagos abrirem",
+          whoLabel: "Quem precisa do BatchCutout Pro",
+          workflowLabel: "Como o Pro encaixa no fluxo",
+          audienceStoresTitle: "Lojas Shopify e WooCommerce",
+          audienceStoresText: "Prepare imagens de catálogo, novidades e variantes de produto sem repetir a mesma edição manualmente.",
+          audienceMarketTitle: "Vendedores em marketplaces",
+          audienceMarketText: "Limpe fotos de produto para Etsy, eBay e outros marketplaces onde a consistência visual importa.",
+          audienceAgencyTitle: "Agências e assistentes",
+          audienceAgencyText: "Processe imagens de clientes em lote e exporte ficheiros organizados prontos a entregar.",
+          stepOneTitle: "1. Teste a qualidade",
+          stepOneText: "Use a versão grátis com 3 imagens e confirme a qualidade do recorte antes de pedir Pro.",
+          stepTwoTitle: "2. Aumente o lote",
+          stepTwoText: "O Pro é pensado para vendedores que preparam dezenas ou centenas de imagens para produtos e variantes.",
+          stepThreeTitle: "3. Exporte ficheiros limpos",
+          stepThreeText: "Descarregue PNGs transparentes ou um ZIP mais fácil de entregar, carregar ou arquivar.",
+          formKicker: "Acesso antecipado",
+          formTitle: "Indique o seu volume mensal de fotos",
+          formLead: "Isto não é um formulário de pagamento. Serve para identificar os casos de uso mais fortes e convidar primeiro os utilizadores certos.",
+          formPointPayment: "Sem pagamento nesta fase.",
+          formPointReply: "Resposta direta por email quando abrirmos os primeiros acessos.",
+          formPointPriority: "Prioridade para lojas com trabalho repetido em lote.",
+          companyPlaceholder: "Loja ou empresa",
+          volumeLabel: "Volume mensal estimado",
+          volumeSmall: "20-100 imagens/mês",
+          volumeMedium: "100-500 imagens/mês",
+          volumeLarge: "500-2.000 imagens/mês",
+          volumeXL: "2.000+ imagens/mês",
+          formButton: "Pedir acesso Pro",
+          privacy: "Sem pagamento agora. Usaremos estes dados apenas para o contactar sobre o acesso Pro.",
+          success: "Obrigado. O seu pedido Pro ficou registado.",
+          error: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
+          emailSubject: "Novo lead BatchCutout Pro - Pricing",
+        },
+        en: {
+          pageTitle: "BatchCutout Pro | Bulk background removal for product photos",
+          metaDescription: "Request early access to BatchCutout Pro for high-volume product photo background removal, larger batches, transparent PNGs, and organized ZIP exports.",
+          ogTitle: "BatchCutout Pro - Early Access",
+          ogDescription: "For online stores, marketplace sellers, and teams processing many product photos at once.",
+          languageLabel: "Language",
+          navTry: "Test 3 images free",
+          heroTitle: "Remove backgrounds from hundreds of product photos",
+          heroLead: "Early access is for ecommerce teams that need to clean product photos in bulk, export transparent PNGs, and receive a ZIP ready for Shopify, Etsy, catalogues, and ads.",
+          primaryCta: "Request Pro access",
+          secondaryCta: "Test 3 images first",
+          metricsLabel: "Pro access summary",
+          metricFree: "free images to test",
+          metricResolution: "minimum export",
+          metricZip: "ready for catalogues",
+          heroImageAlt: "Before and after example of a product photo",
+          planKicker: "Built for volume",
+          planTitle: "Pro early access",
+          planNote: "Pricing is not active yet. The first Pro release will be shaped around real store and catalogue workflows.",
+          featureBatch: "Larger image batches",
+          featureResolution: "Transparent PNGs with a 1200px minimum",
+          featureZip: "Organized ZIP downloads for product teams",
+          featureWorkflow: "Workflow for Shopify, Etsy, and marketplaces",
+          featurePriority: "Priority access when paid plans open",
+          whoLabel: "Who needs BatchCutout Pro",
+          workflowLabel: "How Pro fits the workflow",
+          audienceStoresTitle: "Shopify and WooCommerce stores",
+          audienceStoresText: "Prepare catalogue images, new arrivals, and product variants without repeating the same edit manually.",
+          audienceMarketTitle: "Marketplace sellers",
+          audienceMarketText: "Clean product photos for Etsy, eBay, and other marketplaces where consistent images matter.",
+          audienceAgencyTitle: "Agencies and assistants",
+          audienceAgencyText: "Process client images in batches and export organized files that are ready to deliver.",
+          stepOneTitle: "1. Test quality",
+          stepOneText: "Use the free version with 3 images and confirm cutout quality before requesting Pro.",
+          stepTwoTitle: "2. Scale the batch",
+          stepTwoText: "Pro is aimed at sellers preparing tens or hundreds of images for products and variants.",
+          stepThreeTitle: "3. Export clean files",
+          stepThreeText: "Download transparent PNGs or a ZIP that is easier to hand over, upload, or archive.",
+          formKicker: "Early access",
+          formTitle: "Tell us your monthly photo volume",
+          formLead: "This is not a payment form. It helps us identify the strongest use cases and invite the right users first.",
+          formPointPayment: "No payment at this stage.",
+          formPointReply: "Direct email reply when the first accesses open.",
+          formPointPriority: "Priority for stores with repeated batch workflows.",
+          companyPlaceholder: "Store or company",
+          volumeLabel: "Estimated monthly volume",
+          volumeSmall: "20-100 images/month",
+          volumeMedium: "100-500 images/month",
+          volumeLarge: "500-2,000 images/month",
+          volumeXL: "2,000+ images/month",
+          formButton: "Request Pro access",
+          privacy: "No payment now. We will only use this to contact you about Pro access.",
+          success: "Thanks. Your Pro request has been registered.",
+          error: "We could not submit automatically. Opening an email draft instead.",
+          emailSubject: "BatchCutout Pro lead - Pricing",
+        },
+      };
+
       const pricingForm = document.querySelector(".pricing-form");
       const pricingMessage = document.createElement("p");
+      const languageSelect = document.querySelector("#pricingLanguage");
       pricingMessage.className = "pricing-message hidden";
       pricingForm.after(pricingMessage);
+
+      function detectPricingLanguage() {
+        const saved = localStorage.getItem("language");
+        if (saved === "pt" || saved === "en") return saved;
+        const browserLanguage = (navigator.language || "en").toLowerCase();
+        return browserLanguage.startsWith("pt") ? "pt" : "en";
+      }
+
+      function applyPricingLanguage(language) {
+        const nextLanguage = pricingTranslations[language] ? language : "en";
+        const dictionary = pricingTranslations[nextLanguage];
+        document.documentElement.lang = nextLanguage === "pt" ? "pt-PT" : "en";
+        document.title = dictionary.pageTitle;
+        document.querySelector('meta[name="description"]')?.setAttribute("content", dictionary.metaDescription);
+        document.querySelector('meta[property="og:title"]')?.setAttribute("content", dictionary.ogTitle);
+        document.querySelector('meta[property="og:description"]')?.setAttribute("content", dictionary.ogDescription);
+
+        for (const element of document.querySelectorAll("[data-i18n]")) {
+          element.textContent = dictionary[element.dataset.i18n] || element.textContent;
+        }
+        for (const element of document.querySelectorAll("[data-i18n-placeholder]")) {
+          element.setAttribute("placeholder", dictionary[element.dataset.i18nPlaceholder] || element.getAttribute("placeholder"));
+        }
+        for (const element of document.querySelectorAll("[data-i18n-aria]")) {
+          element.setAttribute("aria-label", dictionary[element.dataset.i18nAria] || element.getAttribute("aria-label"));
+        }
+        for (const element of document.querySelectorAll("[data-i18n-alt]")) {
+          element.setAttribute("alt", dictionary[element.dataset.i18nAlt] || element.getAttribute("alt"));
+        }
+
+        languageSelect.value = nextLanguage;
+        pricingForm.querySelector('[name="language"]').value = nextLanguage;
+        localStorage.setItem("language", nextLanguage);
+      }
+
+      const initialLanguage = detectPricingLanguage();
+      applyPricingLanguage(initialLanguage);
       pricingForm.querySelector('[name="page_url"]').value = window.location.href;
       pricingForm.querySelector('[name="source"]').value =
         new URLSearchParams(window.location.search).get("source") || "pricing-page";
 
+      languageSelect.addEventListener("change", (event) => {
+        applyPricingLanguage(event.target.value);
+      });
+
       pricingForm.addEventListener("submit", async (event) => {
         event.preventDefault();
+        const dictionary = pricingTranslations[languageSelect.value] || pricingTranslations.en;
         const submitButton = pricingForm.querySelector("button");
         submitButton.disabled = true;
         pricingMessage.classList.add("hidden");
@@ -211,13 +391,13 @@
 
           if (!response.ok) throw new Error("Form submit failed");
           pricingForm.reset();
-          pricingMessage.textContent = "Obrigado. O seu pedido Pro ficou registado.";
+          pricingMessage.textContent = dictionary.success;
         } catch (error) {
-          const subject = encodeURIComponent("Novo lead BatchCutout Pro - Pricing");
+          const subject = encodeURIComponent(dictionary.emailSubject);
           const body = encodeURIComponent(
-            `Email: ${email || ""}\nCompany: ${company || ""}\nVolume: ${volume || ""}\nSource: ${window.location.href}`,
+            `Email: ${email || ""}\nCompany: ${company || ""}\nVolume: ${volume || ""}\nLanguage: ${languageSelect.value}\nSource: ${window.location.href}`,
           );
-          pricingMessage.textContent = "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.";
+          pricingMessage.textContent = dictionary.error;
           window.location.href = `mailto:ricardojvilela@gmail.com?subject=${subject}&body=${body}`;
         } finally {
           pricingMessage.classList.remove("hidden");

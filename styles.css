@@ -1100,6 +1100,35 @@ progress::-moz-progress-bar {
   text-decoration: none;
 }
 
+.pricing-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pricing-language {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(202, 213, 226, 0.82);
+  border-radius: 8px;
+  padding: 0 10px;
+  background: #ffffff;
+  color: #52606d;
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.pricing-language select {
+  min-height: 28px;
+  border: 0;
+  background: transparent;
+  color: var(--charcoal);
+  cursor: pointer;
+  font-weight: 900;
+}
+
 .landing-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
@@ -1927,6 +1956,16 @@ progress::-moz-progress-bar {
   .landing-panel {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .pricing-nav-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pricing-language,
+  .landing-nav a:not(.landing-logo) {
+    justify-content: center;
   }
 
   .landing-hero {
