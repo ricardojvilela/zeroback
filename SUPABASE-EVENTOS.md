@@ -14,7 +14,7 @@ As variaveis de producao ja foram configuradas no Vercel:
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `SUPABASE_EVENTS_TABLE`
 
-Validacao em 2026-05-28: `/api/track` respondeu com `stored: true` e o evento foi confirmado na tabela Supabase. O evento de teste foi removido depois da verificacao.
+Validacao em 2026-05-28: `/api/track` respondeu com `stored: true` e o evento foi confirmado na tabela Supabase. O evento de teste foi removido depois da verificacao. A homepage tambem foi validada ponta a ponta com `tool_page_view`, `free_limit: 3`.
 
 ## Estrutura da tabela
 
