@@ -141,3 +141,11 @@ Atualizacao em 2026-05-28 - protecao do admin:
 - `/api/stats` passou a exigir token temporario antes de devolver dados reais do Supabase.
 - `/admin` passou a mostrar ecrã de login antes do painel.
 - A password fica apenas na variavel Vercel `ADMIN_PASSWORD`, nao no codigo.
+
+Atualizacao em 2026-05-28 - conversoes Google Ads:
+
+- Revisto o estado das acoes de conversao no Google Ads.
+- `Lead Pro BatchCutout (1)` permanece como conversao principal usada pelo codigo.
+- `Download ZIP BatchCutout` e `Limite 20 BatchCutout` estao ativos como conversoes secundarias.
+- Nao foi criada nova conversao para `tool_pro_clicked`/`pro_submit_attempt` para evitar otimizar a campanha cedo demais para sinais fracos.
+- Criado `GOOGLE-ADS-CONVERSOES.md` com mapa de conversoes, snippets e regra de otimizacao.
