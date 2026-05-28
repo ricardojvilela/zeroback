@@ -169,6 +169,7 @@
           class="pricing-form"
           action="https://formsubmit.co/ajax/ricardojvilela@gmail.com"
           method="POST"
+          novalidate
         >
           <input type="hidden" name="_subject" value="Novo lead BatchCutout Pro - Pricing" />
           <input type="hidden" name="_template" value="table" />
@@ -498,15 +499,22 @@
         const email = formData.get("email");
         const company = formData.get("company");
         const volume = formData.get("volume");
+        const isValid = pricingForm.checkValidity();
         if (!hasTrackedSubmitAttempt) {
           trackPricingEvent("pro_submit_attempt", {
             volume,
             hasCompany: Boolean(company),
             hasEmail: Boolean(email),
-            isValid: true,
+            isValid,
           });
         }
         hasTrackedSubmitAttempt = false;
+
+        if (!isValid) {
+          pricingForm.reportValidity();
+          submitButton.disabled = false;
+          return;
+        }
 
         window.gtag?.("event", "pro_waitlist_submitted", {
           event_category: "commercial_intent",
