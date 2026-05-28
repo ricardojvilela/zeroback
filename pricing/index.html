@@ -315,6 +315,7 @@
       let debugList;
       let hasTrackedFormStart = false;
       let hasTrackedSubmitAttempt = false;
+      let lastSubmitAttemptAt = 0;
       pricingMessage.className = "pricing-message hidden";
       pricingForm.after(pricingMessage);
 
@@ -463,6 +464,9 @@
       });
 
       const trackSubmitAttemptSnapshot = () => {
+        const now = Date.now();
+        if (now - lastSubmitAttemptAt < 1000) return;
+        lastSubmitAttemptAt = now;
         if (hasTrackedSubmitAttempt) return;
         const formData = new FormData(pricingForm);
         hasTrackedSubmitAttempt = true;
@@ -481,17 +485,7 @@
 
       pricingForm.addEventListener("invalid", () => {
         if (hasTrackedSubmitAttempt) return;
-        const formData = new FormData(pricingForm);
-        hasTrackedSubmitAttempt = true;
-        trackPricingEvent("pro_submit_attempt", {
-          volume: formData.get("volume"),
-          hasCompany: Boolean(formData.get("company")),
-          hasEmail: Boolean(formData.get("email")),
-          isValid: false,
-        });
-        setTimeout(() => {
-          hasTrackedSubmitAttempt = false;
-        }, 0);
+        trackSubmitAttemptSnapshot();
       }, true);
 
       pricingForm.addEventListener("submit", async (event) => {
@@ -507,12 +501,7 @@
         const volume = formData.get("volume");
         const isValid = pricingForm.checkValidity();
         if (!hasTrackedSubmitAttempt) {
-          trackPricingEvent("pro_submit_attempt", {
-            volume,
-            hasCompany: Boolean(company),
-            hasEmail: Boolean(email),
-            isValid,
-          });
+          trackSubmitAttemptSnapshot();
         }
         hasTrackedSubmitAttempt = false;
 
