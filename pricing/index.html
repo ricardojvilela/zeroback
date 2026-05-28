@@ -477,13 +477,7 @@
         }, 1500);
       };
 
-      pricingSubmitButton.addEventListener("pointerdown", trackSubmitAttemptSnapshot);
-      pricingSubmitButton.addEventListener("mousedown", trackSubmitAttemptSnapshot);
-      pricingSubmitButton.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          trackSubmitAttemptSnapshot();
-        }
-      });
+      pricingSubmitButton.addEventListener("click", trackSubmitAttemptSnapshot);
 
       pricingForm.addEventListener("invalid", () => {
         if (hasTrackedSubmitAttempt) return;
