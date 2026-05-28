@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BatchCutout Pro Waitlist | Bulk Background Remover Pricing</title>
+    <title>BatchCutout Pro | Bulk Background Removal for Product Photos</title>
     <meta
       name="description"
-      content="Join the BatchCutout Pro waitlist for larger product photo batches, ecommerce workflows, ZIP exports and priority access."
+      content="Join BatchCutout Pro early access for high-volume product photo background removal, larger batches, transparent PNGs and organized ZIP exports."
     />
-    <meta property="og:title" content="BatchCutout Pro Waitlist" />
+    <meta property="og:title" content="BatchCutout Pro Early Access" />
     <meta
       property="og:description"
-      content="For stores and teams processing 100+ product photos and larger ecommerce catalog batches."
+      content="For ecommerce stores, marketplace sellers and teams processing many product photos at once."
     />
     <meta property="og:url" content="https://batchcutout.com/pricing/" />
     <meta property="og:type" content="website" />
@@ -61,33 +61,33 @@
           <span class="brand-mark">BC</span>
           <span>BatchCutout</span>
         </a>
-        <a href="/?utm_source=pricing&utm_medium=nav&utm_campaign=pro-waitlist#tool">Try free</a>
+        <a href="/?utm_source=pricing&utm_medium=nav&utm_campaign=pro-early-access#tool">Try 3 images free</a>
       </nav>
 
       <section class="pricing-hero">
         <div class="pricing-copy">
           <p class="section-kicker">BatchCutout Pro</p>
-          <h1>For stores and teams processing 100+ product photos</h1>
+          <h1>Remove backgrounds from hundreds of product photos</h1>
           <p>
-            Pro access is being prepared for ecommerce teams that need larger batches, faster repeated
-            workflows and organized transparent PNG exports for catalog work.
+            Early access is for ecommerce teams that need to clean product photos in bulk, export
+            transparent PNGs and receive a ZIP that is ready for Shopify, Etsy, catalogues and ads.
           </p>
           <div class="landing-actions">
-            <a class="landing-button" href="#pro-waitlist">Join Pro waitlist</a>
-            <a class="landing-secondary" href="/?utm_source=pricing&utm_medium=hero&utm_campaign=try-free#tool">Try free batch first</a>
+            <a class="landing-button" href="#pro-waitlist">Request Pro early access</a>
+            <a class="landing-secondary" href="/?utm_source=pricing&utm_medium=hero&utm_campaign=try-free#tool">Test 3 images first</a>
           </div>
         </div>
 
         <aside class="pricing-card" aria-labelledby="pro-plan-title">
-          <p class="section-kicker">Planned Pro access</p>
-          <h2 id="pro-plan-title">Pro waitlist</h2>
-          <p class="pricing-note">Pricing is not active yet. Join the list to help us prioritize the first Pro release.</p>
+          <p class="section-kicker">Built for volume</p>
+          <h2 id="pro-plan-title">Pro early access</h2>
+          <p class="pricing-note">Pricing is not active yet. The first Pro release will be shaped around real store and catalogue workflows.</p>
           <ul>
             <li>Larger image batches</li>
-            <li>Transparent PNG and ZIP exports</li>
-            <li>Ecommerce catalog workflow</li>
-            <li>Priority access when Pro opens</li>
-            <li>Built for stores, agencies and teams</li>
+            <li>Transparent PNG exports at 1200px minimum</li>
+            <li>Organized ZIP downloads for product teams</li>
+            <li>Workflow for Shopify, Etsy and marketplaces</li>
+            <li>Priority access when paid plans open</li>
           </ul>
         </aside>
       </section>
@@ -107,12 +107,27 @@
         </article>
       </section>
 
+      <section class="pricing-proof" aria-label="How Pro fits the workflow">
+        <article>
+          <strong>1. Test quality</strong>
+          <p>Use the free version for 3 images and confirm the cutout quality before requesting Pro.</p>
+        </article>
+        <article>
+          <strong>2. Scale the batch</strong>
+          <p>Pro is aimed at sellers preparing tens or hundreds of images for new products and variants.</p>
+        </article>
+        <article>
+          <strong>3. Export clean files</strong>
+          <p>Download transparent PNGs or one ZIP that is easier to hand over, upload or archive.</p>
+        </article>
+      </section>
+
       <section class="pricing-form-panel" id="pro-waitlist" aria-labelledby="waitlist-title">
         <div>
           <p class="section-kicker">Early access</p>
-          <h2 id="waitlist-title">Join the Pro waitlist</h2>
+          <h2 id="waitlist-title">Tell us your monthly photo volume</h2>
           <p>
-            Tell us the volume you expect to process. This helps define the right pricing and first Pro limits.
+            This is not a payment form. It helps us identify the strongest use cases and invite the right users first.
           </p>
         </div>
         <form
@@ -123,17 +138,19 @@
           <input type="hidden" name="_subject" value="Novo lead BatchCutout Pro - Pricing" />
           <input type="hidden" name="_template" value="table" />
           <input type="hidden" name="source" value="pricing-page" />
+          <input type="hidden" name="page_url" value="" />
           <input type="text" name="_honey" class="honeypot-field" tabindex="-1" autocomplete="off" />
           <input name="email" type="email" autocomplete="email" required placeholder="Email" />
           <input name="company" type="text" autocomplete="organization" placeholder="Store or company" />
           <select name="volume" aria-label="Estimated monthly volume">
+            <option value="20-100">20-100 images/month</option>
             <option value="100-500">100-500 images/month</option>
             <option value="500-2000">500-2,000 images/month</option>
             <option value="2000+">2,000+ images/month</option>
           </select>
-          <button type="submit">Join Pro waitlist</button>
+          <button type="submit">Request Pro access</button>
         </form>
-        <p class="pricing-privacy">No payment now. This only registers interest in Pro access.</p>
+        <p class="pricing-privacy">No payment now. We will only use this to contact you about Pro access.</p>
       </section>
     </main>
     <script>
@@ -141,6 +158,9 @@
       const pricingMessage = document.createElement("p");
       pricingMessage.className = "pricing-message hidden";
       pricingForm.after(pricingMessage);
+      pricingForm.querySelector('[name="page_url"]').value = window.location.href;
+      pricingForm.querySelector('[name="source"]').value =
+        new URLSearchParams(window.location.search).get("source") || "pricing-page";
 
       pricingForm.addEventListener("submit", async (event) => {
         event.preventDefault();

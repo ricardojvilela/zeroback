@@ -1410,9 +1410,13 @@ function clearAll() {
 }
 
 function showProInterest(reason = "manual") {
-  document.querySelector("#pro-title")?.scrollIntoView({ behavior: "smooth", block: "center" });
-  proEmail.focus({ preventScroll: true });
   trackEvent("pro_interest_prompt_clicked", { reason, totalInQueue: items.length });
+  const params = new URLSearchParams({
+    source: "app",
+    reason,
+    limit: String(maxFilesPerBatch),
+  });
+  window.location.href = `./pricing/?${params.toString()}#pro-waitlist`;
 }
 
 function selectFeedbackGoal(goal) {
