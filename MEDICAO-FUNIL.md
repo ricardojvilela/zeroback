@@ -103,3 +103,4 @@ Atualizacao em 2026-05-28 - medicao Pro:
 - A pagina `/pricing/` passou a registar sinais de intencao Pro: visita, clique em CTA, inicio de formulario, volume escolhido e tentativa de envio.
 - O painel tecnico de validacao fica disponivel com `?debug=1`, usando o mesmo historico local de eventos da ferramenta.
 - A tentativa de envio passou a ser registada mesmo quando o formulario ainda esta invalido, para medir interesse antes do contacto completo.
+- Validacao online: tentativa invalida no formulario Pro regista `pro_submit_attempt` com `isValid: false`, sem duplicar a tentativa atual.
