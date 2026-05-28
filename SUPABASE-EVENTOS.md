@@ -1,12 +1,24 @@
 # BatchCutout - Eventos reais com Supabase
 
-Estado: o codigo ja envia eventos para `/api/track`.
+Estado: ativo em producao.
 
-Enquanto o Supabase nao estiver configurado no Vercel, o endpoint responde com sucesso mas nao guarda dados.
+Projeto Supabase:
 
-## 1. Criar tabela no Supabase
+- Project ref: `kpsxurgxmkfwdfnyzzhj`
+- API URL: `https://kpsxurgxmkfwdfnyzzhj.supabase.co`
+- Tabela: `public.batchcutout_events`
 
-No Supabase, abrir SQL Editor e executar:
+As variaveis de producao ja foram configuradas no Vercel:
+
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_EVENTS_TABLE`
+
+Validacao em 2026-05-28: `/api/track` respondeu com `stored: true` e o evento foi confirmado na tabela Supabase. O evento de teste foi removido depois da verificacao.
+
+## Estrutura da tabela
+
+SQL usado no Supabase:
 
 ```sql
 create table if not exists public.batchcutout_events (
@@ -38,19 +50,7 @@ create index if not exists batchcutout_events_visitor_idx
   on public.batchcutout_events (visitor_id);
 ```
 
-## 2. Variaveis no Vercel
-
-No projeto Vercel, adicionar em Settings > Environment Variables:
-
-- `SUPABASE_URL`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `SUPABASE_EVENTS_TABLE` com valor `batchcutout_events`
-
-Usar a `service_role key` apenas no Vercel. Nunca colocar esta chave no frontend.
-
-Depois de guardar as variaveis, fazer redeploy.
-
-## 3. Eventos guardados
+## Eventos guardados
 
 Ferramenta:
 
@@ -74,7 +74,7 @@ Pagina Pro:
 - `pro_submit_attempt`
 - `pro_waitlist_submitted`
 
-## 4. Consultas uteis
+## Consultas uteis
 
 Eventos por dia:
 

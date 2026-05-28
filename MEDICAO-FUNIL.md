@@ -125,3 +125,5 @@ Atualizacao em 2026-05-28 - recolha real de eventos:
 - A homepage envia os eventos principais do funil para o endpoint, alem de Google/Vercel/debug.
 - A pagina `/pricing/` envia eventos Pro para o mesmo endpoint.
 - Criado o guia `SUPABASE-EVENTOS.md` com SQL da tabela, variaveis do Vercel e consultas de funil.
+- Supabase ficou ativo em producao: projeto `kpsxurgxmkfwdfnyzzhj`, tabela `public.batchcutout_events`, endpoint validado com `stored: true`.
+- Variaveis Vercel configuradas em producao: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_EVENTS_TABLE`.
