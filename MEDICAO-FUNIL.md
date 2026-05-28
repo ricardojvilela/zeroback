@@ -134,3 +134,10 @@ Atualizacao em 2026-05-28 - painel com dados reais:
 - Criado endpoint `/api/stats?days=14` para agregar eventos reais do Supabase por dia.
 - A pagina `/admin` passou a mostrar visitantes reais, uploads, tentativas acima de 3, downloads, cliques Pro e tentativas Pro.
 - O painel manual continua disponivel para Google Ads, custos e notas operacionais.
+
+Atualizacao em 2026-05-28 - protecao do admin:
+
+- Criado endpoint `/api/admin-auth` para validar password de administrador.
+- `/api/stats` passou a exigir token temporario antes de devolver dados reais do Supabase.
+- `/admin` passou a mostrar ecrã de login antes do painel.
+- A password fica apenas na variavel Vercel `ADMIN_PASSWORD`, nao no codigo.

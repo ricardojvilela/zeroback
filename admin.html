@@ -83,6 +83,44 @@
         margin: 24px auto 40px;
       }
 
+      body.locked .admin-shell {
+        display: none;
+      }
+
+      .auth-screen {
+        display: none;
+        min-height: 100vh;
+        place-items: center;
+        padding: 24px;
+      }
+
+      body.locked .auth-screen {
+        display: grid;
+      }
+
+      .auth-card {
+        width: min(420px, 100%);
+        border: 1px solid rgba(216, 225, 236, 0.9);
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.95);
+        box-shadow: var(--shadow);
+        padding: 24px;
+      }
+
+      .auth-card h1 {
+        margin-bottom: 10px;
+        font-size: 30px;
+        line-height: 1.05;
+      }
+
+      .auth-error {
+        min-height: 20px;
+        margin: 10px 0 0;
+        color: var(--danger);
+        font-size: 13px;
+        font-weight: 800;
+      }
+
       .admin-header {
         display: flex;
         align-items: center;
@@ -408,7 +446,23 @@
       }
     </style>
   </head>
-  <body>
+  <body class="locked">
+    <section class="auth-screen" aria-label="Acesso protegido">
+      <form class="auth-card" id="authForm">
+        <p class="eyebrow">Painel interno</p>
+        <h1>Acesso protegido</h1>
+        <p class="note">Introduza a password de administrador para consultar os dados reais do BatchCutout.</p>
+        <div class="field">
+          <label for="adminPassword">Password</label>
+          <input id="adminPassword" name="password" type="password" autocomplete="current-password" required />
+        </div>
+        <div class="actions">
+          <button type="submit">Entrar</button>
+        </div>
+        <p class="auth-error" id="authError"></p>
+      </form>
+    </section>
+
     <main class="admin-shell">
       <header class="admin-header">
         <div class="brand">
@@ -626,6 +680,10 @@
 
     <script>
       const storageKey = "batchcutout_growth_rows";
+      const adminTokenStorageKey = "batchcutout_admin_token";
+      const adminTokenExpiryStorageKey = "batchcutout_admin_token_expires";
+      const authForm = document.querySelector("#authForm");
+      const authError = document.querySelector("#authError");
       const form = document.querySelector("#growthForm");
       const rowsBody = document.querySelector("#rowsBody");
       const liveRowsBody = document.querySelector("#liveRowsBody");
@@ -633,6 +691,34 @@
       const csvInput = document.querySelector("#csvInput");
       const today = new Date().toISOString().slice(0, 10);
       form.date.value = today;
+
+      function getAdminToken() {
+        const token = localStorage.getItem(adminTokenStorageKey) || "";
+        const expiresAt = Number(localStorage.getItem(adminTokenExpiryStorageKey) || 0);
+        if (!token || expiresAt <= Date.now()) return "";
+        return token;
+      }
+
+      function unlockAdmin() {
+        document.body.classList.remove("locked");
+      }
+
+      async function loginAdmin(password) {
+        authError.textContent = "";
+        const response = await fetch("/api/admin-auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password }),
+        });
+        const data = await response.json();
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error || "login_failed");
+        }
+        localStorage.setItem(adminTokenStorageKey, data.token);
+        localStorage.setItem(adminTokenExpiryStorageKey, String(data.expiresAt));
+        unlockAdmin();
+        await loadLiveStats();
+      }
 
       function number(value) {
         const parsed = Number(String(value || "").replace(",", "."));
@@ -764,15 +850,31 @@
       }
 
       async function loadLiveStats() {
+        const token = getAdminToken();
+        if (!token) {
+          document.body.classList.add("locked");
+          return;
+        }
+
         liveStatus.textContent = "A carregar dados reais...";
         try {
-          const response = await fetch("/api/stats?days=14", { headers: { Accept: "application/json" } });
+          const response = await fetch("/api/stats?days=14", {
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
           const data = await response.json();
           if (!response.ok || !data.ok) {
             throw new Error(data.error || "stats_failed");
           }
           renderLiveStats(data);
         } catch (error) {
+          if (error.message === "unauthorized") {
+            localStorage.removeItem(adminTokenStorageKey);
+            localStorage.removeItem(adminTokenExpiryStorageKey);
+            document.body.classList.add("locked");
+          }
           liveRowsBody.innerHTML = `<tr><td class="empty" colspan="9">Nao foi possivel carregar dados reais.</td></tr>`;
           liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variaveis Vercel.";
         }
@@ -907,9 +1009,21 @@
       });
 
       document.querySelector("#refreshLive").addEventListener("click", loadLiveStats);
+      authForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const password = new FormData(authForm).get("password");
+        try {
+          await loginAdmin(password);
+        } catch {
+          authError.textContent = "Password invalida ou configuracao em falta.";
+        }
+      });
 
       render();
-      loadLiveStats();
+      if (getAdminToken()) {
+        unlockAdmin();
+        loadLiveStats();
+      }
     </script>
   </body>
 </html>

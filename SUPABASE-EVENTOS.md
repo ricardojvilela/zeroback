@@ -81,6 +81,8 @@ Endpoint interno de leitura agregada:
 - `/api/stats?days=14`
 - Usado pela pagina `/admin`
 - Devolve totais e linhas por dia sem expor a `service_role key`
+- Protegido por token temporario gerado em `/api/admin-auth`
+- Requer variavel Vercel `ADMIN_PASSWORD`
 
 Eventos por dia:
 

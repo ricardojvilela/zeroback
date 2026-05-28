@@ -1,7 +1,9 @@
+import crypto from "node:crypto";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "https://batchcutout.com",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
 function sendJson(response, status, data) {
@@ -37,6 +39,27 @@ function emptyDay(date) {
   };
 }
 
+function verifyAdminToken(request) {
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  if (!adminPassword) return false;
+
+  const header = request.headers.authorization || "";
+  const token = header.startsWith("Bearer ") ? header.slice(7) : "";
+  const [body, signature] = token.split(".");
+  if (!body || !signature) return false;
+
+  const expected = crypto.createHmac("sha256", adminPassword).update(body).digest("base64url");
+  if (signature.length !== expected.length) return false;
+  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return false;
+
+  try {
+    const payload = JSON.parse(Buffer.from(body, "base64url").toString("utf8"));
+    return payload.role === "admin" && Number(payload.expiresAt || 0) > Date.now();
+  } catch {
+    return false;
+  }
+}
+
 export default async function handler(request, response) {
   if (request.method === "OPTIONS") {
     return sendJson(response, 200, { ok: true });
@@ -44,6 +67,10 @@ export default async function handler(request, response) {
 
   if (request.method !== "GET") {
     return sendJson(response, 405, { ok: false, error: "method_not_allowed" });
+  }
+
+  if (!verifyAdminToken(request)) {
+    return sendJson(response, 401, { ok: false, error: "unauthorized" });
   }
 
   const supabaseUrl = process.env.SUPABASE_URL;
