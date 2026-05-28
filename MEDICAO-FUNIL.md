@@ -111,3 +111,10 @@ Atualizacao em 2026-05-28 - funil da ferramenta:
 - O evento antigo `limite_20` fica ativo apenas como compatibilidade com a conversao ja criada no Google Ads, mas os novos relatorios devem usar `batch_limit_exceeded`.
 - Os eventos incluem limite gratuito, idioma, origem/campanha, quantidade selecionada, quantidade aceite, rejeicoes por limite, ficheiros nao suportados e downloads PNG/ZIP.
 - Validacao online: `https://batchcutout.com/?debug=1` mostra `tool_page_view` com `free_limit: 3`; o ficheiro publicado contem os novos eventos de upload, limite, processamento, download e Pro.
+
+Atualizacao em 2026-05-28 - painel interno:
+
+- Criada a pagina `/admin.html` para registo diario de visitantes, uploads, imagens aceites, tentativas acima de 3, downloads, cliques Pro, leads e custo Google Ads.
+- O painel calcula taxas de visita para upload, upload para download, limite para Pro e custo por lead.
+- Inclui recomendacao automatica: manter teste, ajustar pagina/anuncio, melhorar experiencia, reforcar Pro, controlar custo ou escalar com cuidado.
+- A pagina tem `noindex,nofollow`, nao esta no sitemap e o `robots.txt` bloqueia `/admin.html`.

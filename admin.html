@@ -455,10 +455,12 @@
 
           <div class="actions">
             <button type="submit">Guardar leitura</button>
+            <button class="secondary" type="button" id="importCsv">Importar CSV</button>
             <button class="secondary" type="button" id="exportCsv">Exportar CSV</button>
             <button class="secondary" type="button" id="copySummary">Copiar resumo</button>
             <button class="danger" type="button" id="clearData">Limpar dados</button>
           </div>
+          <input id="csvInput" type="file" accept=".csv,text/csv" hidden />
           <p class="note">Os dados ficam guardados neste browser. Para arquivo externo, use Exportar CSV.</p>
         </form>
 
@@ -513,6 +515,7 @@
       const storageKey = "batchcutout_growth_rows";
       const form = document.querySelector("#growthForm");
       const rowsBody = document.querySelector("#rowsBody");
+      const csvInput = document.querySelector("#csvInput");
       const today = new Date().toISOString().slice(0, 10);
       form.date.value = today;
 
@@ -634,6 +637,55 @@
         };
       }
 
+      function parseCsvLine(line) {
+        const values = [];
+        let current = "";
+        let quoted = false;
+        for (let index = 0; index < line.length; index += 1) {
+          const char = line[index];
+          const next = line[index + 1];
+          if (char === '"' && quoted && next === '"') {
+            current += '"';
+            index += 1;
+          } else if (char === '"') {
+            quoted = !quoted;
+          } else if (char === "," && !quoted) {
+            values.push(current);
+            current = "";
+          } else {
+            current += char;
+          }
+        }
+        values.push(current);
+        return values;
+      }
+
+      function importCsv(text) {
+        const lines = text.split(/\r?\n/).filter(Boolean);
+        const headers = parseCsvLine(lines.shift() || "");
+        const rows = lines.map((line) => {
+          const values = parseCsvLine(line);
+          const row = Object.fromEntries(headers.map((header, index) => [header, values[index] || ""]));
+          return {
+            date: row.date || today,
+            visitors: number(row.visitors),
+            uploads: number(row.uploads),
+            acceptedImages: number(row.acceptedImages),
+            limitAttempts: number(row.limitAttempts),
+            downloads: number(row.downloads),
+            proClicks: number(row.proClicks),
+            leads: number(row.leads),
+            adCost: number(row.adCost),
+            goodTerms: row.goodTerms || "",
+            negativeTerms: row.negativeTerms || "",
+            notes: row.notes || "",
+          };
+        });
+
+        saveRows(rows);
+        render();
+      }
+
       form.addEventListener("submit", (event) => {
         event.preventDefault();
         const nextRow = rowFromForm();
@@ -657,6 +709,17 @@
         link.download = `batchcutout-growth-${today}.csv`;
         link.click();
         URL.revokeObjectURL(url);
+      });
+
+      document.querySelector("#importCsv").addEventListener("click", () => {
+        csvInput.click();
+      });
+
+      csvInput.addEventListener("change", async () => {
+        const file = csvInput.files?.[0];
+        if (!file) return;
+        importCsv(await file.text());
+        csvInput.value = "";
       });
 
       document.querySelector("#copySummary").addEventListener("click", async () => {
