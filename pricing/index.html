@@ -308,8 +308,87 @@
       const pricingForm = document.querySelector(".pricing-form");
       const pricingMessage = document.createElement("p");
       const languageSelect = document.querySelector("#pricingLanguage");
+      const debugMode = new URLSearchParams(window.location.search).get("debug") === "1";
+      const debugEventsStorageKey = "batchcutout_debug_events";
+      let debugList;
+      let hasTrackedFormStart = false;
       pricingMessage.className = "pricing-message hidden";
       pricingForm.after(pricingMessage);
+
+      function getPricingEventBase() {
+        return {
+          event_category: "commercial_intent",
+          page_path: window.location.pathname,
+          page_location: window.location.href.split("#")[0],
+          language: languageSelect?.value || document.documentElement.lang || "unknown",
+          source: new URLSearchParams(window.location.search).get("source") || "pricing-page",
+          reason: new URLSearchParams(window.location.search).get("reason") || "",
+          limit: new URLSearchParams(window.location.search).get("limit") || "",
+        };
+      }
+
+      function getDebugEvents() {
+        try {
+          return JSON.parse(localStorage.getItem(debugEventsStorageKey) || "[]");
+        } catch {
+          return [];
+        }
+      }
+
+      function saveDebugEvents(events) {
+        localStorage.setItem(debugEventsStorageKey, JSON.stringify(events.slice(-30)));
+      }
+
+      function renderDebugEvents() {
+        if (!debugList) return;
+        const events = getDebugEvents().slice().reverse();
+        debugList.innerHTML = events.map((event) => `
+          <li>
+            <strong>${event.name}</strong>
+            <span>${new Date(event.at).toLocaleTimeString()}</span>
+            <code>${JSON.stringify(event.detail)}</code>
+          </li>
+        `).join("");
+      }
+
+      function recordDebugEvent(name, detail = {}) {
+        if (!debugMode) return;
+        const events = getDebugEvents();
+        events.push({ name, detail, at: new Date().toISOString() });
+        saveDebugEvents(events);
+        renderDebugEvents();
+      }
+
+      function trackPricingEvent(name, detail = {}) {
+        const eventParams = {
+          ...getPricingEventBase(),
+          event_label: detail.label || detail.volume || detail.language || name,
+          ...detail,
+        };
+        window.dataLayer?.push({ event: name, ...eventParams });
+        window.gtag?.("event", name, eventParams);
+        recordDebugEvent(name, eventParams);
+      }
+
+      function initPricingDebugPanel() {
+        if (!debugMode) return;
+        const panel = document.createElement("aside");
+        panel.className = "debug-panel";
+        panel.innerHTML = `
+          <div>
+            <strong>Pricing debug</strong>
+            <button type="button">Limpar</button>
+          </div>
+          <ul></ul>
+        `;
+        debugList = panel.querySelector("ul");
+        panel.querySelector("button").addEventListener("click", () => {
+          localStorage.removeItem(debugEventsStorageKey);
+          renderDebugEvents();
+        });
+        document.body.append(panel);
+        renderDebugEvents();
+      }
 
       function detectPricingLanguage() {
         const saved = localStorage.getItem("language");
@@ -347,12 +426,37 @@
 
       const initialLanguage = detectPricingLanguage();
       applyPricingLanguage(initialLanguage);
+      initPricingDebugPanel();
+      trackPricingEvent("pro_page_view", { language: initialLanguage });
       pricingForm.querySelector('[name="page_url"]').value = window.location.href;
       pricingForm.querySelector('[name="source"]').value =
         new URLSearchParams(window.location.search).get("source") || "pricing-page";
 
       languageSelect.addEventListener("change", (event) => {
         applyPricingLanguage(event.target.value);
+        trackPricingEvent("pricing_language_changed", { language: event.target.value });
+      });
+
+      for (const cta of document.querySelectorAll(".landing-button, .landing-secondary, .landing-nav a:not(.landing-logo)")) {
+        cta.addEventListener("click", () => {
+          trackPricingEvent("pro_cta_clicked", {
+            label: cta.textContent.trim(),
+            href: cta.getAttribute("href") || "",
+          });
+        });
+      }
+
+      pricingForm.addEventListener("input", (event) => {
+        if (!hasTrackedFormStart && event.target.matches("input, select")) {
+          hasTrackedFormStart = true;
+          trackPricingEvent("pro_form_started", {
+            field: event.target.name || event.target.tagName.toLowerCase(),
+          });
+        }
+      });
+
+      pricingForm.querySelector('[name="volume"]').addEventListener("change", (event) => {
+        trackPricingEvent("pro_volume_selected", { volume: event.target.value });
       });
 
       pricingForm.addEventListener("submit", async (event) => {
@@ -366,6 +470,11 @@
         const email = formData.get("email");
         const company = formData.get("company");
         const volume = formData.get("volume");
+        trackPricingEvent("pro_submit_attempt", {
+          volume,
+          hasCompany: Boolean(company),
+          hasEmail: Boolean(email),
+        });
 
         window.gtag?.("event", "pro_waitlist_submitted", {
           event_category: "commercial_intent",
