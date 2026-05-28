@@ -774,7 +774,7 @@ const proTranslations = {
     demoLabel: "Exemplo antes e depois",
     demoBefore: "Antes",
     demoAfter: "Depois",
-    freeLimitBadge: "{limit} imagens grÃ¡tis por lote",
+    freeLimitBadge: "{limit} imagens gr\u00e1tis por lote",
     audienceKicker: "Criado para volume",
     audienceTitle: "Para quem trata imagens todos os dias",
     audienceStoresTitle: "Lojas online",
