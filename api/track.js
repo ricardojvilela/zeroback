@@ -51,6 +51,30 @@ function sanitizeDetail(detail) {
   return output;
 }
 
+async function readRequestBody(request) {
+  if (request.body && typeof request.body === "object") return request.body;
+  if (typeof request.body === "string") {
+    try {
+      return JSON.parse(request.body);
+    } catch {
+      return {};
+    }
+  }
+
+  const chunks = [];
+  for await (const chunk of request) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
+
+  if (!chunks.length) return {};
+
+  try {
+    return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+  } catch {
+    return {};
+  }
+}
+
 export default async function handler(request, response) {
   if (request.method === "OPTIONS") {
     return sendJson(response, 200, { ok: true });
@@ -60,7 +84,8 @@ export default async function handler(request, response) {
     return sendJson(response, 405, { ok: false, error: "method_not_allowed" });
   }
 
-  const eventName = asString(request.body?.name, 80);
+  const body = await readRequestBody(request);
+  const eventName = asString(body?.name, 80);
   if (!allowedEvents.has(eventName)) {
     return sendJson(response, 400, { ok: false, error: "event_not_allowed" });
   }
@@ -73,7 +98,7 @@ export default async function handler(request, response) {
     return sendJson(response, 202, { ok: true, stored: false, reason: "supabase_not_configured" });
   }
 
-  const detail = sanitizeDetail(request.body?.detail);
+  const detail = sanitizeDetail(body?.detail);
   const row = {
     event_name: eventName,
     event_category: asString(detail.event_category, 80),
@@ -81,8 +106,8 @@ export default async function handler(request, response) {
     page_path: asString(detail.page_path, 500),
     page_location: asString(detail.page_location, 1000),
     language: asString(detail.language, 20),
-    session_id: asString(request.body?.sessionId, 80),
-    visitor_id: asString(request.body?.visitorId, 80),
+    session_id: asString(body?.sessionId, 80),
+    visitor_id: asString(body?.visitorId, 80),
     source: asString(detail.source || detail.utm_source || detail.last_source || detail.first_source, 160),
     campaign: asString(detail.utm_campaign || detail.last_campaign || detail.first_campaign, 160),
     free_limit: Number(detail.free_limit || 0) || null,
