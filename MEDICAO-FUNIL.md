@@ -110,3 +110,4 @@ Atualizacao em 2026-05-28 - funil da ferramenta:
 - A homepage passou a registar eventos de funil mais claros: `tool_page_view`, `tool_drag_upload_intent`, `tool_upload_started`, `tool_upload_added`, `batch_limit_exceeded`, `tool_processing_started`, `tool_processing_completed`, `tool_download_png`, `tool_download_zip` e `tool_pro_clicked`.
 - O evento antigo `limite_20` fica ativo apenas como compatibilidade com a conversao ja criada no Google Ads, mas os novos relatorios devem usar `batch_limit_exceeded`.
 - Os eventos incluem limite gratuito, idioma, origem/campanha, quantidade selecionada, quantidade aceite, rejeicoes por limite, ficheiros nao suportados e downloads PNG/ZIP.
+- Validacao online: `https://batchcutout.com/?debug=1` mostra `tool_page_view` com `free_limit: 3`; o ficheiro publicado contem os novos eventos de upload, limite, processamento, download e Pro.
