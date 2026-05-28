@@ -27,7 +27,7 @@ const maxFilesPerBatch = [2, 3, 5, 10, 20].includes(requestedLimit)
   : defaultMaxFilesPerBatch;
 const minExportSide = 1200;
 const downloadZipConversionId = "AW-18177126609/2EdRCMzF7bMcENHhw9tD";
-const limit20ConversionId = "AW-18177126609/prPXCPXD8LMcENHhw9tD";
+const batchLimitConversionId = "AW-18177126609/prPXCPXD8LMcENHhw9tD";
 const consentStorageKey = "batchcutout_consent";
 const debugMode = new URLSearchParams(window.location.search).get("debug") === "1";
 const debugEventsStorageKey = "batchcutout_debug_events";
@@ -813,16 +813,27 @@ for (const language of Object.keys(translations)) {
 let items = [];
 let currentLanguage = localStorage.getItem("language") || detectLanguage();
 let engineHasLoaded = false;
+let hasTrackedDragIntent = false;
 
 const analyticsEvents = {
+  tool_page_view: { category: "funnel", label: "page_view", step: 0 },
   brand_cta_clicked: { category: "engagement", label: "start_free" },
+  tool_drag_upload_intent: { category: "upload", label: "drag_upload_intent", step: 1 },
+  tool_upload_started: { category: "funnel", label: "upload_started", step: 1 },
+  tool_upload_added: { category: "funnel", label: "upload_added", step: 2 },
+  batch_limit_exceeded: { category: "commercial_intent", label: "batch_limit_exceeded", step: 3 },
+  tool_processing_started: { category: "funnel", label: "processing_started", step: 4 },
+  tool_processing_completed: { category: "funnel", label: "processing_completed", step: 5 },
+  tool_download_png: { category: "funnel", label: "download_png", step: 6 },
+  tool_download_zip: { category: "funnel", label: "download_zip", step: 6 },
+  tool_pro_clicked: { category: "commercial_intent", label: "pro_clicked", step: 7 },
   photos_selected: { category: "upload", label: "photos_selected" },
   upload_rejected: { category: "upload", label: "upload_rejected" },
   upload: { category: "funnel", label: "upload", step: 1 },
   processar: { category: "funnel", label: "processar", step: 2 },
   download_png: { category: "funnel", label: "download_png", step: 3 },
   download_zip: { category: "funnel", label: "download_zip", step: 3 },
-  limite_20: { category: "funnel", label: "limite_20", step: 4 },
+  limite_20: { category: "funnel", label: "batch_limit_legacy", step: 4 },
   lead_pro: { category: "funnel", label: "lead_pro", step: 5 },
   background_removal_started: { category: "processing", label: "started" },
   background_removal_finished: { category: "processing", label: "finished" },
@@ -1004,9 +1015,17 @@ function initDebugPanel() {
   renderDebugEvents();
 }
 
-function trackLimit20(detail = {}) {
-  trackEvent("limite_20", detail);
-  trackGoogleAdsConversion(limit20ConversionId);
+function trackBatchLimitExceeded(detail = {}) {
+  const limitDetail = {
+    free_limit: maxFilesPerBatch,
+    ...detail,
+  };
+  trackEvent("batch_limit_exceeded", limitDetail);
+  trackEvent("limite_20", {
+    ...limitDetail,
+    legacy_name: "limite_20",
+  });
+  trackGoogleAdsConversion(batchLimitConversionId);
 }
 
 function updateConsent(consent) {
@@ -1215,9 +1234,18 @@ function removeItem(index) {
 }
 
 function addFiles(fileList) {
-  const imageFiles = [...fileList].filter(isSupportedImage);
+  const selectedFiles = [...fileList];
+  const imageFiles = selectedFiles.filter(isSupportedImage);
+  const unsupportedFiles = selectedFiles.length - imageFiles.length;
   const availableSlots = Math.max(maxFilesPerBatch - items.length, 0);
   const acceptedFiles = imageFiles.slice(0, availableSlots);
+
+  trackEvent("tool_upload_started", {
+    attempted: selectedFiles.length,
+    supported: imageFiles.length,
+    unsupported: unsupportedFiles,
+    totalInQueue: items.length,
+  });
 
   if (!acceptedFiles.length) {
     setStatus(imageFiles.length ? "statusTooManyFiles" : "statusNoSupportedFiles", 0, {
@@ -1226,13 +1254,16 @@ function addFiles(fileList) {
     });
     render();
     if (imageFiles.length) {
-      showProInterest("batch_limit");
-      trackLimit20({
+      trackBatchLimitExceeded({
         accepted: 0,
         attempted: imageFiles.length,
+        selected: selectedFiles.length,
+        unsupported: unsupportedFiles,
+        rejected: imageFiles.length,
         totalInQueue: items.length,
         reason: "batch_limit",
       });
+      showProInterest("batch_limit");
     }
     trackEvent("upload_rejected", { reason: imageFiles.length ? "batch_limit" : "unsupported_files" });
     return;
@@ -1254,21 +1285,40 @@ function addFiles(fileList) {
     total: imageFiles.length,
   });
   if (rejectedByLimit) {
-    showProInterest("batch_limit");
-    trackLimit20({
+    trackBatchLimitExceeded({
       accepted: acceptedFiles.length,
       attempted: imageFiles.length,
+      selected: selectedFiles.length,
+      unsupported: unsupportedFiles,
       rejected: rejectedByLimit,
       totalInQueue: items.length,
       reason: "batch_limit",
     });
+    showProInterest("batch_limit");
   }
-  trackEvent("photos_selected", { count: acceptedFiles.length, totalInQueue: items.length });
+  trackEvent("photos_selected", {
+    count: acceptedFiles.length,
+    attempted: imageFiles.length,
+    selected: selectedFiles.length,
+    unsupported: unsupportedFiles,
+    totalInQueue: items.length,
+  });
   trackEvent("upload", { count: acceptedFiles.length, totalInQueue: items.length });
+  trackEvent("tool_upload_added", {
+    count: acceptedFiles.length,
+    attempted: imageFiles.length,
+    rejected: rejectedByLimit,
+    unsupported: unsupportedFiles,
+    totalInQueue: items.length,
+  });
   render();
 }
 
 async function processImages() {
+  trackEvent("tool_processing_started", {
+    count: items.length,
+    pending: items.filter((item) => !item.outputBlob).length,
+  });
   trackEvent("background_removal_started", { count: items.length });
   trackEvent("processar", { count: items.length });
   processButton.disabled = true;
@@ -1321,8 +1371,10 @@ async function processImages() {
   }
 
   const failures = items.filter((item) => !item.outputBlob).length;
+  const completed = items.length - failures;
   setStatus(failures ? "statusFailures" : "statusReadyZip", 100, { count: failures });
-  trackEvent("background_removal_finished", { count: items.length, failures });
+  trackEvent("background_removal_finished", { count: items.length, completed, failures });
+  trackEvent("tool_processing_completed", { count: items.length, completed, failures });
   updateControls();
 }
 
@@ -1346,6 +1398,11 @@ async function downloadZip() {
   setStatus("statusZipReady", 100);
   trackEvent("zip_downloaded", { count: readyItems.length });
   trackEvent("download_zip", { count: readyItems.length });
+  trackEvent("tool_download_zip", {
+    count: readyItems.length,
+    fileType: "zip",
+    minExportSide,
+  });
   trackGoogleAdsConversion(downloadZipConversionId);
   showPostDownloadFeedback("zip", readyItems.length);
 }
@@ -1367,6 +1424,11 @@ function downloadSinglePng() {
   setStatus("statusPngReady", 100);
   trackEvent("png_downloaded", { count: 1 });
   trackEvent("download_png", { count: 1 });
+  trackEvent("tool_download_png", {
+    count: 1,
+    fileType: "png",
+    minExportSide,
+  });
   showPostDownloadFeedback("png", 1);
 }
 
@@ -1383,7 +1445,9 @@ function clearAll() {
 }
 
 function showProInterest(reason = "manual") {
-  trackEvent("pro_interest_prompt_clicked", { reason, totalInQueue: items.length });
+  const detail = { reason, totalInQueue: items.length, free_limit: maxFilesPerBatch };
+  trackEvent("pro_interest_prompt_clicked", detail);
+  trackEvent("tool_pro_clicked", detail);
   const params = new URLSearchParams({
     source: "app",
     reason,
@@ -1454,6 +1518,10 @@ for (const eventName of ["dragenter", "dragover"]) {
   dropzone.addEventListener(eventName, (event) => {
     event.preventDefault();
     dropzone.classList.add("dragging");
+    if (!hasTrackedDragIntent) {
+      hasTrackedDragIntent = true;
+      trackEvent("tool_drag_upload_intent");
+    }
   });
 }
 
@@ -1477,3 +1545,4 @@ persistAttribution();
 applyLanguage();
 showConsentBanner();
 initDebugPanel();
+trackEvent("tool_page_view");

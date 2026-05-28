@@ -104,3 +104,9 @@ Atualizacao em 2026-05-28 - medicao Pro:
 - O painel tecnico de validacao fica disponivel com `?debug=1`, usando o mesmo historico local de eventos da ferramenta.
 - A tentativa de envio passou a ser registada mesmo quando o formulario ainda esta invalido, para medir interesse antes do contacto completo.
 - Validacao online: tentativa invalida no formulario Pro regista `pro_submit_attempt` com `isValid: false`, sem duplicar a tentativa atual.
+
+Atualizacao em 2026-05-28 - funil da ferramenta:
+
+- A homepage passou a registar eventos de funil mais claros: `tool_page_view`, `tool_drag_upload_intent`, `tool_upload_started`, `tool_upload_added`, `batch_limit_exceeded`, `tool_processing_started`, `tool_processing_completed`, `tool_download_png`, `tool_download_zip` e `tool_pro_clicked`.
+- O evento antigo `limite_20` fica ativo apenas como compatibilidade com a conversao ja criada no Google Ads, mas os novos relatorios devem usar `batch_limit_exceeded`.
+- Os eventos incluem limite gratuito, idioma, origem/campanha, quantidade selecionada, quantidade aceite, rejeicoes por limite, ficheiros nao suportados e downloads PNG/ZIP.
