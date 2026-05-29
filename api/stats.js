@@ -34,6 +34,9 @@ function emptyDay(date) {
     pngDownloads: 0,
     zipDownloads: 0,
     proClicks: 0,
+    proPrompts: 0,
+    proEmailStarts: 0,
+    proEmailSubmits: 0,
     proPageViews: 0,
     proSubmitAttempts: 0,
   };
@@ -150,6 +153,15 @@ export default async function handler(request, response) {
           break;
         case "tool_pro_clicked":
           row.proClicks += 1;
+          break;
+        case "pro_prompt_shown":
+          row.proPrompts += 1;
+          break;
+        case "pro_email_started":
+          row.proEmailStarts += 1;
+          break;
+        case "pro_email_submitted":
+          row.proEmailSubmits += 1;
           break;
         case "pro_page_view":
           row.proPageViews += 1;

@@ -537,7 +537,15 @@
             <strong id="liveProClicks">0</strong>
           </article>
           <article class="live-card">
-            <span>Tentativas Pro</span>
+            <span>Prompts Pro</span>
+            <strong id="liveProPrompts">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Emails iniciados</span>
+            <strong id="liveProEmailStarts">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Emails Pro enviados</span>
             <strong id="liveProAttempts">0</strong>
           </article>
         </div>
@@ -554,12 +562,14 @@
                 <th>Limite</th>
                 <th>Downloads</th>
                 <th>Pro</th>
-                <th>Tentativas Pro</th>
+                <th>Prompt</th>
+                <th>Email iniciado</th>
+                <th>Email enviado</th>
               </tr>
             </thead>
             <tbody id="liveRowsBody">
               <tr>
-                <td class="empty" colspan="9">A carregar dados reais.</td>
+                <td class="empty" colspan="11">A carregar dados reais.</td>
               </tr>
             </tbody>
           </table>
@@ -827,7 +837,9 @@
         document.querySelector("#liveLimit").textContent = totals.limitAttempts || 0;
         document.querySelector("#liveDownloads").textContent = totals.downloads || 0;
         document.querySelector("#liveProClicks").textContent = totals.proClicks || 0;
-        document.querySelector("#liveProAttempts").textContent = totals.proSubmitAttempts || 0;
+        document.querySelector("#liveProPrompts").textContent = totals.proPrompts || 0;
+        document.querySelector("#liveProEmailStarts").textContent = totals.proEmailStarts || 0;
+        document.querySelector("#liveProAttempts").textContent = totals.proEmailSubmits || totals.proSubmitAttempts || 0;
 
         liveRowsBody.innerHTML = data.rows?.length
           ? data.rows.slice().reverse().map((row) => `
@@ -840,10 +852,12 @@
                 <td>${row.limitAttempts}</td>
                 <td>${row.downloads}</td>
                 <td>${row.proClicks}</td>
-                <td>${row.proSubmitAttempts}</td>
+                <td>${row.proPrompts || 0}</td>
+                <td>${row.proEmailStarts || 0}</td>
+                <td>${row.proEmailSubmits || row.proSubmitAttempts || 0}</td>
               </tr>
             `).join("")
-          : `<tr><td class="empty" colspan="9">Ainda nao existem eventos reais no periodo.</td></tr>`;
+          : `<tr><td class="empty" colspan="11">Ainda nao existem eventos reais no periodo.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "";
         liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Ultima atualizacao: ${generatedAt}`;

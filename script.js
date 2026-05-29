@@ -19,6 +19,12 @@ const countText = document.querySelector("#countText");
 const postDownloadFeedback = document.querySelector("#postDownloadFeedback");
 const postDownloadOptions = document.querySelector("#postDownloadOptions");
 const postDownloadThanks = document.querySelector("#postDownloadThanks");
+const proInterestPanel = document.querySelector("#proInterestPanel");
+const proInlineForm = document.querySelector("#proInlineForm");
+const proInlineEmail = document.querySelector("#proInlineEmail");
+const proInlineLanguage = document.querySelector("#proInlineLanguage");
+const proInlinePageUrl = document.querySelector("#proInlinePageUrl");
+const proInlineMessage = document.querySelector("#proInlineMessage");
 
 const defaultMaxFilesPerBatch = 3;
 const requestedLimit = Number(new URLSearchParams(window.location.search).get("limit"));
@@ -45,6 +51,12 @@ const serverEventNames = new Set([
   "tool_download_png",
   "tool_download_zip",
   "tool_pro_clicked",
+  "pro_prompt_shown",
+  "pro_email_started",
+  "pro_email_submitted",
+  "pro_form_started",
+  "pro_submit_attempt",
+  "pro_waitlist_submitted",
 ]);
 let debugList;
 
@@ -80,10 +92,24 @@ const baseTranslation = {
   postDownloadKicker: "Feedback rápido",
   postDownloadTitle: "O BatchCutout ajudou nas suas fotos?",
   postDownloadSavedTime: "Sim, poupou tempo",
-  postDownloadNeedsQuality: "Precisa de melhor recorte",
-  postDownloadLargerBatches: "Preciso de lotes maiores",
-  postDownloadThanks: "Obrigado. A sua resposta ajuda-nos a melhorar a ferramenta.",
-  benefitsLabel: "Vantagens do serviço",
+    postDownloadNeedsQuality: "Precisa de melhor recorte",
+    postDownloadLargerBatches: "Preciso de lotes maiores",
+    postDownloadThanks: "Obrigado. A sua resposta ajuda-nos a melhorar a ferramenta.",
+    proInlineKicker: "Para lojas com volume",
+    proInlineTitle: "Precisa tratar muitas fotos por semana?",
+    proInlineLead: "Peça acesso ao BatchCutout Pro para remover fundos em lote para lojas online, catálogos e marketplaces.",
+    proEmailPlaceholder: "Email",
+    proCompanyPlaceholder: "Loja ou empresa",
+    proVolumeLabel: "Volume mensal estimado",
+    proVolumeSmall: "20-100 imagens/mês",
+    proVolumeMedium: "100-500 imagens/mês",
+    proVolumeLarge: "500-2.000 imagens/mês",
+    proVolumeXL: "2.000+ imagens/mês",
+    proInlineButton: "Pedir acesso Pro",
+    proInlineNote: "Sem pagamento agora. Usaremos o email apenas para contacto sobre o Pro.",
+    proInlineSuccess: "Pedido recebido. Vamos contactar por email quando abrirmos o acesso Pro.",
+    proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
+    benefitsLabel: "Vantagens do serviço",
   benefitPng: "PNG transparente",
   benefitZip: "ZIP pronto para loja",
   fileSuffix: "sem-fundo",
@@ -166,6 +192,20 @@ const translations = {
     postDownloadNeedsQuality: "Needs better cutout",
     postDownloadLargerBatches: "I need larger batches",
     postDownloadThanks: "Thanks. This helps us improve the tool.",
+    proInlineKicker: "For stores with volume",
+    proInlineTitle: "Need to process many photos every week?",
+    proInlineLead: "Request BatchCutout Pro access for bulk background removal for online stores, catalogues, and marketplaces.",
+    proEmailPlaceholder: "Email",
+    proCompanyPlaceholder: "Store or company",
+    proVolumeLabel: "Estimated monthly volume",
+    proVolumeSmall: "20-100 images/month",
+    proVolumeMedium: "100-500 images/month",
+    proVolumeLarge: "500-2,000 images/month",
+    proVolumeXL: "2,000+ images/month",
+    proInlineButton: "Request Pro access",
+    proInlineNote: "No payment now. We will only use your email to contact you about Pro.",
+    proInlineSuccess: "Request received. We will contact you by email when Pro access opens.",
+    proInlineError: "We could not submit automatically. Opening an email draft instead.",
     eyebrow: "Bulk background removal",
     title: "BatchCutout",
     lead: "Free test: remove the background from up to {limit} images now. Download transparent PNGs or a store-ready ZIP.",
@@ -841,6 +881,12 @@ const analyticsEvents = {
   tool_download_png: { category: "funnel", label: "download_png", step: 6 },
   tool_download_zip: { category: "funnel", label: "download_zip", step: 6 },
   tool_pro_clicked: { category: "commercial_intent", label: "pro_clicked", step: 7 },
+  pro_prompt_shown: { category: "commercial_intent", label: "pro_prompt_shown", step: 7 },
+  pro_email_started: { category: "commercial_intent", label: "pro_email_started", step: 8 },
+  pro_email_submitted: { category: "commercial_intent", label: "pro_email_submitted", step: 9 },
+  pro_form_started: { category: "commercial_intent", label: "pro_form_started", step: 8 },
+  pro_submit_attempt: { category: "commercial_intent", label: "pro_submit_attempt", step: 9 },
+  pro_waitlist_submitted: { category: "commercial_intent", label: "pro_waitlist_submitted", step: 10 },
   photos_selected: { category: "upload", label: "photos_selected" },
   upload_rejected: { category: "upload", label: "upload_rejected" },
   upload: { category: "funnel", label: "upload", step: 1 },
@@ -1510,19 +1556,108 @@ function showProInterest(reason = "manual") {
   const detail = { reason, totalInQueue: items.length, free_limit: maxFilesPerBatch };
   trackEvent("pro_interest_prompt_clicked", detail);
   trackEvent("tool_pro_clicked", detail);
-  const params = new URLSearchParams({
-    source: "app",
-    reason,
-    limit: String(maxFilesPerBatch),
-  });
-  window.location.href = `./pricing/?${params.toString()}#pro-waitlist`;
+  showProPrompt(reason);
+}
+
+function showProPrompt(reason = "post_download") {
+  if (!proInterestPanel) return;
+
+  const wasHidden = proInterestPanel.classList.contains("hidden");
+  proInterestPanel.classList.remove("hidden");
+  proInterestPanel.dataset.reason = reason;
+  if (proInlineLanguage) proInlineLanguage.value = currentLanguage;
+  if (proInlinePageUrl) proInlinePageUrl.value = window.location.href;
+
+  if (wasHidden) {
+    trackEvent("pro_prompt_shown", {
+      reason,
+      totalInQueue: items.length,
+      free_limit: maxFilesPerBatch,
+    });
+  }
+
+  proInterestPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 function showPostDownloadFeedback(downloadType, count) {
   postDownloadFeedback?.classList.remove("hidden");
   postDownloadFeedback?.setAttribute("data-download-type", downloadType);
   postDownloadFeedback?.setAttribute("data-download-count", String(count));
+  showProPrompt(`post_download_${downloadType}`);
   postDownloadFeedback?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+async function submitInlineProLead(event) {
+  event.preventDefault();
+  if (!proInlineForm) return;
+
+  const formData = new FormData(proInlineForm);
+  const email = String(formData.get("email") || "").trim();
+  const company = String(formData.get("company") || "").trim();
+  const volume = String(formData.get("volume") || "");
+  const reason = proInterestPanel?.dataset.reason || "inline_form";
+  const submitButton = proInlineForm.querySelector("button[type='submit']");
+
+  trackEvent("pro_submit_attempt", {
+    reason,
+    volume,
+    hasCompany: Boolean(company),
+    hasEmail: Boolean(email),
+  });
+
+  if (!email || !proInlineForm.checkValidity()) {
+    proInlineForm.reportValidity();
+    return;
+  }
+
+  submitButton.disabled = true;
+  if (proInlineMessage) proInlineMessage.textContent = "";
+  formData.set("language", currentLanguage);
+  formData.set("page_url", window.location.href);
+  formData.set("reason", reason);
+  formData.set("free_limit", String(maxFilesPerBatch));
+  formData.set("processed_images", String(items.filter((item) => item.outputBlob).length));
+
+  trackEvent("pro_email_submitted", {
+    reason,
+    volume,
+    hasCompany: Boolean(company),
+    value: 1,
+  });
+  trackEvent("pro_waitlist_submitted", {
+    source: "tool_inline",
+    reason,
+    volume,
+    hasCompany: Boolean(company),
+    value: 1,
+  });
+  trackEvent("lead_pro", {
+    source: "tool_inline",
+    reason,
+    volume,
+    value: 1,
+  });
+
+  try {
+    const response = await fetch(proInlineForm.action, {
+      method: "POST",
+      body: formData,
+      headers: { Accept: "application/json" },
+    });
+
+    if (!response.ok) throw new Error("Form submit failed");
+    if (proInlineMessage) proInlineMessage.textContent = t("proInlineSuccess");
+    proInlineForm.reset();
+  } catch {
+    if (proInlineMessage) proInlineMessage.textContent = t("proInlineError");
+    const subject = encodeURIComponent("Novo lead BatchCutout Pro - Ferramenta");
+    const body = encodeURIComponent(
+      `Email: ${email}\nCompany: ${company}\nVolume: ${volume}\nReason: ${reason}\nLanguage: ${currentLanguage}\nSource: ${window.location.href}`,
+    );
+    window.location.href = `mailto:ricardojvilela@gmail.com?subject=${subject}&body=${body}`;
+  } finally {
+    submitButton.disabled = false;
+  }
 }
 
 function selectPostDownloadFeedback(answer) {
@@ -1565,6 +1700,24 @@ brandCta.addEventListener("click", () => {
   trackEvent("brand_cta_clicked");
 });
 inlineProCta.addEventListener("click", () => showProInterest("inline_pro_cta"));
+proInlineForm?.addEventListener("submit", submitInlineProLead);
+proInlineEmail?.addEventListener(
+  "focus",
+  () => {
+    if (proInlineEmail.dataset.started === "true") return;
+    proInlineEmail.dataset.started = "true";
+    trackEvent("pro_email_started", {
+      reason: proInterestPanel?.dataset.reason || "inline_form",
+      totalInQueue: items.length,
+      free_limit: maxFilesPerBatch,
+    });
+    trackEvent("pro_form_started", {
+      source: "tool_inline",
+      reason: proInterestPanel?.dataset.reason || "inline_form",
+    });
+  },
+  { once: false },
+);
 postDownloadOptions?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-post-download-feedback]");
   selectPostDownloadFeedback(button?.dataset.postDownloadFeedback);
