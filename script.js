@@ -92,24 +92,18 @@ const baseTranslation = {
   postDownloadKicker: "Feedback rápido",
   postDownloadTitle: "O BatchCutout ajudou nas suas fotos?",
   postDownloadSavedTime: "Sim, poupou tempo",
-    postDownloadNeedsQuality: "Precisa de melhor recorte",
-    postDownloadLargerBatches: "Preciso de lotes maiores",
-    postDownloadThanks: "Obrigado. A sua resposta ajuda-nos a melhorar a ferramenta.",
-    proInlineKicker: "Para lojas com volume",
-    proInlineTitle: "Precisa tratar muitas fotos por semana?",
-    proInlineLead: "Peça acesso ao BatchCutout Pro para remover fundos em lote para lojas online, catálogos e marketplaces.",
-    proEmailPlaceholder: "Email",
-    proCompanyPlaceholder: "Loja ou empresa",
-    proVolumeLabel: "Volume mensal estimado",
-    proVolumeSmall: "20-100 imagens/mês",
-    proVolumeMedium: "100-500 imagens/mês",
-    proVolumeLarge: "500-2.000 imagens/mês",
-    proVolumeXL: "2.000+ imagens/mês",
-    proInlineButton: "Pedir acesso Pro",
-    proInlineNote: "Sem pagamento agora. Usaremos o email apenas para contacto sobre o Pro.",
-    proInlineSuccess: "Pedido recebido. Vamos contactar por email quando abrirmos o acesso Pro.",
-    proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
-    benefitsLabel: "Vantagens do serviço",
+  postDownloadNeedsQuality: "Precisa de melhor recorte",
+  postDownloadLargerBatches: "Preciso de lotes maiores",
+  postDownloadThanks: "Obrigado. A sua resposta ajuda-nos a melhorar a ferramenta.",
+  proInlineKicker: "Para quem trabalha com volume",
+  proInlineTitle: "Trata mais de 50 fotos por mês?",
+  proInlineLead: "Peça acesso Pro para remover fundos em lotes maiores para lojas online, catálogos e marketplaces.",
+  proEmailPlaceholder: "O seu email",
+  proInlineButton: "Quero acesso Pro",
+  proInlineNote: "Sem pagamento agora. Só precisamos do email para o contactar sobre o acesso Pro.",
+  proInlineSuccess: "Pedido recebido. Vamos contactar por email quando abrirmos o acesso Pro.",
+  proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
+  benefitsLabel: "Vantagens do serviço",
   benefitPng: "PNG transparente",
   benefitZip: "ZIP pronto para loja",
   fileSuffix: "sem-fundo",
@@ -192,18 +186,12 @@ const translations = {
     postDownloadNeedsQuality: "Needs better cutout",
     postDownloadLargerBatches: "I need larger batches",
     postDownloadThanks: "Thanks. This helps us improve the tool.",
-    proInlineKicker: "For stores with volume",
-    proInlineTitle: "Need to process many photos every week?",
-    proInlineLead: "Request BatchCutout Pro access for bulk background removal for online stores, catalogues, and marketplaces.",
-    proEmailPlaceholder: "Email",
-    proCompanyPlaceholder: "Store or company",
-    proVolumeLabel: "Estimated monthly volume",
-    proVolumeSmall: "20-100 images/month",
-    proVolumeMedium: "100-500 images/month",
-    proVolumeLarge: "500-2,000 images/month",
-    proVolumeXL: "2,000+ images/month",
-    proInlineButton: "Request Pro access",
-    proInlineNote: "No payment now. We will only use your email to contact you about Pro.",
+    proInlineKicker: "For high-volume sellers",
+    proInlineTitle: "Processing more than 50 photos per month?",
+    proInlineLead: "Request Pro access to remove backgrounds in larger batches for online stores, catalogues, and marketplaces.",
+    proEmailPlaceholder: "Your email",
+    proInlineButton: "I want Pro access",
+    proInlineNote: "No payment now. We only need your email to contact you about Pro access.",
     proInlineSuccess: "Request received. We will contact you by email when Pro access opens.",
     proInlineError: "We could not submit automatically. Opening an email draft instead.",
     eyebrow: "Bulk background removal",
@@ -804,6 +792,14 @@ const proTranslations = {
     proNoCommitment: "Sem compromisso. Primeiro acesso para quem trabalha com volume.",
     brandCta: "Testar com {limit} imagens",
     inlineProCta: "Mais de {limit} imagens? Peça acesso Pro",
+    proInlineKicker: "Para quem trabalha com volume",
+    proInlineTitle: "Trata mais de 50 fotos por mês?",
+    proInlineLead: "Peça acesso Pro para remover fundos em lotes maiores para lojas online, catálogos e marketplaces.",
+    proEmailPlaceholder: "O seu email",
+    proInlineButton: "Quero acesso Pro",
+    proInlineNote: "Sem pagamento agora. Só precisamos do email para o contactar sobre o acesso Pro.",
+    proInlineSuccess: "Pedido recebido. Vamos contactar por email quando abrirmos o acesso Pro.",
+    proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
     emptyTitle: "Os seus PNGs transparentes aparecem aqui",
     emptyState: "Depois pode descarregar uma imagem ou exportar tudo em ZIP.",
     demoLabel: "Exemplo antes e depois",
@@ -835,6 +831,14 @@ const proTranslations = {
     proNoCommitment: "No commitment. Early access for high-volume workflows.",
     brandCta: "Test with {limit} images",
     inlineProCta: "More than {limit} images? Request Pro access",
+    proInlineKicker: "For high-volume sellers",
+    proInlineTitle: "Processing more than 50 photos per month?",
+    proInlineLead: "Request Pro access to remove backgrounds in larger batches for online stores, catalogues, and marketplaces.",
+    proEmailPlaceholder: "Your email",
+    proInlineButton: "I want Pro access",
+    proInlineNote: "No payment now. We only need your email to contact you about Pro access.",
+    proInlineSuccess: "Request received. We will contact you by email when Pro access opens.",
+    proInlineError: "We could not submit automatically. Opening an email draft instead.",
     emptyTitle: "Your transparent PNGs appear here",
     emptyState: "Then download one image or export everything as a ZIP.",
     demoLabel: "Before and after example",
@@ -1594,13 +1598,13 @@ async function submitInlineProLead(event) {
   const formData = new FormData(proInlineForm);
   const email = String(formData.get("email") || "").trim();
   const company = String(formData.get("company") || "").trim();
-  const volume = String(formData.get("volume") || "");
+  const volume = String(formData.get("volume") || "email-only");
   const reason = proInterestPanel?.dataset.reason || "inline_form";
   const submitButton = proInlineForm.querySelector("button[type='submit']");
 
   trackEvent("pro_submit_attempt", {
     reason,
-    volume,
+    volume: "email-only",
     hasCompany: Boolean(company),
     hasEmail: Boolean(email),
   });
@@ -1617,24 +1621,28 @@ async function submitInlineProLead(event) {
   formData.set("reason", reason);
   formData.set("free_limit", String(maxFilesPerBatch));
   formData.set("processed_images", String(items.filter((item) => item.outputBlob).length));
+  formData.set("form_variant", "email_only");
 
   trackEvent("pro_email_submitted", {
     reason,
-    volume,
+    volume: "email-only",
     hasCompany: Boolean(company),
+    form_variant: "email_only",
     value: 1,
   });
   trackEvent("pro_waitlist_submitted", {
     source: "tool_inline",
     reason,
-    volume,
+    volume: "email-only",
     hasCompany: Boolean(company),
+    form_variant: "email_only",
     value: 1,
   });
   trackEvent("lead_pro", {
     source: "tool_inline",
     reason,
-    volume,
+    volume: "email-only",
+    form_variant: "email_only",
     value: 1,
   });
 
