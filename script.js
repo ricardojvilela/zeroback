@@ -8,6 +8,7 @@ const brandCta = document.querySelector("#brandCta");
 const processButton = document.querySelector("#processButton");
 const pngButton = document.querySelector("#pngButton");
 const zipButton = document.querySelector("#zipButton");
+const downloadReadyHint = document.querySelector("#downloadReadyHint");
 const clearButton = document.querySelector("#clearButton");
 const imageGrid = document.querySelector("#imageGrid");
 const emptyState = document.querySelector("#emptyState");
@@ -104,6 +105,7 @@ const baseTranslation = {
   proInlineNote: "Sem pagamento agora. Só precisamos do email para o contactar sobre o acesso Pro.",
   proInlineSuccess: "Pedido recebido. Vamos contactar por email quando abrirmos o acesso Pro.",
   proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
+  downloadReadyHint: "Resultado pronto. Descarregue PNG ou ZIP para usar nas suas lojas e catálogos.",
   zipProCta: "Vai tratar mais fotos? Peça acesso Pro",
   benefitsLabel: "Vantagens do serviço",
   benefitPng: "PNG transparente",
@@ -196,6 +198,7 @@ const translations = {
     proInlineNote: "No payment now. We only need your email to contact you about Pro access.",
     proInlineSuccess: "Request received. We will contact you by email when Pro access opens.",
     proInlineError: "We could not submit automatically. Opening an email draft instead.",
+    downloadReadyHint: "Result ready. Download PNG or ZIP to use in your stores and catalogues.",
     zipProCta: "Processing more photos? Request Pro access",
     eyebrow: "Bulk background removal",
     title: "BatchCutout",
@@ -803,6 +806,7 @@ const proTranslations = {
     proInlineNote: "Sem pagamento agora. Só precisamos do email para o contactar sobre o acesso Pro.",
     proInlineSuccess: "Pedido recebido. Vamos contactar por email quando abrirmos o acesso Pro.",
     proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
+    downloadReadyHint: "Resultado pronto. Descarregue PNG ou ZIP para usar nas suas lojas e catálogos.",
     zipProCta: "Vai tratar mais fotos? Peça acesso Pro",
     emptyTitle: "Os seus PNGs transparentes aparecem aqui",
     emptyState: "Depois pode descarregar uma imagem ou exportar tudo em ZIP.",
@@ -843,6 +847,7 @@ const proTranslations = {
     proInlineNote: "No payment now. We only need your email to contact you about Pro access.",
     proInlineSuccess: "Request received. We will contact you by email when Pro access opens.",
     proInlineError: "We could not submit automatically. Opening an email draft instead.",
+    downloadReadyHint: "Result ready. Download PNG or ZIP to use in your stores and catalogues.",
     zipProCta: "Processing more photos? Request Pro access",
     emptyTitle: "Your transparent PNGs appear here",
     emptyState: "Then download one image or export everything as a ZIP.",
@@ -1301,6 +1306,7 @@ function updateControls() {
   pngButton.disabled = !singleReady || running;
   zipButton.disabled = !allReady || running;
   clearButton.disabled = !hasItems || running;
+  downloadReadyHint?.classList.toggle("hidden", running || (!allReady && !singleReady));
   zipProCta?.classList.toggle("hidden", !allReady || running);
   emptyState.classList.toggle("hidden", hasItems);
   countText.textContent = `${items.length} ${items.length === 1 ? t("photoSingular") : t("photoPlural")}`;
