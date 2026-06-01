@@ -533,6 +533,10 @@
             <strong id="liveDownloads">0</strong>
           </article>
           <article class="live-card">
+            <span>Resultado pronto</span>
+            <strong id="liveDownloadReady">0</strong>
+          </article>
+          <article class="live-card">
             <span>Cliques Pro reais</span>
             <strong id="liveProClicks">0</strong>
           </article>
@@ -543,6 +547,10 @@
           <article class="live-card">
             <span>Emails iniciados</span>
             <strong id="liveProEmailStarts">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Email invalido</span>
+            <strong id="liveProEmailInvalid">0</strong>
           </article>
           <article class="live-card">
             <span>Emails Pro enviados</span>
@@ -560,16 +568,18 @@
                 <th>Uploads</th>
                 <th>Imagens</th>
                 <th>Limite</th>
+                <th>Resultado pronto</th>
                 <th>Downloads</th>
                 <th>Pro</th>
                 <th>Prompt</th>
                 <th>Email iniciado</th>
+                <th>Email invalido</th>
                 <th>Email enviado</th>
               </tr>
             </thead>
             <tbody id="liveRowsBody">
               <tr>
-                <td class="empty" colspan="11">A carregar dados reais.</td>
+                <td class="empty" colspan="13">A carregar dados reais.</td>
               </tr>
             </tbody>
           </table>
@@ -836,9 +846,11 @@
         document.querySelector("#liveUploads").textContent = totals.uploadsStarted || 0;
         document.querySelector("#liveLimit").textContent = totals.limitAttempts || 0;
         document.querySelector("#liveDownloads").textContent = totals.downloads || 0;
+        document.querySelector("#liveDownloadReady").textContent = totals.downloadReadyShown || 0;
         document.querySelector("#liveProClicks").textContent = totals.proClicks || 0;
         document.querySelector("#liveProPrompts").textContent = totals.proPrompts || 0;
         document.querySelector("#liveProEmailStarts").textContent = totals.proEmailStarts || 0;
+        document.querySelector("#liveProEmailInvalid").textContent = totals.proEmailInvalid || 0;
         document.querySelector("#liveProAttempts").textContent = totals.proEmailSubmits || totals.proSubmitAttempts || 0;
 
         liveRowsBody.innerHTML = data.rows?.length
@@ -850,14 +862,16 @@
                 <td>${row.uploadsStarted}</td>
                 <td>${row.imagesAccepted}</td>
                 <td>${row.limitAttempts}</td>
+                <td>${row.downloadReadyShown || 0}</td>
                 <td>${row.downloads}</td>
                 <td>${row.proClicks}</td>
                 <td>${row.proPrompts || 0}</td>
                 <td>${row.proEmailStarts || 0}</td>
+                <td>${row.proEmailInvalid || 0}</td>
                 <td>${row.proEmailSubmits || row.proSubmitAttempts || 0}</td>
               </tr>
             `).join("")
-          : `<tr><td class="empty" colspan="11">Ainda nao existem eventos reais no periodo.</td></tr>`;
+          : `<tr><td class="empty" colspan="13">Ainda nao existem eventos reais no periodo.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "";
         liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Ultima atualizacao: ${generatedAt}`;
@@ -889,7 +903,7 @@
             localStorage.removeItem(adminTokenExpiryStorageKey);
             document.body.classList.add("locked");
           }
-          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="9">Nao foi possivel carregar dados reais.</td></tr>`;
+          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="13">Nao foi possivel carregar dados reais.</td></tr>`;
           liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variaveis Vercel.";
         }
       }

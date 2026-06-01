@@ -47,6 +47,7 @@ const serverEventNames = new Set([
   "tool_drag_upload_intent",
   "tool_upload_started",
   "tool_upload_added",
+  "download_ready_shown",
   "batch_limit_exceeded",
   "tool_processing_started",
   "tool_processing_completed",
@@ -55,6 +56,7 @@ const serverEventNames = new Set([
   "tool_pro_clicked",
   "pro_prompt_shown",
   "pro_email_started",
+  "pro_email_invalid",
   "pro_email_submitted",
   "pro_form_started",
   "pro_submit_attempt",
@@ -97,12 +99,13 @@ const baseTranslation = {
   postDownloadNeedsQuality: "Precisa de melhor recorte",
   postDownloadLargerBatches: "Preciso de lotes maiores",
   postDownloadThanks: "Obrigado. A sua resposta ajuda-nos a melhorar a ferramenta.",
-  proInlineKicker: "Para quem trabalha com volume",
-  proInlineTitle: "Trata mais de 50 fotos por mês?",
-  proInlineLead: "Peça acesso Pro para remover fundos em lotes maiores para lojas online, catálogos e marketplaces.",
+  proInlineKicker: "Acesso Pro em preparação",
+  proInlineTitle: "Quer remover mais fotos por lote?",
+  proInlineLead: "Deixe o email e damos prioridade ao seu acesso Pro: lotes maiores, ZIP pronto para loja e fluxo pensado para catálogos.",
+  proInlineBenefits: "Sem pagamento agora. Contacto direto quando abrirmos os primeiros acessos.",
   proEmailPlaceholder: "O seu email",
-  proInlineButton: "Quero acesso Pro",
-  proInlineNote: "Sem pagamento agora. Só precisamos do email para o contactar sobre o acesso Pro.",
+  proInlineButton: "Reservar acesso Pro",
+  proInlineNote: "Indicado para lojas Shopify, Etsy, WooCommerce, eBay e equipas que tratam fotos de produto em volume.",
   proInlineSuccess: "Pedido recebido. Vamos contactar por email quando abrirmos o acesso Pro.",
   proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
   downloadReadyHint: "Resultado pronto. Descarregue PNG ou ZIP para usar nas suas lojas e catálogos.",
@@ -190,12 +193,13 @@ const translations = {
     postDownloadNeedsQuality: "Needs better cutout",
     postDownloadLargerBatches: "I need larger batches",
     postDownloadThanks: "Thanks. This helps us improve the tool.",
-    proInlineKicker: "For high-volume sellers",
-    proInlineTitle: "Processing more than 50 photos per month?",
-    proInlineLead: "Request Pro access to remove backgrounds in larger batches for online stores, catalogues, and marketplaces.",
+    proInlineKicker: "Pro access in preparation",
+    proInlineTitle: "Need to process more photos per batch?",
+    proInlineLead: "Leave your email and we will prioritize your Pro access: larger batches, store-ready ZIPs, and a workflow built for catalogues.",
+    proInlineBenefits: "No payment now. Direct contact when the first Pro access opens.",
     proEmailPlaceholder: "Your email",
-    proInlineButton: "I want Pro access",
-    proInlineNote: "No payment now. We only need your email to contact you about Pro access.",
+    proInlineButton: "Reserve Pro access",
+    proInlineNote: "Built for Shopify, Etsy, WooCommerce, eBay and product teams processing photos in volume.",
     proInlineSuccess: "Request received. We will contact you by email when Pro access opens.",
     proInlineError: "We could not submit automatically. Opening an email draft instead.",
     downloadReadyHint: "Result ready. Download PNG or ZIP to use in your stores and catalogues.",
@@ -798,12 +802,13 @@ const proTranslations = {
     proNoCommitment: "Sem compromisso. Primeiro acesso para quem trabalha com volume.",
     brandCta: "Testar com {limit} imagens",
     inlineProCta: "Mais de {limit} imagens? Peça acesso Pro",
-    proInlineKicker: "Para quem trabalha com volume",
-    proInlineTitle: "Trata mais de 50 fotos por mês?",
-    proInlineLead: "Peça acesso Pro para remover fundos em lotes maiores para lojas online, catálogos e marketplaces.",
+    proInlineKicker: "Acesso Pro em preparação",
+    proInlineTitle: "Quer remover mais fotos por lote?",
+    proInlineLead: "Deixe o email e damos prioridade ao seu acesso Pro: lotes maiores, ZIP pronto para loja e fluxo pensado para catálogos.",
+    proInlineBenefits: "Sem pagamento agora. Contacto direto quando abrirmos os primeiros acessos.",
     proEmailPlaceholder: "O seu email",
-    proInlineButton: "Quero acesso Pro",
-    proInlineNote: "Sem pagamento agora. Só precisamos do email para o contactar sobre o acesso Pro.",
+    proInlineButton: "Reservar acesso Pro",
+    proInlineNote: "Indicado para lojas Shopify, Etsy, WooCommerce, eBay e equipas que tratam fotos de produto em volume.",
     proInlineSuccess: "Pedido recebido. Vamos contactar por email quando abrirmos o acesso Pro.",
     proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
     downloadReadyHint: "Resultado pronto. Descarregue PNG ou ZIP para usar nas suas lojas e catálogos.",
@@ -839,12 +844,13 @@ const proTranslations = {
     proNoCommitment: "No commitment. Early access for high-volume workflows.",
     brandCta: "Test with {limit} images",
     inlineProCta: "More than {limit} images? Request Pro access",
-    proInlineKicker: "For high-volume sellers",
-    proInlineTitle: "Processing more than 50 photos per month?",
-    proInlineLead: "Request Pro access to remove backgrounds in larger batches for online stores, catalogues, and marketplaces.",
+    proInlineKicker: "Pro access in preparation",
+    proInlineTitle: "Need to process more photos per batch?",
+    proInlineLead: "Leave your email and we will prioritize your Pro access: larger batches, store-ready ZIPs, and a workflow built for catalogues.",
+    proInlineBenefits: "No payment now. Direct contact when the first Pro access opens.",
     proEmailPlaceholder: "Your email",
-    proInlineButton: "I want Pro access",
-    proInlineNote: "No payment now. We only need your email to contact you about Pro access.",
+    proInlineButton: "Reserve Pro access",
+    proInlineNote: "Built for Shopify, Etsy, WooCommerce, eBay and product teams processing photos in volume.",
     proInlineSuccess: "Request received. We will contact you by email when Pro access opens.",
     proInlineError: "We could not submit automatically. Opening an email draft instead.",
     downloadReadyHint: "Result ready. Download PNG or ZIP to use in your stores and catalogues.",
@@ -882,6 +888,7 @@ let items = [];
 let currentLanguage = localStorage.getItem("language") || detectLanguage();
 let engineHasLoaded = false;
 let hasTrackedDragIntent = false;
+let hasTrackedDownloadReady = false;
 
 const analyticsEvents = {
   tool_page_view: { category: "funnel", label: "page_view", step: 0 },
@@ -889,6 +896,7 @@ const analyticsEvents = {
   tool_drag_upload_intent: { category: "upload", label: "drag_upload_intent", step: 1 },
   tool_upload_started: { category: "funnel", label: "upload_started", step: 1 },
   tool_upload_added: { category: "funnel", label: "upload_added", step: 2 },
+  download_ready_shown: { category: "funnel", label: "download_ready", step: 5 },
   batch_limit_exceeded: { category: "commercial_intent", label: "batch_limit_exceeded", step: 3 },
   tool_processing_started: { category: "funnel", label: "processing_started", step: 4 },
   tool_processing_completed: { category: "funnel", label: "processing_completed", step: 5 },
@@ -897,6 +905,7 @@ const analyticsEvents = {
   tool_pro_clicked: { category: "commercial_intent", label: "pro_clicked", step: 7 },
   pro_prompt_shown: { category: "commercial_intent", label: "pro_prompt_shown", step: 7 },
   pro_email_started: { category: "commercial_intent", label: "pro_email_started", step: 8 },
+  pro_email_invalid: { category: "commercial_intent", label: "pro_email_invalid", step: 8 },
   pro_email_submitted: { category: "commercial_intent", label: "pro_email_submitted", step: 9 },
   pro_form_started: { category: "commercial_intent", label: "pro_form_started", step: 8 },
   pro_submit_attempt: { category: "commercial_intent", label: "pro_submit_attempt", step: 9 },
@@ -1301,15 +1310,28 @@ function updateControls() {
   const hasPendingItems = items.some((item) => !item.outputBlob);
   const singleReady = items.length === 1 && Boolean(items[0].outputBlob);
   const running = items.some((item) => item.statusKey === "statusProcessing");
+  const downloadReady = !running && (allReady || singleReady);
 
   processButton.disabled = !hasItems || !hasPendingItems || running;
   pngButton.disabled = !singleReady || running;
   zipButton.disabled = !allReady || running;
   clearButton.disabled = !hasItems || running;
-  downloadReadyHint?.classList.toggle("hidden", running || (!allReady && !singleReady));
+  downloadReadyHint?.classList.toggle("hidden", !downloadReady);
   zipProCta?.classList.toggle("hidden", !allReady || running);
   emptyState.classList.toggle("hidden", hasItems);
   countText.textContent = `${items.length} ${items.length === 1 ? t("photoSingular") : t("photoPlural")}`;
+
+  if (downloadReady && !hasTrackedDownloadReady) {
+    hasTrackedDownloadReady = true;
+    trackEvent("download_ready_shown", {
+      count: items.filter((item) => item.outputBlob).length,
+      mode: allReady ? "zip_available" : "single_png_available",
+    });
+  }
+
+  if (!downloadReady && !running) {
+    hasTrackedDownloadReady = false;
+  }
 }
 
 function render() {
@@ -1363,6 +1385,7 @@ function addFiles(fileList) {
   const unsupportedFiles = selectedFiles.length - imageFiles.length;
   const availableSlots = Math.max(maxFilesPerBatch - items.length, 0);
   const acceptedFiles = imageFiles.slice(0, availableSlots);
+  hasTrackedDownloadReady = false;
 
   trackEvent("tool_upload_started", {
     attempted: selectedFiles.length,
@@ -1562,6 +1585,7 @@ function clearAll() {
   }
 
   items = [];
+  hasTrackedDownloadReady = false;
   fileInput.value = "";
   setStatus("statusWaiting");
   trackEvent("queue_cleared");
@@ -1622,6 +1646,11 @@ async function submitInlineProLead(event) {
   });
 
   if (!email || !proInlineForm.checkValidity()) {
+    trackEvent("pro_email_invalid", {
+      reason,
+      hasEmail: Boolean(email),
+      form_variant: "email_only",
+    });
     proInlineForm.reportValidity();
     return;
   }

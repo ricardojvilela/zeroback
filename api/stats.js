@@ -30,12 +30,14 @@ function emptyDay(date) {
     imagesAccepted: 0,
     limitAttempts: 0,
     processingCompleted: 0,
+    downloadReadyShown: 0,
     downloads: 0,
     pngDownloads: 0,
     zipDownloads: 0,
     proClicks: 0,
     proPrompts: 0,
     proEmailStarts: 0,
+    proEmailInvalid: 0,
     proEmailSubmits: 0,
     proPageViews: 0,
     proSubmitAttempts: 0,
@@ -143,6 +145,9 @@ export default async function handler(request, response) {
         case "tool_processing_completed":
           row.processingCompleted += 1;
           break;
+        case "download_ready_shown":
+          row.downloadReadyShown += 1;
+          break;
         case "tool_download_png":
           row.pngDownloads += 1;
           row.downloads += 1;
@@ -159,6 +164,9 @@ export default async function handler(request, response) {
           break;
         case "pro_email_started":
           row.proEmailStarts += 1;
+          break;
+        case "pro_email_invalid":
+          row.proEmailInvalid += 1;
           break;
         case "pro_email_submitted":
           row.proEmailSubmits += 1;

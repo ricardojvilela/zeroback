@@ -680,6 +680,18 @@ h2 {
   line-height: 1.45;
 }
 
+.pro-interest .pro-benefits {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 12px;
+  border: 1px solid rgba(15, 139, 124, 0.26);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: rgba(15, 139, 124, 0.09);
+  color: var(--accent-strong);
+  font-weight: 900;
+}
+
 .pro-form {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
