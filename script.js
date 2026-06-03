@@ -28,7 +28,7 @@ const proInlineLanguage = document.querySelector("#proInlineLanguage");
 const proInlinePageUrl = document.querySelector("#proInlinePageUrl");
 const proInlineMessage = document.querySelector("#proInlineMessage");
 
-const defaultMaxFilesPerBatch = 3;
+const defaultMaxFilesPerBatch = 2;
 const requestedLimit = Number(new URLSearchParams(window.location.search).get("limit"));
 const maxFilesPerBatch = [2, 3, 5, 10, 20].includes(requestedLimit)
   ? requestedLimit
@@ -109,7 +109,7 @@ const baseTranslation = {
   proInlineSuccess: "Pedido recebido. Vamos contactar por email quando abrirmos o acesso Pro.",
   proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
   downloadReadyHint: "Resultado pronto. Descarregue PNG ou ZIP para usar nas suas lojas e catálogos.",
-  zipProCta: "Vai tratar mais fotos? Peça acesso Pro",
+  zipProCta: "Precisa de ZIPs para mais fotos? Reserve acesso Pro",
   benefitsLabel: "Vantagens do serviço",
   benefitPng: "PNG transparente",
   benefitZip: "ZIP pronto para loja",
@@ -203,7 +203,7 @@ const translations = {
     proInlineSuccess: "Request received. We will contact you by email when Pro access opens.",
     proInlineError: "We could not submit automatically. Opening an email draft instead.",
     downloadReadyHint: "Result ready. Download PNG or ZIP to use in your stores and catalogues.",
-    zipProCta: "Processing more photos? Request Pro access",
+    zipProCta: "Need ZIPs for more photos? Reserve Pro access",
     eyebrow: "Bulk background removal",
     title: "BatchCutout",
     lead: "Free test: remove the background from up to {limit} images now. Download transparent PNGs or a store-ready ZIP.",
@@ -812,7 +812,7 @@ const proTranslations = {
     proInlineSuccess: "Pedido recebido. Vamos contactar por email quando abrirmos o acesso Pro.",
     proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
     downloadReadyHint: "Resultado pronto. Descarregue PNG ou ZIP para usar nas suas lojas e catálogos.",
-    zipProCta: "Vai tratar mais fotos? Peça acesso Pro",
+    zipProCta: "Precisa de ZIPs para mais fotos? Reserve acesso Pro",
     emptyTitle: "Os seus PNGs transparentes aparecem aqui",
     emptyState: "Depois pode descarregar uma imagem ou exportar tudo em ZIP.",
     demoLabel: "Exemplo antes e depois",
@@ -854,7 +854,7 @@ const proTranslations = {
     proInlineSuccess: "Request received. We will contact you by email when Pro access opens.",
     proInlineError: "We could not submit automatically. Opening an email draft instead.",
     downloadReadyHint: "Result ready. Download PNG or ZIP to use in your stores and catalogues.",
-    zipProCta: "Processing more photos? Request Pro access",
+    zipProCta: "Need ZIPs for more photos? Reserve Pro access",
     emptyTitle: "Your transparent PNGs appear here",
     emptyState: "Then download one image or export everything as a ZIP.",
     demoLabel: "Before and after example",
