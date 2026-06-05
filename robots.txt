@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /admin.html
+Disallow: /trial/
 
 Sitemap: https://batchcutout.com/sitemap.xml
