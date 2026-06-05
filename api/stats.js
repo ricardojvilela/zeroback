@@ -61,15 +61,20 @@ function emptyTrialStats() {
   };
 }
 
-function isTrialEvent(detail) {
-  return Number(detail.free_limit || 0) === 100 || detail.limit_variant === "limit_100";
+function isTrialEvent(event, detail) {
+  return (
+    event.event_name === "trial_page_view" ||
+    Number(detail.free_limit || 0) === 100 ||
+    detail.limit_variant === "limit_100"
+  );
 }
 
 function addTrialEvent(row, event, detail, value) {
-  if (!isTrialEvent(detail)) return;
+  if (!isTrialEvent(event, detail)) return;
   if (!row.trial) row.trial = emptyTrialStats();
 
   switch (event.event_name) {
+    case "trial_page_view":
     case "tool_page_view":
       row.trial.pageViews += 1;
       break;
@@ -193,7 +198,7 @@ export default async function handler(request, response) {
       const value = Number(event.value || detail.count || detail.accepted || 0) || 0;
 
       if (event.visitor_id) visitorsByDay.get(date).add(event.visitor_id);
-      if (event.visitor_id && isTrialEvent(detail)) trialVisitorsByDay.get(date).add(event.visitor_id);
+      if (event.visitor_id && isTrialEvent(event, detail)) trialVisitorsByDay.get(date).add(event.visitor_id);
       addTrialEvent(row, event, detail, value);
 
       switch (event.event_name) {

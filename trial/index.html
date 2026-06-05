@@ -196,6 +196,8 @@
       };
 
       const languageSelect = document.querySelector("#trialLanguage");
+      const visitorStorageKey = "batchcutout_visitor_id";
+      const sessionStorageKey = "batchcutout_session_id";
 
       function detectLanguage() {
         const saved = localStorage.getItem("language");
@@ -240,6 +242,44 @@
         };
         window.dataLayer?.push({ event: name, ...payload });
         window.gtag?.("event", name, payload);
+        sendServerEvent(name, payload);
+      }
+
+      function getStableId(storage, key) {
+        try {
+          const existing = storage.getItem(key);
+          if (existing) return existing;
+          const next = crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+          storage.setItem(key, next);
+          return next;
+        } catch {
+          return "";
+        }
+      }
+
+      function sendServerEvent(name, detail = {}) {
+        const payload = JSON.stringify({
+          name,
+          detail,
+          visitorId: getStableId(localStorage, visitorStorageKey),
+          sessionId: getStableId(sessionStorage, sessionStorageKey),
+        });
+
+        try {
+          if (navigator.sendBeacon) {
+            const sent = navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" }));
+            if (sent) return;
+          }
+        } catch {
+          // Ignore measurement transport errors.
+        }
+
+        fetch("/api/track", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload,
+          keepalive: true,
+        }).catch(() => {});
       }
 
       applyLanguage(detectLanguage());
