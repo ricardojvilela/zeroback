@@ -44,6 +44,69 @@ function emptyDay(date) {
   };
 }
 
+function emptyTrialStats() {
+  return {
+    visitors: 0,
+    pageViews: 0,
+    uploadsStarted: 0,
+    imagesAccepted: 0,
+    processingCompleted: 0,
+    downloadReadyShown: 0,
+    downloads: 0,
+    pngDownloads: 0,
+    zipDownloads: 0,
+    proPrompts: 0,
+    proEmailStarts: 0,
+    proEmailSubmits: 0,
+  };
+}
+
+function isTrialEvent(detail) {
+  return Number(detail.free_limit || 0) === 100 || detail.limit_variant === "limit_100";
+}
+
+function addTrialEvent(row, event, detail, value) {
+  if (!isTrialEvent(detail)) return;
+  if (!row.trial) row.trial = emptyTrialStats();
+
+  switch (event.event_name) {
+    case "tool_page_view":
+      row.trial.pageViews += 1;
+      break;
+    case "tool_upload_started":
+      row.trial.uploadsStarted += 1;
+      break;
+    case "tool_upload_added":
+      row.trial.imagesAccepted += Number(detail.count || value || 0) || 0;
+      break;
+    case "tool_processing_completed":
+      row.trial.processingCompleted += 1;
+      break;
+    case "download_ready_shown":
+      row.trial.downloadReadyShown += 1;
+      break;
+    case "tool_download_png":
+      row.trial.pngDownloads += 1;
+      row.trial.downloads += 1;
+      break;
+    case "tool_download_zip":
+      row.trial.zipDownloads += 1;
+      row.trial.downloads += 1;
+      break;
+    case "pro_prompt_shown":
+      row.trial.proPrompts += 1;
+      break;
+    case "pro_email_started":
+      row.trial.proEmailStarts += 1;
+      break;
+    case "pro_email_submitted":
+      row.trial.proEmailSubmits += 1;
+      break;
+    default:
+      break;
+  }
+}
+
 function verifyAdminToken(request) {
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (!adminPassword) return false;
@@ -115,6 +178,7 @@ export default async function handler(request, response) {
     const events = await supabaseResponse.json();
     const byDay = new Map();
     const visitorsByDay = new Map();
+    const trialVisitorsByDay = new Map();
 
     for (const event of events) {
       const date = toIsoDate(event.occurred_at);
@@ -122,12 +186,15 @@ export default async function handler(request, response) {
 
       if (!byDay.has(date)) byDay.set(date, emptyDay(date));
       if (!visitorsByDay.has(date)) visitorsByDay.set(date, new Set());
+      if (!trialVisitorsByDay.has(date)) trialVisitorsByDay.set(date, new Set());
 
       const row = byDay.get(date);
       const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
       const value = Number(event.value || detail.count || detail.accepted || 0) || 0;
 
       if (event.visitor_id) visitorsByDay.get(date).add(event.visitor_id);
+      if (event.visitor_id && isTrialEvent(detail)) trialVisitorsByDay.get(date).add(event.visitor_id);
+      addTrialEvent(row, event, detail, value);
 
       switch (event.event_name) {
         case "tool_page_view":
@@ -185,6 +252,9 @@ export default async function handler(request, response) {
     for (const [date, visitors] of visitorsByDay) {
       byDay.get(date).visitors = visitors.size;
     }
+    for (const [date, visitors] of trialVisitorsByDay) {
+      if (byDay.get(date)?.trial) byDay.get(date).trial.visitors = visitors.size;
+    }
 
     const rows = Array.from(byDay.values()).sort((a, b) => a.date.localeCompare(b.date));
     const totals = rows.reduce((acc, row) => {
@@ -194,6 +264,12 @@ export default async function handler(request, response) {
       }
       return acc;
     }, {});
+    const trialTotals = rows.reduce((acc, row) => {
+      for (const [key, value] of Object.entries(row.trial || {})) {
+        acc[key] = (acc[key] || 0) + Number(value || 0);
+      }
+      return acc;
+    }, emptyTrialStats());
 
     return sendJson(response, 200, {
       ok: true,
@@ -201,6 +277,7 @@ export default async function handler(request, response) {
       eventCount: events.length,
       rows,
       totals,
+      trialTotals,
       generatedAt: new Date().toISOString(),
     });
   } catch (error) {

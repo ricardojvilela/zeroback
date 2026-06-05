@@ -272,11 +272,32 @@
         font-weight: 800;
       }
 
+      .trial-live-block {
+        margin: 14px 0 16px;
+        border: 1px solid rgba(16, 185, 129, 0.18);
+        border-radius: 8px;
+        padding: 14px;
+        background: rgba(16, 185, 129, 0.06);
+      }
+
+      .panel-head.compact {
+        margin-bottom: 10px;
+      }
+
+      .panel-head h3 {
+        margin: 0 0 4px;
+        font-size: 18px;
+      }
+
       .live-grid {
         display: grid;
         grid-template-columns: repeat(6, minmax(0, 1fr));
         gap: 10px;
         margin-bottom: 14px;
+      }
+
+      .trial-grid {
+        margin-bottom: 0;
       }
 
       .live-card {
@@ -558,6 +579,40 @@
           </article>
         </div>
         <p class="live-status" id="liveStatus">A carregar dados reais...</p>
+        <section class="trial-live-block" aria-label="Dados Pro Trial">
+          <div class="panel-head compact">
+            <div>
+              <h3>Pro Trial</h3>
+              <p class="note">Eventos com limite 100 imagens por lote.</p>
+            </div>
+          </div>
+          <div class="live-grid trial-grid">
+            <article class="live-card">
+              <span>Visitantes Trial</span>
+              <strong id="trialVisitors">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Uploads Trial</span>
+              <strong id="trialUploads">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Imagens Trial</span>
+              <strong id="trialImages">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Downloads Trial</span>
+              <strong id="trialDownloads">0</strong>
+            </article>
+            <article class="live-card">
+              <span>ZIPs Trial</span>
+              <strong id="trialZips">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Emails Trial</span>
+              <strong id="trialEmails">0</strong>
+            </article>
+          </div>
+        </section>
         <div class="table-wrap">
           <table>
             <thead>
@@ -575,11 +630,16 @@
                 <th>Email iniciado</th>
                 <th>Email invalido</th>
                 <th>Email enviado</th>
+                <th>Trial visitas</th>
+                <th>Trial uploads</th>
+                <th>Trial imagens</th>
+                <th>Trial downloads</th>
+                <th>Trial ZIP</th>
               </tr>
             </thead>
             <tbody id="liveRowsBody">
               <tr>
-                <td class="empty" colspan="13">A carregar dados reais.</td>
+                <td class="empty" colspan="18">A carregar dados reais.</td>
               </tr>
             </tbody>
           </table>
@@ -842,6 +902,7 @@
 
       function renderLiveStats(data) {
         const totals = data.totals || {};
+        const trialTotals = data.trialTotals || {};
         document.querySelector("#liveVisitors").textContent = totals.visitors || 0;
         document.querySelector("#liveUploads").textContent = totals.uploadsStarted || 0;
         document.querySelector("#liveLimit").textContent = totals.limitAttempts || 0;
@@ -852,26 +913,40 @@
         document.querySelector("#liveProEmailStarts").textContent = totals.proEmailStarts || 0;
         document.querySelector("#liveProEmailInvalid").textContent = totals.proEmailInvalid || 0;
         document.querySelector("#liveProAttempts").textContent = totals.proEmailSubmits || totals.proSubmitAttempts || 0;
+        document.querySelector("#trialVisitors").textContent = trialTotals.visitors || 0;
+        document.querySelector("#trialUploads").textContent = trialTotals.uploadsStarted || 0;
+        document.querySelector("#trialImages").textContent = trialTotals.imagesAccepted || 0;
+        document.querySelector("#trialDownloads").textContent = trialTotals.downloads || 0;
+        document.querySelector("#trialZips").textContent = trialTotals.zipDownloads || 0;
+        document.querySelector("#trialEmails").textContent = trialTotals.proEmailSubmits || 0;
 
         liveRowsBody.innerHTML = data.rows?.length
-          ? data.rows.slice().reverse().map((row) => `
-              <tr>
-                <td>${row.date}</td>
-                <td>${row.visitors}</td>
-                <td>${row.pageViews}</td>
-                <td>${row.uploadsStarted}</td>
-                <td>${row.imagesAccepted}</td>
-                <td>${row.limitAttempts}</td>
-                <td>${row.downloadReadyShown || 0}</td>
-                <td>${row.downloads}</td>
-                <td>${row.proClicks}</td>
-                <td>${row.proPrompts || 0}</td>
-                <td>${row.proEmailStarts || 0}</td>
-                <td>${row.proEmailInvalid || 0}</td>
-                <td>${row.proEmailSubmits || row.proSubmitAttempts || 0}</td>
-              </tr>
-            `).join("")
-          : `<tr><td class="empty" colspan="13">Ainda nao existem eventos reais no periodo.</td></tr>`;
+          ? data.rows.slice().reverse().map((row) => {
+              const trial = row.trial || {};
+              return `
+                <tr>
+                  <td>${row.date}</td>
+                  <td>${row.visitors}</td>
+                  <td>${row.pageViews}</td>
+                  <td>${row.uploadsStarted}</td>
+                  <td>${row.imagesAccepted}</td>
+                  <td>${row.limitAttempts}</td>
+                  <td>${row.downloadReadyShown || 0}</td>
+                  <td>${row.downloads}</td>
+                  <td>${row.proClicks}</td>
+                  <td>${row.proPrompts || 0}</td>
+                  <td>${row.proEmailStarts || 0}</td>
+                  <td>${row.proEmailInvalid || 0}</td>
+                  <td>${row.proEmailSubmits || row.proSubmitAttempts || 0}</td>
+                  <td>${trial.visitors || 0}</td>
+                  <td>${trial.uploadsStarted || 0}</td>
+                  <td>${trial.imagesAccepted || 0}</td>
+                  <td>${trial.downloads || 0}</td>
+                  <td>${trial.zipDownloads || 0}</td>
+                </tr>
+              `;
+            }).join("")
+          : `<tr><td class="empty" colspan="18">Ainda nao existem eventos reais no periodo.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "";
         liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Ultima atualizacao: ${generatedAt}`;
@@ -903,7 +978,7 @@
             localStorage.removeItem(adminTokenExpiryStorageKey);
             document.body.classList.add("locked");
           }
-          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="13">Nao foi possivel carregar dados reais.</td></tr>`;
+          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="18">Nao foi possivel carregar dados reais.</td></tr>`;
           liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variaveis Vercel.";
         }
       }
