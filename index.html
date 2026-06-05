@@ -149,7 +149,7 @@
         <button class="brand-cta" id="brandCta" type="button" data-i18n="brandCta">
           Começar grátis
         </button>
-        <a class="brand-pro-link" href="./pricing/">Acesso Pro para lotes maiores</a>
+        <a class="brand-pro-link" href="./pricing/">Pro Trial grátis para lotes maiores</a>
         <div class="proof-strip" data-i18n-aria="benefitsLabel" aria-label="Vantagens do serviço">
           <span data-i18n="benefitBatch">Feito para muitas fotos</span>
           <span data-i18n="benefitPng">PNG transparente</span>
@@ -219,13 +219,13 @@
           Resultado pronto. Descarregue PNG ou ZIP para usar nas suas lojas e catálogos.
         </p>
         <button class="zip-pro-nudge hidden" id="zipProCta" type="button" data-i18n="zipProCta">
-          Vai tratar mais fotos? Peça acesso Pro
+          Precisa de mais volume? Peça Pro Trial grátis
         </button>
 
         <div class="status-panel" aria-live="polite">
           <span id="statusText">A aguardar fotos</span>
           <button class="status-pro-button hidden" id="proPromptButton" type="button" data-i18n="proLimitCta">
-            Pedir acesso Pro
+            Pedir Pro Trial grátis
           </button>
           <progress id="progressBar" value="0" max="100"></progress>
         </div>
@@ -253,13 +253,13 @@
 
         <section class="pro-interest hidden" id="proInterestPanel" aria-labelledby="pro-interest-title">
           <div>
-            <p class="section-kicker" data-i18n="proInlineKicker">Para quem trabalha com volume</p>
-            <h2 id="pro-interest-title" data-i18n="proInlineTitle">Trata mais de 50 fotos por mês?</h2>
+            <p class="section-kicker" data-i18n="proInlineKicker">Pro Trial gratuito</p>
+            <h2 id="pro-interest-title" data-i18n="proInlineTitle">Teste Pro grátis durante 15 dias</h2>
             <p data-i18n="proInlineLead">
-              Peça acesso Pro para remover fundos em lotes maiores para lojas online, catálogos e marketplaces.
+              Deixe o email para receber acesso manual ao Pro Trial: lotes até 100 imagens, ZIP pronto para loja e fluxo pensado para catálogos.
             </p>
             <p class="pro-benefits" data-i18n="proInlineBenefits">
-              Sem pagamento agora. Contacto direto quando abrirmos os primeiros acessos.
+              Sem pagamento. Ativação manual por email para testar volume real.
             </p>
           </div>
           <form
@@ -275,12 +275,15 @@
             <input type="hidden" name="language" value="pt" id="proInlineLanguage" />
             <input type="hidden" name="page_url" value="" id="proInlinePageUrl" />
             <input type="hidden" name="volume" value="not-specified" />
+            <input type="hidden" name="offer" value="pro-trial" />
+            <input type="hidden" name="trial_days" value="15" />
+            <input type="hidden" name="trial_limit" value="100" />
             <input type="text" name="_honey" class="honeypot-field" tabindex="-1" autocomplete="off" />
             <input id="proInlineEmail" name="email" type="email" autocomplete="email" required placeholder="O seu email" data-i18n-placeholder="proEmailPlaceholder" />
-            <button type="submit" data-i18n="proInlineButton">Quero acesso Pro</button>
+            <button type="submit" data-i18n="proInlineButton">Pedir Pro Trial grátis</button>
           </form>
           <p class="pro-message" id="proInlineMessage" aria-live="polite"></p>
-          <p class="pro-note" data-i18n="proInlineNote">Sem pagamento agora. Só precisamos do email para o contactar sobre o acesso Pro.</p>
+          <p class="pro-note" data-i18n="proInlineNote">Indicado para lojas Shopify, Etsy, WooCommerce, eBay e equipas que tratam fotos de produto em volume.</p>
         </section>
 
         <div class="info-list">
@@ -295,7 +298,7 @@
           </p>
         </div>
         <button class="inline-pro-cta" id="inlineProCta" type="button" data-i18n="inlineProCta">
-          Mais de 2 imagens? Peça acesso Pro
+          Mais de 2 imagens? Peça Pro Trial grátis
         </button>
 
         <section class="faq-section" aria-labelledby="faq-title">
@@ -311,7 +314,7 @@
           </details>
           <details>
             <summary data-i18n="faqVolumeQ">Posso processar mais de 2 imagens?</summary>
-            <p data-i18n="faqVolumeA">O modo gratuito permite 2 imagens por lote. Para volumes maiores, peça acesso Pro.</p>
+            <p data-i18n="faqVolumeA">O modo gratuito permite 2 imagens por lote. Para volumes maiores, peça o Pro Trial gratuito.</p>
           </details>
         </section>
       </section>

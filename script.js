@@ -30,7 +30,7 @@ const proInlineMessage = document.querySelector("#proInlineMessage");
 
 const defaultMaxFilesPerBatch = 2;
 const requestedLimit = Number(new URLSearchParams(window.location.search).get("limit"));
-const maxFilesPerBatch = [2, 3, 5, 10, 20].includes(requestedLimit)
+const maxFilesPerBatch = [2, 3, 5, 10, 20, 100].includes(requestedLimit)
   ? requestedLimit
   : defaultMaxFilesPerBatch;
 const minExportSide = 1200;
@@ -99,17 +99,17 @@ const baseTranslation = {
   postDownloadNeedsQuality: "Precisa de melhor recorte",
   postDownloadLargerBatches: "Preciso de lotes maiores",
   postDownloadThanks: "Obrigado. A sua resposta ajuda-nos a melhorar a ferramenta.",
-  proInlineKicker: "Acesso Pro em preparação",
-  proInlineTitle: "Quer remover mais fotos por lote?",
-  proInlineLead: "Deixe o email e damos prioridade ao seu acesso Pro: lotes maiores, ZIP pronto para loja e fluxo pensado para catálogos.",
-  proInlineBenefits: "Sem pagamento agora. Contacto direto quando abrirmos os primeiros acessos.",
+  proInlineKicker: "Pro Trial gratuito",
+  proInlineTitle: "Teste Pro grátis durante 15 dias",
+  proInlineLead: "Deixe o email para receber acesso manual ao Pro Trial: lotes até 100 imagens, ZIP pronto para loja e fluxo pensado para catálogos.",
+  proInlineBenefits: "Sem pagamento. Ativação manual por email para testar volume real.",
   proEmailPlaceholder: "O seu email",
-  proInlineButton: "Reservar acesso Pro",
+  proInlineButton: "Pedir Pro Trial grátis",
   proInlineNote: "Indicado para lojas Shopify, Etsy, WooCommerce, eBay e equipas que tratam fotos de produto em volume.",
-  proInlineSuccess: "Pedido recebido. Vamos contactar por email quando abrirmos o acesso Pro.",
+  proInlineSuccess: "Pedido recebido. Vamos enviar o acesso Pro Trial por email.",
   proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
   downloadReadyHint: "Resultado pronto. Descarregue PNG ou ZIP para usar nas suas lojas e catálogos.",
-  zipProCta: "Precisa de ZIPs para mais fotos? Reserve acesso Pro",
+  zipProCta: "Precisa de mais volume? Peça Pro Trial grátis",
   benefitsLabel: "Vantagens do serviço",
   benefitPng: "PNG transparente",
   benefitZip: "ZIP pronto para loja",
@@ -193,17 +193,17 @@ const translations = {
     postDownloadNeedsQuality: "Needs better cutout",
     postDownloadLargerBatches: "I need larger batches",
     postDownloadThanks: "Thanks. This helps us improve the tool.",
-    proInlineKicker: "Pro access in preparation",
-    proInlineTitle: "Need to process more photos per batch?",
-    proInlineLead: "Leave your email and we will prioritize your Pro access: larger batches, store-ready ZIPs, and a workflow built for catalogues.",
-    proInlineBenefits: "No payment now. Direct contact when the first Pro access opens.",
+    proInlineKicker: "Free Pro Trial",
+    proInlineTitle: "Try Pro free for 15 days",
+    proInlineLead: "Leave your email to receive manual Pro Trial access: batches up to 100 images, store-ready ZIPs, and a workflow built for catalogues.",
+    proInlineBenefits: "No payment. Manual email activation so you can test real volume.",
     proEmailPlaceholder: "Your email",
-    proInlineButton: "Reserve Pro access",
+    proInlineButton: "Request free Pro Trial",
     proInlineNote: "Built for Shopify, Etsy, WooCommerce, eBay and product teams processing photos in volume.",
-    proInlineSuccess: "Request received. We will contact you by email when Pro access opens.",
+    proInlineSuccess: "Request received. We will send Pro Trial access by email.",
     proInlineError: "We could not submit automatically. Opening an email draft instead.",
     downloadReadyHint: "Result ready. Download PNG or ZIP to use in your stores and catalogues.",
-    zipProCta: "Need ZIPs for more photos? Reserve Pro access",
+    zipProCta: "Need more volume? Request free Pro Trial",
     eyebrow: "Bulk background removal",
     title: "BatchCutout",
     lead: "Free test: remove the background from up to {limit} images now. Download transparent PNGs or a store-ready ZIP.",
@@ -798,21 +798,21 @@ const proTranslations = {
     proKicker: "Para equipas e lojas",
     proTitle: "Precisa de processar centenas de fotos?",
     proLead: "Remova limites e prepare lotes maiores para catálogos, lojas online e equipas.",
-    proLimitCta: "Pedir acesso Pro",
+    proLimitCta: "Pedir Pro Trial grátis",
     proNoCommitment: "Sem compromisso. Primeiro acesso para quem trabalha com volume.",
     brandCta: "Testar com {limit} imagens",
-    inlineProCta: "Mais de {limit} imagens? Peça acesso Pro",
-    proInlineKicker: "Acesso Pro em preparação",
-    proInlineTitle: "Quer remover mais fotos por lote?",
-    proInlineLead: "Deixe o email e damos prioridade ao seu acesso Pro: lotes maiores, ZIP pronto para loja e fluxo pensado para catálogos.",
-    proInlineBenefits: "Sem pagamento agora. Contacto direto quando abrirmos os primeiros acessos.",
+    inlineProCta: "Mais de {limit} imagens? Peça Pro Trial grátis",
+    proInlineKicker: "Pro Trial gratuito",
+    proInlineTitle: "Teste Pro grátis durante 15 dias",
+    proInlineLead: "Deixe o email para receber acesso manual ao Pro Trial: lotes até 100 imagens, ZIP pronto para loja e fluxo pensado para catálogos.",
+    proInlineBenefits: "Sem pagamento. Ativação manual por email para testar volume real.",
     proEmailPlaceholder: "O seu email",
-    proInlineButton: "Reservar acesso Pro",
+    proInlineButton: "Pedir Pro Trial grátis",
     proInlineNote: "Indicado para lojas Shopify, Etsy, WooCommerce, eBay e equipas que tratam fotos de produto em volume.",
-    proInlineSuccess: "Pedido recebido. Vamos contactar por email quando abrirmos o acesso Pro.",
+    proInlineSuccess: "Pedido recebido. Vamos enviar o acesso Pro Trial por email.",
     proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
     downloadReadyHint: "Resultado pronto. Descarregue PNG ou ZIP para usar nas suas lojas e catálogos.",
-    zipProCta: "Precisa de ZIPs para mais fotos? Reserve acesso Pro",
+    zipProCta: "Precisa de mais volume? Peça Pro Trial grátis",
     emptyTitle: "Os seus PNGs transparentes aparecem aqui",
     emptyState: "Depois pode descarregar uma imagem ou exportar tudo em ZIP.",
     demoLabel: "Exemplo antes e depois",
@@ -834,27 +834,27 @@ const proTranslations = {
     faqFormatsQ: "Que formatos são aceites?",
     faqFormatsA: "JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG, HEIC, HEIF e outros formatos de imagem suportados pelo navegador.",
     faqVolumeQ: "Posso processar mais de {limit} imagens?",
-    faqVolumeA: "O modo gratuito permite {limit} imagens por lote. Para volumes maiores, peça acesso Pro.",
+    faqVolumeA: "O modo gratuito permite {limit} imagens por lote. Para volumes maiores, peça o Pro Trial gratuito.",
   },
   en: {
     proKicker: "For teams and stores",
     proTitle: "Need to process hundreds of photos?",
     proLead: "Remove limits and prepare larger batches for catalogues, online stores, and teams.",
-    proLimitCta: "Request Pro access",
+    proLimitCta: "Request free Pro Trial",
     proNoCommitment: "No commitment. Early access for high-volume workflows.",
     brandCta: "Test with {limit} images",
-    inlineProCta: "More than {limit} images? Request Pro access",
-    proInlineKicker: "Pro access in preparation",
-    proInlineTitle: "Need to process more photos per batch?",
-    proInlineLead: "Leave your email and we will prioritize your Pro access: larger batches, store-ready ZIPs, and a workflow built for catalogues.",
-    proInlineBenefits: "No payment now. Direct contact when the first Pro access opens.",
+    inlineProCta: "More than {limit} images? Request free Pro Trial",
+    proInlineKicker: "Free Pro Trial",
+    proInlineTitle: "Try Pro free for 15 days",
+    proInlineLead: "Leave your email to receive manual Pro Trial access: batches up to 100 images, store-ready ZIPs, and a workflow built for catalogues.",
+    proInlineBenefits: "No payment. Manual email activation so you can test real volume.",
     proEmailPlaceholder: "Your email",
-    proInlineButton: "Reserve Pro access",
+    proInlineButton: "Request free Pro Trial",
     proInlineNote: "Built for Shopify, Etsy, WooCommerce, eBay and product teams processing photos in volume.",
-    proInlineSuccess: "Request received. We will contact you by email when Pro access opens.",
+    proInlineSuccess: "Request received. We will send Pro Trial access by email.",
     proInlineError: "We could not submit automatically. Opening an email draft instead.",
     downloadReadyHint: "Result ready. Download PNG or ZIP to use in your stores and catalogues.",
-    zipProCta: "Need ZIPs for more photos? Reserve Pro access",
+    zipProCta: "Need more volume? Request free Pro Trial",
     emptyTitle: "Your transparent PNGs appear here",
     emptyState: "Then download one image or export everything as a ZIP.",
     demoLabel: "Before and after example",
@@ -876,7 +876,7 @@ const proTranslations = {
     faqFormatsQ: "Which formats are supported?",
     faqFormatsA: "JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG, HEIC, HEIF, and other image formats supported by your browser.",
     faqVolumeQ: "Can I process more than {limit} images?",
-    faqVolumeA: "Free mode allows {limit} images per batch. For larger volumes, request Pro access.",
+    faqVolumeA: "Free mode allows {limit} images per batch. For larger volumes, request the free Pro Trial.",
   },
 };
 
@@ -1663,12 +1663,18 @@ async function submitInlineProLead(event) {
   formData.set("free_limit", String(maxFilesPerBatch));
   formData.set("processed_images", String(items.filter((item) => item.outputBlob).length));
   formData.set("form_variant", "email_only");
+  formData.set("offer", "pro_trial");
+  formData.set("trial_days", "15");
+  formData.set("trial_limit", "100");
 
   trackEvent("pro_email_submitted", {
     reason,
     volume: "email-only",
     hasCompany: Boolean(company),
     form_variant: "email_only",
+    offer: "pro_trial",
+    trial_days: 15,
+    trial_limit: 100,
     value: 1,
   });
   trackEvent("pro_waitlist_submitted", {
@@ -1677,6 +1683,9 @@ async function submitInlineProLead(event) {
     volume: "email-only",
     hasCompany: Boolean(company),
     form_variant: "email_only",
+    offer: "pro_trial",
+    trial_days: 15,
+    trial_limit: 100,
     value: 1,
   });
   trackEvent("lead_pro", {
@@ -1684,6 +1693,9 @@ async function submitInlineProLead(event) {
     reason,
     volume: "email-only",
     form_variant: "email_only",
+    offer: "pro_trial",
+    trial_days: 15,
+    trial_limit: 100,
     value: 1,
   });
 
@@ -1701,7 +1713,7 @@ async function submitInlineProLead(event) {
     if (proInlineMessage) proInlineMessage.textContent = t("proInlineError");
     const subject = encodeURIComponent("Novo lead BatchCutout Pro - Ferramenta");
     const body = encodeURIComponent(
-      `Email: ${email}\nCompany: ${company}\nVolume: ${volume}\nReason: ${reason}\nLanguage: ${currentLanguage}\nSource: ${window.location.href}`,
+      `Email: ${email}\nCompany: ${company}\nVolume: ${volume}\nOffer: Pro Trial\nTrial days: 15\nTrial limit: 100 images per batch\nReason: ${reason}\nLanguage: ${currentLanguage}\nSource: ${window.location.href}`,
     );
     window.location.href = `mailto:ricardojvilela@gmail.com?subject=${subject}&body=${body}`;
   } finally {

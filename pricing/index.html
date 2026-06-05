@@ -8,7 +8,7 @@
       name="description"
       content="Peça acesso antecipado ao BatchCutout Pro para remover fundos de fotos de produto em volume, com lotes maiores, PNGs transparentes e ZIP organizado."
     />
-    <meta property="og:title" content="BatchCutout Pro - Acesso antecipado" />
+    <meta property="og:title" content="BatchCutout Pro - Pro Trial gratuito" />
     <meta
       property="og:description"
       content="Para lojas online, vendedores em marketplaces e equipas que processam muitas fotos de produto de uma vez."
@@ -77,14 +77,14 @@
 
       <section class="pricing-hero">
         <div class="pricing-copy">
-          <p class="section-kicker">BatchCutout Pro</p>
+          <p class="section-kicker">BatchCutout Pro Trial</p>
           <h1 data-i18n="heroTitle">Remova fundos de centenas de fotos de produto</h1>
           <p data-i18n="heroLead">
             O acesso antecipado é para equipas de ecommerce que precisam de limpar fotos em lote,
             exportar PNGs transparentes e receber um ZIP pronto para Shopify, Etsy, catálogos e anúncios.
           </p>
           <div class="landing-actions">
-            <a class="landing-button" href="#pro-waitlist" data-i18n="primaryCta">Pedir acesso Pro</a>
+            <a class="landing-button" href="#pro-waitlist" data-i18n="primaryCta">Pedir Pro Trial grátis</a>
             <a class="landing-secondary" href="/?utm_source=pricing&utm_medium=hero&utm_campaign=try-free#tool" data-i18n="secondaryCta">
               Testar 2 imagens primeiro
             </a>
@@ -104,13 +104,13 @@
             loading="eager"
             decoding="async"
           />
-          <p class="section-kicker" data-i18n="planKicker">Criado para volume</p>
-          <h2 id="pro-plan-title" data-i18n="planTitle">Acesso Pro antecipado</h2>
+          <p class="section-kicker" data-i18n="planKicker">Trial gratuito</p>
+          <h2 id="pro-plan-title" data-i18n="planTitle">15 dias para testar volume real</h2>
           <p class="pricing-note" data-i18n="planNote">
             Os preços ainda não estão ativos. A primeira versão Pro será definida com base em fluxos reais de lojas e catálogos.
           </p>
           <ul>
-            <li data-i18n="featureBatch">Lotes maiores de imagens</li>
+            <li data-i18n="featureBatch">Lotes até 100 imagens por lote durante o trial</li>
             <li data-i18n="featureResolution">PNGs transparentes com mínimo de 1200px</li>
             <li data-i18n="featureZip">ZIP organizado para equipas de produto</li>
             <li data-i18n="featureWorkflow">Fluxo para Shopify, Etsy e marketplaces</li>
@@ -154,15 +154,15 @@
 
       <section class="pricing-form-panel" id="pro-waitlist" aria-labelledby="waitlist-title">
         <div>
-          <p class="section-kicker" data-i18n="formKicker">Acesso antecipado</p>
-          <h2 id="waitlist-title" data-i18n="formTitle">Indique o seu volume mensal de fotos</h2>
+          <p class="section-kicker" data-i18n="formKicker">Pro Trial gratuito</p>
+          <h2 id="waitlist-title" data-i18n="formTitle">Peça acesso manual ao trial de 15 dias</h2>
           <p data-i18n="formLead">
             Isto não é um formulário de pagamento. Serve para identificar os casos de uso mais fortes e convidar primeiro os utilizadores certos.
           </p>
           <ul class="pro-form-points">
-            <li data-i18n="formPointPayment">Sem pagamento nesta fase.</li>
-            <li data-i18n="formPointReply">Resposta direta por email quando abrirmos os primeiros acessos.</li>
-            <li data-i18n="formPointPriority">Prioridade para lojas com trabalho repetido em lote.</li>
+            <li data-i18n="formPointPayment">15 dias grátis, sem pagamento.</li>
+            <li data-i18n="formPointReply">Acesso enviado manualmente por email.</li>
+            <li data-i18n="formPointPriority">Trial com lotes até 100 imagens.</li>
           </ul>
         </div>
         <form
@@ -171,11 +171,14 @@
           method="POST"
           novalidate
         >
-          <input type="hidden" name="_subject" value="Novo lead BatchCutout Pro - Pricing" />
+          <input type="hidden" name="_subject" value="Novo pedido BatchCutout Pro Trial - Pricing" />
           <input type="hidden" name="_template" value="table" />
           <input type="hidden" name="source" value="pricing-page" />
           <input type="hidden" name="language" value="pt" />
           <input type="hidden" name="page_url" value="" />
+          <input type="hidden" name="offer" value="pro-trial" />
+          <input type="hidden" name="trial_days" value="15" />
+          <input type="hidden" name="trial_limit" value="100" />
           <input type="text" name="_honey" class="honeypot-field" tabindex="-1" autocomplete="off" />
           <input name="email" type="email" autocomplete="email" required placeholder="Email" />
           <input name="company" type="text" autocomplete="organization" placeholder="Loja ou empresa" data-i18n-placeholder="companyPlaceholder" />
@@ -185,9 +188,9 @@
             <option value="500-2000" data-i18n="volumeLarge">500-2.000 imagens/mês</option>
             <option value="2000+" data-i18n="volumeXL">2.000+ imagens/mês</option>
           </select>
-          <button type="submit" data-i18n="formButton">Pedir acesso Pro</button>
+          <button type="submit" data-i18n="formButton">Pedir Pro Trial grátis</button>
         </form>
-        <p class="pricing-privacy" data-i18n="privacy">Sem pagamento agora. Usaremos estes dados apenas para o contactar sobre o acesso Pro.</p>
+        <p class="pricing-privacy" data-i18n="privacy">Sem pagamento. Usaremos estes dados apenas para enviar o acesso Pro Trial e acompanhar o teste.</p>
       </section>
     </main>
     <script>
@@ -195,23 +198,23 @@
         pt: {
           pageTitle: "BatchCutout Pro | Remoção de fundo em lote para fotos de produto",
           metaDescription: "Peça acesso antecipado ao BatchCutout Pro para remover fundos de fotos de produto em volume, com lotes maiores, PNGs transparentes e ZIP organizado.",
-          ogTitle: "BatchCutout Pro - Acesso antecipado",
+          ogTitle: "BatchCutout Pro - Pro Trial gratuito",
           ogDescription: "Para lojas online, vendedores em marketplaces e equipas que processam muitas fotos de produto de uma vez.",
           languageLabel: "Idioma",
           navTry: "Testar 2 imagens grátis",
           heroTitle: "Remova fundos de centenas de fotos de produto",
           heroLead: "O acesso antecipado é para equipas de ecommerce que precisam de limpar fotos em lote, exportar PNGs transparentes e receber um ZIP pronto para Shopify, Etsy, catálogos e anúncios.",
-          primaryCta: "Pedir acesso Pro",
+          primaryCta: "Pedir Pro Trial grátis",
           secondaryCta: "Testar 2 imagens primeiro",
           metricsLabel: "Resumo do acesso Pro",
           metricFree: "imagens grátis para testar",
           metricResolution: "exportação mínima",
           metricZip: "pronto para catálogo",
           heroImageAlt: "Exemplo antes e depois de uma foto de produto",
-          planKicker: "Criado para volume",
-          planTitle: "Acesso Pro antecipado",
+          planKicker: "Trial gratuito",
+          planTitle: "15 dias para testar volume real",
           planNote: "Os preços ainda não estão ativos. A primeira versão Pro será definida com base em fluxos reais de lojas e catálogos.",
-          featureBatch: "Lotes maiores de imagens",
+          featureBatch: "Lotes até 100 imagens por lote durante o trial",
           featureResolution: "PNGs transparentes com mínimo de 1200px",
           featureZip: "ZIP organizado para equipas de produto",
           featureWorkflow: "Fluxo para Shopify, Etsy e marketplaces",
@@ -230,23 +233,23 @@
           stepTwoText: "O Pro é pensado para vendedores que preparam dezenas ou centenas de imagens para produtos e variantes.",
           stepThreeTitle: "3. Exporte ficheiros limpos",
           stepThreeText: "Descarregue PNGs transparentes ou um ZIP mais fácil de entregar, carregar ou arquivar.",
-          formKicker: "Acesso antecipado",
-          formTitle: "Indique o seu volume mensal de fotos",
+          formKicker: "Pro Trial gratuito",
+          formTitle: "Peça acesso manual ao trial de 15 dias",
           formLead: "Isto não é um formulário de pagamento. Serve para identificar os casos de uso mais fortes e convidar primeiro os utilizadores certos.",
-          formPointPayment: "Sem pagamento nesta fase.",
-          formPointReply: "Resposta direta por email quando abrirmos os primeiros acessos.",
-          formPointPriority: "Prioridade para lojas com trabalho repetido em lote.",
+          formPointPayment: "15 dias grátis, sem pagamento.",
+          formPointReply: "Acesso enviado manualmente por email.",
+          formPointPriority: "Trial com lotes até 100 imagens.",
           companyPlaceholder: "Loja ou empresa",
           volumeLabel: "Volume mensal estimado",
           volumeSmall: "20-100 imagens/mês",
           volumeMedium: "100-500 imagens/mês",
           volumeLarge: "500-2.000 imagens/mês",
           volumeXL: "2.000+ imagens/mês",
-          formButton: "Pedir acesso Pro",
-          privacy: "Sem pagamento agora. Usaremos estes dados apenas para o contactar sobre o acesso Pro.",
-          success: "Obrigado. O seu pedido Pro ficou registado.",
+          formButton: "Pedir Pro Trial grátis",
+          privacy: "Sem pagamento. Usaremos estes dados apenas para enviar o acesso Pro Trial e acompanhar o teste.",
+          success: "Obrigado. O seu pedido Pro Trial ficou registado.",
           error: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
-          emailSubject: "Novo lead BatchCutout Pro - Pricing",
+          emailSubject: "Novo pedido BatchCutout Pro Trial - Pricing",
         },
         en: {
           pageTitle: "BatchCutout Pro | Bulk background removal for product photos",
@@ -257,21 +260,21 @@
           navTry: "Test 2 images free",
           heroTitle: "Remove backgrounds from hundreds of product photos",
           heroLead: "Early access is for ecommerce teams that need to clean product photos in bulk, export transparent PNGs, and receive a ZIP ready for Shopify, Etsy, catalogues, and ads.",
-          primaryCta: "Request Pro access",
+          primaryCta: "Request free Pro Trial",
           secondaryCta: "Test 2 images first",
           metricsLabel: "Pro access summary",
-          metricFree: "free images to test",
+          metricFree: "free Pro Trial",
           metricResolution: "minimum export",
-          metricZip: "ready for catalogues",
+          metricZip: "images per trial batch",
           heroImageAlt: "Before and after example of a product photo",
-          planKicker: "Built for volume",
-          planTitle: "Pro early access",
-          planNote: "Pricing is not active yet. The first Pro release will be shaped around real store and catalogue workflows.",
-          featureBatch: "Larger image batches",
+          planKicker: "Free trial",
+          planTitle: "15 days to test real volume",
+          planNote: "Manual email activation. Test batches up to 100 images before we define paid plans.",
+          featureBatch: "Batches up to 100 images during the trial",
           featureResolution: "Transparent PNGs with a 1200px minimum",
           featureZip: "Organized ZIP downloads for product teams",
           featureWorkflow: "Workflow for Shopify, Etsy, and marketplaces",
-          featurePriority: "Priority access when paid plans open",
+          featurePriority: "No payment during the 15-day trial",
           whoLabel: "Who needs BatchCutout Pro",
           workflowLabel: "How Pro fits the workflow",
           audienceStoresTitle: "Shopify and WooCommerce stores",
@@ -281,28 +284,28 @@
           audienceAgencyTitle: "Agencies and assistants",
           audienceAgencyText: "Process client images in batches and export organized files that are ready to deliver.",
           stepOneTitle: "1. Test quality",
-          stepOneText: "Use the free version with 2 images and confirm cutout quality before requesting Pro.",
+          stepOneText: "Use the free version with 2 images and confirm cutout quality before requesting the trial.",
           stepTwoTitle: "2. Scale the batch",
-          stepTwoText: "Pro is aimed at sellers preparing tens or hundreds of images for products and variants.",
+          stepTwoText: "For 15 days, test batches up to 100 images and see whether it fits your real workflow.",
           stepThreeTitle: "3. Export clean files",
           stepThreeText: "Download transparent PNGs or a ZIP that is easier to hand over, upload, or archive.",
-          formKicker: "Early access",
-          formTitle: "Tell us your monthly photo volume",
-          formLead: "This is not a payment form. It helps us identify the strongest use cases and invite the right users first.",
-          formPointPayment: "No payment at this stage.",
-          formPointReply: "Direct email reply when the first accesses open.",
-          formPointPriority: "Priority for stores with repeated batch workflows.",
+          formKicker: "Free Pro Trial",
+          formTitle: "Request manual access to the 15-day trial",
+          formLead: "This is not a payment form. We use it to send manual trial access and understand who really uses volume.",
+          formPointPayment: "15 days free, no payment.",
+          formPointReply: "Access sent manually by email.",
+          formPointPriority: "Trial with batches up to 100 images.",
           companyPlaceholder: "Store or company",
           volumeLabel: "Estimated monthly volume",
           volumeSmall: "20-100 images/month",
           volumeMedium: "100-500 images/month",
           volumeLarge: "500-2,000 images/month",
           volumeXL: "2,000+ images/month",
-          formButton: "Request Pro access",
-          privacy: "No payment now. We will only use this to contact you about Pro access.",
-          success: "Thanks. Your Pro request has been registered.",
+          formButton: "Request free Pro Trial",
+          privacy: "No payment. We only use this to send Pro Trial access and follow up on the test.",
+          success: "Thanks. Your Pro Trial request has been registered.",
           error: "We could not submit automatically. Opening an email draft instead.",
-          emailSubject: "BatchCutout Pro lead - Pricing",
+          emailSubject: "BatchCutout Pro Trial request - Pricing",
         },
       };
 
@@ -524,6 +527,9 @@
           volume: formData.get("volume"),
           hasCompany: Boolean(formData.get("company")),
           hasEmail: Boolean(formData.get("email")),
+          offer: "pro_trial",
+          trial_days: 15,
+          trial_limit: 100,
           isValid: pricingForm.checkValidity(),
         });
         setTimeout(() => {
@@ -564,6 +570,9 @@
         window.gtag?.("event", "pro_waitlist_submitted", {
           event_category: "commercial_intent",
           event_label: volume,
+          offer: "pro_trial",
+          trial_days: 15,
+          trial_limit: 100,
           page_path: window.location.pathname,
         });
         window.gtag?.("event", "generate_lead", {
@@ -589,7 +598,7 @@
         } catch (error) {
           const subject = encodeURIComponent(dictionary.emailSubject);
           const body = encodeURIComponent(
-            `Email: ${email || ""}\nCompany: ${company || ""}\nVolume: ${volume || ""}\nLanguage: ${languageSelect.value}\nSource: ${window.location.href}`,
+            `Email: ${email || ""}\nCompany: ${company || ""}\nVolume: ${volume || ""}\nOffer: Pro Trial\nTrial days: 15\nTrial limit: 100 images per batch\nLanguage: ${languageSelect.value}\nSource: ${window.location.href}`,
           );
           pricingMessage.textContent = dictionary.error;
           window.location.href = `mailto:ricardojvilela@gmail.com?subject=${subject}&body=${body}`;
