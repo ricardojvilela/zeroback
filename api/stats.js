@@ -161,26 +161,38 @@ export default async function handler(request, response) {
     select: "event_name,visitor_id,value,detail,occurred_at",
     occurred_at: `gte.${since.toISOString()}`,
     order: "occurred_at.asc",
-    limit: "10000",
   });
 
   try {
-    const supabaseResponse = await fetch(`${supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}?${query}`, {
-      headers: {
-        apikey: serviceRoleKey,
-        Authorization: `Bearer ${serviceRoleKey}`,
-      },
-    });
+    const events = [];
+    const pageSize = 1000;
+    const maxEvents = 20000;
 
-    if (!supabaseResponse.ok) {
-      return sendJson(response, 502, {
-        ok: false,
-        error: "supabase_read_failed",
-        status: supabaseResponse.status,
+    for (let offset = 0; offset < maxEvents; offset += pageSize) {
+      const pageQuery = new URLSearchParams(query);
+      pageQuery.set("limit", String(pageSize));
+      pageQuery.set("offset", String(offset));
+
+      const supabaseResponse = await fetch(`${supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}?${pageQuery}`, {
+        headers: {
+          apikey: serviceRoleKey,
+          Authorization: `Bearer ${serviceRoleKey}`,
+        },
       });
+
+      if (!supabaseResponse.ok) {
+        return sendJson(response, 502, {
+          ok: false,
+          error: "supabase_read_failed",
+          status: supabaseResponse.status,
+        });
+      }
+
+      const pageEvents = await supabaseResponse.json();
+      events.push(...pageEvents);
+      if (pageEvents.length < pageSize) break;
     }
 
-    const events = await supabaseResponse.json();
     const byDay = new Map();
     const visitorsByDay = new Map();
     const trialVisitorsByDay = new Map();
