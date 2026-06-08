@@ -75,7 +75,18 @@ function hostnameFrom(value) {
 }
 
 function classifySource(event, detail) {
-  const source = asCleanText(event.source || detail.utm_source || detail.source || detail.last_source || detail.first_source, 200);
+  const rawEventSource = asCleanText(event.source || detail.source, 200);
+  const internalSources = new Set([
+    "tool_inline",
+    "tool_limit_prompt",
+    "tool_empty_state",
+    "post_download",
+    "hero",
+    "pricing",
+    "admin",
+  ]);
+  const eventSource = internalSources.has(rawEventSource.toLowerCase()) ? "" : rawEventSource;
+  const source = asCleanText(detail.utm_source || detail.last_source || detail.first_source || eventSource, 200);
   const medium = asCleanText(detail.utm_medium || detail.medium, 80).toLowerCase();
   const campaign = asCleanText(event.campaign || detail.utm_campaign || detail.campaign || detail.last_campaign || detail.first_campaign, 200);
   const referrer = asCleanText(detail.referrer || "", 500);
