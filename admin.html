@@ -280,6 +280,14 @@
         background: rgba(16, 185, 129, 0.06);
       }
 
+      .source-live-block {
+        margin: 14px 0 16px;
+        border: 1px solid rgba(38, 70, 216, 0.16);
+        border-radius: 8px;
+        padding: 14px;
+        background: rgba(38, 70, 216, 0.05);
+      }
+
       .panel-head.compact {
         margin-bottom: 10px;
       }
@@ -546,7 +554,7 @@
             <strong id="liveUploads">0</strong>
           </article>
           <article class="live-card">
-            <span>Limite acima de 3</span>
+            <span>Limite acima de 2</span>
             <strong id="liveLimit">0</strong>
           </article>
           <article class="live-card">
@@ -613,6 +621,36 @@
             </article>
           </div>
         </section>
+        <section class="source-live-block" aria-label="Origem das visitas">
+          <div class="panel-head compact">
+            <div>
+              <h3>Top origens</h3>
+              <p class="note">Fontes identificadas por UTM, Google Ads ou referrer.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Origem</th>
+                  <th>Visitantes</th>
+                  <th>Page views</th>
+                  <th>Uploads</th>
+                  <th>Imagens</th>
+                  <th>Downloads</th>
+                  <th>ZIP</th>
+                  <th>Cliques Pro</th>
+                  <th>Leads</th>
+                </tr>
+              </thead>
+              <tbody id="sourceRowsBody">
+                <tr>
+                  <td class="empty" colspan="9">A carregar origens.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
         <div class="table-wrap">
           <table>
             <thead>
@@ -667,7 +705,7 @@
               <input id="acceptedImages" name="acceptedImages" type="number" min="0" inputmode="numeric" />
             </div>
             <div class="field">
-              <label for="limitAttempts">Tentativas acima de 3</label>
+              <label for="limitAttempts">Tentativas acima de 2</label>
               <input id="limitAttempts" name="limitAttempts" type="number" min="0" inputmode="numeric" />
             </div>
             <div class="field">
@@ -767,6 +805,7 @@
       const form = document.querySelector("#growthForm");
       const rowsBody = document.querySelector("#rowsBody");
       const liveRowsBody = document.querySelector("#liveRowsBody");
+      const sourceRowsBody = document.querySelector("#sourceRowsBody");
       const liveStatus = document.querySelector("#liveStatus");
       const csvInput = document.querySelector("#csvInput");
       const today = new Date().toISOString().slice(0, 10);
@@ -948,6 +987,22 @@
             }).join("")
           : `<tr><td class="empty" colspan="18">Ainda nao existem eventos reais no periodo.</td></tr>`;
 
+        sourceRowsBody.innerHTML = data.sourceBreakdown?.length
+          ? data.sourceBreakdown.map((row) => `
+              <tr>
+                <td>${row.source}</td>
+                <td>${row.visitors || 0}</td>
+                <td>${row.pageViews || 0}</td>
+                <td>${row.uploadsStarted || 0}</td>
+                <td>${row.imagesAccepted || 0}</td>
+                <td>${row.downloads || 0}</td>
+                <td>${row.zipDownloads || 0}</td>
+                <td>${row.proClicks || 0}</td>
+                <td>${row.proEmailSubmits || 0}</td>
+              </tr>
+            `).join("")
+          : `<tr><td class="empty" colspan="9">Ainda nao existem origens identificadas.</td></tr>`;
+
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "";
         liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Ultima atualizacao: ${generatedAt}`;
       }
@@ -1096,7 +1151,7 @@
           `Visitantes: ${total.visitors || 0}`,
           `Uploads: ${total.uploads || 0}`,
           `Downloads: ${total.downloads || 0}`,
-          `Tentativas acima de 3: ${total.limitAttempts || 0}`,
+          `Tentativas acima de 2: ${total.limitAttempts || 0}`,
           `Cliques Pro: ${total.proClicks || 0}`,
           `Leads Pro: ${total.leads || 0}`,
           `Custo Ads: ${money(total.adCost || 0)}`,
