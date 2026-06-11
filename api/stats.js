@@ -180,6 +180,30 @@ function addTrialEvent(row, event, detail, value) {
   }
 }
 
+function getRecentProLeads(events) {
+  return events
+    .filter((event) => event.event_name === "pro_email_submitted")
+    .map((event) => {
+      const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+      return {
+        date: toIsoDate(event.occurred_at),
+        occurredAt: event.occurred_at,
+        email: typeof detail.email === "string" ? detail.email : "",
+        company: typeof detail.company === "string" ? detail.company : "",
+        reason: typeof detail.reason === "string" ? detail.reason : "",
+        source: typeof detail.source === "string" ? detail.source : "",
+        freeLimit: Number(detail.free_limit || 0) || null,
+        processedImages: Number(detail.processed_images || 0) || null,
+        offer: typeof detail.offer === "string" ? detail.offer : "",
+        trialDays: Number(detail.trial_days || 0) || null,
+        trialLimit: Number(detail.trial_limit || 0) || null,
+        pageLocation: typeof detail.page_location === "string" ? detail.page_location : "",
+      };
+    })
+    .sort((a, b) => String(b.occurredAt).localeCompare(String(a.occurredAt)))
+    .slice(0, 20);
+}
+
 function verifyAdminToken(request) {
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (!adminPassword) return false;
@@ -390,6 +414,7 @@ export default async function handler(request, response) {
       totals,
       trialTotals,
       sourceBreakdown,
+      recentProLeads: getRecentProLeads(events),
       generatedAt: new Date().toISOString(),
     });
   } catch (error) {
