@@ -75,7 +75,6 @@ function hostnameFrom(value) {
 }
 
 function classifySource(event, detail) {
-  const rawEventSource = asCleanText(event.source || detail.source, 200);
   const internalSources = new Set([
     "tool_inline",
     "tool_limit_prompt",
@@ -89,8 +88,15 @@ function classifySource(event, detail) {
     "use-cases",
     "admin",
   ]);
-  const eventSource = internalSources.has(rawEventSource.toLowerCase()) ? "" : rawEventSource;
-  const source = asCleanText(detail.utm_source || detail.last_source || detail.first_source || eventSource, 200);
+  const cleanSource = (value) => {
+    const cleaned = asCleanText(value, 200);
+    return internalSources.has(cleaned.toLowerCase()) ? "" : cleaned;
+  };
+  const source = cleanSource(detail.utm_source) ||
+    cleanSource(detail.source) ||
+    cleanSource(detail.last_source) ||
+    cleanSource(detail.first_source) ||
+    cleanSource(event.source);
   const medium = asCleanText(detail.utm_medium || detail.medium, 80).toLowerCase();
   const campaign = asCleanText(event.campaign || detail.utm_campaign || detail.campaign || detail.last_campaign || detail.first_campaign, 200);
   const referrer = asCleanText(detail.referrer || "", 500);
