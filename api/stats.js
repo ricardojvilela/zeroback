@@ -83,6 +83,10 @@ function classifySource(event, detail) {
     "post_download",
     "hero",
     "pricing",
+    "pricing-page",
+    "seo",
+    "landing",
+    "use-cases",
     "admin",
   ]);
   const eventSource = internalSources.has(rawEventSource.toLowerCase()) ? "" : rawEventSource;
