@@ -591,7 +591,7 @@
           <div class="panel-head compact">
             <div>
               <h3>Pro Trial</h3>
-              <p class="note">Eventos com limite 100 imagens por lote.</p>
+              <p class="note">Eventos com limite 100 imagens por lote e identificador de trial.</p>
             </div>
           </div>
           <div class="live-grid trial-grid">
@@ -619,6 +619,27 @@
               <span>Emails Trial</span>
               <strong id="trialEmails">0</strong>
             </article>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Trial</th>
+                  <th>Visitantes</th>
+                  <th>Page views</th>
+                  <th>Uploads</th>
+                  <th>Imagens</th>
+                  <th>Downloads</th>
+                  <th>ZIP</th>
+                  <th>Ultimo evento</th>
+                </tr>
+              </thead>
+              <tbody id="trialLinkRowsBody">
+                <tr>
+                  <td class="empty" colspan="8">A carregar links de trial.</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </section>
         <section class="source-live-block" aria-label="Origem das visitas">
@@ -806,6 +827,7 @@
       const rowsBody = document.querySelector("#rowsBody");
       const liveRowsBody = document.querySelector("#liveRowsBody");
       const sourceRowsBody = document.querySelector("#sourceRowsBody");
+      const trialLinkRowsBody = document.querySelector("#trialLinkRowsBody");
       const liveStatus = document.querySelector("#liveStatus");
       const csvInput = document.querySelector("#csvInput");
       const today = new Date().toISOString().slice(0, 10);
@@ -958,6 +980,20 @@
         document.querySelector("#trialDownloads").textContent = trialTotals.downloads || 0;
         document.querySelector("#trialZips").textContent = trialTotals.zipDownloads || 0;
         document.querySelector("#trialEmails").textContent = trialTotals.proEmailSubmits || 0;
+        trialLinkRowsBody.innerHTML = data.topTrialLinks?.length
+          ? data.topTrialLinks.map((row) => `
+              <tr>
+                <td>${row.trialSlug || row.trialId || "-"}</td>
+                <td>${row.visitors || 0}</td>
+                <td>${row.pageViews || 0}</td>
+                <td>${row.uploadsStarted || 0}</td>
+                <td>${row.imagesAccepted || 0}</td>
+                <td>${row.downloads || 0}</td>
+                <td>${row.zipDownloads || 0}</td>
+                <td>${row.lastSeenAt ? new Date(row.lastSeenAt).toLocaleString() : "-"}</td>
+              </tr>
+            `).join("")
+          : `<tr><td class="empty" colspan="8">Ainda nao existem links de trial com uso medido.</td></tr>`;
 
         liveRowsBody.innerHTML = data.rows?.length
           ? data.rows.slice().reverse().map((row) => {
@@ -1034,6 +1070,7 @@
             document.body.classList.add("locked");
           }
           liveRowsBody.innerHTML = `<tr><td class="empty" colspan="18">Nao foi possivel carregar dados reais.</td></tr>`;
+          trialLinkRowsBody.innerHTML = `<tr><td class="empty" colspan="8">Nao foi possivel carregar links de trial.</td></tr>`;
           liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variaveis Vercel.";
         }
       }

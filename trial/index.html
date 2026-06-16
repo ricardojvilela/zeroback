@@ -64,6 +64,7 @@
           </p>
           <div class="landing-actions">
             <a
+              id="trialOpenTool"
               class="landing-button"
               href="/?limit=100&utm_source=pro_trial&utm_medium=email&utm_campaign=trial_15_days#tool"
               data-i18n="primaryCta"
@@ -197,8 +198,56 @@
       };
 
       const languageSelect = document.querySelector("#trialLanguage");
+      const openToolLink = document.querySelector("#trialOpenTool");
       const visitorStorageKey = "batchcutout_visitor_id";
       const sessionStorageKey = "batchcutout_session_id";
+      const trialContextStorageKey = "batchcutout_trial_context";
+
+      function normalizeTrialSlug(value) {
+        return String(value || "")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "")
+          .slice(0, 64);
+      }
+
+      function readTrialContext() {
+        const params = new URLSearchParams(window.location.search);
+        const trialId = String(params.get("trial_id") || params.get("trial") || "").trim().slice(0, 80);
+        const trialSlug = normalizeTrialSlug(params.get("trial_slug") || params.get("slug") || params.get("lead") || "");
+        if (!trialId && !trialSlug) return {};
+        return {
+          id: trialId,
+          slug: trialSlug,
+          campaign: String(params.get("utm_campaign") || "trial_15_days").trim().slice(0, 120),
+          source: "pro_trial",
+          origin: "/trial/",
+          seen_at: new Date().toISOString(),
+        };
+      }
+
+      function persistTrialContext() {
+        const context = readTrialContext();
+        if (!context.id && !context.slug) return {};
+        try {
+          localStorage.setItem(trialContextStorageKey, JSON.stringify(context));
+        } catch {
+          return context;
+        }
+        return context;
+      }
+
+      function buildOpenToolHref() {
+        const url = new URL("/?limit=100", window.location.origin);
+        url.searchParams.set("utm_source", "pro_trial");
+        url.searchParams.set("utm_medium", "email");
+        url.searchParams.set("utm_campaign", readTrialContext().campaign || "trial_15_days");
+        const context = readTrialContext();
+        if (context.id) url.searchParams.set("trial_id", context.id);
+        if (context.slug) url.searchParams.set("trial_slug", context.slug);
+        url.hash = "tool";
+        return url.toString();
+      }
 
       function detectLanguage() {
         const saved = localStorage.getItem("language");
@@ -230,6 +279,7 @@
       }
 
       function trackTrialEvent(name, detail = {}) {
+        const trialContext = readTrialContext();
         const payload = {
           event_category: "pro_trial",
           event_label: detail.label || name,
@@ -239,6 +289,9 @@
           offer: "pro_trial",
           trial_days: 15,
           trial_limit: 100,
+          trial_id: trialContext.id,
+          trial_slug: trialContext.slug,
+          trial_campaign: trialContext.campaign,
           ...detail,
         };
         window.dataLayer?.push({ event: name, ...payload });
@@ -284,6 +337,8 @@
       }
 
       applyLanguage(detectLanguage());
+      persistTrialContext();
+      if (openToolLink) openToolLink.href = buildOpenToolHref();
       trackTrialEvent("trial_page_view");
 
       languageSelect.addEventListener("change", (event) => {

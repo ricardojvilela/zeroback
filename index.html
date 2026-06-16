@@ -255,9 +255,7 @@
           <div>
             <p class="section-kicker" data-i18n="proInlineKicker">Pro Trial gratuito</p>
             <h2 id="pro-interest-title" data-i18n="proInlineTitle">Receba o link para processar até 100 imagens por lote</h2>
-            <p data-i18n="proInlineLead">
-              O Pro Trial foi criado para lojas e equipas que têm muitas fotos para preparar. Deixe o email e receba acesso manual durante 15 dias.
-            </p>
+            <p data-i18n="proInlineLead">Deixe o email e receba um link privado para testar lotes maiores durante 15 dias.</p>
             <p class="pro-benefits" data-i18n="proInlineBenefits">
               15 dias grátis. Até 100 imagens por lote. PNG individual e ZIP completo.
             </p>
@@ -278,12 +276,18 @@
             <input type="hidden" name="offer" value="pro-trial" />
             <input type="hidden" name="trial_days" value="15" />
             <input type="hidden" name="trial_limit" value="100" />
+            <input type="hidden" name="trial_id" value="" id="proInlineTrialId" />
+            <input type="hidden" name="trial_slug" value="" id="proInlineTrialSlug" />
+            <input type="hidden" name="trial_url" value="" id="proInlineTrialUrl" />
             <input type="text" name="_honey" class="honeypot-field" tabindex="-1" autocomplete="off" />
             <input id="proInlineEmail" name="email" type="email" autocomplete="email" required placeholder="O seu email" data-i18n-placeholder="proEmailPlaceholder" />
             <button type="submit" data-i18n="proInlineButton">Receber link Pro Trial</button>
           </form>
           <p class="pro-message" id="proInlineMessage" aria-live="polite"></p>
-          <p class="pro-note" data-i18n="proInlineNote">Sem pagamento. Use fotos reais de produto e diga-nos se faria sentido pagar por este fluxo.</p>
+          <div class="pro-note" id="proInlineSuccessCard" hidden>
+            <strong data-i18n="proInlineSuccessTitle">Pedido registado</strong>
+            <p data-i18n="proInlineSuccessDetail">Vamos enviar o link privado por email. O acesso inclui 15 dias e até 100 imagens por lote.</p>
+          </div>
         </section>
 
         <div class="info-list">

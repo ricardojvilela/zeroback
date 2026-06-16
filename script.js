@@ -26,7 +26,11 @@ const proInlineForm = document.querySelector("#proInlineForm");
 const proInlineEmail = document.querySelector("#proInlineEmail");
 const proInlineLanguage = document.querySelector("#proInlineLanguage");
 const proInlinePageUrl = document.querySelector("#proInlinePageUrl");
+const proInlineTrialId = document.querySelector("#proInlineTrialId");
+const proInlineTrialSlug = document.querySelector("#proInlineTrialSlug");
+const proInlineTrialUrl = document.querySelector("#proInlineTrialUrl");
 const proInlineMessage = document.querySelector("#proInlineMessage");
+const proInlineSuccessCard = document.querySelector("#proInlineSuccessCard");
 
 const defaultMaxFilesPerBatch = 2;
 const requestedLimit = Number(new URLSearchParams(window.location.search).get("limit"));
@@ -40,6 +44,7 @@ const consentStorageKey = "batchcutout_consent";
 const debugMode = new URLSearchParams(window.location.search).get("debug") === "1";
 const debugEventsStorageKey = "batchcutout_debug_events";
 const attributionStorageKey = "batchcutout_attribution";
+const trialContextStorageKey = "batchcutout_trial_context";
 const visitorStorageKey = "batchcutout_visitor_id";
 const sessionStorageKey = "batchcutout_session_id";
 const serverEventNames = new Set([
@@ -101,12 +106,13 @@ const baseTranslation = {
   postDownloadThanks: "Obrigado. A sua resposta ajuda-nos a melhorar a ferramenta.",
   proInlineKicker: "Pro Trial gratuito",
   proInlineTitle: "Receba o link para processar até 100 imagens por lote",
-  proInlineLead: "O Pro Trial foi criado para lojas e equipas que têm muitas fotos para preparar. Deixe o email e receba acesso manual durante 15 dias.",
+  proInlineLead: "Deixe o email e receba um link privado para testar lotes maiores durante 15 dias.",
   proInlineBenefits: "15 dias grátis. Até 100 imagens por lote. PNG individual e ZIP completo.",
   proEmailPlaceholder: "O seu email",
   proInlineButton: "Receber link Pro Trial",
-  proInlineNote: "Sem pagamento. Use fotos reais de produto e diga-nos se faria sentido pagar por este fluxo.",
   proInlineSuccess: "Pedido recebido. Vamos enviar o link Pro Trial por email.",
+  proInlineSuccessTitle: "Pedido registado",
+  proInlineSuccessDetail: "Vamos enviar o link privado por email. O acesso inclui 15 dias e até 100 imagens por lote.",
   proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
   downloadReadyHint: "Resultado pronto. Descarregue PNG ou ZIP para usar nas suas lojas e catálogos.",
   zipProCta: "Quer processar até 100 imagens por lote? Receba Pro Trial",
@@ -199,8 +205,9 @@ const translations = {
     proInlineBenefits: "No payment. Manual email activation so you can test real volume.",
     proEmailPlaceholder: "Your email",
     proInlineButton: "Request free Pro Trial",
-    proInlineNote: "Built for Shopify, Etsy, WooCommerce, eBay and product teams processing photos in volume.",
     proInlineSuccess: "Request received. We will send Pro Trial access by email.",
+    proInlineSuccessTitle: "Request recorded",
+    proInlineSuccessDetail: "We will send the private link by email. Access includes 15 days and up to 100 images per batch.",
     proInlineError: "We could not submit automatically. Opening an email draft instead.",
     downloadReadyHint: "Result ready. Download PNG or ZIP to use in your stores and catalogues.",
     zipProCta: "Need more volume? Request free Pro Trial",
@@ -999,6 +1006,7 @@ function sendServerEvent(name, detail = {}) {
 function getAttributionParams() {
   const params = new URLSearchParams(window.location.search);
   const storedAttribution = getStoredAttribution();
+  const trialContext = getTrialContext();
   const attribution = {
     page_path: window.location.pathname,
     page_title: document.title,
@@ -1021,6 +1029,10 @@ function getAttributionParams() {
     last_campaign: storedAttribution.last?.campaign,
     last_landing_page: storedAttribution.last?.landing_page,
     last_seen_at: storedAttribution.last?.seen_at,
+    trial_id: trialContext.id,
+    trial_slug: trialContext.slug,
+    trial_campaign: trialContext.campaign,
+    trial_origin: trialContext.origin,
   };
 
   return Object.fromEntries(Object.entries(attribution).filter(([, value]) => Boolean(value)));
@@ -1034,8 +1046,81 @@ function getStoredAttribution() {
   }
 }
 
+function normalizeTrialSlug(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 64);
+}
+
+function readTrialContextFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const rawId = params.get("trial_id") || params.get("trial");
+  const rawSlug = params.get("trial_slug") || params.get("slug") || params.get("lead");
+  const id = String(rawId || "").trim().slice(0, 80);
+  const slug = normalizeTrialSlug(rawSlug);
+  const campaign = String(params.get("utm_campaign") || "").trim().slice(0, 120);
+
+  if (!id && !slug) return null;
+
+  return {
+    id,
+    slug,
+    campaign,
+    origin: window.location.pathname,
+    seen_at: new Date().toISOString(),
+  };
+}
+
+function getStoredTrialContext() {
+  try {
+    return JSON.parse(localStorage.getItem(trialContextStorageKey) || "null");
+  } catch {
+    return null;
+  }
+}
+
+function persistTrialContext() {
+  const fromUrl = readTrialContextFromUrl();
+  if (!fromUrl) return getStoredTrialContext();
+
+  try {
+    localStorage.setItem(trialContextStorageKey, JSON.stringify(fromUrl));
+  } catch {
+    return fromUrl;
+  }
+  return fromUrl;
+}
+
+function getTrialContext() {
+  return readTrialContextFromUrl() || getStoredTrialContext() || {};
+}
+
+function buildTrialSlugFromEmail(email) {
+  const [localPart] = String(email || "").trim().toLowerCase().split("@");
+  const safeLocal = normalizeTrialSlug(localPart || "lead");
+  return `${safeLocal}-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}`.slice(0, 64);
+}
+
+function buildTrialId(slug) {
+  const randomPart = Math.random().toString(36).slice(2, 8);
+  return `${slug}-${randomPart}`.slice(0, 80);
+}
+
+function buildTrialUrl(trialId, trialSlug) {
+  const url = new URL("/trial/", window.location.origin);
+  url.searchParams.set("trial_id", trialId);
+  url.searchParams.set("trial_slug", trialSlug);
+  url.searchParams.set("utm_source", "pro_trial");
+  url.searchParams.set("utm_medium", "email");
+  url.searchParams.set("utm_campaign", "trial_15_days");
+  return url.toString();
+}
+
 function getVisitAttribution() {
   const params = new URLSearchParams(window.location.search);
+  const trialContext = getTrialContext();
   const referrer = document.referrer && !document.referrer.includes(window.location.hostname)
     ? document.referrer
     : "";
@@ -1053,6 +1138,8 @@ function getVisitAttribution() {
     landing_page: window.location.href.split("#")[0],
     referrer,
     free_limit: maxFilesPerBatch,
+    trial_id: trialContext.id,
+    trial_slug: trialContext.slug,
     seen_at: new Date().toISOString(),
   };
 }
@@ -1068,6 +1155,7 @@ function persistAttribution() {
   };
 
   localStorage.setItem(attributionStorageKey, JSON.stringify(next));
+  persistTrialContext();
   recordDebugEvent("attribution_saved", next);
 }
 
@@ -1614,6 +1702,8 @@ function showProPrompt(reason = "post_download") {
   proInterestPanel.dataset.reason = reason;
   if (proInlineLanguage) proInlineLanguage.value = currentLanguage;
   if (proInlinePageUrl) proInlinePageUrl.value = window.location.href;
+  if (proInlineMessage) proInlineMessage.textContent = "";
+  if (proInlineSuccessCard) proInlineSuccessCard.hidden = true;
 
   if (wasHidden) {
     trackEvent("pro_prompt_shown", {
@@ -1664,6 +1754,7 @@ async function submitInlineProLead(event) {
 
   submitButton.disabled = true;
   if (proInlineMessage) proInlineMessage.textContent = "";
+  if (proInlineSuccessCard) proInlineSuccessCard.hidden = true;
   formData.set("language", currentLanguage);
   formData.set("page_url", window.location.href);
   formData.set("reason", reason);
@@ -1673,6 +1764,15 @@ async function submitInlineProLead(event) {
   formData.set("offer", "pro_trial");
   formData.set("trial_days", "15");
   formData.set("trial_limit", "100");
+  const trialSlug = buildTrialSlugFromEmail(email);
+  const trialId = buildTrialId(trialSlug);
+  const trialUrl = buildTrialUrl(trialId, trialSlug);
+  formData.set("trial_id", trialId);
+  formData.set("trial_slug", trialSlug);
+  formData.set("trial_url", trialUrl);
+  if (proInlineTrialId) proInlineTrialId.value = trialId;
+  if (proInlineTrialSlug) proInlineTrialSlug.value = trialSlug;
+  if (proInlineTrialUrl) proInlineTrialUrl.value = trialUrl;
 
   trackEvent("pro_email_submitted", {
     reason,
@@ -1684,6 +1784,9 @@ async function submitInlineProLead(event) {
     offer: "pro_trial",
     trial_days: 15,
     trial_limit: 100,
+    trial_id: trialId,
+    trial_slug: trialSlug,
+    trial_url: trialUrl,
     value: 1,
   });
   trackEvent("pro_waitlist_submitted", {
@@ -1697,6 +1800,9 @@ async function submitInlineProLead(event) {
     offer: "pro_trial",
     trial_days: 15,
     trial_limit: 100,
+    trial_id: trialId,
+    trial_slug: trialSlug,
+    trial_url: trialUrl,
     value: 1,
   });
   trackEvent("lead_pro", {
@@ -1709,6 +1815,9 @@ async function submitInlineProLead(event) {
     offer: "pro_trial",
     trial_days: 15,
     trial_limit: 100,
+    trial_id: trialId,
+    trial_slug: trialSlug,
+    trial_url: trialUrl,
     value: 1,
   });
 
@@ -1721,12 +1830,14 @@ async function submitInlineProLead(event) {
 
     if (!response.ok) throw new Error("Form submit failed");
     if (proInlineMessage) proInlineMessage.textContent = t("proInlineSuccess");
+    if (proInlineSuccessCard) proInlineSuccessCard.hidden = false;
     proInlineForm.reset();
+    proInlineEmail.dataset.started = "false";
   } catch {
     if (proInlineMessage) proInlineMessage.textContent = t("proInlineError");
     const subject = encodeURIComponent("Novo lead BatchCutout Pro - Ferramenta");
     const body = encodeURIComponent(
-      `Email: ${email}\nCompany: ${company}\nVolume: ${volume}\nOffer: Pro Trial\nTrial days: 15\nTrial limit: 100 images per batch\nReason: ${reason}\nLanguage: ${currentLanguage}\nSource: ${window.location.href}`,
+      `Email: ${email}\nCompany: ${company}\nVolume: ${volume}\nOffer: Pro Trial\nTrial days: 15\nTrial limit: 100 images per batch\nTrial ID: ${trialId}\nTrial slug: ${trialSlug}\nTrial URL: ${trialUrl}\nReason: ${reason}\nLanguage: ${currentLanguage}\nSource: ${window.location.href}`,
     );
     window.location.href = `mailto:ricardojvilela@gmail.com?subject=${subject}&body=${body}`;
   } finally {

@@ -61,6 +61,22 @@ function emptyTrialStats() {
   };
 }
 
+function emptyTrialLinkRow(key, trialId, trialSlug) {
+  return {
+    key,
+    trialId,
+    trialSlug,
+    visitors: 0,
+    pageViews: 0,
+    uploadsStarted: 0,
+    imagesAccepted: 0,
+    downloads: 0,
+    zipDownloads: 0,
+    proEmailSubmits: 0,
+    lastSeenAt: "",
+  };
+}
+
 function asCleanText(value, maxLength = 120) {
   if (value === null || value === undefined) return "";
   return String(value).trim().slice(0, maxLength);
@@ -110,6 +126,7 @@ function classifySource(event, detail) {
   if (raw.includes("zearches")) return "Zearches";
   if (raw.includes("listai")) return "ListAI";
   if (raw.includes("thenextai") || raw.includes("the next ai")) return "The Next AI";
+  if (raw.includes("pro_trial") || raw.includes("trial_15_days")) return "Pro Trial email";
   if (raw.includes("future-pedia") || raw.includes("futurepedia")) return "Future-pedia";
   if (raw.includes("producthunt") || raw.includes("product hunt")) return "Product Hunt";
   if (raw.includes("facebook") || raw.includes("fbclid")) return "Facebook";
@@ -190,6 +207,17 @@ function addTrialEvent(row, event, detail, value) {
   }
 }
 
+function getTrialLinkKey(detail) {
+  const trialId = asCleanText(detail.trial_id || "", 80);
+  const trialSlug = asCleanText(detail.trial_slug || "", 80);
+  if (!trialId && !trialSlug) return null;
+  return {
+    key: trialId || trialSlug,
+    trialId,
+    trialSlug,
+  };
+}
+
 function getRecentProLeads(events) {
   return events
     .filter((event) => event.event_name === "pro_email_submitted")
@@ -207,6 +235,9 @@ function getRecentProLeads(events) {
         offer: typeof detail.offer === "string" ? detail.offer : "",
         trialDays: Number(detail.trial_days || 0) || null,
         trialLimit: Number(detail.trial_limit || 0) || null,
+        trialId: typeof detail.trial_id === "string" ? detail.trial_id : "",
+        trialSlug: typeof detail.trial_slug === "string" ? detail.trial_slug : "",
+        trialUrl: typeof detail.trial_url === "string" ? detail.trial_url : "",
         pageLocation: typeof detail.page_location === "string" ? detail.page_location : "",
       };
     })
@@ -300,6 +331,8 @@ export default async function handler(request, response) {
     const trialVisitorsByDay = new Map();
     const bySource = new Map();
     const visitorsBySource = new Map();
+    const byTrialLink = new Map();
+    const visitorsByTrialLink = new Map();
 
     for (const event of events) {
       const date = toIsoDate(event.occurred_at);
@@ -313,6 +346,7 @@ export default async function handler(request, response) {
       const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
       const value = Number(event.value || detail.count || detail.accepted || 0) || 0;
       const sourceName = classifySource(event, detail);
+      const trialLink = getTrialLinkKey(detail);
 
       if (!bySource.has(sourceName)) bySource.set(sourceName, emptySourceRow(sourceName));
       if (!visitorsBySource.has(sourceName)) visitorsBySource.set(sourceName, new Set());
@@ -322,6 +356,39 @@ export default async function handler(request, response) {
 
       if (event.visitor_id) visitorsByDay.get(date).add(event.visitor_id);
       if (event.visitor_id && isTrialEvent(event, detail)) trialVisitorsByDay.get(date).add(event.visitor_id);
+      if (trialLink) {
+        if (!byTrialLink.has(trialLink.key)) {
+          byTrialLink.set(trialLink.key, emptyTrialLinkRow(trialLink.key, trialLink.trialId, trialLink.trialSlug));
+        }
+        if (!visitorsByTrialLink.has(trialLink.key)) visitorsByTrialLink.set(trialLink.key, new Set());
+        if (event.visitor_id) visitorsByTrialLink.get(trialLink.key).add(event.visitor_id);
+        const trialRow = byTrialLink.get(trialLink.key);
+        trialRow.lastSeenAt = event.occurred_at;
+        switch (event.event_name) {
+          case "trial_page_view":
+          case "tool_page_view":
+            if (isTrialEvent(event, detail)) trialRow.pageViews += 1;
+            break;
+          case "tool_upload_started":
+            trialRow.uploadsStarted += 1;
+            break;
+          case "tool_upload_added":
+            trialRow.imagesAccepted += Number(detail.count || value || 0) || 0;
+            break;
+          case "tool_download_png":
+            trialRow.downloads += 1;
+            break;
+          case "tool_download_zip":
+            trialRow.downloads += 1;
+            trialRow.zipDownloads += 1;
+            break;
+          case "pro_email_submitted":
+            trialRow.proEmailSubmits += 1;
+            break;
+          default:
+            break;
+        }
+      }
       addTrialEvent(row, event, detail, value);
 
       switch (event.event_name) {
@@ -396,6 +463,9 @@ export default async function handler(request, response) {
     for (const [source, visitors] of visitorsBySource) {
       bySource.get(source).visitors = visitors.size;
     }
+    for (const [key, visitors] of visitorsByTrialLink) {
+      if (byTrialLink.get(key)) byTrialLink.get(key).visitors = visitors.size;
+    }
 
     const rows = Array.from(byDay.values()).sort((a, b) => a.date.localeCompare(b.date));
     const totals = rows.reduce((acc, row) => {
@@ -415,6 +485,9 @@ export default async function handler(request, response) {
     const sourceBreakdown = Array.from(bySource.values())
       .sort((a, b) => b.visitors - a.visitors || b.pageViews - a.pageViews || b.events - a.events)
       .slice(0, 20);
+    const topTrialLinks = Array.from(byTrialLink.values())
+      .sort((a, b) => b.visitors - a.visitors || b.uploadsStarted - a.uploadsStarted || String(b.lastSeenAt).localeCompare(String(a.lastSeenAt)))
+      .slice(0, 20);
 
     return sendJson(response, 200, {
       ok: true,
@@ -424,6 +497,7 @@ export default async function handler(request, response) {
       totals,
       trialTotals,
       sourceBreakdown,
+      topTrialLinks,
       recentProLeads: getRecentProLeads(events),
       generatedAt: new Date().toISOString(),
     });
