@@ -1268,6 +1268,15 @@ function cleanName(name) {
     .toLowerCase();
 }
 
+function exportPngName(fileName, fallback = "imagem") {
+  const baseName = cleanName(fileName) || fallback;
+  return `${baseName}-${t("fileSuffix")}-batchcutout-com.png`;
+}
+
+function exportZipName() {
+  return t("zipFilename").replace(/\.zip$/i, "-batchcutout-com.zip");
+}
+
 function isSupportedImage(file) {
   const lowerName = file.name.toLowerCase();
   return file.type.startsWith("image/") || supportedExtensions.some((extension) => lowerName.endsWith(extension));
@@ -1530,8 +1539,7 @@ async function downloadZip() {
   const readyItems = items.filter((item) => item.outputBlob);
 
   for (const [index, item] of readyItems.entries()) {
-    const baseName = cleanName(item.file.name) || `imagem-${index + 1}`;
-    zip.file(`${baseName}-${t("fileSuffix")}.png`, item.outputBlob);
+    zip.file(exportPngName(item.file.name, `imagem-${index + 1}`), item.outputBlob);
   }
 
   setStatus("statusPreparingZip", 100);
@@ -1539,7 +1547,7 @@ async function downloadZip() {
   const url = URL.createObjectURL(zipBlob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = t("zipFilename");
+  link.download = exportZipName();
   link.click();
   URL.revokeObjectURL(url);
   setStatus("statusZipReady", 100);
@@ -1561,11 +1569,10 @@ function downloadSinglePng() {
     return;
   }
 
-  const baseName = cleanName(item.file.name) || "imagem";
   const url = URL.createObjectURL(item.outputBlob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `${baseName}-${t("fileSuffix")}.png`;
+  link.download = exportPngName(item.file.name);
   link.click();
   URL.revokeObjectURL(url);
   setStatus("statusPngReady", 100);
