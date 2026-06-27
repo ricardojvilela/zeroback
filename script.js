@@ -37,7 +37,10 @@ const accountBadge = document.querySelector("#accountBadge");
 const accountStatus = document.querySelector("#accountStatus");
 const accountMessage = document.querySelector("#accountMessage");
 const accountForm = document.querySelector("#accountForm");
+const accountEmail = document.querySelector("#accountEmail");
+const accountPassword = document.querySelector("#accountPassword");
 const accountSubmit = document.querySelector("#accountSubmit");
+const accountCreate = document.querySelector("#accountCreate");
 const accountActions = document.querySelector("#accountActions");
 const accountRefresh = document.querySelector("#accountRefresh");
 const accountLogout = document.querySelector("#accountLogout");
@@ -143,19 +146,25 @@ const baseTranslation = {
   accountBadgeGuest: "Sem sessão",
   accountBadgeFree: "Free",
   accountBadgePro: "Pro",
-  accountStatusGuest: "Entre com Google para ativar ou gerir o seu acesso Pro.",
+  accountStatusGuest: "Entre com email e password para ativar ou gerir o seu acesso Pro.",
   accountStatusLoading: "A verificar a sua conta...",
   accountStatusFree: "Conta gratuita. O Pro ativa até 100 imagens por lote e 2.000 imagens por mês.",
   accountStatusPro: "Conta Pro ativa. Até {batchLimit} imagens por lote e {monthlyRemaining} de {monthlyLimit} disponíveis este mês.",
   accountStatusTrial: "Trial ativo. Até {batchLimit} imagens por lote e {monthlyRemaining} de {monthlyLimit} disponíveis este mês.",
   accountStatusConfigMissing: "Login Pro ainda não configurado neste ambiente.",
-  accountSubmit: "Continuar com Google",
-  accountSubmitSending: "A abrir Google...",
+  accountEmailPlaceholder: "O seu email",
+  accountPasswordPlaceholder: "A sua password",
+  accountSubmit: "Entrar",
+  accountSubmitSending: "A entrar...",
+  accountCreate: "Criar conta",
+  accountCreateSending: "A criar conta...",
   accountRefresh: "Atualizar conta",
   accountLogout: "Sair",
-  accountMagicLinkSent: "A redirecionar para o login Google.",
+  accountMagicLinkSent: "Sessão iniciada.",
+  accountSignupSuccess: "Conta criada. Se a confirmação de email estiver ativa, verifique a sua caixa de entrada antes de entrar.",
   accountLoggedOut: "Sessão terminada.",
   accountAuthError: "Não foi possível iniciar sessão agora.",
+  accountSignupError: "Não foi possível criar a conta agora.",
   accountReserveError: "A sua conta não permite este lote neste momento.",
   accountMonthlyLimitReached: "A sua conta Pro atingiu o limite mensal de {monthlyLimit} imagens.",
   statusTooManyFilesPro: "O seu acesso atual permite até {limit} imagens por lote.",
@@ -249,19 +258,25 @@ const translations = {
     accountBadgeGuest: "No session",
     accountBadgeFree: "Free",
     accountBadgePro: "Pro",
-    accountStatusGuest: "Sign in with Google to activate or manage your Pro access.",
+    accountStatusGuest: "Sign in with email and password to activate or manage your Pro access.",
     accountStatusLoading: "Checking your account...",
     accountStatusFree: "Free account. Pro unlocks up to 100 images per batch and 2,000 images per month.",
     accountStatusPro: "Pro account active. Up to {batchLimit} images per batch and {monthlyRemaining} of {monthlyLimit} available this month.",
     accountStatusTrial: "Trial active. Up to {batchLimit} images per batch and {monthlyRemaining} of {monthlyLimit} available this month.",
     accountStatusConfigMissing: "Pro login is not configured in this environment yet.",
-    accountSubmit: "Continue with Google",
-    accountSubmitSending: "Opening Google...",
+    accountEmailPlaceholder: "Your email",
+    accountPasswordPlaceholder: "Your password",
+    accountSubmit: "Sign in",
+    accountSubmitSending: "Signing in...",
+    accountCreate: "Create account",
+    accountCreateSending: "Creating account...",
     accountRefresh: "Refresh account",
     accountLogout: "Sign out",
-    accountMagicLinkSent: "Redirecting to Google sign-in.",
+    accountMagicLinkSent: "Signed in.",
+    accountSignupSuccess: "Account created. If email confirmation is enabled, check your inbox before signing in.",
     accountLoggedOut: "Signed out.",
     accountAuthError: "We could not sign you in right now.",
+    accountSignupError: "We could not create the account right now.",
     accountReserveError: "Your account does not allow this batch right now.",
     accountMonthlyLimitReached: "Your Pro account reached the monthly limit of {monthlyLimit} images.",
     statusTooManyFilesPro: "Your current access allows up to {limit} images per batch.",
@@ -1541,8 +1556,15 @@ async function initAuth() {
 
 async function handleAccountLogin(event) {
   event.preventDefault();
-  if (!supabaseClient || !accountSubmit) {
+  if (!supabaseClient || !accountEmail || !accountPassword || !accountSubmit) {
     setAccountMessage("accountStatusConfigMissing");
+    return;
+  }
+
+  const email = accountEmail.value.trim();
+  const password = accountPassword.value;
+  if (!email || !password) {
+    accountForm?.reportValidity();
     return;
   }
 
@@ -1551,12 +1573,9 @@ async function handleAccountLogin(event) {
   setAccountMessage();
 
   try {
-    const redirectTo = `${window.location.origin}${window.location.pathname}${window.location.search}`;
-    const { error } = await supabaseClient.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo,
-      },
+    const { error } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password,
     });
 
     if (error) throw error;
@@ -1566,6 +1585,43 @@ async function handleAccountLogin(event) {
   } finally {
     accountSubmit.disabled = false;
     accountSubmit.textContent = t("accountSubmit");
+  }
+}
+
+async function handleAccountCreate() {
+  if (!supabaseClient || !accountEmail || !accountPassword || !accountCreate) {
+    setAccountMessage("accountStatusConfigMissing");
+    return;
+  }
+
+  const email = accountEmail.value.trim();
+  const password = accountPassword.value;
+  if (!email || !password) {
+    accountForm?.reportValidity();
+    return;
+  }
+
+  accountCreate.disabled = true;
+  accountCreate.textContent = t("accountCreateSending");
+  setAccountMessage();
+
+  try {
+    const redirectTo = `${window.location.origin}${window.location.pathname}${window.location.search}`;
+    const { error } = await supabaseClient.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectTo,
+      },
+    });
+
+    if (error) throw error;
+    setAccountMessage("accountSignupSuccess");
+  } catch {
+    setAccountMessage("accountSignupError");
+  } finally {
+    accountCreate.disabled = false;
+    accountCreate.textContent = t("accountCreate");
   }
 }
 
@@ -2184,6 +2240,7 @@ inlineProCta.addEventListener("click", () => showProInterest("inline_pro_cta"));
 zipProCta?.addEventListener("click", () => showProInterest("zip_download_context"));
 proInlineForm?.addEventListener("submit", submitInlineProLead);
 accountForm?.addEventListener("submit", handleAccountLogin);
+accountCreate?.addEventListener("click", handleAccountCreate);
 accountRefresh?.addEventListener("click", refreshAccount);
 accountLogout?.addEventListener("click", handleAccountLogout);
 proInlineEmail?.addEventListener(

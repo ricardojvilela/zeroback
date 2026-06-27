@@ -22,13 +22,17 @@ Em `Authentication > URL Configuration`:
 
 Sem isto, o login pode abrir e não devolver a sessão corretamente ao site.
 
-Em `Authentication > Providers > Google`:
+Em `Authentication > Providers > Email`:
 
-- ativar `Google`
-- configurar o `Client ID`
-- configurar o `Client Secret`
+- ativar `Email`
+- permitir `Email + password`
 
-Sem o provider Google ativo, o login autónomo não funciona.
+Se queres acesso imediato sem confirmação por email:
+
+- em `Authentication > Providers > Email`
+- desativar `Confirm email`
+
+Sem o provider Email ativo, o login próprio com email e password não funciona.
 
 ### 3. Tabela no Supabase
 
@@ -58,7 +62,7 @@ O mesmo SQL está pronto em [C:\Users\Ricardo\Documents\Codex\BatchCutout-git\SU
 
 ### 4. Ativar um utilizador Pro manualmente
 
-Depois do utilizador entrar com Google pelo menos uma vez, executar:
+Depois do utilizador criar conta e entrar pelo menos uma vez, executar:
 
 ```sql
 update public.batchcutout_users
@@ -108,5 +112,5 @@ Depois de adicionar as variáveis na Vercel, fazer novo deploy para publicar:
 - Pro: 100 imagens por lote
 - Pro: 2000 imagens por mês
 - O site reserva o consumo antes de começar a processar
-- O login é por Google via Supabase
+- O login é por email e password via Supabase
 - O painel `/admin` permite listar contas e mudar entre `Free`, `Trial`, `Pro` e `Reset uso`
