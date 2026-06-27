@@ -26,11 +26,17 @@ Em `Authentication > Providers > Email`:
 
 - ativar `Email`
 - permitir `Email + password`
+- manter `Allow new users to sign up` ativo
 
-Se queres acesso imediato sem confirmação por email:
+Estado atual em produção:
 
-- em `Authentication > Providers > Email`
-- desativar `Confirm email`
+- `Confirm email` fica desativado enquanto o projeto estiver a usar o email integrado do Supabase, porque esse serviço tem limites baixos de envio e pode bloquear a criação de contas com `email rate limit exceeded`.
+- O template profissional de confirmação está guardado e pode ser reativado quando houver SMTP/custom email configurado.
+
+Se for ativado SMTP/custom email:
+
+- em `Authentication > Providers > Email`, ativar `Confirm email`
+- testar novamente criação de conta e receção do email
 
 Sem o provider Email ativo, o login próprio com email e password não funciona.
 
