@@ -37,7 +37,6 @@ const accountBadge = document.querySelector("#accountBadge");
 const accountStatus = document.querySelector("#accountStatus");
 const accountMessage = document.querySelector("#accountMessage");
 const accountForm = document.querySelector("#accountForm");
-const accountEmail = document.querySelector("#accountEmail");
 const accountSubmit = document.querySelector("#accountSubmit");
 const accountActions = document.querySelector("#accountActions");
 const accountRefresh = document.querySelector("#accountRefresh");
@@ -144,18 +143,17 @@ const baseTranslation = {
   accountBadgeGuest: "Sem sessão",
   accountBadgeFree: "Free",
   accountBadgePro: "Pro",
-  accountStatusGuest: "Entre por email para ativar ou gerir o seu acesso Pro.",
+  accountStatusGuest: "Entre com Google para ativar ou gerir o seu acesso Pro.",
   accountStatusLoading: "A verificar a sua conta...",
   accountStatusFree: "Conta gratuita. O Pro ativa até 100 imagens por lote e 2.000 imagens por mês.",
   accountStatusPro: "Conta Pro ativa. Até {batchLimit} imagens por lote e {monthlyRemaining} de {monthlyLimit} disponíveis este mês.",
   accountStatusTrial: "Trial ativo. Até {batchLimit} imagens por lote e {monthlyRemaining} de {monthlyLimit} disponíveis este mês.",
   accountStatusConfigMissing: "Login Pro ainda não configurado neste ambiente.",
-  accountEmailPlaceholder: "O seu email",
-  accountSubmit: "Receber link de acesso",
-  accountSubmitSending: "A enviar...",
+  accountSubmit: "Continuar com Google",
+  accountSubmitSending: "A abrir Google...",
   accountRefresh: "Atualizar conta",
   accountLogout: "Sair",
-  accountMagicLinkSent: "Enviámos um link de acesso para o seu email.",
+  accountMagicLinkSent: "A redirecionar para o login Google.",
   accountLoggedOut: "Sessão terminada.",
   accountAuthError: "Não foi possível iniciar sessão agora.",
   accountReserveError: "A sua conta não permite este lote neste momento.",
@@ -251,18 +249,17 @@ const translations = {
     accountBadgeGuest: "No session",
     accountBadgeFree: "Free",
     accountBadgePro: "Pro",
-    accountStatusGuest: "Sign in by email to activate or manage your Pro access.",
+    accountStatusGuest: "Sign in with Google to activate or manage your Pro access.",
     accountStatusLoading: "Checking your account...",
     accountStatusFree: "Free account. Pro unlocks up to 100 images per batch and 2,000 images per month.",
     accountStatusPro: "Pro account active. Up to {batchLimit} images per batch and {monthlyRemaining} of {monthlyLimit} available this month.",
     accountStatusTrial: "Trial active. Up to {batchLimit} images per batch and {monthlyRemaining} of {monthlyLimit} available this month.",
     accountStatusConfigMissing: "Pro login is not configured in this environment yet.",
-    accountEmailPlaceholder: "Your email",
-    accountSubmit: "Send access link",
-    accountSubmitSending: "Sending...",
+    accountSubmit: "Continue with Google",
+    accountSubmitSending: "Opening Google...",
     accountRefresh: "Refresh account",
     accountLogout: "Sign out",
-    accountMagicLinkSent: "We sent an access link to your email.",
+    accountMagicLinkSent: "Redirecting to Google sign-in.",
     accountLoggedOut: "Signed out.",
     accountAuthError: "We could not sign you in right now.",
     accountReserveError: "Your account does not allow this batch right now.",
@@ -1544,13 +1541,10 @@ async function initAuth() {
 
 async function handleAccountLogin(event) {
   event.preventDefault();
-  if (!supabaseClient || !accountEmail || !accountSubmit) {
+  if (!supabaseClient || !accountSubmit) {
     setAccountMessage("accountStatusConfigMissing");
     return;
   }
-
-  const email = accountEmail.value.trim();
-  if (!email) return;
 
   accountSubmit.disabled = true;
   accountSubmit.textContent = t("accountSubmitSending");
@@ -1558,10 +1552,10 @@ async function handleAccountLogin(event) {
 
   try {
     const redirectTo = `${window.location.origin}${window.location.pathname}${window.location.search}`;
-    const { error } = await supabaseClient.auth.signInWithOtp({
-      email,
+    const { error } = await supabaseClient.auth.signInWithOAuth({
+      provider: "google",
       options: {
-        emailRedirectTo: redirectTo,
+        redirectTo,
       },
     });
 

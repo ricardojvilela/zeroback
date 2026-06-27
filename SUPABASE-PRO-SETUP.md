@@ -20,7 +20,15 @@ Em `Authentication > URL Configuration`:
   - `https://www.batchcutout.com`
   - `https://www.batchcutout.com/`
 
-Sem isto, o magic link pode abrir e não devolver a sessão corretamente ao site.
+Sem isto, o login pode abrir e não devolver a sessão corretamente ao site.
+
+Em `Authentication > Providers > Google`:
+
+- ativar `Google`
+- configurar o `Client ID`
+- configurar o `Client Secret`
+
+Sem o provider Google ativo, o login autónomo não funciona.
 
 ### 3. Tabela no Supabase
 
@@ -50,7 +58,7 @@ O mesmo SQL está pronto em [C:\Users\Ricardo\Documents\Codex\BatchCutout-git\SU
 
 ### 4. Ativar um utilizador Pro manualmente
 
-Depois do utilizador entrar por email pelo menos uma vez, executar:
+Depois do utilizador entrar com Google pelo menos uma vez, executar:
 
 ```sql
 update public.batchcutout_users
@@ -100,5 +108,5 @@ Depois de adicionar as variáveis na Vercel, fazer novo deploy para publicar:
 - Pro: 100 imagens por lote
 - Pro: 2000 imagens por mês
 - O site reserva o consumo antes de começar a processar
-- O login é por magic link do Supabase
+- O login é por Google via Supabase
 - O painel `/admin` permite listar contas e mudar entre `Free`, `Trial`, `Pro` e `Reset uso`
