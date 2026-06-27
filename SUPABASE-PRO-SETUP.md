@@ -34,6 +34,14 @@ Se queres acesso imediato sem confirmação por email:
 
 Sem o provider Email ativo, o login próprio com email e password não funciona.
 
+### 2.1 Template de confirmação de conta
+
+Em `Authentication > Email Templates`:
+
+- atualizar o assunto para: `Confirm your BatchCutout account`
+- usar o HTML de [C:\Users\Ricardo\Documents\Codex\BatchCutout-git\SUPABASE-CONFIRMATION-EMAIL.html](C:\Users\Ricardo\Documents\Codex\BatchCutout-git\SUPABASE-CONFIRMATION-EMAIL.html)
+- se precisares de versão simples, usar [C:\Users\Ricardo\Documents\Codex\BatchCutout-git\SUPABASE-CONFIRMATION-EMAIL.txt](C:\Users\Ricardo\Documents\Codex\BatchCutout-git\SUPABASE-CONFIRMATION-EMAIL.txt)
+
 ### 3. Tabela no Supabase
 
 ```sql

@@ -1,0 +1,15 @@
+Subject:
+Confirm your BatchCutout account
+
+Body:
+Hi,
+
+Please confirm your email address to activate your BatchCutout account.
+
+Confirm account:
+{{ .ConfirmationURL }}
+
+If you did not request this account, you can safely ignore this email.
+
+BatchCutout
+Bulk background removal for product photos
