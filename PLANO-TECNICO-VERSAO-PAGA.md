@@ -23,6 +23,13 @@ Documento interno para preparar a passagem de teste gratuito para produto pago.
 6. Historico simples de lotes.
 7. Painel admin com utilizadores, leads e pagamentos.
 
+## Regras comerciais fixadas
+
+- Free: 2 imagens por lote.
+- Pro: 100 imagens por lote.
+- Pro: 2.000 imagens por mes.
+- O processamento continua no browser nesta primeira fase.
+
 ## Processamento
 
 ### Fase 1: manter no browser
@@ -57,9 +64,12 @@ Limites:
 - email
 - created_at
 - plan
+- batch_limit
 - stripe_customer_id
 - monthly_image_limit
 - monthly_images_used
+- current_period_start
+- current_period_end
 
 ### leads
 
@@ -82,7 +92,8 @@ Limites:
 
 1. Guardar leads em Supabase.
 2. Criar login.
-3. Criar contador mensal.
-4. Integrar Stripe.
-5. Bloquear Pro sem pagamento.
+3. Definir batch_limit e monthly_image_limit por plano.
+4. Criar contador mensal.
+5. Integrar Stripe.
 6. Criar painel admin.
+7. Bloquear Pro sem pagamento.

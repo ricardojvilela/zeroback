@@ -150,6 +150,31 @@
           Começar grátis
         </button>
         <a class="brand-pro-link" href="./pricing/">Precisa de mais volume? Peça Pro Trial</a>
+        <section class="account-panel" id="accountPanel" aria-labelledby="accountTitle">
+          <div class="account-panel-head">
+            <p class="section-kicker" id="accountTitle" data-i18n="accountKicker">Acesso Pro</p>
+            <span class="account-badge" id="accountBadge" data-i18n="accountBadgeGuest">Sem sessão</span>
+          </div>
+          <p class="account-status" id="accountStatus" data-i18n="accountStatusGuest">
+            Entre por email para ativar ou gerir o seu acesso Pro.
+          </p>
+          <form class="account-form" id="accountForm" novalidate>
+            <input
+              id="accountEmail"
+              type="email"
+              autocomplete="email"
+              required
+              placeholder="O seu email"
+              data-i18n-placeholder="accountEmailPlaceholder"
+            />
+            <button type="submit" id="accountSubmit" data-i18n="accountSubmit">Receber link de acesso</button>
+          </form>
+          <div class="account-actions hidden" id="accountActions">
+            <button type="button" class="ghost-button small" id="accountRefresh" data-i18n="accountRefresh">Atualizar conta</button>
+            <button type="button" class="ghost-button small" id="accountLogout" data-i18n="accountLogout">Sair</button>
+          </div>
+          <p class="account-message" id="accountMessage" aria-live="polite"></p>
+        </section>
         <div class="proof-strip" data-i18n-aria="benefitsLabel" aria-label="Vantagens do serviço">
           <span data-i18n="benefitBatch">Feito para muitas fotos</span>
           <span data-i18n="benefitPng">PNG transparente</span>
@@ -255,9 +280,9 @@
           <div>
             <p class="section-kicker" data-i18n="proInlineKicker">Pro Trial gratuito</p>
             <h2 id="pro-interest-title" data-i18n="proInlineTitle">Desbloqueie até 100 imagens por lote</h2>
-            <p data-i18n="proInlineLead">Deixe o email para receber acesso privado durante 15 dias. Feito para lojas, catálogos e equipas com volume real.</p>
+            <p data-i18n="proInlineLead">Deixe o email para receber acesso privado durante 15 dias. O Pro foi definido para até 100 imagens por lote e 2.000 imagens por mês.</p>
             <p class="pro-benefits" data-i18n="proInlineBenefits">
-              15 dias grátis. Até 100 imagens por lote. PNGs e ZIP prontos para loja.
+              15 dias grátis. Até 100 imagens por lote. Plano Pro alvo com 2.000 imagens por mês.
             </p>
           </div>
           <form
@@ -286,7 +311,7 @@
           <p class="pro-message" id="proInlineMessage" aria-live="polite"></p>
           <div class="pro-note" id="proInlineSuccessCard" hidden>
             <strong data-i18n="proInlineSuccessTitle">Pedido registado</strong>
-            <p data-i18n="proInlineSuccessDetail">Vamos enviar o link privado por email. O acesso inclui 15 dias e até 100 imagens por lote.</p>
+            <p data-i18n="proInlineSuccessDetail">Vamos enviar o link privado por email. O acesso inclui 15 dias, até 100 imagens por lote e a validação do Pro com 2.000 imagens por mês.</p>
           </div>
         </section>
 

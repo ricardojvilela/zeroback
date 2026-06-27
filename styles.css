@@ -215,6 +215,72 @@ h2 {
   color: #ffffff;
 }
 
+.account-panel {
+  margin: 0 0 22px;
+  padding: 14px;
+  border: 1px solid rgba(81, 215, 198, 0.24);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.account-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.account-panel .section-kicker {
+  margin: 0;
+}
+
+.account-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.account-status,
+.account-message {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.account-form,
+.account-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.account-form input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+}
+
+.account-form input::placeholder {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.account-form button,
+.account-actions .ghost-button {
+  width: 100%;
+}
+
 .trust-copy {
   margin: 24px 0 0;
   color: rgba(255, 255, 255, 0.72);
@@ -320,6 +386,17 @@ h2 {
 .ghost-button:hover:not(:disabled) {
   background: #fff1ef;
   color: var(--danger);
+}
+
+.ghost-button.small {
+  min-width: 0;
+  color: #2a4a62;
+  border-color: rgba(42, 74, 98, 0.2);
+}
+
+.ghost-button.small:hover:not(:disabled) {
+  background: #edf5fb;
+  color: #173346;
 }
 
 .dropzone {

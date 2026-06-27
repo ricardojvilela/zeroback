@@ -272,6 +272,29 @@
         font-weight: 800;
       }
 
+      .table-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .table-actions button {
+        min-height: 34px;
+        padding: 0 10px;
+        font-size: 12px;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 6px 10px;
+        background: #edf3ff;
+        color: var(--blue);
+        font-size: 12px;
+        font-weight: 800;
+      }
+
       .trial-live-block {
         margin: 14px 0 16px;
         border: 1px solid rgba(16, 185, 129, 0.18);
@@ -699,6 +722,36 @@
             </table>
           </div>
         </section>
+        <section class="source-live-block" aria-label="Contas Pro">
+          <div class="panel-head compact">
+            <div>
+              <h3>Contas Pro</h3>
+              <p class="note">Gestao direta de acessos Free, Trial e Pro.</p>
+            </div>
+            <div class="actions">
+              <button class="secondary" type="button" id="refreshProUsers">Atualizar contas</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Plano</th>
+                  <th>Lote</th>
+                  <th>Uso mensal</th>
+                  <th>Periodo</th>
+                  <th>Acoes</th>
+                </tr>
+              </thead>
+              <tbody id="proUsersRowsBody">
+                <tr>
+                  <td class="empty" colspan="6">A carregar contas.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
         <div class="table-wrap">
           <table>
             <thead>
@@ -856,6 +909,7 @@
       const sourceRowsBody = document.querySelector("#sourceRowsBody");
       const trialLinkRowsBody = document.querySelector("#trialLinkRowsBody");
       const recentLeadRowsBody = document.querySelector("#recentLeadRowsBody");
+      const proUsersRowsBody = document.querySelector("#proUsersRowsBody");
       const liveStatus = document.querySelector("#liveStatus");
       const csvInput = document.querySelector("#csvInput");
       const today = new Date().toISOString().slice(0, 10);
@@ -901,6 +955,14 @@
 
       function money(value) {
         return `${number(value).toFixed(2)} EUR`;
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;");
       }
 
       function getRows() {
@@ -1083,6 +1145,71 @@
         liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Ultima atualizacao: ${generatedAt}`;
       }
 
+      function renderProUsers(users) {
+        proUsersRowsBody.innerHTML = users?.length
+          ? users.map((user) => `
+              <tr>
+                <td>${escapeHtml(user.email || "-")}</td>
+                <td><span class="pill">${escapeHtml(`${user.plan || "free"} / ${user.planStatus || "active"}`)}</span></td>
+                <td>${user.batchLimit || 0}</td>
+                <td>${user.monthlyUsed || 0} / ${user.monthlyLimit || 0}</td>
+                <td>${user.periodEnd ? new Date(user.periodEnd).toLocaleDateString() : "-"}</td>
+                <td>
+                  <div class="table-actions">
+                    <button class="secondary" type="button" data-user-action="free" data-user-id="${escapeHtml(user.userId)}">Free</button>
+                    <button class="secondary" type="button" data-user-action="trial" data-user-id="${escapeHtml(user.userId)}">Trial</button>
+                    <button type="button" data-user-action="pro" data-user-id="${escapeHtml(user.userId)}">Pro</button>
+                    <button class="secondary" type="button" data-user-action="reset-usage" data-user-id="${escapeHtml(user.userId)}">Reset uso</button>
+                  </div>
+                </td>
+              </tr>
+            `).join("")
+          : `<tr><td class="empty" colspan="6">Ainda nao existem contas registadas.</td></tr>`;
+      }
+
+      async function loadProUsers() {
+        const token = getAdminToken();
+        if (!token) return;
+
+        try {
+          const response = await fetch("/api/pro-users", {
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await response.json();
+          if (!response.ok || !data.ok) {
+            throw new Error(data.error || "pro_users_failed");
+          }
+          renderProUsers(data.users || []);
+        } catch {
+          proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Nao foi possivel carregar contas Pro.</td></tr>`;
+        }
+      }
+
+      async function updateProUser(userId, mode) {
+        const token = getAdminToken();
+        if (!token) return;
+
+        const response = await fetch("/api/pro-users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ userId, mode }),
+        });
+
+        const data = await response.json();
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error || "pro_user_update_failed");
+        }
+
+        await loadProUsers();
+      }
+
       async function loadLiveStats() {
         const token = getAdminToken();
         if (!token) {
@@ -1103,6 +1230,7 @@
             throw new Error(data.error || "stats_failed");
           }
           renderLiveStats(data);
+          await loadProUsers();
         } catch (error) {
           if (error.message === "unauthorized") {
             localStorage.removeItem(adminTokenStorageKey);
@@ -1112,6 +1240,7 @@
           liveRowsBody.innerHTML = `<tr><td class="empty" colspan="18">Nao foi possivel carregar dados reais.</td></tr>`;
           trialLinkRowsBody.innerHTML = `<tr><td class="empty" colspan="8">Nao foi possivel carregar links de trial.</td></tr>`;
           recentLeadRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Nao foi possivel carregar leads Pro.</td></tr>`;
+          proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Nao foi possivel carregar contas Pro.</td></tr>`;
           liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variaveis Vercel.";
         }
       }
@@ -1245,6 +1374,24 @@
       });
 
       document.querySelector("#refreshLive").addEventListener("click", loadLiveStats);
+      document.querySelector("#refreshProUsers").addEventListener("click", loadProUsers);
+      proUsersRowsBody.addEventListener("click", async (event) => {
+        const button = event.target.closest("[data-user-action]");
+        if (!button) return;
+
+        const userId = button.dataset.userId;
+        const mode = button.dataset.userAction;
+        if (!userId || !mode) return;
+
+        button.disabled = true;
+        try {
+          await updateProUser(userId, mode);
+        } catch {
+          alert("Nao foi possivel atualizar a conta.");
+        } finally {
+          button.disabled = false;
+        }
+      });
       authForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         const password = new FormData(authForm).get("password");

@@ -1,5 +1,6 @@
 ﻿import JSZip from "https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm";
 import { removeBackground } from "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.6.0/+esm";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const fileInput = document.querySelector("#fileInput");
 const dropzone = document.querySelector("#dropzone");
@@ -31,13 +32,25 @@ const proInlineTrialSlug = document.querySelector("#proInlineTrialSlug");
 const proInlineTrialUrl = document.querySelector("#proInlineTrialUrl");
 const proInlineMessage = document.querySelector("#proInlineMessage");
 const proInlineSuccessCard = document.querySelector("#proInlineSuccessCard");
+const accountPanel = document.querySelector("#accountPanel");
+const accountBadge = document.querySelector("#accountBadge");
+const accountStatus = document.querySelector("#accountStatus");
+const accountMessage = document.querySelector("#accountMessage");
+const accountForm = document.querySelector("#accountForm");
+const accountEmail = document.querySelector("#accountEmail");
+const accountSubmit = document.querySelector("#accountSubmit");
+const accountActions = document.querySelector("#accountActions");
+const accountRefresh = document.querySelector("#accountRefresh");
+const accountLogout = document.querySelector("#accountLogout");
 
 const defaultMaxFilesPerBatch = 2;
 const requestedLimit = Number(new URLSearchParams(window.location.search).get("limit"));
-const maxFilesPerBatch = [2, 3, 5, 10, 20, 100].includes(requestedLimit)
+let maxFilesPerBatch = [2, 3, 5, 10, 20, 100].includes(requestedLimit)
   ? requestedLimit
   : defaultMaxFilesPerBatch;
 const minExportSide = 1200;
+const defaultProBatchLimit = 100;
+const defaultProMonthlyLimit = 2000;
 const downloadZipConversionId = "AW-18177126609/2EdRCMzF7bMcENHhw9tD";
 const batchLimitConversionId = "AW-18177126609/prPXCPXD8LMcENHhw9tD";
 const consentStorageKey = "batchcutout_consent";
@@ -68,6 +81,10 @@ const serverEventNames = new Set([
   "pro_waitlist_submitted",
 ]);
 let debugList;
+let supabaseClient = null;
+let authConfig = null;
+let currentAccount = null;
+let lastUsageReservation = null;
 
 const supportedExtensions = [
   ".jpg",
@@ -106,13 +123,13 @@ const baseTranslation = {
   postDownloadThanks: "Obrigado. A sua resposta ajuda-nos a melhorar a ferramenta.",
   proInlineKicker: "Pro Trial gratuito",
   proInlineTitle: "Desbloqueie até 100 imagens por lote",
-  proInlineLead: "Deixe o email para receber acesso privado durante 15 dias. Feito para lojas, catálogos e equipas com volume real.",
-  proInlineBenefits: "15 dias grátis. Até 100 imagens por lote. PNGs e ZIP prontos para loja.",
+  proInlineLead: "Deixe o email para receber acesso privado durante 15 dias. O Pro foi definido para até 100 imagens por lote e 2.000 imagens por mês.",
+  proInlineBenefits: "15 dias grátis. Até 100 imagens por lote. Plano Pro alvo com 2.000 imagens por mês.",
   proEmailPlaceholder: "O seu email",
   proInlineButton: "Receber link Pro Trial",
   proInlineSuccess: "Pedido recebido. Vamos enviar o link Pro Trial por email.",
   proInlineSuccessTitle: "Pedido registado",
-  proInlineSuccessDetail: "Vamos enviar o link privado por email. O acesso inclui 15 dias e até 100 imagens por lote.",
+  proInlineSuccessDetail: "Vamos enviar o link privado por email. O acesso inclui 15 dias, até 100 imagens por lote e a validação do Pro com 2.000 imagens por mês.",
   proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
   downloadReadyHint: "Resultado pronto. Descarregue PNG ou ZIP pronto para loja.",
   zipProCta: "Precisa de lotes até 100 imagens? Peça Pro Trial",
@@ -123,6 +140,27 @@ const baseTranslation = {
   cookieText: "Usamos medição simples para perceber visitas e pedidos Pro. Pode aceitar ou continuar sem medição.",
   cookieAccept: "Aceitar medição",
   cookieDecline: "Continuar sem medição",
+  accountKicker: "Acesso Pro",
+  accountBadgeGuest: "Sem sessão",
+  accountBadgeFree: "Free",
+  accountBadgePro: "Pro",
+  accountStatusGuest: "Entre por email para ativar ou gerir o seu acesso Pro.",
+  accountStatusLoading: "A verificar a sua conta...",
+  accountStatusFree: "Conta gratuita. O Pro ativa até 100 imagens por lote e 2.000 imagens por mês.",
+  accountStatusPro: "Conta Pro ativa. Até {batchLimit} imagens por lote e {monthlyRemaining} de {monthlyLimit} disponíveis este mês.",
+  accountStatusTrial: "Trial ativo. Até {batchLimit} imagens por lote e {monthlyRemaining} de {monthlyLimit} disponíveis este mês.",
+  accountStatusConfigMissing: "Login Pro ainda não configurado neste ambiente.",
+  accountEmailPlaceholder: "O seu email",
+  accountSubmit: "Receber link de acesso",
+  accountSubmitSending: "A enviar...",
+  accountRefresh: "Atualizar conta",
+  accountLogout: "Sair",
+  accountMagicLinkSent: "Enviámos um link de acesso para o seu email.",
+  accountLoggedOut: "Sessão terminada.",
+  accountAuthError: "Não foi possível iniciar sessão agora.",
+  accountReserveError: "A sua conta não permite este lote neste momento.",
+  accountMonthlyLimitReached: "A sua conta Pro atingiu o limite mensal de {monthlyLimit} imagens.",
+  statusTooManyFilesPro: "O seu acesso atual permite até {limit} imagens por lote.",
 };
 
 const languageNames = {
@@ -201,14 +239,35 @@ const translations = {
     postDownloadThanks: "Thanks. This helps us improve the tool.",
     proInlineKicker: "Free Pro Trial",
     proInlineTitle: "Unlock up to 100 images per batch",
-    proInlineLead: "Leave your email to receive private access for 15 days. Built for stores, catalogues, and teams handling real volume.",
-    proInlineBenefits: "15 days free. Up to 100 images per batch. Store-ready PNGs and ZIP export.",
+    proInlineLead: "Leave your email to receive private access for 15 days. Pro is defined for up to 100 images per batch and 2,000 images per month.",
+    proInlineBenefits: "15 days free. Up to 100 images per batch. Planned Pro offer with 2,000 images per month.",
     proEmailPlaceholder: "Your email",
     proInlineButton: "Request free Pro Trial",
     proInlineSuccess: "Request received. We will send Pro Trial access by email.",
     proInlineSuccessTitle: "Request recorded",
-    proInlineSuccessDetail: "We will send the private link by email. Access includes 15 days and up to 100 images per batch.",
+    proInlineSuccessDetail: "We will send the private link by email. Access includes 15 days, up to 100 images per batch, and validation of the 2,000 images per month Pro offer.",
     proInlineError: "We could not submit automatically. Opening an email draft instead.",
+    accountKicker: "Pro access",
+    accountBadgeGuest: "No session",
+    accountBadgeFree: "Free",
+    accountBadgePro: "Pro",
+    accountStatusGuest: "Sign in by email to activate or manage your Pro access.",
+    accountStatusLoading: "Checking your account...",
+    accountStatusFree: "Free account. Pro unlocks up to 100 images per batch and 2,000 images per month.",
+    accountStatusPro: "Pro account active. Up to {batchLimit} images per batch and {monthlyRemaining} of {monthlyLimit} available this month.",
+    accountStatusTrial: "Trial active. Up to {batchLimit} images per batch and {monthlyRemaining} of {monthlyLimit} available this month.",
+    accountStatusConfigMissing: "Pro login is not configured in this environment yet.",
+    accountEmailPlaceholder: "Your email",
+    accountSubmit: "Send access link",
+    accountSubmitSending: "Sending...",
+    accountRefresh: "Refresh account",
+    accountLogout: "Sign out",
+    accountMagicLinkSent: "We sent an access link to your email.",
+    accountLoggedOut: "Signed out.",
+    accountAuthError: "We could not sign you in right now.",
+    accountReserveError: "Your account does not allow this batch right now.",
+    accountMonthlyLimitReached: "Your Pro account reached the monthly limit of {monthlyLimit} images.",
+    statusTooManyFilesPro: "Your current access allows up to {limit} images per batch.",
     downloadReadyHint: "Result ready. Download a PNG or a store-ready ZIP.",
     zipProCta: "Need batches up to 100 images? Request Pro Trial",
     eyebrow: "Bulk background removal",
@@ -811,8 +870,8 @@ const proTranslations = {
     inlineProCta: "Quer desbloquear até 100 imagens por lote? Peça Pro Trial",
     proInlineKicker: "Pro Trial gratuito",
     proInlineTitle: "Desbloqueie até 100 imagens por lote",
-    proInlineLead: "Deixe o email para receber acesso privado durante 15 dias. Feito para lojas, catálogos e equipas com volume real.",
-    proInlineBenefits: "15 dias grátis. Até 100 imagens por lote. PNGs e ZIP prontos para loja.",
+    proInlineLead: "Deixe o email para receber acesso privado durante 15 dias. O Pro foi definido para até 100 imagens por lote e 2.000 imagens por mês.",
+    proInlineBenefits: "15 dias grátis. Até 100 imagens por lote. Plano Pro alvo com 2.000 imagens por mês.",
     proEmailPlaceholder: "O seu email",
     proInlineButton: "Receber link Pro Trial",
     proInlineNote: "Sem pagamento. Teste com fotos reais e diga-nos se este fluxo faria sentido na sua operação.",
@@ -853,8 +912,8 @@ const proTranslations = {
     inlineProCta: "Want to unlock up to 100 images per batch? Get Pro Trial",
     proInlineKicker: "Free Pro Trial",
     proInlineTitle: "Unlock up to 100 images per batch",
-    proInlineLead: "Leave your email to receive private access for 15 days. Built for stores, catalogues, and teams handling real volume.",
-    proInlineBenefits: "15 days free. Up to 100 images per batch. Store-ready PNGs and ZIP export.",
+    proInlineLead: "Leave your email to receive private access for 15 days. Pro is defined for up to 100 images per batch and 2,000 images per month.",
+    proInlineBenefits: "15 days free. Up to 100 images per batch. Planned Pro offer with 2,000 images per month.",
     proEmailPlaceholder: "Your email",
     proInlineButton: "Get Pro Trial link",
     proInlineNote: "No payment. Test with real photos and tell us whether this workflow would fit your operation.",
@@ -1343,7 +1402,212 @@ function applyLanguage() {
 
   languageSelect.value = currentLanguage;
   refreshStatusText();
+  updateAccountUi();
   render();
+}
+
+function setAccountMessage(key = "", params = {}) {
+  if (!accountMessage) return;
+  accountMessage.textContent = key ? t(key, params) : "";
+}
+
+function getRequestedBatchLimit() {
+  if (![2, 3, 5, 10, 20, 100].includes(requestedLimit)) return defaultMaxFilesPerBatch;
+  if (requestedLimit !== 100) return requestedLimit;
+  const trialContext = getTrialContext?.();
+  return trialContext?.id || trialContext?.slug ? 100 : defaultMaxFilesPerBatch;
+}
+
+function getAccountBatchLimit() {
+  return Number(currentAccount?.access?.batchLimit || 0) || 0;
+}
+
+function canUsePaidAccess() {
+  return Boolean(currentAccount?.access?.canUsePro);
+}
+
+function syncBatchLimit() {
+  const nextLimit = Math.max(defaultMaxFilesPerBatch, getRequestedBatchLimit(), getAccountBatchLimit());
+  maxFilesPerBatch = nextLimit;
+}
+
+function updateAccountUi() {
+  if (!accountPanel || !accountBadge || !accountStatus) return;
+
+  syncBatchLimit();
+
+  if (!authConfig?.configured) {
+    accountBadge.textContent = t("accountBadgeGuest");
+    accountStatus.textContent = t("accountStatusConfigMissing");
+    accountForm?.classList.remove("hidden");
+    accountActions?.classList.add("hidden");
+    return;
+  }
+
+  if (!currentAccount) {
+    accountBadge.textContent = t("accountBadgeGuest");
+    accountStatus.textContent = t("accountStatusGuest");
+    accountForm?.classList.remove("hidden");
+    accountActions?.classList.add("hidden");
+    return;
+  }
+
+  const { access = {}, email = "" } = currentAccount;
+  const statusKey = access.planStatus === "trialing" ? "accountStatusTrial" : access.canUsePro ? "accountStatusPro" : "accountStatusFree";
+  const badgeKey = access.canUsePro ? "accountBadgePro" : "accountBadgeFree";
+  const statusTextValue = access.canUsePro
+    ? t(statusKey, {
+        batchLimit: access.batchLimit || defaultProBatchLimit,
+        monthlyLimit: access.monthlyLimit || defaultProMonthlyLimit,
+        monthlyRemaining: access.monthlyRemaining ?? access.monthlyLimit ?? defaultProMonthlyLimit,
+      })
+    : t(statusKey);
+
+  accountBadge.textContent = t(badgeKey);
+  accountStatus.textContent = email ? `${email} - ${statusTextValue}` : statusTextValue;
+  accountForm?.classList.add("hidden");
+  accountActions?.classList.remove("hidden");
+}
+
+async function fetchAuthConfig() {
+  try {
+    const response = await fetch("/api/auth-config");
+    const data = await response.json();
+    authConfig = data?.ok ? data : { configured: false };
+  } catch {
+    authConfig = { configured: false };
+  }
+
+  if (authConfig?.configured && authConfig.url && authConfig.anonKey) {
+    supabaseClient = createClient(authConfig.url, authConfig.anonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
+    });
+  }
+
+  updateAccountUi();
+}
+
+async function refreshAccount() {
+  if (!supabaseClient) {
+    currentAccount = null;
+    updateAccountUi();
+    return null;
+  }
+
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  const accessToken = sessionData?.session?.access_token;
+
+  if (!accessToken) {
+    currentAccount = null;
+    updateAccountUi();
+    return null;
+  }
+
+  const response = await fetch("/api/account", {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    currentAccount = null;
+    updateAccountUi();
+    return null;
+  }
+
+  const data = await response.json();
+  currentAccount = data.account || null;
+  updateAccountUi();
+  return currentAccount;
+}
+
+async function initAuth() {
+  await fetchAuthConfig();
+  if (!supabaseClient) return;
+
+  await refreshAccount();
+
+  supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+    if (!session?.access_token) {
+      currentAccount = null;
+      updateAccountUi();
+      return;
+    }
+
+    await refreshAccount();
+  });
+}
+
+async function handleAccountLogin(event) {
+  event.preventDefault();
+  if (!supabaseClient || !accountEmail || !accountSubmit) {
+    setAccountMessage("accountStatusConfigMissing");
+    return;
+  }
+
+  const email = accountEmail.value.trim();
+  if (!email) return;
+
+  accountSubmit.disabled = true;
+  accountSubmit.textContent = t("accountSubmitSending");
+  setAccountMessage();
+
+  try {
+    const redirectTo = `${window.location.origin}${window.location.pathname}${window.location.search}`;
+    const { error } = await supabaseClient.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: redirectTo,
+      },
+    });
+
+    if (error) throw error;
+    setAccountMessage("accountMagicLinkSent");
+  } catch {
+    setAccountMessage("accountAuthError");
+  } finally {
+    accountSubmit.disabled = false;
+    accountSubmit.textContent = t("accountSubmit");
+  }
+}
+
+async function handleAccountLogout() {
+  if (!supabaseClient) return;
+  await supabaseClient.auth.signOut();
+  currentAccount = null;
+  updateAccountUi();
+  setAccountMessage("accountLoggedOut");
+}
+
+async function reserveMonthlyUsage(count) {
+  if (!canUsePaidAccess() || !supabaseClient || count <= 0) return { ok: true };
+
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  const accessToken = sessionData?.session?.access_token;
+  if (!accessToken) return { ok: false, error: "unauthorized" };
+
+  const response = await fetch("/api/usage-reserve", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify({ count }),
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok || !data.ok) {
+    return { ok: false, error: data.error || "reserve_failed", detail: data };
+  }
+
+  currentAccount = data.account || currentAccount;
+  lastUsageReservation = { count, at: Date.now() };
+  updateAccountUi();
+  return { ok: true, account: currentAccount };
 }
 
 function cleanName(name) {
@@ -1408,13 +1672,14 @@ function updateControls() {
   const singleReady = items.length === 1 && Boolean(items[0].outputBlob);
   const running = items.some((item) => item.statusKey === "statusProcessing");
   const downloadReady = !running && (allReady || singleReady);
+  const paidAccess = canUsePaidAccess();
 
   processButton.disabled = !hasItems || !hasPendingItems || running;
   pngButton.disabled = !singleReady || running;
   zipButton.disabled = !allReady || running;
   clearButton.disabled = !hasItems || running;
   downloadReadyHint?.classList.toggle("hidden", !downloadReady);
-  zipProCta?.classList.toggle("hidden", !allReady || running);
+  zipProCta?.classList.toggle("hidden", paidAccess || !allReady || running);
   emptyState.classList.toggle("hidden", hasItems);
   countText.textContent = `${items.length} ${items.length === 1 ? t("photoSingular") : t("photoPlural")}`;
 
@@ -1482,6 +1747,7 @@ function addFiles(fileList) {
   const unsupportedFiles = selectedFiles.length - imageFiles.length;
   const availableSlots = Math.max(maxFilesPerBatch - items.length, 0);
   const acceptedFiles = imageFiles.slice(0, availableSlots);
+  const overLimitStatusKey = canUsePaidAccess() ? "statusTooManyFilesPro" : "statusTooManyFiles";
   hasTrackedDownloadReady = false;
 
   trackEvent("tool_upload_started", {
@@ -1492,7 +1758,7 @@ function addFiles(fileList) {
   });
 
   if (!acceptedFiles.length) {
-    setStatus(imageFiles.length ? "statusTooManyFiles" : "statusNoSupportedFiles", 0, {
+    setStatus(imageFiles.length ? overLimitStatusKey : "statusNoSupportedFiles", 0, {
       accepted: 0,
       total: items.length + imageFiles.length,
     });
@@ -1507,7 +1773,9 @@ function addFiles(fileList) {
         totalInQueue: items.length,
         reason: "batch_limit",
       });
-      showProInterest("batch_limit");
+      if (!canUsePaidAccess()) {
+        showProInterest("batch_limit");
+      }
     }
     trackEvent("upload_rejected", { reason: imageFiles.length ? "batch_limit" : "unsupported_files" });
     return;
@@ -1523,7 +1791,7 @@ function addFiles(fileList) {
   }));
 
   items = [...items, ...nextItems];
-  setStatus(rejectedByLimit ? "statusTooManyFiles" : "statusLoaded", 0, {
+  setStatus(rejectedByLimit ? overLimitStatusKey : "statusLoaded", 0, {
     accepted: acceptedFiles.length,
     count: acceptedFiles.length,
     total: imageFiles.length,
@@ -1538,7 +1806,9 @@ function addFiles(fileList) {
       totalInQueue: items.length,
       reason: "batch_limit",
     });
-    showProInterest("batch_limit");
+    if (!canUsePaidAccess()) {
+      showProInterest("batch_limit");
+    }
   }
   trackEvent("photos_selected", {
     count: acceptedFiles.length,
@@ -1559,9 +1829,31 @@ function addFiles(fileList) {
 }
 
 async function processImages() {
+  const pendingItems = items.filter((item) => !item.outputBlob);
+  const pendingCount = pendingItems.length;
+
+  if (!pendingCount) {
+    updateControls();
+    return;
+  }
+
+  if (canUsePaidAccess()) {
+    const reservation = await reserveMonthlyUsage(pendingCount);
+    if (!reservation.ok) {
+      const monthlyLimit = currentAccount?.access?.monthlyLimit || defaultProMonthlyLimit;
+      setStatus(
+        reservation.error === "monthly_limit_reached" ? "accountMonthlyLimitReached" : "accountReserveError",
+        0,
+        { monthlyLimit },
+      );
+      render();
+      return;
+    }
+  }
+
   trackEvent("tool_processing_started", {
     count: items.length,
-    pending: items.filter((item) => !item.outputBlob).length,
+    pending: pendingCount,
   });
   trackEvent("background_removal_started", { count: items.length });
   trackEvent("processar", { count: items.length });
@@ -1570,13 +1862,18 @@ async function processImages() {
   zipButton.disabled = true;
   clearButton.disabled = true;
 
-  const total = items.length;
+  const total = pendingCount;
+  let processedIndex = 0;
 
   for (const [index, item] of items.entries()) {
+    if (item.outputBlob) {
+      continue;
+    }
+
     item.statusKey = "statusProcessing";
     item.statusClass = "";
-    setStatus("statusProcessingCount", Math.round((index / total) * 100), {
-      current: index + 1,
+    setStatus("statusProcessingCount", Math.round((processedIndex / total) * 100), {
+      current: processedIndex + 1,
       total,
     });
     render();
@@ -1607,8 +1904,9 @@ async function processImages() {
       engineHasLoaded = true;
     }
 
-    setStatus("statusProcessingCount", Math.round(((index + 1) / total) * 100), {
-      current: index + 1,
+    processedIndex += 1;
+    setStatus("statusProcessingCount", Math.round((processedIndex / total) * 100), {
+      current: processedIndex,
       total,
     });
     render();
@@ -1688,6 +1986,10 @@ function clearAll() {
 }
 
 function showProInterest(reason = "manual") {
+  if (canUsePaidAccess()) {
+    return;
+  }
+
   const detail = { reason, totalInQueue: items.length, free_limit: maxFilesPerBatch };
   trackEvent("pro_interest_prompt_clicked", detail);
   trackEvent("tool_pro_clicked", detail);
@@ -1887,6 +2189,9 @@ brandCta.addEventListener("click", () => {
 inlineProCta.addEventListener("click", () => showProInterest("inline_pro_cta"));
 zipProCta?.addEventListener("click", () => showProInterest("zip_download_context"));
 proInlineForm?.addEventListener("submit", submitInlineProLead);
+accountForm?.addEventListener("submit", handleAccountLogin);
+accountRefresh?.addEventListener("click", refreshAccount);
+accountLogout?.addEventListener("click", handleAccountLogout);
 proInlineEmail?.addEventListener(
   "focus",
   () => {
@@ -1908,6 +2213,8 @@ postDownloadOptions?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-post-download-feedback]");
   selectPostDownloadFeedback(button?.dataset.postDownloadFeedback);
 });
+
+initAuth();
 
 for (const eventName of ["dragenter", "dragover", "dragleave", "drop"]) {
   document.addEventListener(eventName, (event) => {

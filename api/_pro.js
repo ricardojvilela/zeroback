@@ -1,0 +1,250 @@
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "https://batchcutout.com",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
+export function sendJson(response, status, data) {
+  for (const [key, value] of Object.entries(corsHeaders)) {
+    response.setHeader(key, value);
+  }
+  response.setHeader("Content-Type", "application/json");
+  response.status(status).json(data);
+}
+
+export async function readRequestBody(request) {
+  if (request.body && typeof request.body === "object") return request.body;
+  if (typeof request.body === "string") {
+    try {
+      return JSON.parse(request.body);
+    } catch {
+      return {};
+    }
+  }
+
+  const chunks = [];
+  for await (const chunk of request) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
+
+  if (!chunks.length) return {};
+
+  try {
+    return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+  } catch {
+    return {};
+  }
+}
+
+export function getSupabaseSettings() {
+  return {
+    supabaseUrl: process.env.SUPABASE_URL?.replace(/\/$/, "") || "",
+    anonKey: process.env.SUPABASE_ANON_KEY || "",
+    serviceRoleKey: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
+    usersTable: process.env.SUPABASE_USERS_TABLE || "batchcutout_users",
+  };
+}
+
+export function getAccessToken(request) {
+  const header = request.headers?.authorization || request.headers?.Authorization || "";
+  const match = String(header).match(/^Bearer\s+(.+)$/i);
+  return match?.[1] || "";
+}
+
+export async function getSupabaseUser({ supabaseUrl, serviceRoleKey }, accessToken) {
+  const response = await fetch(`${supabaseUrl}/auth/v1/user`, {
+    headers: {
+      apikey: serviceRoleKey,
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    return null;
+  }
+
+  return response.json();
+}
+
+function escapeValue(value) {
+  return encodeURIComponent(String(value ?? ""));
+}
+
+async function supabaseSelectSingle({ supabaseUrl, serviceRoleKey, usersTable, userId }) {
+  const response = await fetch(
+    `${supabaseUrl}/rest/v1/${usersTable}?user_id=eq.${escapeValue(userId)}&select=*`,
+    {
+      headers: {
+        apikey: serviceRoleKey,
+        Authorization: `Bearer ${serviceRoleKey}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`select_failed:${response.status}:${detail.slice(0, 300)}`);
+  }
+
+  const rows = await response.json();
+  return rows?.[0] || null;
+}
+
+async function supabaseInsert({ supabaseUrl, serviceRoleKey, usersTable, row }) {
+  const response = await fetch(`${supabaseUrl}/rest/v1/${usersTable}`, {
+    method: "POST",
+    headers: {
+      apikey: serviceRoleKey,
+      Authorization: `Bearer ${serviceRoleKey}`,
+      "Content-Type": "application/json",
+      Prefer: "return=representation",
+    },
+    body: JSON.stringify(row),
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`insert_failed:${response.status}:${detail.slice(0, 300)}`);
+  }
+
+  const rows = await response.json();
+  return rows?.[0] || null;
+}
+
+export async function supabaseUpdateByUserId({ supabaseUrl, serviceRoleKey, usersTable, userId, patch }) {
+  const response = await fetch(`${supabaseUrl}/rest/v1/${usersTable}?user_id=eq.${escapeValue(userId)}`, {
+    method: "PATCH",
+    headers: {
+      apikey: serviceRoleKey,
+      Authorization: `Bearer ${serviceRoleKey}`,
+      "Content-Type": "application/json",
+      Prefer: "return=representation",
+    },
+    body: JSON.stringify({
+      ...patch,
+      updated_at: new Date().toISOString(),
+    }),
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`update_failed:${response.status}:${detail.slice(0, 300)}`);
+  }
+
+  const rows = await response.json();
+  return rows?.[0] || null;
+}
+
+export function calendarPeriodFor(referenceDate = new Date()) {
+  const start = new Date(referenceDate);
+  start.setUTCDate(1);
+  start.setUTCHours(0, 0, 0, 0);
+
+  const end = new Date(start);
+  end.setUTCMonth(end.getUTCMonth() + 1);
+
+  return {
+    start: start.toISOString(),
+    end: end.toISOString(),
+  };
+}
+
+export function normalizeProfile(row, user) {
+  const plan = String(row?.plan || "free");
+  const planStatus = String(row?.plan_status || "active");
+  const monthlyLimit = Number(row?.monthly_image_limit || 0) || 0;
+  const monthlyUsed = Number(row?.monthly_images_used || 0) || 0;
+  const batchLimit = Number(row?.batch_limit || (plan === "pro" ? 100 : 2)) || 2;
+  const period = calendarPeriodFor(new Date());
+
+  return {
+    id: row?.id || null,
+    user_id: user.id,
+    email: row?.email || user.email || "",
+    plan,
+    plan_status: planStatus,
+    batch_limit: batchLimit,
+    monthly_image_limit: monthlyLimit,
+    monthly_images_used: monthlyUsed,
+    current_period_start: row?.current_period_start || period.start,
+    current_period_end: row?.current_period_end || period.end,
+    stripe_customer_id: row?.stripe_customer_id || null,
+    stripe_subscription_id: row?.stripe_subscription_id || null,
+    created_at: row?.created_at || null,
+    updated_at: row?.updated_at || null,
+  };
+}
+
+export function canUsePro(profile) {
+  return profile.plan === "pro" && ["active", "trialing"].includes(profile.plan_status);
+}
+
+export async function loadOrCreateProfile(settings, user) {
+  const existing = await supabaseSelectSingle({ ...settings, userId: user.id });
+  if (existing) {
+    return normalizeProfile(existing, user);
+  }
+
+  const period = calendarPeriodFor(new Date());
+  const inserted = await supabaseInsert({
+    ...settings,
+    row: {
+      user_id: user.id,
+      email: user.email || "",
+      plan: "free",
+      plan_status: "active",
+      batch_limit: 2,
+      monthly_image_limit: 0,
+      monthly_images_used: 0,
+      current_period_start: period.start,
+      current_period_end: period.end,
+    },
+  });
+
+  return normalizeProfile(inserted, user);
+}
+
+export async function rollMonthlyWindowIfNeeded(settings, profile, user) {
+  const currentEnd = profile.current_period_end ? new Date(profile.current_period_end) : null;
+  const now = new Date();
+
+  if (currentEnd && currentEnd > now) {
+    return profile;
+  }
+
+  const period = calendarPeriodFor(now);
+  const updated = await supabaseUpdateByUserId({
+    ...settings,
+    userId: user.id,
+    patch: {
+      current_period_start: period.start,
+      current_period_end: period.end,
+      monthly_images_used: 0,
+    },
+  });
+
+  return normalizeProfile(updated, user);
+}
+
+export function serializeAccount(profile, user) {
+  const paidAccess = canUsePro(profile);
+  const monthlyLimit = Number(profile.monthly_image_limit || 0) || 0;
+  const monthlyUsed = Number(profile.monthly_images_used || 0) || 0;
+  const monthlyRemaining = Math.max(monthlyLimit - monthlyUsed, 0);
+
+  return {
+    email: user.email || profile.email || "",
+    userId: user.id,
+    access: {
+      plan: profile.plan,
+      planStatus: profile.plan_status,
+      canUsePro: paidAccess,
+      batchLimit: paidAccess ? Number(profile.batch_limit || 100) || 100 : 2,
+      monthlyLimit,
+      monthlyUsed,
+      monthlyRemaining,
+      periodStart: profile.current_period_start || null,
+      periodEnd: profile.current_period_end || null,
+    },
+  };
+}

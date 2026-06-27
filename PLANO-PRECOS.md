@@ -10,26 +10,24 @@ Validar monetizacao simples para utilizadores que precisam de remover fundos em 
 
 | Plano | Preco | Limite sugerido | Publico |
 | --- | ---: | --- | --- |
-| Free | 0 EUR | 20 imagens por lote | Teste, uso ocasional |
-| Pro | 9 EUR/mes | 500 imagens/mes | Pequenas lojas online |
-| Business | 29 EUR/mes | 2.500 imagens/mes | Catalogos e equipas |
-| Pack avulso | 4,99 EUR | 250 imagens | Utilizadores ocasionais com volume |
+| Free | 0 EUR | 2 imagens por lote | Teste rapido |
+| Pro | A definir | 100 imagens por lote + 2.000 imagens/mes | Lojas online e equipas com volume recorrente |
 
 ## Regras recomendadas
 
-- Manter ferramenta gratuita utilizavel.
-- Nao baixar o limite gratuito abaixo de 20 enquanto o posicionamento for "em lote".
+- Manter ferramenta gratuita como teste rapido, sem competir com o Pro.
+- O valor principal do Pro deve ser o volume: 100 imagens por lote e 2.000 por mes.
 - Cobrar pelo volume, nao por funcionalidades complexas.
 - Comecar com Stripe Checkout simples.
-- Evitar planos anuais antes de validar retencao.
+- Nao abrir varios planos antes de validar a conversao do primeiro Pro.
 
 ## Sinais para ativar pagamento
 
 - 3 a 5 leads Pro reais.
-- Pelo menos 1 lead com volume superior a 500 imagens/mes.
+- Pelo menos 1 lead com volume proximo de 2.000 imagens/mes.
 - Custo por lead aceitavel face ao preco Pro.
 - Termos de pesquisa alinhados com ecommerce, product photos ou bulk removal.
 
 ## Mensagem comercial futura
 
-"Remova fundos em lote para catalogos, lojas online e marketplaces. Poupe tempo em dezenas ou centenas de fotos de produto."
+"Remova fundos em lotes ate 100 imagens e processe ate 2.000 fotos por mes para catalogos, lojas online e marketplaces."
