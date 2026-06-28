@@ -159,10 +159,10 @@
         </article>
       </section>
 
-      <section class="pricing-form-panel" id="pro-waitlist" aria-labelledby="waitlist-title">
+      <section class="pricing-form-panel" id="pro-plans" aria-labelledby="plans-title">
         <div>
           <p class="section-kicker" data-i18n="formKicker">Planos Pro</p>
-          <h2 id="waitlist-title" data-i18n="formTitle">Escolha o plano para começar</h2>
+          <h2 id="plans-title" data-i18n="formTitle">Escolha o plano para começar</h2>
           <p data-i18n="formLead">
             O pagamento é feito por Stripe Checkout. Depois de pagar, a conta passa automaticamente para Pro.
           </p>
@@ -341,7 +341,7 @@
         "pro_form_started",
         "pro_volume_selected",
         "pro_submit_attempt",
-        "pro_waitlist_submitted",
+        "pro_checkout_interest_submitted",
       ]);
       let debugList;
       let hasTrackedFormStart = false;
@@ -585,7 +585,7 @@
           return;
         }
 
-        window.gtag?.("event", "pro_waitlist_submitted", {
+        window.gtag?.("event", "pro_checkout_interest_submitted", {
           event_category: "commercial_intent",
           event_label: volume,
           offer: "pro_paid",
@@ -595,7 +595,7 @@
         });
         window.gtag?.("event", "generate_lead", {
           event_category: "commercial_intent",
-          event_label: "pricing_waitlist",
+          event_label: "pricing_checkout",
         });
         window.gtag?.("event", "conversion", {
           send_to: "AW-18177126609/riWOCOiI67McENHhw9tD",

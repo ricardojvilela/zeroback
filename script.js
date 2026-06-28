@@ -24,12 +24,6 @@ const postDownloadOptions = document.querySelector("#postDownloadOptions");
 const postDownloadThanks = document.querySelector("#postDownloadThanks");
 const proInterestPanel = document.querySelector("#proInterestPanel");
 const proInlineForm = document.querySelector("#proInlineForm");
-const proInlineEmail = document.querySelector("#proInlineEmail");
-const proInlineLanguage = document.querySelector("#proInlineLanguage");
-const proInlinePageUrl = document.querySelector("#proInlinePageUrl");
-const proInlineTrialId = document.querySelector("#proInlineTrialId");
-const proInlineTrialSlug = document.querySelector("#proInlineTrialSlug");
-const proInlineTrialUrl = document.querySelector("#proInlineTrialUrl");
 const proInlineMessage = document.querySelector("#proInlineMessage");
 const proInlineSuccessCard = document.querySelector("#proInlineSuccessCard");
 const accountPanel = document.querySelector("#accountPanel");
@@ -53,7 +47,7 @@ const requestedLimit = Number(pageParams.get("limit"));
 const requestedCheckoutPlan = pageParams.get("checkout_plan");
 const checkoutStatus = pageParams.get("checkout");
 const checkoutPlans = new Set(["monthly", "annual", "early"]);
-let maxFilesPerBatch = [2, 3, 5, 10, 20, 100].includes(requestedLimit)
+let maxFilesPerBatch = [2, 3, 5, 10, 20].includes(requestedLimit)
   ? requestedLimit
   : defaultMaxFilesPerBatch;
 const minExportSide = 1200;
@@ -65,7 +59,6 @@ const consentStorageKey = "batchcutout_consent";
 const debugMode = pageParams.get("debug") === "1";
 const debugEventsStorageKey = "batchcutout_debug_events";
 const attributionStorageKey = "batchcutout_attribution";
-const trialContextStorageKey = "batchcutout_trial_context";
 const visitorStorageKey = "batchcutout_visitor_id";
 const sessionStorageKey = "batchcutout_session_id";
 const serverEventNames = new Set([
@@ -81,12 +74,8 @@ const serverEventNames = new Set([
   "tool_download_zip",
   "tool_pro_clicked",
   "pro_prompt_shown",
-  "pro_email_started",
-  "pro_email_invalid",
-  "pro_email_submitted",
   "pro_form_started",
   "pro_submit_attempt",
-  "pro_waitlist_submitted",
 ]);
 let debugList;
 let supabaseClient = null;
@@ -158,7 +147,6 @@ const baseTranslation = {
   accountStatusLoading: "A verificar a sua conta...",
   accountStatusFree: "Conta gratuita. O Pro ativa até 100 imagens por lote e 2.000 imagens por mês.",
   accountStatusPro: "Conta Pro ativa. Até {batchLimit} imagens por lote e {monthlyRemaining} de {monthlyLimit} disponíveis este mês.",
-  accountStatusTrial: "Trial ativo. Até {batchLimit} imagens por lote e {monthlyRemaining} de {monthlyLimit} disponíveis este mês.",
   accountStatusConfigMissing: "Login Pro ainda não configurado neste ambiente.",
   accountEmailPlaceholder: "O seu email",
   accountPasswordPlaceholder: "A sua password",
@@ -216,7 +204,7 @@ const translations = {
     languageLabel: "Idioma",
     eyebrow: "Remoção de fundo em massa",
     title: "BatchCutout",
-    lead: "Teste gr\u00e1tis: remova o fundo de at\u00e9 {limit} imagens agora. Descarregue PNGs transparentes ou um ZIP pronto para loja.",
+    lead: "Plano gr\u00e1tis: remova o fundo de at\u00e9 {limit} imagens agora. Descarregue PNGs transparentes ou um ZIP pronto para loja.",
     benefitBatch: "V\u00e1rias fotos de uma vez",
     uploadLabel: "Carregar fotos",
     startNow: "Começar agora",
@@ -282,7 +270,6 @@ const translations = {
     accountStatusLoading: "Checking your account...",
     accountStatusFree: "Free account. Pro unlocks up to 100 images per batch and 2,000 images per month.",
     accountStatusPro: "Pro account active. Up to {batchLimit} images per batch and {monthlyRemaining} of {monthlyLimit} available this month.",
-    accountStatusTrial: "Trial active. Up to {batchLimit} images per batch and {monthlyRemaining} of {monthlyLimit} available this month.",
     accountStatusConfigMissing: "Pro login is not configured in this environment yet.",
     accountEmailPlaceholder: "Your email",
     accountPasswordPlaceholder: "Your password",
@@ -315,7 +302,7 @@ const translations = {
     zipProCta: "Need batches up to 100 images? View Pro plans",
     eyebrow: "Bulk background removal",
     title: "BatchCutout",
-    lead: "Free test: remove the background from up to {limit} images now. Download transparent PNGs or a store-ready ZIP.",
+    lead: "Free plan: remove the background from up to {limit} images now. Download transparent PNGs or a store-ready ZIP.",
     benefitsLabel: "Service benefits",
     benefitBatch: "Multiple photos at once",
     benefitPng: "Transparent PNG",
@@ -908,7 +895,7 @@ const proTranslations = {
     proTitle: "Precisa de processar centenas de fotos?",
     proLead: "Remova limites e prepare lotes maiores para catálogos, lojas online e equipas.",
     proLimitCta: "Ver planos Pro",
-    proNoCommitment: "Sem compromisso. Primeiro acesso para quem trabalha com volume.",
+    proNoCommitment: "Pagamento seguro por Stripe Checkout para quem trabalha com volume.",
     brandCta: "Testar grátis com {limit} imagens",
     inlineProCta: "Quer desbloquear até 100 imagens por lote? Ver planos Pro",
     proInlineKicker: "BatchCutout Pro",
@@ -950,7 +937,7 @@ const proTranslations = {
     proTitle: "Need to process hundreds of photos?",
     proLead: "Remove limits and prepare larger batches for catalogues, online stores, and teams.",
     proLimitCta: "View Pro plans",
-    proNoCommitment: "No commitment. Early access for high-volume workflows.",
+    proNoCommitment: "Secure Stripe Checkout for high-volume workflows.",
     brandCta: "Start free with {limit} images",
     inlineProCta: "Want to unlock up to 100 images per batch? View Pro plans",
     proInlineKicker: "BatchCutout Pro",
@@ -1013,12 +1000,8 @@ const analyticsEvents = {
   tool_download_zip: { category: "funnel", label: "download_zip", step: 6 },
   tool_pro_clicked: { category: "commercial_intent", label: "pro_clicked", step: 7 },
   pro_prompt_shown: { category: "commercial_intent", label: "pro_prompt_shown", step: 7 },
-  pro_email_started: { category: "commercial_intent", label: "pro_email_started", step: 8 },
-  pro_email_invalid: { category: "commercial_intent", label: "pro_email_invalid", step: 8 },
-  pro_email_submitted: { category: "commercial_intent", label: "pro_email_submitted", step: 9 },
   pro_form_started: { category: "commercial_intent", label: "pro_form_started", step: 8 },
   pro_submit_attempt: { category: "commercial_intent", label: "pro_submit_attempt", step: 9 },
-  pro_waitlist_submitted: { category: "commercial_intent", label: "pro_waitlist_submitted", step: 10 },
   photos_selected: { category: "upload", label: "photos_selected" },
   upload_rejected: { category: "upload", label: "upload_rejected" },
   upload: { category: "funnel", label: "upload", step: 1 },
@@ -1026,13 +1009,11 @@ const analyticsEvents = {
   download_png: { category: "funnel", label: "download_png", step: 3 },
   download_zip: { category: "funnel", label: "download_zip", step: 3 },
   limite_20: { category: "funnel", label: "batch_limit_legacy", step: 4 },
-  lead_pro: { category: "funnel", label: "lead_pro", step: 5 },
   background_removal_started: { category: "processing", label: "started" },
   background_removal_finished: { category: "processing", label: "finished" },
   png_downloaded: { category: "download", label: "single_png" },
   zip_downloaded: { category: "download", label: "zip" },
   pro_interest_prompt_clicked: { category: "commercial_intent", label: "pro_interest" },
-  pro_lead_submitted: { category: "commercial_intent", label: "pro_lead" },
   feedback_goal_selected: { category: "feedback", label: "visitor_goal" },
   post_download_feedback_selected: { category: "feedback", label: "post_download" },
 };
@@ -1108,7 +1089,6 @@ function sendServerEvent(name, detail = {}) {
 function getAttributionParams() {
   const params = new URLSearchParams(window.location.search);
   const storedAttribution = getStoredAttribution();
-  const trialContext = getTrialContext();
   const attribution = {
     page_path: window.location.pathname,
     page_title: document.title,
@@ -1131,10 +1111,6 @@ function getAttributionParams() {
     last_campaign: storedAttribution.last?.campaign,
     last_landing_page: storedAttribution.last?.landing_page,
     last_seen_at: storedAttribution.last?.seen_at,
-    trial_id: trialContext.id,
-    trial_slug: trialContext.slug,
-    trial_campaign: trialContext.campaign,
-    trial_origin: trialContext.origin,
   };
 
   return Object.fromEntries(Object.entries(attribution).filter(([, value]) => Boolean(value)));
@@ -1148,81 +1124,8 @@ function getStoredAttribution() {
   }
 }
 
-function normalizeTrialSlug(value) {
-  return String(value || "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 64);
-}
-
-function readTrialContextFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  const rawId = params.get("trial_id") || params.get("trial");
-  const rawSlug = params.get("trial_slug") || params.get("slug") || params.get("lead");
-  const id = String(rawId || "").trim().slice(0, 80);
-  const slug = normalizeTrialSlug(rawSlug);
-  const campaign = String(params.get("utm_campaign") || "").trim().slice(0, 120);
-
-  if (!id && !slug) return null;
-
-  return {
-    id,
-    slug,
-    campaign,
-    origin: window.location.pathname,
-    seen_at: new Date().toISOString(),
-  };
-}
-
-function getStoredTrialContext() {
-  try {
-    return JSON.parse(localStorage.getItem(trialContextStorageKey) || "null");
-  } catch {
-    return null;
-  }
-}
-
-function persistTrialContext() {
-  const fromUrl = readTrialContextFromUrl();
-  if (!fromUrl) return getStoredTrialContext();
-
-  try {
-    localStorage.setItem(trialContextStorageKey, JSON.stringify(fromUrl));
-  } catch {
-    return fromUrl;
-  }
-  return fromUrl;
-}
-
-function getTrialContext() {
-  return readTrialContextFromUrl() || getStoredTrialContext() || {};
-}
-
-function buildTrialSlugFromEmail(email) {
-  const [localPart] = String(email || "").trim().toLowerCase().split("@");
-  const safeLocal = normalizeTrialSlug(localPart || "lead");
-  return `${safeLocal}-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}`.slice(0, 64);
-}
-
-function buildTrialId(slug) {
-  const randomPart = Math.random().toString(36).slice(2, 8);
-  return `${slug}-${randomPart}`.slice(0, 80);
-}
-
-function buildTrialUrl(trialId, trialSlug) {
-  const url = new URL("/trial/", window.location.origin);
-  url.searchParams.set("trial_id", trialId);
-  url.searchParams.set("trial_slug", trialSlug);
-  url.searchParams.set("utm_source", "pro_trial");
-  url.searchParams.set("utm_medium", "email");
-  url.searchParams.set("utm_campaign", "trial_15_days");
-  return url.toString();
-}
-
 function getVisitAttribution() {
   const params = new URLSearchParams(window.location.search);
-  const trialContext = getTrialContext();
   const referrer = document.referrer && !document.referrer.includes(window.location.hostname)
     ? document.referrer
     : "";
@@ -1240,8 +1143,6 @@ function getVisitAttribution() {
     landing_page: window.location.href.split("#")[0],
     referrer,
     free_limit: maxFilesPerBatch,
-    trial_id: trialContext.id,
-    trial_slug: trialContext.slug,
     seen_at: new Date().toISOString(),
   };
 }
@@ -1257,7 +1158,6 @@ function persistAttribution() {
   };
 
   localStorage.setItem(attributionStorageKey, JSON.stringify(next));
-  persistTrialContext();
   recordDebugEvent("attribution_saved", next);
 }
 
@@ -1455,10 +1355,8 @@ function setAccountMessage(key = "", params = {}) {
 }
 
 function getRequestedBatchLimit() {
-  if (![2, 3, 5, 10, 20, 100].includes(requestedLimit)) return defaultMaxFilesPerBatch;
-  if (requestedLimit !== 100) return requestedLimit;
-  const trialContext = getTrialContext?.();
-  return trialContext?.id || trialContext?.slug ? 100 : defaultMaxFilesPerBatch;
+  if (![2, 3, 5, 10, 20].includes(requestedLimit)) return defaultMaxFilesPerBatch;
+  return requestedLimit;
 }
 
 function getAccountBatchLimit() {
@@ -1500,7 +1398,7 @@ function updateAccountUi() {
   }
 
   const { access = {}, email = "" } = currentAccount;
-  const statusKey = access.planStatus === "trialing" ? "accountStatusTrial" : access.canUsePro ? "accountStatusPro" : "accountStatusFree";
+  const statusKey = access.canUsePro ? "accountStatusPro" : "accountStatusFree";
   const badgeKey = access.canUsePro ? "accountBadgePro" : "accountBadgeFree";
   const statusTextValue = access.canUsePro
     ? t(statusKey, {
@@ -2230,127 +2128,6 @@ function showPostDownloadFeedback(downloadType, count) {
   postDownloadFeedback?.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
-async function submitInlineProLead(event) {
-  event.preventDefault();
-  if (!proInlineForm) return;
-
-  const formData = new FormData(proInlineForm);
-  const email = String(formData.get("email") || "").trim();
-  const company = String(formData.get("company") || "").trim();
-  const volume = String(formData.get("volume") || "email-only");
-  const reason = proInterestPanel?.dataset.reason || "inline_form";
-  const submitButton = proInlineForm.querySelector("button[type='submit']");
-
-  trackEvent("pro_submit_attempt", {
-    reason,
-    volume: "email-only",
-    hasCompany: Boolean(company),
-    hasEmail: Boolean(email),
-  });
-
-  if (!email || !proInlineForm.checkValidity()) {
-    trackEvent("pro_email_invalid", {
-      reason,
-      hasEmail: Boolean(email),
-      form_variant: "email_only",
-    });
-    proInlineForm.reportValidity();
-    return;
-  }
-
-  submitButton.disabled = true;
-  if (proInlineMessage) proInlineMessage.textContent = "";
-  if (proInlineSuccessCard) proInlineSuccessCard.hidden = true;
-  formData.set("language", currentLanguage);
-  formData.set("page_url", window.location.href);
-  formData.set("reason", reason);
-  formData.set("free_limit", String(maxFilesPerBatch));
-  formData.set("processed_images", String(items.filter((item) => item.outputBlob).length));
-  formData.set("form_variant", "email_only");
-  formData.set("offer", "pro_trial");
-  formData.set("trial_days", "15");
-  formData.set("trial_limit", "100");
-  const trialSlug = buildTrialSlugFromEmail(email);
-  const trialId = buildTrialId(trialSlug);
-  const trialUrl = buildTrialUrl(trialId, trialSlug);
-  formData.set("trial_id", trialId);
-  formData.set("trial_slug", trialSlug);
-  formData.set("trial_url", trialUrl);
-  if (proInlineTrialId) proInlineTrialId.value = trialId;
-  if (proInlineTrialSlug) proInlineTrialSlug.value = trialSlug;
-  if (proInlineTrialUrl) proInlineTrialUrl.value = trialUrl;
-
-  trackEvent("pro_email_submitted", {
-    reason,
-    volume: "email-only",
-    email,
-    company,
-    hasCompany: Boolean(company),
-    form_variant: "email_only",
-    offer: "pro_trial",
-    trial_days: 15,
-    trial_limit: 100,
-    trial_id: trialId,
-    trial_slug: trialSlug,
-    trial_url: trialUrl,
-    value: 1,
-  });
-  trackEvent("pro_waitlist_submitted", {
-    source: "tool_inline",
-    reason,
-    volume: "email-only",
-    email,
-    company,
-    hasCompany: Boolean(company),
-    form_variant: "email_only",
-    offer: "pro_trial",
-    trial_days: 15,
-    trial_limit: 100,
-    trial_id: trialId,
-    trial_slug: trialSlug,
-    trial_url: trialUrl,
-    value: 1,
-  });
-  trackEvent("lead_pro", {
-    source: "tool_inline",
-    reason,
-    volume: "email-only",
-    email,
-    company,
-    form_variant: "email_only",
-    offer: "pro_trial",
-    trial_days: 15,
-    trial_limit: 100,
-    trial_id: trialId,
-    trial_slug: trialSlug,
-    trial_url: trialUrl,
-    value: 1,
-  });
-
-  try {
-    const response = await fetch(proInlineForm.action, {
-      method: "POST",
-      body: formData,
-      headers: { Accept: "application/json" },
-    });
-
-    if (!response.ok) throw new Error("Form submit failed");
-    if (proInlineMessage) proInlineMessage.textContent = t("proInlineSuccess");
-    if (proInlineSuccessCard) proInlineSuccessCard.hidden = false;
-    proInlineForm.reset();
-    proInlineEmail.dataset.started = "false";
-  } catch {
-    if (proInlineMessage) proInlineMessage.textContent = t("proInlineError");
-    const subject = encodeURIComponent("Novo lead BatchCutout Pro - Ferramenta");
-    const body = encodeURIComponent(
-      `Email: ${email}\nCompany: ${company}\nVolume: ${volume}\nOffer: Pro paid\nBatch limit: 100 images per batch\nMonthly limit: 2000 images\nReason: ${reason}\nLanguage: ${currentLanguage}\nSource: ${window.location.href}`,
-    );
-    window.location.href = `mailto:ricardojvilela@gmail.com?subject=${subject}&body=${body}`;
-  } finally {
-    submitButton.disabled = false;
-  }
-}
-
 function selectPostDownloadFeedback(answer) {
   if (!answer) return;
 
@@ -2407,23 +2184,6 @@ billingActions?.addEventListener("click", (event) => {
   startCheckout(button.dataset.checkoutPlan, button);
 });
 billingPortal?.addEventListener("click", openBillingPortal);
-proInlineEmail?.addEventListener(
-  "focus",
-  () => {
-    if (proInlineEmail.dataset.started === "true") return;
-    proInlineEmail.dataset.started = "true";
-    trackEvent("pro_email_started", {
-      reason: proInterestPanel?.dataset.reason || "inline_form",
-      totalInQueue: items.length,
-      free_limit: maxFilesPerBatch,
-    });
-    trackEvent("pro_form_started", {
-      source: "tool_inline",
-      reason: proInterestPanel?.dataset.reason || "inline_form",
-    });
-  },
-  { once: false },
-);
 postDownloadOptions?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-post-download-feedback]");
   selectPostDownloadFeedback(button?.dataset.postDownloadFeedback);

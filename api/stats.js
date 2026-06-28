@@ -44,39 +44,6 @@ function emptyDay(date) {
   };
 }
 
-function emptyTrialStats() {
-  return {
-    visitors: 0,
-    pageViews: 0,
-    uploadsStarted: 0,
-    imagesAccepted: 0,
-    processingCompleted: 0,
-    downloadReadyShown: 0,
-    downloads: 0,
-    pngDownloads: 0,
-    zipDownloads: 0,
-    proPrompts: 0,
-    proEmailStarts: 0,
-    proEmailSubmits: 0,
-  };
-}
-
-function emptyTrialLinkRow(key, trialId, trialSlug) {
-  return {
-    key,
-    trialId,
-    trialSlug,
-    visitors: 0,
-    pageViews: 0,
-    uploadsStarted: 0,
-    imagesAccepted: 0,
-    downloads: 0,
-    zipDownloads: 0,
-    proEmailSubmits: 0,
-    lastSeenAt: "",
-  };
-}
-
 function asCleanText(value, maxLength = 120) {
   if (value === null || value === undefined) return "";
   return String(value).trim().slice(0, maxLength);
@@ -126,7 +93,6 @@ function classifySource(event, detail) {
   if (raw.includes("zearches")) return "Zearches";
   if (raw.includes("listai")) return "ListAI";
   if (raw.includes("thenextai") || raw.includes("the next ai")) return "The Next AI";
-  if (raw.includes("pro_trial") || raw.includes("trial_15_days")) return "Pro Trial email";
   if (raw.includes("future-pedia") || raw.includes("futurepedia")) return "Future-pedia";
   if (raw.includes("producthunt") || raw.includes("product hunt")) return "Product Hunt";
   if (raw.includes("facebook") || raw.includes("fbclid")) return "Facebook";
@@ -156,68 +122,6 @@ function emptySourceRow(source) {
   };
 }
 
-function isTrialEvent(event, detail) {
-  return (
-    event.event_name === "trial_page_view" ||
-    Number(detail.free_limit || 0) === 100 ||
-    detail.limit_variant === "limit_100"
-  );
-}
-
-function addTrialEvent(row, event, detail, value) {
-  if (!isTrialEvent(event, detail)) return;
-  if (!row.trial) row.trial = emptyTrialStats();
-
-  switch (event.event_name) {
-    case "trial_page_view":
-    case "tool_page_view":
-      row.trial.pageViews += 1;
-      break;
-    case "tool_upload_started":
-      row.trial.uploadsStarted += 1;
-      break;
-    case "tool_upload_added":
-      row.trial.imagesAccepted += Number(detail.count || value || 0) || 0;
-      break;
-    case "tool_processing_completed":
-      row.trial.processingCompleted += 1;
-      break;
-    case "download_ready_shown":
-      row.trial.downloadReadyShown += 1;
-      break;
-    case "tool_download_png":
-      row.trial.pngDownloads += 1;
-      row.trial.downloads += 1;
-      break;
-    case "tool_download_zip":
-      row.trial.zipDownloads += 1;
-      row.trial.downloads += 1;
-      break;
-    case "pro_prompt_shown":
-      row.trial.proPrompts += 1;
-      break;
-    case "pro_email_started":
-      row.trial.proEmailStarts += 1;
-      break;
-    case "pro_email_submitted":
-      row.trial.proEmailSubmits += 1;
-      break;
-    default:
-      break;
-  }
-}
-
-function getTrialLinkKey(detail) {
-  const trialId = asCleanText(detail.trial_id || "", 80);
-  const trialSlug = asCleanText(detail.trial_slug || "", 80);
-  if (!trialId && !trialSlug) return null;
-  return {
-    key: trialId || trialSlug,
-    trialId,
-    trialSlug,
-  };
-}
-
 function getRecentProLeads(events) {
   return events
     .filter((event) => event.event_name === "pro_email_submitted")
@@ -233,11 +137,6 @@ function getRecentProLeads(events) {
         freeLimit: Number(detail.free_limit || 0) || null,
         processedImages: Number(detail.processed_images || 0) || null,
         offer: typeof detail.offer === "string" ? detail.offer : "",
-        trialDays: Number(detail.trial_days || 0) || null,
-        trialLimit: Number(detail.trial_limit || 0) || null,
-        trialId: typeof detail.trial_id === "string" ? detail.trial_id : "",
-        trialSlug: typeof detail.trial_slug === "string" ? detail.trial_slug : "",
-        trialUrl: typeof detail.trial_url === "string" ? detail.trial_url : "",
         pageLocation: typeof detail.page_location === "string" ? detail.page_location : "",
       };
     })
@@ -328,11 +227,8 @@ export default async function handler(request, response) {
 
     const byDay = new Map();
     const visitorsByDay = new Map();
-    const trialVisitorsByDay = new Map();
     const bySource = new Map();
     const visitorsBySource = new Map();
-    const byTrialLink = new Map();
-    const visitorsByTrialLink = new Map();
 
     for (const event of events) {
       const date = toIsoDate(event.occurred_at);
@@ -340,13 +236,11 @@ export default async function handler(request, response) {
 
       if (!byDay.has(date)) byDay.set(date, emptyDay(date));
       if (!visitorsByDay.has(date)) visitorsByDay.set(date, new Set());
-      if (!trialVisitorsByDay.has(date)) trialVisitorsByDay.set(date, new Set());
 
       const row = byDay.get(date);
       const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
       const value = Number(event.value || detail.count || detail.accepted || 0) || 0;
       const sourceName = classifySource(event, detail);
-      const trialLink = getTrialLinkKey(detail);
 
       if (!bySource.has(sourceName)) bySource.set(sourceName, emptySourceRow(sourceName));
       if (!visitorsBySource.has(sourceName)) visitorsBySource.set(sourceName, new Set());
@@ -355,44 +249,8 @@ export default async function handler(request, response) {
       if (event.visitor_id) visitorsBySource.get(sourceName).add(event.visitor_id);
 
       if (event.visitor_id) visitorsByDay.get(date).add(event.visitor_id);
-      if (event.visitor_id && isTrialEvent(event, detail)) trialVisitorsByDay.get(date).add(event.visitor_id);
-      if (trialLink) {
-        if (!byTrialLink.has(trialLink.key)) {
-          byTrialLink.set(trialLink.key, emptyTrialLinkRow(trialLink.key, trialLink.trialId, trialLink.trialSlug));
-        }
-        if (!visitorsByTrialLink.has(trialLink.key)) visitorsByTrialLink.set(trialLink.key, new Set());
-        if (event.visitor_id) visitorsByTrialLink.get(trialLink.key).add(event.visitor_id);
-        const trialRow = byTrialLink.get(trialLink.key);
-        trialRow.lastSeenAt = event.occurred_at;
-        switch (event.event_name) {
-          case "trial_page_view":
-          case "tool_page_view":
-            if (isTrialEvent(event, detail)) trialRow.pageViews += 1;
-            break;
-          case "tool_upload_started":
-            trialRow.uploadsStarted += 1;
-            break;
-          case "tool_upload_added":
-            trialRow.imagesAccepted += Number(detail.count || value || 0) || 0;
-            break;
-          case "tool_download_png":
-            trialRow.downloads += 1;
-            break;
-          case "tool_download_zip":
-            trialRow.downloads += 1;
-            trialRow.zipDownloads += 1;
-            break;
-          case "pro_email_submitted":
-            trialRow.proEmailSubmits += 1;
-            break;
-          default:
-            break;
-        }
-      }
-      addTrialEvent(row, event, detail, value);
 
       switch (event.event_name) {
-        case "trial_page_view":
         case "pro_page_view":
         case "tool_page_view":
           row.pageViews += 1;
@@ -457,14 +315,8 @@ export default async function handler(request, response) {
     for (const [date, visitors] of visitorsByDay) {
       byDay.get(date).visitors = visitors.size;
     }
-    for (const [date, visitors] of trialVisitorsByDay) {
-      if (byDay.get(date)?.trial) byDay.get(date).trial.visitors = visitors.size;
-    }
     for (const [source, visitors] of visitorsBySource) {
       bySource.get(source).visitors = visitors.size;
-    }
-    for (const [key, visitors] of visitorsByTrialLink) {
-      if (byTrialLink.get(key)) byTrialLink.get(key).visitors = visitors.size;
     }
 
     const rows = Array.from(byDay.values()).sort((a, b) => a.date.localeCompare(b.date));
@@ -476,17 +328,8 @@ export default async function handler(request, response) {
       }
       return acc;
     }, {});
-    const trialTotals = rows.reduce((acc, row) => {
-      for (const [key, value] of Object.entries(row.trial || {})) {
-        acc[key] = (acc[key] || 0) + Number(value || 0);
-      }
-      return acc;
-    }, emptyTrialStats());
     const sourceBreakdown = Array.from(bySource.values())
       .sort((a, b) => b.visitors - a.visitors || b.pageViews - a.pageViews || b.events - a.events)
-      .slice(0, 20);
-    const topTrialLinks = Array.from(byTrialLink.values())
-      .sort((a, b) => b.visitors - a.visitors || b.uploadsStarted - a.uploadsStarted || String(b.lastSeenAt).localeCompare(String(a.lastSeenAt)))
       .slice(0, 20);
 
     return sendJson(response, 200, {
@@ -495,9 +338,7 @@ export default async function handler(request, response) {
       eventCount: events.length,
       rows,
       totals,
-      trialTotals,
       sourceBreakdown,
-      topTrialLinks,
       recentProLeads: getRecentProLeads(events),
       generatedAt: new Date().toISOString(),
     });

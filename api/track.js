@@ -19,11 +19,7 @@ const allowedEvents = new Set([
   "pro_form_started",
   "pro_volume_selected",
   "pro_submit_attempt",
-  "pro_waitlist_submitted",
-  "trial_page_view",
-  "trial_open_tool",
-  "trial_feedback_email",
-  "trial_language_changed",
+  "pro_checkout_interest_submitted",
 ]);
 
 const corsHeaders = {

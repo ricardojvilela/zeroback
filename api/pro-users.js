@@ -98,7 +98,7 @@ export default async function handler(request, response) {
     const body = await readRequestBody(request);
     const userId = String(body?.userId || "").trim();
     const mode = String(body?.mode || "").trim();
-    if (!userId || !["free", "trial", "pro", "reset-usage"].includes(mode)) {
+    if (!userId || !["free", "pro", "reset-usage"].includes(mode)) {
       return sendJson(response, 400, { ok: false, error: "invalid_request" });
     }
 
@@ -119,19 +119,6 @@ export default async function handler(request, response) {
         monthly_images_used: 0,
         current_period_start: period.start,
         current_period_end: period.end,
-      };
-    } else if (mode === "trial") {
-      const now = new Date();
-      const end = new Date(now);
-      end.setUTCDate(end.getUTCDate() + 15);
-      patch = {
-        plan: "pro",
-        plan_status: "trialing",
-        batch_limit: 100,
-        monthly_image_limit: 2000,
-        monthly_images_used: 0,
-        current_period_start: now.toISOString(),
-        current_period_end: end.toISOString(),
       };
     } else {
       const period = monthPeriod();
