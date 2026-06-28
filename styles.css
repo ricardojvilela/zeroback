@@ -100,11 +100,17 @@ button:disabled {
   width: 54px;
   height: 54px;
   place-items: center;
-  border-radius: 8px;
-  background: #ffffff;
-  color: var(--charcoal);
+  border-radius: 14px;
+  background-color: transparent;
+  background-image: url("./favicon.svg");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  color: transparent;
+  font-size: 0;
   font-weight: 950;
   letter-spacing: 0;
+  line-height: 0;
 }
 
 .language-switch {
@@ -1189,8 +1195,8 @@ progress::-moz-progress-bar {
 
 .thanks-panel .brand-mark {
   margin-bottom: 22px;
-  background: var(--charcoal);
-  color: #fff;
+  background-color: transparent;
+  color: transparent;
 }
 
 .thanks-button {
@@ -1267,8 +1273,8 @@ progress::-moz-progress-bar {
 .landing-logo .brand-mark {
   width: 42px;
   height: 42px;
-  background: var(--charcoal);
-  color: #fff;
+  background-color: transparent;
+  color: transparent;
 }
 
 .landing-nav a:not(.landing-logo) {

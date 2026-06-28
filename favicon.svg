@@ -1,6 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#111827"/>
-  <path d="M13 13h38v38H13z" fill="#f8fafc"/>
-  <path d="M20 24h24v6H20zm0 11h17v6H20z" fill="#2563eb"/>
-  <path d="M42 18h9v9h-9zM13 51h20v6H13z" fill="#14b8a6"/>
+  <defs>
+    <linearGradient id="batchcutout-base" x1="10" x2="56" y1="8" y2="58" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#123844"/>
+      <stop offset="1" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="batchcutout-accent" x1="18" x2="49" y1="20" y2="46" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2dd4bf"/>
+      <stop offset="1" stop-color="#38bdf8"/>
+    </linearGradient>
+    <clipPath id="batchcutout-sheet">
+      <rect x="17" y="14" width="34" height="36" rx="7"/>
+    </clipPath>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="15" fill="url(#batchcutout-base)"/>
+  <rect x="10" y="21" width="32" height="31" rx="7" fill="#0f8b7c" opacity=".45"/>
+  <rect x="14" y="17" width="32" height="34" rx="7" fill="#2563eb" opacity=".54"/>
+  <rect x="17" y="14" width="34" height="36" rx="7" fill="#f8fafc"/>
+  <g clip-path="url(#batchcutout-sheet)" opacity=".82">
+    <path fill="#e9f0f4" d="M17 14h8v8h-8zM33 14h8v8h-8zM49 14h8v8h-8zM25 22h8v8h-8zM41 22h8v8h-8zM17 30h8v8h-8zM33 30h8v8h-8zM49 30h8v8h-8zM25 38h8v8h-8zM41 38h8v8h-8zM17 46h8v8h-8zM33 46h8v8h-8zM49 46h8v8h-8z"/>
+  </g>
+  <path fill="url(#batchcutout-accent)" d="M25.5 43.5c-3.4-2.4-5.3-6-5.3-10.1 0-7.4 5.7-12.9 13.4-12.9 8.2 0 14.2 6.1 14.2 14.1 0 5.5-4 9.9-9.6 9.9H28.3c-1 0-2-.3-2.8-1z"/>
+  <path d="M24 37.8c7-2.8 14.1-8.2 20.1-15.2" fill="none" stroke="#ffffff" stroke-linecap="round" stroke-width="4"/>
+  <path d="M23.8 38c3.5.7 7 .9 10.4.5" fill="none" stroke="#0f172a" stroke-linecap="round" stroke-opacity=".35" stroke-width="2.4"/>
 </svg>
