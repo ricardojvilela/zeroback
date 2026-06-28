@@ -44,9 +44,15 @@ const accountCreate = document.querySelector("#accountCreate");
 const accountActions = document.querySelector("#accountActions");
 const accountRefresh = document.querySelector("#accountRefresh");
 const accountLogout = document.querySelector("#accountLogout");
+const billingActions = document.querySelector("#billingActions");
+const billingPortal = document.querySelector("#billingPortal");
 
 const defaultMaxFilesPerBatch = 2;
-const requestedLimit = Number(new URLSearchParams(window.location.search).get("limit"));
+const pageParams = new URLSearchParams(window.location.search);
+const requestedLimit = Number(pageParams.get("limit"));
+const requestedCheckoutPlan = pageParams.get("checkout_plan");
+const checkoutStatus = pageParams.get("checkout");
+const checkoutPlans = new Set(["monthly", "annual", "early"]);
 let maxFilesPerBatch = [2, 3, 5, 10, 20, 100].includes(requestedLimit)
   ? requestedLimit
   : defaultMaxFilesPerBatch;
@@ -56,7 +62,7 @@ const defaultProMonthlyLimit = 2000;
 const downloadZipConversionId = "AW-18177126609/2EdRCMzF7bMcENHhw9tD";
 const batchLimitConversionId = "AW-18177126609/prPXCPXD8LMcENHhw9tD";
 const consentStorageKey = "batchcutout_consent";
-const debugMode = new URLSearchParams(window.location.search).get("debug") === "1";
+const debugMode = pageParams.get("debug") === "1";
 const debugEventsStorageKey = "batchcutout_debug_events";
 const attributionStorageKey = "batchcutout_attribution";
 const trialContextStorageKey = "batchcutout_trial_context";
@@ -87,6 +93,7 @@ let supabaseClient = null;
 let authConfig = null;
 let currentAccount = null;
 let lastUsageReservation = null;
+let hasStartedRequestedCheckout = false;
 
 const supportedExtensions = [
   ".jpg",
@@ -111,6 +118,7 @@ const supportedExtensions = [
 
 const baseTranslation = {
   feedbackKicker: "Ajude-nos a melhorar",
+  parentBrand: "Um produto NexaFlow Labs",
   feedbackTitle: "O que procurava fazer hoje?",
   feedbackBulk: "Remover fundos em lote",
   feedbackStore: "Preparar fotos para loja",
@@ -123,18 +131,18 @@ const baseTranslation = {
   postDownloadNeedsQuality: "Precisa de melhor recorte",
   postDownloadLargerBatches: "Preciso de lotes maiores",
   postDownloadThanks: "Obrigado. A sua resposta ajuda-nos a melhorar a ferramenta.",
-  proInlineKicker: "Pro Trial gratuito",
+  proInlineKicker: "BatchCutout Pro",
   proInlineTitle: "Desbloqueie até 100 imagens por lote",
-  proInlineLead: "Deixe o email para receber acesso privado durante 15 dias. O Pro foi definido para até 100 imagens por lote e 2.000 imagens por mês.",
-  proInlineBenefits: "15 dias grátis. Até 100 imagens por lote. Plano Pro alvo com 2.000 imagens por mês.",
+  proInlineLead: "Escolha um plano Pro para processar até 100 imagens por lote e 2.000 imagens por mês.",
+  proInlineBenefits: "Pro mensal 19 EUR/mês. Early adopter 15 EUR/mês. Anual 190 EUR/ano.",
   proEmailPlaceholder: "O seu email",
-  proInlineButton: "Receber link Pro Trial",
-  proInlineSuccess: "Pedido recebido. Vamos enviar o link Pro Trial por email.",
-  proInlineSuccessTitle: "Pedido registado",
-  proInlineSuccessDetail: "Vamos enviar o link privado por email. O acesso inclui 15 dias, até 100 imagens por lote e a validação do Pro com 2.000 imagens por mês.",
+  proInlineButton: "Comprar Pro",
+  proInlineSuccess: "A abrir pagamento Pro.",
+  proInlineSuccessTitle: "Pagamento seguro",
+  proInlineSuccessDetail: "Depois do pagamento, o acesso Pro é ativado automaticamente na conta.",
   proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
   downloadReadyHint: "Resultado pronto. Descarregue PNG ou ZIP pronto para loja.",
-  zipProCta: "Precisa de lotes até 100 imagens? Peça Pro Trial",
+  zipProCta: "Precisa de lotes até 100 imagens? Ver planos Pro",
   benefitsLabel: "Vantagens do serviço",
   benefitPng: "PNG transparente",
   benefitZip: "ZIP pronto para loja",
@@ -160,6 +168,17 @@ const baseTranslation = {
   accountCreateSending: "A criar conta...",
   accountRefresh: "Atualizar conta",
   accountLogout: "Sair",
+  billingEarly: "Early adopter - 15 EUR/mês",
+  billingMonthly: "Pro mensal - 19 EUR/mês",
+  billingAnnual: "Pro anual - 190 EUR/ano",
+  billingPortal: "Gerir pagamento",
+  billingCheckoutStarting: "A abrir pagamento...",
+  billingPortalStarting: "A abrir gestão de pagamento...",
+  billingCheckoutSuccess: "Pagamento recebido. A ativação Pro pode demorar alguns segundos.",
+  billingCheckoutCancelled: "Pagamento cancelado. Pode tentar novamente quando quiser.",
+  billingLoginRequired: "Entre ou crie conta antes de escolher um plano Pro.",
+  billingCheckoutError: "Não foi possível abrir o pagamento agora.",
+  billingPortalError: "Não foi possível abrir a gestão de pagamento agora.",
   accountMagicLinkSent: "Sessão iniciada.",
   accountSignupSuccess: "Conta criada. Se a confirmação de email estiver ativa, verifique a sua caixa de entrada antes de entrar.",
   accountLoggedOut: "Sessão terminada.",
@@ -231,6 +250,7 @@ const translations = {
     ...baseTranslation,
     pageTitle: "BatchCutout - Bulk Background Remover",
     languageLabel: "Language",
+    parentBrand: "A NexaFlow Labs product",
     feedbackKicker: "Help us improve",
     feedbackTitle: "What were you trying to do today?",
     feedbackBulk: "Remove backgrounds in bulk",
@@ -244,15 +264,15 @@ const translations = {
     postDownloadNeedsQuality: "Needs better cutout",
     postDownloadLargerBatches: "I need larger batches",
     postDownloadThanks: "Thanks. This helps us improve the tool.",
-    proInlineKicker: "Free Pro Trial",
+    proInlineKicker: "BatchCutout Pro",
     proInlineTitle: "Unlock up to 100 images per batch",
-    proInlineLead: "Leave your email to receive private access for 15 days. Pro is defined for up to 100 images per batch and 2,000 images per month.",
-    proInlineBenefits: "15 days free. Up to 100 images per batch. Planned Pro offer with 2,000 images per month.",
+    proInlineLead: "Choose a Pro plan to process up to 100 images per batch and 2,000 images per month.",
+    proInlineBenefits: "Monthly Pro EUR 19/month. Early adopter EUR 15/month. Annual EUR 190/year.",
     proEmailPlaceholder: "Your email",
-    proInlineButton: "Request free Pro Trial",
-    proInlineSuccess: "Request received. We will send Pro Trial access by email.",
-    proInlineSuccessTitle: "Request recorded",
-    proInlineSuccessDetail: "We will send the private link by email. Access includes 15 days, up to 100 images per batch, and validation of the 2,000 images per month Pro offer.",
+    proInlineButton: "Buy Pro",
+    proInlineSuccess: "Opening Pro payment.",
+    proInlineSuccessTitle: "Secure payment",
+    proInlineSuccessDetail: "After payment, Pro access is activated automatically on your account.",
     proInlineError: "We could not submit automatically. Opening an email draft instead.",
     accountKicker: "Pro access",
     accountBadgeGuest: "No session",
@@ -272,6 +292,17 @@ const translations = {
     accountCreateSending: "Creating account...",
     accountRefresh: "Refresh account",
     accountLogout: "Sign out",
+    billingEarly: "Early adopter - EUR 15/month",
+    billingMonthly: "Pro monthly - EUR 19/month",
+    billingAnnual: "Pro annual - EUR 190/year",
+    billingPortal: "Manage payment",
+    billingCheckoutStarting: "Opening payment...",
+    billingPortalStarting: "Opening billing...",
+    billingCheckoutSuccess: "Payment received. Pro activation can take a few seconds.",
+    billingCheckoutCancelled: "Payment cancelled. You can try again whenever you want.",
+    billingLoginRequired: "Sign in or create an account before choosing a Pro plan.",
+    billingCheckoutError: "We could not open payment right now.",
+    billingPortalError: "We could not open billing management right now.",
     accountMagicLinkSent: "Signed in.",
     accountSignupSuccess: "Account created. If email confirmation is enabled, check your inbox before signing in.",
     accountLoggedOut: "Signed out.",
@@ -281,7 +312,7 @@ const translations = {
     accountMonthlyLimitReached: "Your Pro account reached the monthly limit of {monthlyLimit} images.",
     statusTooManyFilesPro: "Your current access allows up to {limit} images per batch.",
     downloadReadyHint: "Result ready. Download a PNG or a store-ready ZIP.",
-    zipProCta: "Need batches up to 100 images? Request Pro Trial",
+    zipProCta: "Need batches up to 100 images? View Pro plans",
     eyebrow: "Bulk background removal",
     title: "BatchCutout",
     lead: "Free test: remove the background from up to {limit} images now. Download transparent PNGs or a store-ready ZIP.",
@@ -725,9 +756,9 @@ const translatedAddons = {
     trustText: "Ideal para lojas online, catálogos, marketplaces e equipas que tratam muitas imagens.",
     privacyNote: "Processamento local",
     formatNote: "Vários formatos",
-    batchLimitNote: "{limit} imagens grátis. Para mais volume, peça Pro Trial.",
+    batchLimitNote: "{limit} imagens grátis. Para mais volume, escolha Pro.",
     privacyLink: "Privacidade e termos",
-    statusTooManyFiles: "Foram adicionadas {accepted} de {total} imagens. Para processar lotes maiores de uma vez, peça o Pro Trial.",
+    statusTooManyFiles: "Foram adicionadas {accepted} de {total} imagens. Para processar lotes maiores de uma vez, escolha Pro.",
     statusNoSupportedFiles: "Nenhum ficheiro de imagem suportado foi encontrado.",
     statusEngineLoading: "A carregar o motor de remoção. A primeira vez pode demorar mais.",
     statusError: "não foi possível processar. Experimente JPG, PNG ou WebP.",
@@ -737,9 +768,9 @@ const translatedAddons = {
     trustText: "Ideal for online stores, catalogues, marketplaces, and teams handling many images.",
     privacyNote: "Local processing",
     formatNote: "Multiple formats",
-    batchLimitNote: "{limit} images free. Need more volume? Request Pro Trial.",
+    batchLimitNote: "{limit} images free. Need more volume? Choose Pro.",
     privacyLink: "Privacy and terms",
-    statusTooManyFiles: "{accepted} of {total} images were added. To process larger batches at once, request Pro Trial.",
+    statusTooManyFiles: "{accepted} of {total} images were added. To process larger batches at once, choose Pro.",
     statusNoSupportedFiles: "No supported image file was found.",
     statusEngineLoading: "Loading the removal engine. The first run may take longer.",
     statusError: "could not be processed. Try JPG, PNG, or WebP.",
@@ -876,21 +907,21 @@ const proTranslations = {
     proKicker: "Para equipas e lojas",
     proTitle: "Precisa de processar centenas de fotos?",
     proLead: "Remova limites e prepare lotes maiores para catálogos, lojas online e equipas.",
-    proLimitCta: "Receber Pro Trial",
+    proLimitCta: "Ver planos Pro",
     proNoCommitment: "Sem compromisso. Primeiro acesso para quem trabalha com volume.",
     brandCta: "Testar grátis com {limit} imagens",
-    inlineProCta: "Quer desbloquear até 100 imagens por lote? Peça Pro Trial",
-    proInlineKicker: "Pro Trial gratuito",
+    inlineProCta: "Quer desbloquear até 100 imagens por lote? Ver planos Pro",
+    proInlineKicker: "BatchCutout Pro",
     proInlineTitle: "Desbloqueie até 100 imagens por lote",
-    proInlineLead: "Deixe o email para receber acesso privado durante 15 dias. O Pro foi definido para até 100 imagens por lote e 2.000 imagens por mês.",
-    proInlineBenefits: "15 dias grátis. Até 100 imagens por lote. Plano Pro alvo com 2.000 imagens por mês.",
+    proInlineLead: "Escolha um plano Pro para processar até 100 imagens por lote e 2.000 imagens por mês.",
+    proInlineBenefits: "Pro mensal 19 EUR/mês. Early adopter 15 EUR/mês. Anual 190 EUR/ano.",
     proEmailPlaceholder: "O seu email",
-    proInlineButton: "Receber link Pro Trial",
-    proInlineNote: "Sem pagamento. Teste com fotos reais e diga-nos se este fluxo faria sentido na sua operação.",
-    proInlineSuccess: "Pedido recebido. Vamos enviar o link Pro Trial por email.",
+    proInlineButton: "Comprar Pro",
+    proInlineNote: "Pagamento seguro por Stripe Checkout.",
+    proInlineSuccess: "A abrir pagamento Pro.",
     proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
     downloadReadyHint: "Resultado pronto. Descarregue PNG ou ZIP pronto para loja.",
-    zipProCta: "Precisa de lotes até 100 imagens? Peça Pro Trial",
+    zipProCta: "Precisa de lotes até 100 imagens? Ver planos Pro",
     emptyTitle: "Os seus PNGs transparentes aparecem aqui",
     emptyState: "Depois pode descarregar uma imagem ou exportar tudo em ZIP.",
     demoLabel: "Exemplo antes e depois",
@@ -912,27 +943,27 @@ const proTranslations = {
     faqFormatsQ: "Que formatos são aceites?",
     faqFormatsA: "JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG, HEIC, HEIF e outros formatos de imagem suportados pelo navegador.",
     faqVolumeQ: "Posso processar mais de {limit} imagens?",
-    faqVolumeA: "O modo gratuito permite {limit} imagens por lote. Se precisar de volume real, peça o Pro Trial e teste até 100 imagens por lote durante 15 dias.",
+    faqVolumeA: "O modo gratuito permite {limit} imagens por lote. O Pro permite até 100 imagens por lote e 2.000 imagens por mês.",
   },
   en: {
     proKicker: "For teams and stores",
     proTitle: "Need to process hundreds of photos?",
     proLead: "Remove limits and prepare larger batches for catalogues, online stores, and teams.",
-    proLimitCta: "Get Pro Trial",
+    proLimitCta: "View Pro plans",
     proNoCommitment: "No commitment. Early access for high-volume workflows.",
     brandCta: "Start free with {limit} images",
-    inlineProCta: "Want to unlock up to 100 images per batch? Get Pro Trial",
-    proInlineKicker: "Free Pro Trial",
+    inlineProCta: "Want to unlock up to 100 images per batch? View Pro plans",
+    proInlineKicker: "BatchCutout Pro",
     proInlineTitle: "Unlock up to 100 images per batch",
-    proInlineLead: "Leave your email to receive private access for 15 days. Pro is defined for up to 100 images per batch and 2,000 images per month.",
-    proInlineBenefits: "15 days free. Up to 100 images per batch. Planned Pro offer with 2,000 images per month.",
+    proInlineLead: "Choose a Pro plan to process up to 100 images per batch and 2,000 images per month.",
+    proInlineBenefits: "Monthly Pro EUR 19/month. Early adopter EUR 15/month. Annual EUR 190/year.",
     proEmailPlaceholder: "Your email",
-    proInlineButton: "Get Pro Trial link",
-    proInlineNote: "No payment. Test with real photos and tell us whether this workflow would fit your operation.",
-    proInlineSuccess: "Request received. We will send the Pro Trial link by email.",
+    proInlineButton: "Buy Pro",
+    proInlineNote: "Secure payment through Stripe Checkout.",
+    proInlineSuccess: "Opening Pro payment.",
     proInlineError: "We could not submit automatically. Opening an email draft instead.",
     downloadReadyHint: "Result ready. Download a PNG or a store-ready ZIP.",
-    zipProCta: "Need batches up to 100 images? Get Pro Trial",
+    zipProCta: "Need batches up to 100 images? View Pro plans",
     emptyTitle: "Your transparent PNGs appear here",
     emptyState: "Then download one image or export everything as a ZIP.",
     demoLabel: "Before and after example",
@@ -954,7 +985,7 @@ const proTranslations = {
     faqFormatsQ: "Which formats are supported?",
     faqFormatsA: "JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG, HEIC, HEIF, and other image formats supported by your browser.",
     faqVolumeQ: "Can I process more than {limit} images?",
-    faqVolumeA: "Free mode allows {limit} images per batch. If you need real volume, request Pro Trial and test up to 100 images per batch for 15 days.",
+    faqVolumeA: "Free mode allows {limit} images per batch. Pro unlocks up to 100 images per batch and 2,000 images per month.",
   },
 };
 
@@ -1453,6 +1484,8 @@ function updateAccountUi() {
     accountStatus.textContent = t("accountStatusConfigMissing");
     accountForm?.classList.remove("hidden");
     accountActions?.classList.add("hidden");
+    billingActions?.classList.add("hidden");
+    billingPortal?.classList.add("hidden");
     return;
   }
 
@@ -1461,6 +1494,8 @@ function updateAccountUi() {
     accountStatus.textContent = t("accountStatusGuest");
     accountForm?.classList.remove("hidden");
     accountActions?.classList.add("hidden");
+    billingActions?.classList.add("hidden");
+    billingPortal?.classList.add("hidden");
     return;
   }
 
@@ -1479,6 +1514,8 @@ function updateAccountUi() {
   accountStatus.textContent = email ? `${email} - ${statusTextValue}` : statusTextValue;
   accountForm?.classList.add("hidden");
   accountActions?.classList.remove("hidden");
+  billingActions?.classList.toggle("hidden", Boolean(access.canUsePro));
+  billingPortal?.classList.toggle("hidden", !access.canUsePro || !currentAccount?.billing?.hasStripeCustomer);
 }
 
 async function fetchAuthConfig() {
@@ -1542,6 +1579,8 @@ async function initAuth() {
   if (!supabaseClient) return;
 
   await refreshAccount();
+  showCheckoutReturnMessage();
+  await maybeStartRequestedCheckout();
 
   supabaseClient.auth.onAuthStateChange(async (_event, session) => {
     if (!session?.access_token) {
@@ -1551,6 +1590,7 @@ async function initAuth() {
     }
 
     await refreshAccount();
+    await maybeStartRequestedCheckout();
   });
 }
 
@@ -1631,6 +1671,120 @@ async function handleAccountLogout() {
   currentAccount = null;
   updateAccountUi();
   setAccountMessage("accountLoggedOut");
+}
+
+async function getCurrentAccessToken() {
+  if (!supabaseClient) return "";
+  const { data: sessionData } = await supabaseClient.auth.getSession();
+  return sessionData?.session?.access_token || "";
+}
+
+function checkoutPlanLabelKey(plan) {
+  if (plan === "annual") return "billingAnnual";
+  if (plan === "early") return "billingEarly";
+  return "billingMonthly";
+}
+
+async function startCheckout(plan = "monthly", triggerButton = null) {
+  const selectedPlan = checkoutPlans.has(plan) ? plan : "monthly";
+  const accessToken = await getCurrentAccessToken();
+
+  if (!accessToken) {
+    setAccountMessage("billingLoginRequired");
+    accountPanel?.scrollIntoView({ behavior: "smooth", block: "start" });
+    return;
+  }
+
+  if (triggerButton) {
+    triggerButton.disabled = true;
+    triggerButton.textContent = t("billingCheckoutStarting");
+  }
+  setAccountMessage("billingCheckoutStarting");
+
+  try {
+    const response = await fetch("/api/create-checkout-session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ plan: selectedPlan }),
+    });
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok || !data.url) {
+      throw new Error(data.error || "checkout_failed");
+    }
+
+    trackEvent("pro_checkout_started", {
+      plan: selectedPlan,
+      label: data.label || selectedPlan,
+      value: selectedPlan === "annual" ? 190 : selectedPlan === "early" ? 15 : 19,
+      currency: "EUR",
+    });
+    window.location.href = data.url;
+  } catch {
+    setAccountMessage("billingCheckoutError");
+    if (triggerButton) {
+      triggerButton.disabled = false;
+      triggerButton.textContent = t(checkoutPlanLabelKey(selectedPlan));
+    }
+  }
+}
+
+async function openBillingPortal() {
+  if (!billingPortal) return;
+  const accessToken = await getCurrentAccessToken();
+  if (!accessToken) {
+    setAccountMessage("billingLoginRequired");
+    return;
+  }
+
+  billingPortal.disabled = true;
+  billingPortal.textContent = t("billingPortalStarting");
+  setAccountMessage("billingPortalStarting");
+
+  try {
+    const response = await fetch("/api/create-billing-portal-session", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok || !data.url) {
+      throw new Error(data.error || "billing_portal_failed");
+    }
+
+    trackEvent("billing_portal_opened", { plan: currentAccount?.access?.plan || "unknown" });
+    window.location.href = data.url;
+  } catch {
+    setAccountMessage("billingPortalError");
+    billingPortal.disabled = false;
+    billingPortal.textContent = t("billingPortal");
+  }
+}
+
+function showCheckoutReturnMessage() {
+  if (checkoutStatus === "success") {
+    setAccountMessage("billingCheckoutSuccess");
+    setTimeout(() => refreshAccount(), 2500);
+  } else if (checkoutStatus === "cancelled") {
+    setAccountMessage("billingCheckoutCancelled");
+  }
+}
+
+async function maybeStartRequestedCheckout() {
+  if (hasStartedRequestedCheckout || !checkoutPlans.has(requestedCheckoutPlan || "")) return;
+  if (!currentAccount) {
+    setAccountMessage("billingLoginRequired");
+    return;
+  }
+  if (currentAccount.access?.canUsePro) return;
+
+  hasStartedRequestedCheckout = true;
+  await startCheckout(requestedCheckoutPlan);
 }
 
 async function reserveMonthlyUsage(count) {
@@ -2189,7 +2343,7 @@ async function submitInlineProLead(event) {
     if (proInlineMessage) proInlineMessage.textContent = t("proInlineError");
     const subject = encodeURIComponent("Novo lead BatchCutout Pro - Ferramenta");
     const body = encodeURIComponent(
-      `Email: ${email}\nCompany: ${company}\nVolume: ${volume}\nOffer: Pro Trial\nTrial days: 15\nTrial limit: 100 images per batch\nTrial ID: ${trialId}\nTrial slug: ${trialSlug}\nTrial URL: ${trialUrl}\nReason: ${reason}\nLanguage: ${currentLanguage}\nSource: ${window.location.href}`,
+      `Email: ${email}\nCompany: ${company}\nVolume: ${volume}\nOffer: Pro paid\nBatch limit: 100 images per batch\nMonthly limit: 2000 images\nReason: ${reason}\nLanguage: ${currentLanguage}\nSource: ${window.location.href}`,
     );
     window.location.href = `mailto:ricardojvilela@gmail.com?subject=${subject}&body=${body}`;
   } finally {
@@ -2238,11 +2392,21 @@ brandCta.addEventListener("click", () => {
 });
 inlineProCta.addEventListener("click", () => showProInterest("inline_pro_cta"));
 zipProCta?.addEventListener("click", () => showProInterest("zip_download_context"));
-proInlineForm?.addEventListener("submit", submitInlineProLead);
+proInlineForm?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-checkout-plan]");
+  if (!button) return;
+  startCheckout(button.dataset.checkoutPlan, button);
+});
 accountForm?.addEventListener("submit", handleAccountLogin);
 accountCreate?.addEventListener("click", handleAccountCreate);
 accountRefresh?.addEventListener("click", refreshAccount);
 accountLogout?.addEventListener("click", handleAccountLogout);
+billingActions?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-checkout-plan]");
+  if (!button) return;
+  startCheckout(button.dataset.checkoutPlan, button);
+});
+billingPortal?.addEventListener("click", openBillingPortal);
 proInlineEmail?.addEventListener(
   "focus",
   () => {

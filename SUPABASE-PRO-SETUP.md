@@ -128,7 +128,43 @@ set
 where email = 'cliente@exemplo.com';
 ```
 
-### 6. Deploy
+### 6. Stripe
+
+Criar no Stripe um produto `BatchCutout Pro` com estes Prices:
+
+- Early adopter mensal: `15 EUR` por mes
+- Pro mensal: `19 EUR` por mes
+- Pro anual: `190 EUR` por ano
+
+Adicionar na Vercel:
+
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `STRIPE_PRO_EARLY_PRICE_ID`
+- `STRIPE_PRO_MONTHLY_PRICE_ID`
+- `STRIPE_PRO_ANNUAL_PRICE_ID`
+- `BATCHCUTOUT_SITE_URL=https://batchcutout.com`
+
+Configurar webhook no Stripe para:
+
+- `https://batchcutout.com/api/stripe-webhook`
+
+Ativar/configurar o Stripe Customer Portal para permitir gestão de cartão, faturas e cancelamento.
+
+Eventos a enviar:
+
+- `checkout.session.completed`
+- `customer.subscription.created`
+- `customer.subscription.updated`
+- `customer.subscription.deleted`
+
+O Checkout e o Customer Portal usam estes endpoints:
+
+- `/api/create-checkout-session`
+- `/api/create-billing-portal-session`
+- `/api/stripe-webhook`
+
+### 7. Deploy
 
 Depois de adicionar as variáveis na Vercel, fazer novo deploy para publicar:
 
@@ -136,12 +172,20 @@ Depois de adicionar as variáveis na Vercel, fazer novo deploy para publicar:
 - `api/account`
 - `api/usage-reserve`
 - `api/pro-users`
+- `api/create-checkout-session`
+- `api/create-billing-portal-session`
+- `api/stripe-webhook`
 
-### 7. Comportamento atual
+### 8. Comportamento atual
 - Free: 2 imagens por lote
 - Pro: 100 imagens por lote
 - Pro: 2000 imagens por mês
+- Pro Early Adopter: 15 EUR/mês
+- Pro Mensal: 19 EUR/mês
+- Pro Anual: 190 EUR/ano
 - O site reserva o consumo antes de começar a processar
 - O login é por email e password via Supabase
 - Novas contas precisam de confirmar o email antes do primeiro login
+- O pagamento é feito por Stripe Checkout
+- O webhook Stripe ativa/remove acesso Pro automaticamente
 - O painel `/admin` permite listar contas e mudar entre `Free`, `Trial`, `Pro` e `Reset uso`

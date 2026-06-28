@@ -11,7 +11,9 @@ Validar monetizacao simples para utilizadores que precisam de remover fundos em 
 | Plano | Preco | Limite sugerido | Publico |
 | --- | ---: | --- | --- |
 | Free | 0 EUR | 2 imagens por lote | Teste rapido |
-| Pro | A definir | 100 imagens por lote + 2.000 imagens/mes | Lojas online e equipas com volume recorrente |
+| Pro Early Adopter | 15 EUR/mes | 100 imagens por lote + 2.000 imagens/mes | Primeiros clientes |
+| Pro Mensal | 19 EUR/mes | 100 imagens por lote + 2.000 imagens/mes | Lojas online e equipas com volume recorrente |
+| Pro Anual | 190 EUR/ano | 100 imagens por lote + 2.000 imagens/mes | Clientes que querem desconto anual |
 
 ## Regras recomendadas
 
@@ -20,6 +22,7 @@ Validar monetizacao simples para utilizadores que precisam de remover fundos em 
 - Cobrar pelo volume, nao por funcionalidades complexas.
 - Comecar com Stripe Checkout simples.
 - Nao abrir varios planos antes de validar a conversao do primeiro Pro.
+- Usar um unico produto Stripe `BatchCutout Pro` com tres Prices: early adopter mensal, mensal normal e anual.
 
 ## Sinais para ativar pagamento
 
@@ -30,4 +33,4 @@ Validar monetizacao simples para utilizadores que precisam de remover fundos em 
 
 ## Mensagem comercial futura
 
-"Remova fundos em lotes ate 100 imagens e processe ate 2.000 fotos por mes para catalogos, lojas online e marketplaces."
+"Remova fundos em lotes ate 100 imagens e processe ate 2.000 fotos por mes para catalogos, lojas online e marketplaces. Pro desde 19 EUR/mes."

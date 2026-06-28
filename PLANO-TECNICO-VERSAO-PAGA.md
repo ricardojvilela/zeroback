@@ -28,6 +28,9 @@ Documento interno para preparar a passagem de teste gratuito para produto pago.
 - Free: 2 imagens por lote.
 - Pro: 100 imagens por lote.
 - Pro: 2.000 imagens por mes.
+- Pro Early Adopter: 15 EUR/mes.
+- Pro Mensal: 19 EUR/mes.
+- Pro Anual: 190 EUR/ano.
 - O processamento continua no browser nesta primeira fase.
 
 ## Processamento
@@ -94,6 +97,17 @@ Limites:
 2. Criar login.
 3. Definir batch_limit e monthly_image_limit por plano.
 4. Criar contador mensal.
-5. Integrar Stripe.
+5. Integrar Stripe. [implementado no codigo]
 6. Criar painel admin.
 7. Bloquear Pro sem pagamento.
+
+## Stripe
+
+Endpoints implementados:
+
+- `/api/create-checkout-session`
+- `/api/create-billing-portal-session`
+- `/api/stripe-webhook`
+
+O webhook ativa Pro automaticamente quando a assinatura fica `active` ou `trialing`.
+Estados de assinatura sem acesso pago voltam a conta para `free`.

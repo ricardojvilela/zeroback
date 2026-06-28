@@ -40,9 +40,13 @@
           {
             "@type": "Organization",
             "@id": "https://batchcutout.com/#organization",
-            "name": "BatchCutout",
+            "name": "NexaFlow Labs",
             "url": "https://batchcutout.com/",
-            "logo": "https://batchcutout.com/favicon.svg"
+            "logo": "https://batchcutout.com/favicon.svg",
+            "brand": {
+              "@type": "Brand",
+              "name": "BatchCutout"
+            }
           },
           {
             "@type": "WebSite",
@@ -59,6 +63,13 @@
             "@id": "https://batchcutout.com/#app",
             "name": "BatchCutout",
             "applicationCategory": "MultimediaApplication",
+            "publisher": {
+              "@id": "https://batchcutout.com/#organization"
+            },
+            "brand": {
+              "@type": "Brand",
+              "name": "BatchCutout"
+            },
             "operatingSystem": "Web",
             "url": "https://batchcutout.com/",
             "image": "https://batchcutout.com/assets/product-before-after.png",
@@ -105,7 +116,7 @@
                 "name": "Can users process larger batches?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "The free version allows up to 2 images per batch. Users can request a Pro Trial to test batches up to 100 images."
+                  "text": "The free version allows up to 2 images per batch. Pro unlocks batches up to 100 images and 2,000 images per month."
                 }
               }
             ]
@@ -141,6 +152,7 @@
         </div>
 
         <p class="eyebrow" data-i18n="eyebrow">Remoção de fundo em massa</p>
+        <p class="parent-brand" data-i18n="parentBrand">Um produto NexaFlow Labs</p>
         <h1 id="app-title" data-i18n="title">BatchCutout</h1>
         <p class="lead" data-i18n="lead">
           Remova o fundo de várias fotos ao mesmo tempo e exporte imagens prontas
@@ -149,7 +161,7 @@
         <button class="brand-cta" id="brandCta" type="button" data-i18n="brandCta">
           Começar grátis
         </button>
-        <a class="brand-pro-link" href="./pricing/">Precisa de mais volume? Peça Pro Trial</a>
+        <a class="brand-pro-link" href="./pricing/">Precisa de mais volume? Ver planos Pro</a>
         <section class="account-panel" id="accountPanel" aria-labelledby="accountTitle">
           <div class="account-panel-head">
             <p class="section-kicker" id="accountTitle" data-i18n="accountKicker">Acesso Pro</p>
@@ -181,6 +193,12 @@
           </form>
           <div class="account-actions hidden" id="accountActions">
             <button type="button" class="ghost-button small" id="accountRefresh" data-i18n="accountRefresh">Atualizar conta</button>
+            <div class="billing-actions" id="billingActions">
+              <button type="button" data-checkout-plan="early" data-i18n="billingEarly">Early adopter - 15 EUR/mês</button>
+              <button type="button" data-checkout-plan="monthly" data-i18n="billingMonthly">Pro mensal - 19 EUR/mês</button>
+              <button type="button" data-checkout-plan="annual" data-i18n="billingAnnual">Pro anual - 190 EUR/ano</button>
+            </div>
+            <button type="button" class="ghost-button small hidden" id="billingPortal" data-i18n="billingPortal">Gerir pagamento</button>
             <button type="button" class="ghost-button small" id="accountLogout" data-i18n="accountLogout">Sair</button>
           </div>
           <p class="account-message" id="accountMessage" aria-live="polite"></p>
@@ -254,13 +272,13 @@
           Resultado pronto. Descarregue PNG ou ZIP pronto para loja.
         </p>
         <button class="zip-pro-nudge hidden" id="zipProCta" type="button" data-i18n="zipProCta">
-          Precisa de lotes até 100 imagens? Peça Pro Trial
+          Precisa de lotes até 100 imagens? Ver planos Pro
         </button>
 
         <div class="status-panel" aria-live="polite">
           <span id="statusText">A aguardar fotos</span>
           <button class="status-pro-button hidden" id="proPromptButton" type="button" data-i18n="proLimitCta">
-            Receber Pro Trial
+            Ver planos Pro
           </button>
           <progress id="progressBar" value="0" max="100"></progress>
         </div>
@@ -288,40 +306,26 @@
 
         <section class="pro-interest hidden" id="proInterestPanel" aria-labelledby="pro-interest-title">
           <div>
-            <p class="section-kicker" data-i18n="proInlineKicker">Pro Trial gratuito</p>
+            <p class="section-kicker" data-i18n="proInlineKicker">BatchCutout Pro</p>
             <h2 id="pro-interest-title" data-i18n="proInlineTitle">Desbloqueie até 100 imagens por lote</h2>
-            <p data-i18n="proInlineLead">Deixe o email para receber acesso privado durante 15 dias. O Pro foi definido para até 100 imagens por lote e 2.000 imagens por mês.</p>
+            <p data-i18n="proInlineLead">Escolha um plano Pro para processar até 100 imagens por lote e 2.000 imagens por mês.</p>
             <p class="pro-benefits" data-i18n="proInlineBenefits">
-              15 dias grátis. Até 100 imagens por lote. Plano Pro alvo com 2.000 imagens por mês.
+              Pro mensal 19 EUR/mês. Early adopter 15 EUR/mês. Anual 190 EUR/ano.
             </p>
           </div>
           <form
-            class="pro-form"
+            class="pro-form pro-checkout-actions"
             id="proInlineForm"
-            action="https://formsubmit.co/ajax/ricardojvilela@gmail.com"
-            method="POST"
             novalidate
           >
-            <input type="hidden" name="_subject" value="Novo lead BatchCutout Pro - Ferramenta" />
-            <input type="hidden" name="_template" value="table" />
-            <input type="hidden" name="source" value="tool-post-download" />
-            <input type="hidden" name="language" value="pt" id="proInlineLanguage" />
-            <input type="hidden" name="page_url" value="" id="proInlinePageUrl" />
-            <input type="hidden" name="volume" value="not-specified" />
-            <input type="hidden" name="offer" value="pro-trial" />
-            <input type="hidden" name="trial_days" value="15" />
-            <input type="hidden" name="trial_limit" value="100" />
-            <input type="hidden" name="trial_id" value="" id="proInlineTrialId" />
-            <input type="hidden" name="trial_slug" value="" id="proInlineTrialSlug" />
-            <input type="hidden" name="trial_url" value="" id="proInlineTrialUrl" />
-            <input type="text" name="_honey" class="honeypot-field" tabindex="-1" autocomplete="off" />
-            <input id="proInlineEmail" name="email" type="email" autocomplete="email" required placeholder="O seu email" data-i18n-placeholder="proEmailPlaceholder" />
-            <button type="submit" data-i18n="proInlineButton">Receber link Pro Trial</button>
+            <button type="button" data-checkout-plan="early" data-i18n="billingEarly">Early adopter - 15 EUR/mês</button>
+            <button type="button" data-checkout-plan="monthly" data-i18n="billingMonthly">Pro mensal - 19 EUR/mês</button>
+            <button type="button" data-checkout-plan="annual" data-i18n="billingAnnual">Pro anual - 190 EUR/ano</button>
           </form>
           <p class="pro-message" id="proInlineMessage" aria-live="polite"></p>
           <div class="pro-note" id="proInlineSuccessCard" hidden>
-            <strong data-i18n="proInlineSuccessTitle">Pedido registado</strong>
-            <p data-i18n="proInlineSuccessDetail">Vamos enviar o link privado por email. O acesso inclui 15 dias, até 100 imagens por lote e a validação do Pro com 2.000 imagens por mês.</p>
+            <strong data-i18n="proInlineSuccessTitle">Pagamento seguro</strong>
+            <p data-i18n="proInlineSuccessDetail">Depois do pagamento, o acesso Pro é ativado automaticamente na conta.</p>
           </div>
         </section>
 
@@ -332,12 +336,12 @@
           <p data-i18n="formatNote">
             Alguns formatos podem depender do suporte do navegador.
           </p>
-          <p data-i18n="batchLimitNote">
-            Grátis até 2 imagens por lote. Para mais volume, peça o Pro Trial.
+            <p data-i18n="batchLimitNote">
+            Grátis até 2 imagens por lote. Para mais volume, escolha o Pro.
           </p>
         </div>
         <button class="inline-pro-cta" id="inlineProCta" type="button" data-i18n="inlineProCta">
-          Quer desbloquear até 100 imagens por lote? Peça Pro Trial
+          Quer desbloquear até 100 imagens por lote? Ver planos Pro
         </button>
 
         <section class="faq-section" aria-labelledby="faq-title">
@@ -353,7 +357,7 @@
           </details>
           <details>
             <summary data-i18n="faqVolumeQ">Posso processar mais de 2 imagens?</summary>
-            <p data-i18n="faqVolumeA">O modo gratuito permite 2 imagens por lote. Se precisar de volume real, peça o Pro Trial e teste até 100 imagens por lote durante 15 dias.</p>
+            <p data-i18n="faqVolumeA">O modo gratuito permite 2 imagens por lote. O Pro permite até 100 imagens por lote e 2.000 imagens por mês.</p>
           </details>
         </section>
 

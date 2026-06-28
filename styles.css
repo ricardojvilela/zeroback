@@ -170,6 +170,19 @@ h1 {
   overflow-wrap: normal;
 }
 
+.parent-brand {
+  margin: 0 0 8px;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.parent-brand.light {
+  color: #697483;
+}
+
 h2 {
   margin-bottom: 0;
   font-size: 1.45rem;
@@ -279,6 +292,25 @@ h2 {
 .account-form button,
 .account-actions .ghost-button {
   width: 100%;
+}
+
+.billing-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.billing-actions button {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid rgba(81, 215, 198, 0.28);
+  background: rgba(81, 215, 198, 0.14);
+  color: #ffffff;
+  font-size: 0.88rem;
+}
+
+.billing-actions button:hover:not(:disabled) {
+  border-color: rgba(81, 215, 198, 0.5);
+  background: rgba(81, 215, 198, 0.2);
 }
 
 .trust-copy {
@@ -777,6 +809,10 @@ h2 {
   margin-top: 14px;
 }
 
+.pro-checkout-actions {
+  grid-template-columns: 1fr;
+}
+
 .pro-form button {
   min-height: 44px;
   white-space: nowrap;
@@ -1219,6 +1255,15 @@ progress::-moz-progress-bar {
   text-decoration: none;
 }
 
+.landing-parent-brand {
+  margin-right: auto;
+  color: #697483;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
 .landing-logo .brand-mark {
   width: 42px;
   height: 42px;
@@ -1593,6 +1638,19 @@ progress::-moz-progress-bar {
 .pricing-form {
   display: grid;
   gap: 10px;
+}
+
+.pricing-plan-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.pricing-plan-actions .landing-button,
+.pricing-plan-actions .landing-secondary {
+  width: 100%;
+  justify-content: center;
+  min-height: 48px;
+  text-align: center;
 }
 
 .pricing-form input,

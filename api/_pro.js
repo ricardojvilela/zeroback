@@ -36,6 +36,19 @@ export async function readRequestBody(request) {
   }
 }
 
+export async function readRawRequestBody(request) {
+  if (Buffer.isBuffer(request.body)) return request.body.toString("utf8");
+  if (typeof request.body === "string") return request.body;
+  if (request.body && typeof request.body === "object") return JSON.stringify(request.body);
+
+  const chunks = [];
+  for await (const chunk of request) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
+
+  return Buffer.concat(chunks).toString("utf8");
+}
+
 export function getSupabaseSettings() {
   return {
     supabaseUrl: process.env.SUPABASE_URL?.replace(/\/$/, "") || "",
@@ -90,6 +103,31 @@ async function supabaseSelectSingle({ supabaseUrl, serviceRoleKey, usersTable, u
   return rows?.[0] || null;
 }
 
+export async function supabaseSelectSingleByColumn({ supabaseUrl, serviceRoleKey, usersTable, column, value }) {
+  const allowedColumns = new Set(["user_id", "email", "stripe_customer_id", "stripe_subscription_id"]);
+  if (!allowedColumns.has(column)) {
+    throw new Error(`invalid_column:${column}`);
+  }
+
+  const response = await fetch(
+    `${supabaseUrl}/rest/v1/${usersTable}?${column}=eq.${escapeValue(value)}&select=*&limit=1`,
+    {
+      headers: {
+        apikey: serviceRoleKey,
+        Authorization: `Bearer ${serviceRoleKey}`,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`select_failed:${response.status}:${detail.slice(0, 300)}`);
+  }
+
+  const rows = await response.json();
+  return rows?.[0] || null;
+}
+
 async function supabaseInsert({ supabaseUrl, serviceRoleKey, usersTable, row }) {
   const response = await fetch(`${supabaseUrl}/rest/v1/${usersTable}`, {
     method: "POST",
@@ -113,6 +151,35 @@ async function supabaseInsert({ supabaseUrl, serviceRoleKey, usersTable, row }) 
 
 export async function supabaseUpdateByUserId({ supabaseUrl, serviceRoleKey, usersTable, userId, patch }) {
   const response = await fetch(`${supabaseUrl}/rest/v1/${usersTable}?user_id=eq.${escapeValue(userId)}`, {
+    method: "PATCH",
+    headers: {
+      apikey: serviceRoleKey,
+      Authorization: `Bearer ${serviceRoleKey}`,
+      "Content-Type": "application/json",
+      Prefer: "return=representation",
+    },
+    body: JSON.stringify({
+      ...patch,
+      updated_at: new Date().toISOString(),
+    }),
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`update_failed:${response.status}:${detail.slice(0, 300)}`);
+  }
+
+  const rows = await response.json();
+  return rows?.[0] || null;
+}
+
+export async function supabaseUpdateByColumn({ supabaseUrl, serviceRoleKey, usersTable, column, value, patch }) {
+  const allowedColumns = new Set(["user_id", "email", "stripe_customer_id", "stripe_subscription_id"]);
+  if (!allowedColumns.has(column)) {
+    throw new Error(`invalid_column:${column}`);
+  }
+
+  const response = await fetch(`${supabaseUrl}/rest/v1/${usersTable}?${column}=eq.${escapeValue(value)}`, {
     method: "PATCH",
     headers: {
       apikey: serviceRoleKey,
@@ -245,6 +312,10 @@ export function serializeAccount(profile, user) {
       monthlyRemaining,
       periodStart: profile.current_period_start || null,
       periodEnd: profile.current_period_end || null,
+    },
+    billing: {
+      hasStripeCustomer: Boolean(profile.stripe_customer_id),
+      hasStripeSubscription: Boolean(profile.stripe_subscription_id),
     },
   };
 }
