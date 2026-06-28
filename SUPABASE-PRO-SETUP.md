@@ -30,17 +30,33 @@ Em `Authentication > Providers > Email`:
 
 Estado atual em produção:
 
-- `Confirm email` fica desativado enquanto o projeto estiver a usar o email integrado do Supabase, porque esse serviço tem limites baixos de envio e pode bloquear a criação de contas com `email rate limit exceeded`.
-- O template profissional de confirmação está guardado e pode ser reativado quando houver SMTP/custom email configurado.
-
-Se for ativado SMTP/custom email:
-
-- em `Authentication > Providers > Email`, ativar `Confirm email`
-- testar novamente criação de conta e receção do email
+- `Confirm email` está ativo.
+- O envio de confirmação usa SMTP/custom email com Resend.
+- O template profissional de confirmação está guardado e ativo.
 
 Sem o provider Email ativo, o login próprio com email e password não funciona.
 
-### 2.1 Template de confirmação de conta
+### 2.1 SMTP / Resend
+
+Em `Authentication > SMTP Settings`, o SMTP/custom email está ativo com:
+
+- Sender email: `noreply@batchcutout.com`
+- Sender name: `BatchCutout`
+- Host: `smtp.resend.com`
+- Port: `465`
+- Username: `resend`
+- Password: chave API do Resend com `Sending access`
+- Minimum interval per user: `60`
+
+No Resend, o domínio `batchcutout.com` está verificado. Os registos DNS foram adicionados no Vercel para:
+
+- MX: `send.batchcutout.com`
+- SPF/TXT: `send.batchcutout.com`
+- DKIM/TXT: `resend._domainkey.batchcutout.com`
+
+Não guardar a chave API do Resend no repositório. Se a chave for rodada, atualizar apenas o campo `Password` no SMTP do Supabase.
+
+### 2.2 Template de confirmação de conta
 
 Em `Authentication > Email Templates`:
 
@@ -127,4 +143,5 @@ Depois de adicionar as variáveis na Vercel, fazer novo deploy para publicar:
 - Pro: 2000 imagens por mês
 - O site reserva o consumo antes de começar a processar
 - O login é por email e password via Supabase
+- Novas contas precisam de confirmar o email antes do primeiro login
 - O painel `/admin` permite listar contas e mudar entre `Free`, `Trial`, `Pro` e `Reset uso`
