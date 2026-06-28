@@ -46,7 +46,7 @@ export function getPlanLabel(plan) {
 
 export function profilePatchForSubscription(subscription, customerId = "", profile = null) {
   const status = String(subscription?.status || "incomplete");
-  const hasPaidAccess = ["active", "trialing"].includes(status);
+  const hasPaidAccess = status === "active";
   const now = new Date();
   const period = calendarPeriodFor(now);
   const normalizedCustomerId = customerId || (typeof subscription?.customer === "string" ? subscription.customer : subscription?.customer?.id) || null;
@@ -76,7 +76,7 @@ export function profilePatchForSubscription(subscription, customerId = "", profi
 
   return {
     plan: "pro",
-    plan_status: status === "trialing" ? "trialing" : "active",
+    plan_status: "active",
     batch_limit: 100,
     monthly_image_limit: 2000,
     ...usagePeriodPatch,

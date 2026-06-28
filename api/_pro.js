@@ -243,7 +243,7 @@ export function normalizeProfile(row, user) {
 }
 
 export function canUsePro(profile) {
-  return profile.plan === "pro" && ["active", "trialing"].includes(profile.plan_status);
+  return profile.plan === "pro" && profile.plan_status === "active";
 }
 
 export async function loadOrCreateProfile(settings, user) {
