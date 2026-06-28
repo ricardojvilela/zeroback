@@ -659,7 +659,7 @@
           <div class="panel-head compact">
             <div>
               <h3>Contas Pro</h3>
-              <p class="note">Gestao direta de acessos Free e Pro.</p>
+              <p class="note">Gestao direta de acessos Grátis e Pro.</p>
             </div>
             <div class="actions">
               <button class="secondary" type="button" id="refreshProUsers">Atualizar contas</button>
@@ -1056,7 +1056,7 @@
                 <td>${user.periodEnd ? new Date(user.periodEnd).toLocaleDateString() : "-"}</td>
                 <td>
                   <div class="table-actions">
-                    <button class="secondary" type="button" data-user-action="free" data-user-id="${escapeHtml(user.userId)}">Free</button>
+                    <button class="secondary" type="button" data-user-action="free" data-user-id="${escapeHtml(user.userId)}">Grátis</button>
                     <button type="button" data-user-action="pro" data-user-id="${escapeHtml(user.userId)}">Pro</button>
                     <button class="secondary" type="button" data-user-action="reset-usage" data-user-id="${escapeHtml(user.userId)}">Reset uso</button>
                   </div>

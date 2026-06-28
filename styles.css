@@ -1329,11 +1329,12 @@ progress::-moz-progress-bar {
 }
 
 .landing-copy h1 {
-  max-width: 12ch;
+  max-width: min(100%, 12ch);
   margin-bottom: 18px;
   color: var(--charcoal);
-  font-size: clamp(3rem, 7vw, 5.7rem);
+  font-size: clamp(3rem, 6.4vw, 5.25rem);
   line-height: 0.92;
+  overflow-wrap: break-word;
 }
 
 .landing-copy p {

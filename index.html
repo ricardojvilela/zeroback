@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-PT">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -56,7 +56,7 @@
             "publisher": {
               "@id": "https://batchcutout.com/#organization"
             },
-            "inLanguage": "en"
+            "inLanguage": "pt-PT"
           },
           {
             "@type": "SoftwareApplication",
@@ -73,7 +73,7 @@
             "operatingSystem": "Web",
             "url": "https://batchcutout.com/",
             "image": "https://batchcutout.com/assets/product-before-after-v5.png",
-            "description": "Bulk background remover for product photos. Upload multiple images, remove backgrounds and export transparent PNG files individually or as a ZIP.",
+            "description": "Removedor de fundo em lote para fotos de produto. Carregue várias imagens, remova fundos e exporte PNGs transparentes individualmente ou num ZIP.",
             "offers": {
               "@type": "Offer",
               "price": "0",
@@ -81,14 +81,14 @@
             },
             "audience": {
               "@type": "Audience",
-              "audienceType": "Ecommerce sellers, online stores, marketplace sellers and catalog teams"
+              "audienceType": "Vendedores ecommerce, lojas online, vendedores de marketplaces e equipas de catálogo"
             },
             "featureList": [
-              "Bulk background removal",
-              "Transparent PNG export",
-              "ZIP export",
-              "Browser-based image processing",
-              "Product photo workflow for ecommerce"
+              "Remoção de fundo em lote",
+              "Exportação PNG transparente",
+              "Exportação ZIP",
+              "Processamento de imagens no browser",
+              "Fluxo de fotos de produto para ecommerce"
             ]
           },
           {
@@ -97,26 +97,26 @@
             "mainEntity": [
               {
                 "@type": "Question",
-                "name": "Are photos uploaded to a server?",
+                "name": "As fotos são enviadas para um servidor?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "No. Images are processed in the user's browser and are not uploaded to BatchCutout servers."
+                  "text": "Não. As imagens são processadas no browser do utilizador e não são carregadas para servidores BatchCutout."
                 }
               },
               {
                 "@type": "Question",
-                "name": "What image formats are accepted?",
+                "name": "Que formatos de imagem são aceites?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "BatchCutout accepts common browser-supported image formats including JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG, HEIC and HEIF."
+                  "text": "O BatchCutout aceita formatos de imagem suportados pelo browser, incluindo JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG, HEIC e HEIF."
                 }
               },
               {
                 "@type": "Question",
-                "name": "Can users process larger batches?",
+                "name": "É possível processar lotes maiores?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "The free version allows up to 2 images per batch. Pro unlocks batches up to 100 images and 2,000 images per month."
+                  "text": "A versão grátis permite até 2 imagens por lote. O Pro desbloqueia lotes até 100 imagens e 2.000 imagens por mês."
                 }
               }
             ]
@@ -124,7 +124,7 @@
         ]
       }
     </script>
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v=20260628-design" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
   <body>
@@ -194,7 +194,7 @@
           <div class="account-actions hidden" id="accountActions">
             <button type="button" class="ghost-button small" id="accountRefresh" data-i18n="accountRefresh">Atualizar conta</button>
             <div class="billing-actions" id="billingActions">
-              <button type="button" data-checkout-plan="early" data-i18n="billingEarly">Early adopter - 15 EUR/mês</button>
+              <button type="button" data-checkout-plan="early" data-i18n="billingEarly">Plano fundador - 15 EUR/mês</button>
               <button type="button" data-checkout-plan="monthly" data-i18n="billingMonthly">Pro mensal - 19 EUR/mês</button>
               <button type="button" data-checkout-plan="annual" data-i18n="billingAnnual">Pro anual - 190 EUR/ano</button>
             </div>
@@ -310,7 +310,7 @@
             <h2 id="pro-interest-title" data-i18n="proInlineTitle">Desbloqueie até 100 imagens por lote</h2>
             <p data-i18n="proInlineLead">Escolha um plano Pro para processar até 100 imagens por lote e 2.000 imagens por mês.</p>
             <p class="pro-benefits" data-i18n="proInlineBenefits">
-              Pro mensal 19 EUR/mês. Early adopter 15 EUR/mês. Anual 190 EUR/ano.
+              Pro mensal 19 EUR/mês. Plano fundador 15 EUR/mês. Anual 190 EUR/ano.
             </p>
           </div>
           <form
@@ -318,7 +318,7 @@
             id="proInlineForm"
             novalidate
           >
-            <button type="button" data-checkout-plan="early" data-i18n="billingEarly">Early adopter - 15 EUR/mês</button>
+            <button type="button" data-checkout-plan="early" data-i18n="billingEarly">Plano fundador - 15 EUR/mês</button>
             <button type="button" data-checkout-plan="monthly" data-i18n="billingMonthly">Pro mensal - 19 EUR/mês</button>
             <button type="button" data-checkout-plan="annual" data-i18n="billingAnnual">Pro anual - 190 EUR/ano</button>
           </form>
@@ -365,28 +365,28 @@
           <h2 id="workflow-links-title">Fluxos por plataforma</h2>
           <div class="seo-link-grid">
             <a href="/remove-background-for-shopify/">
-              <strong>Shopify product photos</strong>
-              <span>Prepare product images before uploading to Shopify.</span>
+              <strong>Fotos de produto Shopify</strong>
+              <span>Prepare imagens de produto antes de carregar para Shopify.</span>
             </a>
             <a href="/etsy-product-photo-background-remover/">
-              <strong>Etsy listing photos</strong>
-              <span>Clean product cutouts for listings, bundles and shop updates.</span>
+              <strong>Fotos para anúncios Etsy</strong>
+              <span>Crie recortes limpos para anúncios, packs e atualizações da loja.</span>
             </a>
             <a href="/woocommerce-product-background-remover/">
-              <strong>WooCommerce catalogs</strong>
-              <span>Process product sets, variants and category images in batches.</span>
+              <strong>Catálogos WooCommerce</strong>
+              <span>Processe conjuntos, variantes e imagens de categoria em lote.</span>
             </a>
             <a href="/ebay-product-background-remover/">
-              <strong>eBay listing photos</strong>
-              <span>Prepare cleaner photos for reselling and marketplace workflows.</span>
+              <strong>Fotos para anúncios eBay</strong>
+              <span>Prepare fotos mais limpas para revenda e marketplaces.</span>
             </a>
             <a href="/amazon-product-background-remover/">
-              <strong>Amazon product photos</strong>
-              <span>Clean product batches before marketplace listing updates.</span>
+              <strong>Fotos de produto Amazon</strong>
+              <span>Limpe lotes de produto antes de atualizar anúncios.</span>
             </a>
             <a href="/bulk-product-photo-editor/">
-              <strong>Bulk product photo editor</strong>
-              <span>Remove backgrounds and export transparent PNGs in batches.</span>
+              <strong>Editor de fotos em lote</strong>
+              <span>Remova fundos e exporte PNGs transparentes em lote.</span>
             </a>
           </div>
         </section>
