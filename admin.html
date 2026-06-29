@@ -1283,7 +1283,7 @@
 
         subscriptionsStatus.textContent = "A carregar subscricoes...";
         try {
-          const response = await fetch("/api/admin-subscriptions", {
+          const response = await fetch("/api/pro-users?view=subscriptions", {
             headers: {
               Accept: "application/json",
               Authorization: `Bearer ${token}`,
