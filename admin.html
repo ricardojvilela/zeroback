@@ -462,7 +462,7 @@
       <form class="auth-card" id="authForm">
         <p class="eyebrow">Painel interno</p>
         <h1>Acesso protegido</h1>
-        <p class="note">Introduza a password de administrador para consultar a operacao do BatchCutout.</p>
+        <p class="note">Introduza a password de administrador para consultar a operação do BatchCutout.</p>
         <div class="field">
           <label for="adminPassword">Password</label>
           <input id="adminPassword" name="password" type="password" autocomplete="current-password" required />
@@ -486,14 +486,14 @@
       <section class="hero">
         <div class="hero-main">
           <p class="eyebrow">Painel interno</p>
-          <h1>Subscricoes, receita e uso real</h1>
-          <p>Acompanhe MRR, clientes ativos, acessos Pro e utilizacao do produto. O sinal comercial principal agora e a subscricao Stripe.</p>
+          <h1>Subscrições, receita e uso real</h1>
+          <p>Acompanhe MRR, clientes ativos, acessos Pro e utilização do produto. O sinal comercial principal agora é a subscrição Stripe.</p>
         </div>
 
         <aside class="recommendation">
           <span class="decision" id="decisionBadge">A carregar</span>
           <strong id="decisionTitle">Resumo comercial</strong>
-          <p class="note" id="decisionText">A carregar subscricoes Stripe e contas BatchCutout.</p>
+          <p class="note" id="decisionText">A carregar subscrições Stripe e contas BatchCutout.</p>
         </aside>
       </section>
 
@@ -507,7 +507,7 @@
           <strong id="dashboardUploads">0</strong>
         </article>
         <article class="metric">
-          <span>Subscricoes ativas</span>
+          <span>Subscrições ativas</span>
           <strong id="dashboardActiveSubscriptions">0</strong>
         </article>
         <article class="metric">
@@ -516,11 +516,11 @@
         </article>
       </section>
 
-      <section class="panel live-panel" aria-label="Operacao BatchCutout">
+      <section class="panel live-panel" aria-label="Operação BatchCutout">
         <div class="panel-head">
           <div>
-            <h2>Operacao BatchCutout</h2>
-            <p class="note">Subscricoes, acessos e eventos recolhidos automaticamente nos ultimos 14 dias.</p>
+            <h2>Operação BatchCutout</h2>
+            <p class="note">Subscrições, acessos e eventos recolhidos automaticamente nos últimos 14 dias.</p>
           </div>
           <div class="actions">
             <button class="secondary" type="button" id="refreshLive">Atualizar</button>
@@ -557,14 +557,14 @@
           </article>
         </div>
         <p class="live-status" id="liveStatus">A carregar atividade...</p>
-        <section class="source-live-block" aria-label="Subscricoes Stripe">
+        <section class="source-live-block" aria-label="Subscrições Stripe">
           <div class="panel-head compact">
             <div>
-              <h3>Subscricoes Stripe</h3>
-              <p class="note">Acompanhamento de pagamentos recorrentes, renovacoes e ligacao ao acesso Pro.</p>
+              <h3>Subscrições Stripe</h3>
+              <p class="note">Acompanhamento de pagamentos recorrentes, renovações e ligação ao acesso Pro.</p>
             </div>
             <div class="actions">
-              <button class="secondary" type="button" id="refreshSubscriptions">Atualizar subscricoes</button>
+              <button class="secondary" type="button" id="refreshSubscriptions">Atualizar subscrições</button>
             </div>
           </div>
           <div class="live-grid">
@@ -585,15 +585,15 @@
               <strong id="subscriptionAttention">0</strong>
             </article>
             <article class="live-card">
-              <span>Fim de periodo</span>
+              <span>Fim de período</span>
               <strong id="subscriptionCancelAtPeriodEnd">0</strong>
             </article>
             <article class="live-card">
-              <span>Sem ligacao</span>
+              <span>Sem ligação</span>
               <strong id="subscriptionUnlinked">0</strong>
             </article>
           </div>
-          <p class="live-status" id="subscriptionsStatus">A carregar subscricoes...</p>
+          <p class="live-status" id="subscriptionsStatus">A carregar subscrições...</p>
           <div class="table-wrap">
             <table>
               <thead>
@@ -602,14 +602,14 @@
                   <th>Estado</th>
                   <th>Plano Stripe</th>
                   <th>Valor</th>
-                  <th>Renovacao</th>
+                  <th>Renovação</th>
                   <th>Acesso BatchCutout</th>
                   <th>Stripe</th>
                 </tr>
               </thead>
               <tbody id="subscriptionsRowsBody">
                 <tr>
-                  <td class="empty" colspan="7">A carregar subscricoes.</td>
+                  <td class="empty" colspan="7">A carregar subscrições.</td>
                 </tr>
               </tbody>
             </table>
@@ -633,8 +633,8 @@
                   <th>Plano</th>
                   <th>Lote</th>
                   <th>Uso mensal</th>
-                  <th>Periodo</th>
-                  <th>Acoes</th>
+                  <th>Período</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
               <tbody id="proUsersRowsBody">
@@ -763,14 +763,14 @@
       }
 
       function subscriptionStatusLabel(status, cancelAtPeriodEnd = false) {
-        if (cancelAtPeriodEnd && status === "active") return "termina no periodo";
+        if (cancelAtPeriodEnd && status === "active") return "termina no período";
         const labels = {
           active: "ativa",
           canceled: "cancelada",
           incomplete: "incompleta",
           incomplete_expired: "expirada",
           past_due: "pagamento pendente",
-          unpaid: "nao paga",
+          unpaid: "não paga",
           paused: "pausada",
         };
         return labels[status] || status || "-";
@@ -819,7 +819,7 @@
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="10">Ainda nao existem eventos reais no periodo.</td></tr>`;
+          : `<tr><td class="empty" colspan="10">Ainda não existem eventos reais no período.</td></tr>`;
 
         sourceRowsBody.innerHTML = data.sourceBreakdown?.length
           ? data.sourceBreakdown.map((row) => `
@@ -835,10 +835,10 @@
                 <td>${row.checkoutStarts || 0}</td>
               </tr>
             `).join("")
-          : `<tr><td class="empty" colspan="9">Ainda nao existem origens identificadas.</td></tr>`;
+          : `<tr><td class="empty" colspan="9">Ainda não existem origens identificadas.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "";
-        liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Ultima atualizacao: ${generatedAt}`;
+        liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Última atualização: ${generatedAt}`;
       }
 
       function renderProUsers(users) {
@@ -859,7 +859,7 @@
                 </td>
               </tr>
             `).join("")
-          : `<tr><td class="empty" colspan="6">Ainda nao existem contas registadas.</td></tr>`;
+          : `<tr><td class="empty" colspan="6">Ainda não existem contas registadas.</td></tr>`;
       }
 
       function renderSubscriptions(data) {
@@ -874,10 +874,14 @@
         document.querySelector("#subscriptionCancelAtPeriodEnd").textContent = summary.cancelAtPeriodEnd || 0;
         document.querySelector("#subscriptionUnlinked").textContent = summary.unlinked || 0;
         document.querySelector("#decisionBadge").textContent = summary.attention ? "Rever" : "Operacional";
-        document.querySelector("#decisionTitle").textContent = `${summary.active || 0} subscricoes ativas`;
-        document.querySelector("#decisionText").textContent = summary.attention
-          ? `${summary.attention} subscricao ou ligacao precisa de atencao. Verifique estados pendentes, cancelamentos ou contas sem ligacao.`
-          : `MRR estimado: ${mrrLabel}. As subscricoes ativas estao ligadas ao acesso BatchCutout.`;
+        const attentionCount = summary.attention || 0;
+        const attentionLabel = attentionCount === 1
+          ? "1 subscrição ou ligação precisa de atenção"
+          : `${attentionCount} subscrições ou ligações precisam de atenção`;
+        document.querySelector("#decisionTitle").textContent = `${summary.active || 0} subscrições ativas`;
+        document.querySelector("#decisionText").textContent = attentionCount
+          ? `${attentionLabel}. Verifique estados pendentes, cancelamentos ou contas sem ligação.`
+          : `MRR estimado: ${mrrLabel}. As subscrições ativas estão ligadas ao acesso BatchCutout.`;
 
         subscriptionsRowsBody.innerHTML = data.subscriptions?.length
           ? data.subscriptions.map((subscription) => {
@@ -886,7 +890,7 @@
               const customerEmail = subscription.customerEmail || subscription.profileEmail || "-";
               const accessLabel = subscription.linkedToSupabase
                 ? `${subscription.accessPlan || "free"} / ${subscription.accessStatus || "active"}`
-                : "sem ligacao";
+                : "sem ligação";
               const usageLabel = subscription.linkedToSupabase
                 ? `${subscription.monthlyUsed || 0} / ${subscription.monthlyLimit || 0} imagens`
                 : "sem utilizador ligado";
@@ -915,17 +919,17 @@
                     <span class="muted-small">${escapeHtml(usageLabel)}</span>
                   </td>
                   <td>
-                    <a class="subscription-link" href="${escapeHtml(subscription.stripeDashboardUrl)}" target="_blank" rel="noreferrer">Subscricao</a>
+                    <a class="subscription-link" href="${escapeHtml(subscription.stripeDashboardUrl)}" target="_blank" rel="noreferrer">Subscrição</a>
                     ${subscription.customerDashboardUrl ? `<span class="muted-small"><a class="subscription-link" href="${escapeHtml(subscription.customerDashboardUrl)}" target="_blank" rel="noreferrer">Cliente</a></span>` : ""}
-                    ${subscription.status === "active" && !subscription.cancelAtPeriodEnd ? `<span class="muted-small"><button class="secondary" type="button" data-subscription-action="cancel-renewal" data-subscription-id="${escapeHtml(subscription.id)}">Cancelar renovacao</button></span>` : ""}
+                    ${subscription.status === "active" && !subscription.cancelAtPeriodEnd ? `<span class="muted-small"><button class="secondary" type="button" data-subscription-action="cancel-renewal" data-subscription-id="${escapeHtml(subscription.id)}">Cancelar renovação</button></span>` : ""}
                   </td>
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="7">Ainda nao existem subscricoes Stripe.</td></tr>`;
+          : `<tr><td class="empty" colspan="7">Ainda não existem subscrições Stripe.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString("pt-PT") : "";
-        subscriptionsStatus.textContent = `${summary.total || 0} subscricoes lidas. Ultima atualizacao: ${generatedAt}`;
+        subscriptionsStatus.textContent = `${summary.total || 0} subscrições lidas. Última atualização: ${generatedAt}`;
       }
 
       async function loadProUsers() {
@@ -945,7 +949,7 @@
           }
           renderProUsers(data.users || []);
         } catch {
-          proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Nao foi possivel carregar contas.</td></tr>`;
+          proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar contas.</td></tr>`;
         }
       }
 
@@ -953,7 +957,7 @@
         const token = getAdminToken();
         if (!token) return;
 
-        subscriptionsStatus.textContent = "A carregar subscricoes...";
+        subscriptionsStatus.textContent = "A carregar subscrições...";
         try {
           const response = await fetch("/api/pro-users?view=subscriptions", {
             headers: {
@@ -967,8 +971,8 @@
           }
           renderSubscriptions(data);
         } catch {
-          subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="7">Nao foi possivel carregar subscricoes Stripe.</td></tr>`;
-          subscriptionsStatus.textContent = "Erro ao carregar Stripe. Verificar chave Stripe e permissao do admin.";
+          subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="7">Não foi possível carregar subscrições Stripe.</td></tr>`;
+          subscriptionsStatus.textContent = "Erro ao carregar Stripe. Verificar chave Stripe e permissão do admin.";
         }
       }
 
@@ -1045,11 +1049,11 @@
             localStorage.removeItem(adminTokenExpiryStorageKey);
             document.body.classList.add("locked");
           }
-          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="10">Nao foi possivel carregar atividade.</td></tr>`;
-          proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Nao foi possivel carregar contas.</td></tr>`;
-          subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="7">Nao foi possivel carregar subscricoes Stripe.</td></tr>`;
-          liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variaveis Vercel.";
-          subscriptionsStatus.textContent = "Erro ao carregar subscricoes.";
+          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="10">Não foi possível carregar atividade.</td></tr>`;
+          proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar contas.</td></tr>`;
+          subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="7">Não foi possível carregar subscrições Stripe.</td></tr>`;
+          liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variáveis Vercel.";
+          subscriptionsStatus.textContent = "Erro ao carregar subscrições.";
         }
       }
 
@@ -1062,13 +1066,13 @@
 
         const subscriptionId = button.dataset.subscriptionId;
         if (!subscriptionId) return;
-        if (!confirm("Cancelar a renovacao desta subscricao no Stripe?")) return;
+        if (!confirm("Cancelar a renovação desta subscrição no Stripe?")) return;
 
         button.disabled = true;
         try {
           await cancelSubscription(subscriptionId);
         } catch {
-          alert("Nao foi possivel cancelar a renovacao.");
+          alert("Não foi possível cancelar a renovação.");
         } finally {
           button.disabled = false;
         }
@@ -1085,7 +1089,7 @@
         try {
           await updateProUser(userId, mode);
         } catch {
-          alert("Nao foi possivel atualizar a conta.");
+          alert("Não foi possível atualizar a conta.");
         } finally {
           button.disabled = false;
         }
