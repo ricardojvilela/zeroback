@@ -211,7 +211,7 @@ async function listSubscriptions(settings) {
     stripe.subscriptions.list({
       status: "all",
       limit: 100,
-      expand: ["data.customer", "data.items.data.price.product"],
+      expand: ["data.customer"],
     }),
   ]);
 
@@ -239,6 +239,20 @@ async function listSubscriptions(settings) {
     summary: summarizeSubscriptions(subscriptions),
     subscriptions,
   };
+}
+
+async function cancelSubscriptionRenewal(subscriptionId) {
+  const stripe = getStripeClient();
+  if (!stripe) {
+    throw new Error("stripe_not_configured");
+  }
+
+  const subscription = await stripe.subscriptions.update(subscriptionId, {
+    cancel_at_period_end: true,
+    expand: ["customer"],
+  });
+
+  return mapSubscription(subscription);
 }
 
 export default async function handler(request, response) {
@@ -274,6 +288,17 @@ export default async function handler(request, response) {
     const body = await readRequestBody(request);
     const userId = String(body?.userId || "").trim();
     const mode = String(body?.mode || "").trim();
+
+    if (mode === "cancel-subscription") {
+      const subscriptionId = String(body?.subscriptionId || "").trim();
+      if (!subscriptionId.startsWith("sub_")) {
+        return sendJson(response, 400, { ok: false, error: "invalid_subscription_id" });
+      }
+
+      const subscription = await cancelSubscriptionRenewal(subscriptionId);
+      return sendJson(response, 200, { ok: true, subscription });
+    }
+
     if (!userId || !["free", "pro", "reset-usage"].includes(mode)) {
       return sendJson(response, 400, { ok: false, error: "invalid_request" });
     }
@@ -300,7 +325,7 @@ export default async function handler(request, response) {
       const period = monthPeriod();
       patch = {
         plan: "pro",
-        plan_status: "active",
+        plan_status: "manual",
         batch_limit: 100,
         monthly_image_limit: 2000,
         monthly_images_used: 0,
