@@ -1,15 +1,8 @@
-import { getSupabaseSettings, readRawRequestBody } from "./_pro.js";
+import { getSupabaseSettings } from "./_pro.js";
 import { getStripeClient, updateProfileFromSubscription } from "./_stripe.js";
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-function sendWebhookJson(response, status, data) {
-  response.setHeader("Content-Type", "application/json");
-  response.status(status).json(data);
+function webhookJson(status, data) {
+  return Response.json(data, { status });
 }
 
 async function getSubscriptionFromCheckout(stripe, session) {
@@ -20,37 +13,15 @@ async function getSubscriptionFromCheckout(stripe, session) {
   return session.subscription;
 }
 
-export default async function handler(request, response) {
-  if (request.method !== "POST") {
-    return sendWebhookJson(response, 405, { ok: false, error: "method_not_allowed" });
+async function handleStripeEvent(event) {
+  const settings = getSupabaseSettings();
+  if (!settings.supabaseUrl || !settings.serviceRoleKey) {
+    return webhookJson(503, { ok: false, error: "supabase_not_configured" });
   }
 
   const stripe = getStripeClient();
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
-  if (!stripe || !webhookSecret) {
-    return sendWebhookJson(response, 503, { ok: false, error: "stripe_webhook_not_configured" });
-  }
-
-  const signature = request.headers["stripe-signature"] || request.headers["Stripe-Signature"];
-  if (!signature) {
-    return sendWebhookJson(response, 400, { ok: false, error: "missing_stripe_signature" });
-  }
-
-  let event;
-  try {
-    const rawBody = await readRawRequestBody(request);
-    event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
-  } catch (error) {
-    return sendWebhookJson(response, 400, {
-      ok: false,
-      error: "invalid_stripe_signature",
-      detail: error instanceof Error ? error.message : "unknown_error",
-    });
-  }
-
-  const settings = getSupabaseSettings();
-  if (!settings.supabaseUrl || !settings.serviceRoleKey) {
-    return sendWebhookJson(response, 503, { ok: false, error: "supabase_not_configured" });
+  if (!stripe) {
+    return webhookJson(503, { ok: false, error: "stripe_not_configured" });
   }
 
   try {
@@ -70,12 +41,43 @@ export default async function handler(request, response) {
       await updateProfileFromSubscription(settings, event.data.object);
     }
 
-    return sendWebhookJson(response, 200, { ok: true, received: true });
+    return webhookJson(200, { ok: true, received: true });
   } catch (error) {
-    return sendWebhookJson(response, 500, {
+    return webhookJson(500, {
       ok: false,
       error: "stripe_webhook_failed",
       detail: error instanceof Error ? error.message : "unknown_error",
     });
   }
+}
+
+export async function POST(request) {
+  const stripe = getStripeClient();
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
+  if (!stripe || !webhookSecret) {
+    return webhookJson(503, { ok: false, error: "stripe_webhook_not_configured" });
+  }
+
+  const signature = request.headers.get("stripe-signature") || "";
+  if (!signature) {
+    return webhookJson(400, { ok: false, error: "missing_stripe_signature" });
+  }
+
+  let event;
+  try {
+    const rawBody = await request.text();
+    event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
+  } catch (error) {
+    return webhookJson(400, {
+      ok: false,
+      error: "invalid_stripe_signature",
+      detail: error instanceof Error ? error.message : "unknown_error",
+    });
+  }
+
+  return handleStripeEvent(event);
+}
+
+export function GET() {
+  return webhookJson(405, { ok: false, error: "method_not_allowed" });
 }
