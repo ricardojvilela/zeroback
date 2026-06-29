@@ -51,18 +51,18 @@ export function profilePatchForSubscription(subscription, customerId = "", profi
   const period = calendarPeriodFor(now);
   const normalizedCustomerId = customerId || (typeof subscription?.customer === "string" ? subscription.customer : subscription?.customer?.id) || null;
 
-  if (!hasPaidAccess) {
-    if (profile?.plan === "pro" && profile?.plan_status === "manual") {
-      return {
-        plan: "pro",
-        plan_status: "manual",
-        batch_limit: 100,
-        monthly_image_limit: 2000,
-        stripe_customer_id: normalizedCustomerId,
-        stripe_subscription_id: subscription?.id || null,
-      };
-    }
+  if (profile?.plan === "pro" && profile?.plan_status === "manual") {
+    return {
+      plan: "pro",
+      plan_status: "manual",
+      batch_limit: 100,
+      monthly_image_limit: 2000,
+      stripe_customer_id: normalizedCustomerId,
+      stripe_subscription_id: subscription?.id || null,
+    };
+  }
 
+  if (!hasPaidAccess) {
     return {
       plan: "free",
       plan_status: status,
