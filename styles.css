@@ -1498,6 +1498,189 @@ progress::-moz-progress-bar {
   line-height: 1.5;
 }
 
+.landing-metrics,
+.landing-workflow,
+.landing-comparison,
+.landing-offer {
+  margin-top: 22px;
+  border: 1px solid rgba(219, 227, 238, 0.9);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 14px 34px rgba(26, 39, 57, 0.08);
+}
+
+.landing-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  overflow: hidden;
+}
+
+.landing-metrics span {
+  display: flex;
+  min-height: 116px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  border-right: 1px solid rgba(219, 227, 238, 0.88);
+  padding: 18px;
+  color: #52606d;
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
+.landing-metrics span:last-child {
+  border-right: 0;
+}
+
+.landing-metrics strong {
+  color: var(--charcoal);
+  font-size: clamp(1.9rem, 3vw, 2.6rem);
+  line-height: 1;
+}
+
+.landing-workflow,
+.landing-offer {
+  padding: 24px;
+}
+
+.landing-workflow h2,
+.landing-comparison h2,
+.landing-offer h2 {
+  margin-bottom: 10px;
+}
+
+.landing-workflow > p,
+.landing-comparison > p,
+.landing-offer > p {
+  max-width: 54rem;
+  margin: 0 0 18px;
+  color: #52606d;
+  line-height: 1.55;
+}
+
+.landing-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.landing-step {
+  border: 1px solid rgba(219, 227, 238, 0.9);
+  border-radius: 8px;
+  padding: 16px;
+  background: #ffffff;
+}
+
+.landing-step span {
+  display: inline-flex;
+  min-width: 34px;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  background: rgba(15, 139, 124, 0.1);
+  color: var(--accent-strong);
+  font-weight: 950;
+}
+
+.landing-step strong {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--charcoal);
+}
+
+.landing-step p {
+  margin: 0;
+  color: #52606d;
+  font-size: 0.94rem;
+  line-height: 1.48;
+}
+
+.landing-comparison {
+  overflow: hidden;
+}
+
+.landing-comparison header,
+.landing-offer header {
+  padding: 22px 24px 0;
+}
+
+.landing-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #ffffff;
+}
+
+.landing-table th,
+.landing-table td {
+  border-top: 1px solid rgba(219, 227, 238, 0.9);
+  padding: 14px 16px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.landing-table th {
+  color: var(--charcoal);
+  font-size: 0.86rem;
+  text-transform: uppercase;
+}
+
+.landing-table td {
+  color: #52606d;
+  line-height: 1.45;
+}
+
+.landing-table td:first-child {
+  color: var(--charcoal);
+  font-weight: 900;
+}
+
+.landing-offer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.55fr);
+  gap: 20px;
+  align-items: center;
+}
+
+.landing-offer header {
+  padding: 0;
+}
+
+.landing-offer-list {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing-offer-list li {
+  border-left: 3px solid var(--accent);
+  padding: 8px 0 8px 12px;
+  color: #52606d;
+  line-height: 1.45;
+}
+
+.landing-price-box {
+  border: 1px solid rgba(38, 70, 216, 0.18);
+  border-radius: 8px;
+  padding: 18px;
+  background: #f7f9ff;
+}
+
+.landing-price-box strong {
+  display: block;
+  color: var(--charcoal);
+  font-size: 2rem;
+}
+
+.landing-price-box p {
+  margin: 8px 0 16px;
+  color: #52606d;
+  line-height: 1.45;
+}
+
 .pricing-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(330px, 0.92fr);
@@ -2096,6 +2279,9 @@ progress::-moz-progress-bar {
 
   .landing-hero,
   .landing-proof,
+  .landing-metrics,
+  .landing-steps,
+  .landing-offer,
   .pricing-hero,
   .pricing-proof,
   .pricing-form-panel,
@@ -2246,5 +2432,28 @@ progress::-moz-progress-bar {
 
   .pricing-form-panel {
     padding: 20px;
+  }
+
+  .landing-metrics span {
+    min-height: auto;
+    border-right: 0;
+    border-bottom: 1px solid rgba(219, 227, 238, 0.88);
+  }
+
+  .landing-metrics span:last-child {
+    border-bottom: 0;
+  }
+
+  .landing-workflow,
+  .landing-offer {
+    padding: 20px;
+  }
+
+  .landing-comparison {
+    overflow-x: auto;
+  }
+
+  .landing-table {
+    min-width: 620px;
   }
 }

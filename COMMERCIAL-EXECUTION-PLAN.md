@@ -1,0 +1,159 @@
+# BatchCutout - Commercial execution plan
+
+## North star
+
+Maximize renewable revenue from ecommerce users who repeatedly process product photos.
+
+Primary KPI:
+
+- MRR renovavel
+- Subscricoes pagas ativas
+- Custo por subscricao
+
+Secondary KPIs:
+
+- Visitantes por origem
+- Uploads iniciados
+- Downloads
+- Cliques em planos
+- Checkout sem login
+- Contas criadas
+- Checkouts iniciados
+- Portal aberto
+
+## Positioning
+
+BatchCutout is not a generic photo editor. It is a bulk background remover for ecommerce product photos.
+
+Core promise:
+
+> Remove backgrounds from product photos in batch. Export transparent PNGs or one organized ZIP.
+
+Best audiences:
+
+- Shopify and WooCommerce stores
+- Etsy, eBay and Amazon sellers
+- Catalog teams
+- Ecommerce assistants
+- Small agencies managing product photos for clients
+
+## Offer ladder
+
+Current public offer:
+
+- Free: 2 images per batch
+- Founder plan: 15 EUR/month
+- Pro monthly: 19 EUR/month
+- Pro annual: 190 EUR/year
+
+Do not add more paid plans until at least 20 paying customers exist.
+
+Future upsell:
+
+- Pro Plus: 39 EUR/month, higher monthly image volume
+- Agency: 79 EUR/month, higher volume and priority support
+
+## 30-day execution
+
+### Week 1
+
+- Launch Search campaigns only.
+- Budget: 10 EUR/day.
+- Split budget:
+  - 4 EUR/day bulk background remover
+  - 3 EUR/day Shopify
+  - 3 EUR/day Etsy
+- Review search terms every 48 hours.
+- Add negatives aggressively for free-only, tutorial, wallpaper and generic editor traffic.
+
+Success signal:
+
+- Visitors upload images.
+- Downloads happen.
+- At least some users click Pro plans.
+
+### Week 2
+
+- Pause weak keywords.
+- Move budget toward the campaign with the most downloads and plan clicks.
+- Review account-to-checkout gap in `/admin`.
+- If checkout without login is high, make account panel copy more direct.
+- If uploads are high and Pro clicks are low, strengthen post-download Pro CTA.
+
+Success signal:
+
+- First paid subscriptions from cold traffic or account creation from paid traffic.
+
+### Week 3
+
+- Start manual outreach to high-fit users:
+  - Shopify stores
+  - Etsy sellers with many product listings
+  - WooCommerce agencies
+  - Ecommerce virtual assistants
+- Offer founder plan.
+- Ask first customers why they bought and what stopped them.
+
+Success signal:
+
+- 5 paying customers or strong account/checkout intent.
+
+### Week 4
+
+- Calculate CAC by channel.
+- Keep campaigns with measurable product usage.
+- Pause campaigns that only generate visits.
+- If annual plan has low uptake, test copy: "2 months free".
+- If users hit monthly limits, prepare Pro Plus.
+
+Success signal:
+
+- 10 to 20 paid users or clear evidence of which segment converts.
+
+## Daily dashboard routine
+
+Open `/admin` once per day and record:
+
+- Visitors 14 days
+- Uploads 14 days
+- Downloads
+- Clicks in plans
+- Checkout without login
+- Signups
+- Checkouts
+- Active subscriptions
+- Renewable MRR
+
+Decision rules:
+
+- Traffic without uploads: landing page or keyword mismatch.
+- Uploads without downloads: product quality or processing issue.
+- Downloads without Pro clicks: pricing/CTA issue.
+- Pro clicks without accounts: account friction.
+- Accounts without checkout: offer or checkout friction.
+- Checkout without payment: payment trust, price or Stripe flow issue.
+
+## First revenue targets
+
+Target 1:
+
+- 20 paying customers
+- 300 to 380 EUR MRR
+
+Target 2:
+
+- 100 paying customers
+- 1,500 to 2,000 EUR MRR
+
+Acceptable CAC:
+
+- Monthly subscriber: up to 25 to 35 EUR initially.
+- Annual subscriber: up to 50 to 70 EUR initially.
+
+## Do not do yet
+
+- Do not build complex team accounts before paid demand exists.
+- Do not create many pricing tiers before 20 paying customers.
+- Do not spend on broad Meta campaigns before Search data is clear.
+- Do not compete on "free background remover" traffic.
+- Do not rewrite the whole product before measuring real conversion.
