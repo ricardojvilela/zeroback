@@ -507,11 +507,11 @@
           <strong id="dashboardUploads">0</strong>
         </article>
         <article class="metric">
-          <span>Subscrições ativas</span>
+          <span>Subscrições a renovar</span>
           <strong id="dashboardActiveSubscriptions">0</strong>
         </article>
         <article class="metric">
-          <span>MRR estimado</span>
+          <span>MRR renovável</span>
           <strong id="dashboardMrr">0 EUR</strong>
         </article>
       </section>
@@ -569,7 +569,7 @@
           </div>
           <div class="live-grid">
             <article class="live-card">
-              <span>MRR estimado</span>
+              <span>MRR renovável</span>
               <strong id="subscriptionMrr">0 EUR</strong>
             </article>
             <article class="live-card">
@@ -865,7 +865,8 @@
       function renderSubscriptions(data) {
         const summary = data.summary || {};
         const mrrLabel = formatCurrencyFromCents(summary.mrrAmount || 0, summary.currency || "eur");
-        document.querySelector("#dashboardActiveSubscriptions").textContent = summary.active || 0;
+        const renewingSubscriptions = summary.renewing ?? summary.active ?? 0;
+        document.querySelector("#dashboardActiveSubscriptions").textContent = renewingSubscriptions;
         document.querySelector("#dashboardMrr").textContent = mrrLabel;
         document.querySelector("#subscriptionMrr").textContent = mrrLabel;
         document.querySelector("#subscriptionActive").textContent = summary.active || 0;
@@ -878,10 +879,10 @@
         const attentionLabel = attentionCount === 1
           ? "1 subscrição ou ligação precisa de atenção"
           : `${attentionCount} subscrições ou ligações precisam de atenção`;
-        document.querySelector("#decisionTitle").textContent = `${summary.active || 0} subscrições ativas`;
+        document.querySelector("#decisionTitle").textContent = `${renewingSubscriptions} subscrições a renovar`;
         document.querySelector("#decisionText").textContent = attentionCount
           ? `${attentionLabel}. Verifique estados pendentes, cancelamentos ou contas sem ligação.`
-          : `MRR estimado: ${mrrLabel}. As subscrições ativas estão ligadas ao acesso BatchCutout.`;
+          : `MRR renovável: ${mrrLabel}. As subscrições a renovar estão ligadas ao acesso BatchCutout.`;
 
         subscriptionsRowsBody.innerHTML = data.subscriptions?.length
           ? data.subscriptions.map((subscription) => {

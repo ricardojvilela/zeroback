@@ -141,6 +141,7 @@ function summarizeSubscriptions(subscriptions) {
   const summary = {
     total: subscriptions.length,
     active: 0,
+    renewing: 0,
     canceled: 0,
     attention: 0,
     cancelAtPeriodEnd: 0,
@@ -153,7 +154,10 @@ function summarizeSubscriptions(subscriptions) {
     if (subscription.currency) summary.currency = subscription.currency;
     if (subscription.status === "active") {
       summary.active += 1;
-      summary.mrrAmount += Number(subscription.monthlyAmount || 0) || 0;
+      if (!subscription.cancelAtPeriodEnd) {
+        summary.renewing += 1;
+        summary.mrrAmount += Number(subscription.monthlyAmount || 0) || 0;
+      }
     }
     if (subscription.status === "canceled") summary.canceled += 1;
     if (subscription.cancelAtPeriodEnd) summary.cancelAtPeriodEnd += 1;
