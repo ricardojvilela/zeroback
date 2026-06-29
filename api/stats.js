@@ -35,7 +35,12 @@ function emptyDay(date) {
     pngDownloads: 0,
     zipDownloads: 0,
     proClicks: 0,
+    checkoutLoginRequired: 0,
     checkoutStarts: 0,
+    accountSignupStarts: 0,
+    accountSignups: 0,
+    accountLogins: 0,
+    billingPortalOpens: 0,
   };
 }
 
@@ -112,7 +117,12 @@ function emptySourceRow(source) {
     downloads: 0,
     zipDownloads: 0,
     proClicks: 0,
+    checkoutLoginRequired: 0,
     checkoutStarts: 0,
+    accountSignupStarts: 0,
+    accountSignups: 0,
+    accountLogins: 0,
+    billingPortalOpens: 0,
     events: 0,
   };
 }
@@ -261,9 +271,29 @@ export default async function handler(request, response) {
           row.proClicks += 1;
           sourceRow.proClicks += 1;
           break;
+        case "pro_checkout_login_required":
+          row.checkoutLoginRequired += 1;
+          sourceRow.checkoutLoginRequired += 1;
+          break;
         case "pro_checkout_started":
           row.checkoutStarts += 1;
           sourceRow.checkoutStarts += 1;
+          break;
+        case "account_signup_started":
+          row.accountSignupStarts += 1;
+          sourceRow.accountSignupStarts += 1;
+          break;
+        case "account_signup_succeeded":
+          row.accountSignups += 1;
+          sourceRow.accountSignups += 1;
+          break;
+        case "account_login_succeeded":
+          row.accountLogins += 1;
+          sourceRow.accountLogins += 1;
+          break;
+        case "billing_portal_opened":
+          row.billingPortalOpens += 1;
+          sourceRow.billingPortalOpens += 1;
           break;
         default:
           break;

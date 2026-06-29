@@ -390,7 +390,7 @@
 
       table {
         width: 100%;
-        min-width: 920px;
+        min-width: 1180px;
         border-collapse: collapse;
         background: #fff;
       }
@@ -555,6 +555,30 @@
             <span>Checkouts iniciados</span>
             <strong id="liveCheckoutStarts">0</strong>
           </article>
+          <article class="live-card">
+            <span>Checkout sem login</span>
+            <strong id="liveCheckoutLoginRequired">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Registos iniciados</span>
+            <strong id="liveAccountSignupStarts">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Contas criadas</span>
+            <strong id="liveAccountSignups">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Logins</span>
+            <strong id="liveAccountLogins">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Conta sem checkout</span>
+            <strong id="liveAccountCheckoutGap">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Portal aberto</span>
+            <strong id="liveBillingPortalOpens">0</strong>
+          </article>
         </div>
         <p class="live-status" id="liveStatus">A carregar atividade...</p>
         <section class="source-live-block" aria-label="Subscrições Stripe">
@@ -664,12 +688,17 @@
                   <th>Downloads</th>
                   <th>ZIP</th>
                   <th>Cliques planos</th>
+                  <th>Sem login</th>
+                  <th>Registos</th>
+                  <th>Contas</th>
+                  <th>Logins</th>
                   <th>Checkouts</th>
+                  <th>Portal</th>
                 </tr>
               </thead>
               <tbody id="sourceRowsBody">
                 <tr>
-                  <td class="empty" colspan="9">A carregar origens.</td>
+                  <td class="empty" colspan="14">A carregar origens.</td>
                 </tr>
               </tbody>
             </table>
@@ -688,12 +717,17 @@
                 <th>Resultado pronto</th>
                 <th>Downloads</th>
                 <th>Cliques planos</th>
+                <th>Sem login</th>
+                <th>Registos</th>
+                <th>Contas</th>
+                <th>Logins</th>
                 <th>Checkouts</th>
+                <th>Portal</th>
               </tr>
             </thead>
             <tbody id="liveRowsBody">
               <tr>
-                <td class="empty" colspan="10">A carregar atividade.</td>
+                <td class="empty" colspan="15">A carregar atividade.</td>
               </tr>
             </tbody>
           </table>
@@ -801,6 +835,13 @@
         document.querySelector("#liveDownloadReady").textContent = totals.downloadReadyShown || 0;
         document.querySelector("#liveProClicks").textContent = totals.proClicks || 0;
         document.querySelector("#liveCheckoutStarts").textContent = totals.checkoutStarts || 0;
+        document.querySelector("#liveCheckoutLoginRequired").textContent = totals.checkoutLoginRequired || 0;
+        document.querySelector("#liveAccountSignupStarts").textContent = totals.accountSignupStarts || 0;
+        document.querySelector("#liveAccountSignups").textContent = totals.accountSignups || 0;
+        document.querySelector("#liveAccountLogins").textContent = totals.accountLogins || 0;
+        document.querySelector("#liveBillingPortalOpens").textContent = totals.billingPortalOpens || 0;
+        const accountEntrants = (totals.accountSignups || 0) + (totals.accountLogins || 0);
+        document.querySelector("#liveAccountCheckoutGap").textContent = Math.max(accountEntrants - (totals.checkoutStarts || 0), 0);
 
         liveRowsBody.innerHTML = data.rows?.length
           ? data.rows.slice().reverse().map((row) => {
@@ -815,11 +856,16 @@
                   <td>${row.downloadReadyShown || 0}</td>
                   <td>${row.downloads}</td>
                   <td>${row.proClicks}</td>
+                  <td>${row.checkoutLoginRequired || 0}</td>
+                  <td>${row.accountSignupStarts || 0}</td>
+                  <td>${row.accountSignups || 0}</td>
+                  <td>${row.accountLogins || 0}</td>
                   <td>${row.checkoutStarts || 0}</td>
+                  <td>${row.billingPortalOpens || 0}</td>
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="10">Ainda não existem eventos reais no período.</td></tr>`;
+          : `<tr><td class="empty" colspan="15">Ainda não existem eventos reais no período.</td></tr>`;
 
         sourceRowsBody.innerHTML = data.sourceBreakdown?.length
           ? data.sourceBreakdown.map((row) => `
@@ -832,10 +878,15 @@
                 <td>${row.downloads || 0}</td>
                 <td>${row.zipDownloads || 0}</td>
                 <td>${row.proClicks || 0}</td>
+                <td>${row.checkoutLoginRequired || 0}</td>
+                <td>${row.accountSignupStarts || 0}</td>
+                <td>${row.accountSignups || 0}</td>
+                <td>${row.accountLogins || 0}</td>
                 <td>${row.checkoutStarts || 0}</td>
+                <td>${row.billingPortalOpens || 0}</td>
               </tr>
             `).join("")
-          : `<tr><td class="empty" colspan="9">Ainda não existem origens identificadas.</td></tr>`;
+          : `<tr><td class="empty" colspan="14">Ainda não existem origens identificadas.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "";
         liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Última atualização: ${generatedAt}`;
@@ -1050,7 +1101,7 @@
             localStorage.removeItem(adminTokenExpiryStorageKey);
             document.body.classList.add("locked");
           }
-          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="10">Não foi possível carregar atividade.</td></tr>`;
+          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="15">Não foi possível carregar atividade.</td></tr>`;
           proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar contas.</td></tr>`;
           subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="7">Não foi possível carregar subscrições Stripe.</td></tr>`;
           liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variáveis Vercel.";

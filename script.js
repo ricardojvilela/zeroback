@@ -77,6 +77,12 @@ const serverEventNames = new Set([
   "pro_prompt_shown",
   "pro_form_started",
   "pro_submit_attempt",
+  "pro_checkout_login_required",
+  "pro_checkout_started",
+  "billing_portal_opened",
+  "account_signup_started",
+  "account_signup_succeeded",
+  "account_login_succeeded",
 ]);
 let debugList;
 let supabaseClient = null;
@@ -1003,6 +1009,12 @@ const analyticsEvents = {
   pro_prompt_shown: { category: "commercial_intent", label: "pro_prompt_shown", step: 7 },
   pro_form_started: { category: "commercial_intent", label: "pro_form_started", step: 8 },
   pro_submit_attempt: { category: "commercial_intent", label: "pro_submit_attempt", step: 9 },
+  pro_checkout_login_required: { category: "commercial_intent", label: "checkout_login_required", step: 10 },
+  pro_checkout_started: { category: "commercial_intent", label: "checkout_started", step: 11 },
+  billing_portal_opened: { category: "account", label: "billing_portal_opened" },
+  account_signup_started: { category: "account", label: "signup_started" },
+  account_signup_succeeded: { category: "account", label: "signup_succeeded" },
+  account_login_succeeded: { category: "account", label: "login_succeeded" },
   photos_selected: { category: "upload", label: "photos_selected" },
   upload_rejected: { category: "upload", label: "upload_rejected" },
   upload: { category: "funnel", label: "upload", step: 1 },
@@ -1518,6 +1530,10 @@ async function handleAccountLogin(event) {
     });
 
     if (error) throw error;
+    trackEvent("account_login_succeeded", {
+      source: requestedCheckoutPlan ? "checkout_plan" : "account_panel",
+      has_requested_checkout: Boolean(requestedCheckoutPlan),
+    });
     setAccountMessage("accountMagicLinkSent");
   } catch {
     setAccountMessage("accountAuthError");
@@ -1543,6 +1559,10 @@ async function handleAccountCreate() {
   accountCreate.disabled = true;
   accountCreate.textContent = t("accountCreateSending");
   setAccountMessage();
+  trackEvent("account_signup_started", {
+    source: requestedCheckoutPlan ? "checkout_plan" : "account_panel",
+    has_requested_checkout: Boolean(requestedCheckoutPlan),
+  });
 
   try {
     const redirectTo = `${window.location.origin}${window.location.pathname}${window.location.search}`;
@@ -1555,6 +1575,10 @@ async function handleAccountCreate() {
     });
 
     if (error) throw error;
+    trackEvent("account_signup_succeeded", {
+      source: requestedCheckoutPlan ? "checkout_plan" : "account_panel",
+      has_requested_checkout: Boolean(requestedCheckoutPlan),
+    });
     setAccountMessage("accountSignupSuccess");
   } catch {
     setAccountMessage("accountSignupError");
@@ -1589,6 +1613,7 @@ async function startCheckout(plan = "monthly", triggerButton = null) {
   const accessToken = await getCurrentAccessToken();
 
   if (!accessToken) {
+    trackEvent("pro_checkout_login_required", { plan: selectedPlan });
     setAccountMessage("billingLoginRequired");
     accountPanel?.scrollIntoView({ behavior: "smooth", block: "start" });
     return;

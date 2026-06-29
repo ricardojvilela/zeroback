@@ -20,8 +20,12 @@ const allowedEvents = new Set([
   "pro_volume_selected",
   "pro_submit_attempt",
   "pro_checkout_interest_submitted",
+  "pro_checkout_login_required",
   "pro_checkout_started",
   "billing_portal_opened",
+  "account_signup_started",
+  "account_signup_succeeded",
+  "account_login_succeeded",
 ]);
 
 const corsHeaders = {
