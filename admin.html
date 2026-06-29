@@ -295,6 +295,39 @@
         font-weight: 800;
       }
 
+      .pill.success {
+        background: #e9f7f4;
+        color: var(--accent);
+      }
+
+      .pill.warning {
+        background: #fff7df;
+        color: var(--warning);
+      }
+
+      .pill.danger {
+        background: #fff1ef;
+        color: var(--danger);
+      }
+
+      .subscription-link {
+        color: var(--blue);
+        font-weight: 900;
+        text-decoration: none;
+      }
+
+      .subscription-link:hover {
+        text-decoration: underline;
+      }
+
+      .muted-small {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 700;
+      }
+
       .source-live-block {
         margin: 14px 0 16px;
         border: 1px solid rgba(38, 70, 216, 0.16);
@@ -685,6 +718,64 @@
             </table>
           </div>
         </section>
+        <section class="source-live-block" aria-label="Subscricoes Stripe">
+          <div class="panel-head compact">
+            <div>
+              <h3>Subscricoes Stripe</h3>
+              <p class="note">Acompanhamento de pagamentos recorrentes, renovacoes e ligacao ao acesso Pro.</p>
+            </div>
+            <div class="actions">
+              <button class="secondary" type="button" id="refreshSubscriptions">Atualizar subscricoes</button>
+            </div>
+          </div>
+          <div class="live-grid">
+            <article class="live-card">
+              <span>MRR estimado</span>
+              <strong id="subscriptionMrr">0 EUR</strong>
+            </article>
+            <article class="live-card">
+              <span>Ativas</span>
+              <strong id="subscriptionActive">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Total Stripe</span>
+              <strong id="subscriptionTotal">0</strong>
+            </article>
+            <article class="live-card">
+              <span>A rever</span>
+              <strong id="subscriptionAttention">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Fim de periodo</span>
+              <strong id="subscriptionCancelAtPeriodEnd">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Sem ligacao</span>
+              <strong id="subscriptionUnlinked">0</strong>
+            </article>
+          </div>
+          <p class="live-status" id="subscriptionsStatus">A carregar subscricoes...</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Estado</th>
+                  <th>Plano Stripe</th>
+                  <th>Valor</th>
+                  <th>Renovacao</th>
+                  <th>Acesso BatchCutout</th>
+                  <th>Stripe</th>
+                </tr>
+              </thead>
+              <tbody id="subscriptionsRowsBody">
+                <tr>
+                  <td class="empty" colspan="7">A carregar subscricoes.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
         <div class="table-wrap">
           <table>
             <thead>
@@ -837,6 +928,8 @@
       const sourceRowsBody = document.querySelector("#sourceRowsBody");
       const recentLeadRowsBody = document.querySelector("#recentLeadRowsBody");
       const proUsersRowsBody = document.querySelector("#proUsersRowsBody");
+      const subscriptionsRowsBody = document.querySelector("#subscriptionsRowsBody");
+      const subscriptionsStatus = document.querySelector("#subscriptionsStatus");
       const liveStatus = document.querySelector("#liveStatus");
       const csvInput = document.querySelector("#csvInput");
       const today = new Date().toISOString().slice(0, 10);
@@ -882,6 +975,46 @@
 
       function money(value) {
         return `${number(value).toFixed(2)} EUR`;
+      }
+
+      function formatCurrencyFromCents(amount, currency = "eur") {
+        const normalizedCurrency = String(currency || "eur").toUpperCase();
+        try {
+          return new Intl.NumberFormat("pt-PT", {
+            style: "currency",
+            currency: normalizedCurrency,
+            maximumFractionDigits: 2,
+          }).format((Number(amount || 0) || 0) / 100);
+        } catch {
+          return `${((Number(amount || 0) || 0) / 100).toFixed(2)} ${normalizedCurrency}`;
+        }
+      }
+
+      function formatDate(value) {
+        if (!value) return "-";
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "-";
+        return date.toLocaleDateString("pt-PT", { year: "numeric", month: "2-digit", day: "2-digit" });
+      }
+
+      function subscriptionStatusLabel(status, cancelAtPeriodEnd = false) {
+        if (cancelAtPeriodEnd && status === "active") return "termina no periodo";
+        const labels = {
+          active: "ativa",
+          canceled: "cancelada",
+          incomplete: "incompleta",
+          incomplete_expired: "expirada",
+          past_due: "pagamento pendente",
+          unpaid: "nao paga",
+          paused: "pausada",
+        };
+        return labels[status] || status || "-";
+      }
+
+      function subscriptionStatusClass(status, cancelAtPeriodEnd = false) {
+        if (status === "active" && !cancelAtPeriodEnd) return "success";
+        if (status === "canceled" || status === "unpaid" || status === "incomplete_expired") return "danger";
+        return "warning";
       }
 
       function escapeHtml(value) {
@@ -1066,6 +1199,63 @@
           : `<tr><td class="empty" colspan="6">Ainda nao existem contas registadas.</td></tr>`;
       }
 
+      function renderSubscriptions(data) {
+        const summary = data.summary || {};
+        document.querySelector("#subscriptionMrr").textContent = formatCurrencyFromCents(summary.mrrAmount || 0, summary.currency || "eur");
+        document.querySelector("#subscriptionActive").textContent = summary.active || 0;
+        document.querySelector("#subscriptionTotal").textContent = summary.total || 0;
+        document.querySelector("#subscriptionAttention").textContent = summary.attention || 0;
+        document.querySelector("#subscriptionCancelAtPeriodEnd").textContent = summary.cancelAtPeriodEnd || 0;
+        document.querySelector("#subscriptionUnlinked").textContent = summary.unlinked || 0;
+
+        subscriptionsRowsBody.innerHTML = data.subscriptions?.length
+          ? data.subscriptions.map((subscription) => {
+              const statusClass = subscriptionStatusClass(subscription.status, subscription.cancelAtPeriodEnd);
+              const statusLabel = subscriptionStatusLabel(subscription.status, subscription.cancelAtPeriodEnd);
+              const customerEmail = subscription.customerEmail || subscription.profileEmail || "-";
+              const accessLabel = subscription.linkedToSupabase
+                ? `${subscription.accessPlan || "free"} / ${subscription.accessStatus || "active"}`
+                : "sem ligacao";
+              const usageLabel = subscription.linkedToSupabase
+                ? `${subscription.monthlyUsed || 0} / ${subscription.monthlyLimit || 0} imagens`
+                : "sem utilizador ligado";
+              const periodText = subscription.currentPeriodEnd
+                ? formatDate(subscription.currentPeriodEnd)
+                : formatDate(subscription.canceledAt);
+
+              return `
+                <tr>
+                  <td>
+                    ${escapeHtml(customerEmail)}
+                    <span class="muted-small">${escapeHtml(subscription.customerId || "-")}</span>
+                  </td>
+                  <td><span class="pill ${statusClass}">${escapeHtml(statusLabel)}</span></td>
+                  <td>
+                    ${escapeHtml(subscription.planName || "Plano Stripe")}
+                    <span class="muted-small">${escapeHtml(subscription.priceId || "-")}</span>
+                  </td>
+                  <td>
+                    ${formatCurrencyFromCents(subscription.amount || 0, subscription.currency)}
+                    <span class="muted-small">${escapeHtml(subscription.interval || "-")}</span>
+                  </td>
+                  <td>${periodText}</td>
+                  <td>
+                    <span class="pill ${subscription.linkedToSupabase ? "success" : "warning"}">${escapeHtml(accessLabel)}</span>
+                    <span class="muted-small">${escapeHtml(usageLabel)}</span>
+                  </td>
+                  <td>
+                    <a class="subscription-link" href="${escapeHtml(subscription.stripeDashboardUrl)}" target="_blank" rel="noreferrer">Subscricao</a>
+                    ${subscription.customerDashboardUrl ? `<span class="muted-small"><a class="subscription-link" href="${escapeHtml(subscription.customerDashboardUrl)}" target="_blank" rel="noreferrer">Cliente</a></span>` : ""}
+                  </td>
+                </tr>
+              `;
+            }).join("")
+          : `<tr><td class="empty" colspan="7">Ainda nao existem subscricoes Stripe.</td></tr>`;
+
+        const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString("pt-PT") : "";
+        subscriptionsStatus.textContent = `${summary.total || 0} subscricoes lidas. Ultima atualizacao: ${generatedAt}`;
+      }
+
       async function loadProUsers() {
         const token = getAdminToken();
         if (!token) return;
@@ -1084,6 +1274,29 @@
           renderProUsers(data.users || []);
         } catch {
           proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Nao foi possivel carregar contas Pro.</td></tr>`;
+        }
+      }
+
+      async function loadSubscriptions() {
+        const token = getAdminToken();
+        if (!token) return;
+
+        subscriptionsStatus.textContent = "A carregar subscricoes...";
+        try {
+          const response = await fetch("/api/admin-subscriptions", {
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await response.json();
+          if (!response.ok || !data.ok) {
+            throw new Error(data.error || "admin_subscriptions_failed");
+          }
+          renderSubscriptions(data);
+        } catch {
+          subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="7">Nao foi possivel carregar subscricoes Stripe.</td></tr>`;
+          subscriptionsStatus.textContent = "Erro ao carregar Stripe. Verificar chave Stripe e permissao do admin.";
         }
       }
 
@@ -1130,6 +1343,7 @@
           }
           renderLiveStats(data);
           await loadProUsers();
+          await loadSubscriptions();
         } catch (error) {
           if (error.message === "unauthorized") {
             localStorage.removeItem(adminTokenStorageKey);
@@ -1139,7 +1353,9 @@
           liveRowsBody.innerHTML = `<tr><td class="empty" colspan="13">Nao foi possivel carregar dados reais.</td></tr>`;
           recentLeadRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Nao foi possivel carregar leads Pro.</td></tr>`;
           proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Nao foi possivel carregar contas Pro.</td></tr>`;
+          subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="7">Nao foi possivel carregar subscricoes Stripe.</td></tr>`;
           liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variaveis Vercel.";
+          subscriptionsStatus.textContent = "Erro ao carregar subscricoes.";
         }
       }
 
@@ -1273,6 +1489,7 @@
 
       document.querySelector("#refreshLive").addEventListener("click", loadLiveStats);
       document.querySelector("#refreshProUsers").addEventListener("click", loadProUsers);
+      document.querySelector("#refreshSubscriptions").addEventListener("click", loadSubscriptions);
       proUsersRowsBody.addEventListener("click", async (event) => {
         const button = event.target.closest("[data-user-action]");
         if (!button) return;
