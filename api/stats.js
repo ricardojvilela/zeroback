@@ -35,12 +35,7 @@ function emptyDay(date) {
     pngDownloads: 0,
     zipDownloads: 0,
     proClicks: 0,
-    proPrompts: 0,
-    proEmailStarts: 0,
-    proEmailInvalid: 0,
-    proEmailSubmits: 0,
-    proPageViews: 0,
-    proSubmitAttempts: 0,
+    checkoutStarts: 0,
   };
 }
 
@@ -117,31 +112,9 @@ function emptySourceRow(source) {
     downloads: 0,
     zipDownloads: 0,
     proClicks: 0,
-    proEmailSubmits: 0,
+    checkoutStarts: 0,
     events: 0,
   };
-}
-
-function getRecentProLeads(events) {
-  return events
-    .filter((event) => event.event_name === "pro_email_submitted")
-    .map((event) => {
-      const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
-      return {
-        date: toIsoDate(event.occurred_at),
-        occurredAt: event.occurred_at,
-        email: typeof detail.email === "string" ? detail.email : "",
-        company: typeof detail.company === "string" ? detail.company : "",
-        reason: typeof detail.reason === "string" ? detail.reason : "",
-        source: typeof detail.source === "string" ? detail.source : "",
-        freeLimit: Number(detail.free_limit || 0) || null,
-        processedImages: Number(detail.processed_images || 0) || null,
-        offer: typeof detail.offer === "string" ? detail.offer : "",
-        pageLocation: typeof detail.page_location === "string" ? detail.page_location : "",
-      };
-    })
-    .sort((a, b) => String(b.occurredAt).localeCompare(String(a.occurredAt)))
-    .slice(0, 20);
 }
 
 function verifyAdminToken(request) {
@@ -288,24 +261,9 @@ export default async function handler(request, response) {
           row.proClicks += 1;
           sourceRow.proClicks += 1;
           break;
-        case "pro_prompt_shown":
-          row.proPrompts += 1;
-          break;
-        case "pro_email_started":
-          row.proEmailStarts += 1;
-          break;
-        case "pro_email_invalid":
-          row.proEmailInvalid += 1;
-          break;
-        case "pro_email_submitted":
-          row.proEmailSubmits += 1;
-          sourceRow.proEmailSubmits += 1;
-          break;
-        case "pro_page_view":
-          row.proPageViews += 1;
-          break;
-        case "pro_submit_attempt":
-          row.proSubmitAttempts += 1;
+        case "pro_checkout_started":
+          row.checkoutStarts += 1;
+          sourceRow.checkoutStarts += 1;
           break;
         default:
           break;
@@ -339,7 +297,6 @@ export default async function handler(request, response) {
       rows,
       totals,
       sourceBreakdown,
-      recentProLeads: getRecentProLeads(events),
       generatedAt: new Date().toISOString(),
     });
   } catch (error) {

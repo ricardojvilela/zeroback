@@ -28,17 +28,13 @@
 
       body {
         margin: 0;
-        background:
-          radial-gradient(circle at 12% 8%, rgba(15, 139, 124, 0.14), transparent 28%),
-          radial-gradient(circle at 90% 14%, rgba(38, 70, 216, 0.12), transparent 28%),
-          linear-gradient(180deg, #ffffff 0%, var(--bg) 70%);
+        background: linear-gradient(180deg, #f8fbfd 0%, var(--bg) 100%);
         color: var(--ink);
         font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       }
 
       button,
-      input,
-      textarea {
+      input {
         font: inherit;
       }
 
@@ -58,24 +54,13 @@
         color: var(--dark);
       }
 
-      button.danger {
-        background: #fff1ef;
-        color: var(--danger);
-      }
-
-      input,
-      textarea {
+      input {
         width: 100%;
         border: 1px solid var(--line);
         border-radius: 8px;
         background: #fff;
         color: var(--ink);
         padding: 11px 12px;
-      }
-
-      textarea {
-        min-height: 84px;
-        resize: vertical;
       }
 
       .admin-shell {
@@ -373,13 +358,6 @@
         line-height: 1;
       }
 
-      .layout {
-        display: grid;
-        grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
-        gap: 16px;
-        align-items: start;
-      }
-
       .panel {
         padding: 20px;
       }
@@ -387,16 +365,6 @@
       .panel h2 {
         margin-bottom: 14px;
         font-size: 22px;
-      }
-
-      .form-grid {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-      }
-
-      .field.full {
-        grid-column: 1 / -1;
       }
 
       .field label {
@@ -446,32 +414,6 @@
         border-bottom: 0;
       }
 
-      .rates {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 10px;
-        margin: 16px 0;
-      }
-
-      .rate {
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        padding: 14px;
-        background: #fbfdff;
-      }
-
-      .rate span {
-        display: block;
-        margin-bottom: 7px;
-        color: var(--muted);
-        font-size: 12px;
-        font-weight: 900;
-      }
-
-      .rate strong {
-        font-size: 23px;
-      }
-
       .empty {
         padding: 28px;
         color: var(--muted);
@@ -485,13 +427,11 @@
       }
 
       @media (max-width: 960px) {
-        .hero,
-        .layout {
+        .hero {
           grid-template-columns: 1fr;
         }
 
         .metrics-grid,
-        .rates,
         .live-grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
         }
@@ -505,9 +445,7 @@
         }
 
         .metrics-grid,
-        .rates,
-        .live-grid,
-        .form-grid {
+        .live-grid {
           grid-template-columns: 1fr;
         }
 
@@ -524,7 +462,7 @@
       <form class="auth-card" id="authForm">
         <p class="eyebrow">Painel interno</p>
         <h1>Acesso protegido</h1>
-        <p class="note">Introduza a password de administrador para consultar os dados reais do BatchCutout.</p>
+        <p class="note">Introduza a password de administrador para consultar a operacao do BatchCutout.</p>
         <div class="field">
           <label for="adminPassword">Password</label>
           <input id="adminPassword" name="password" type="password" autocomplete="current-password" required />
@@ -548,41 +486,41 @@
       <section class="hero">
         <div class="hero-main">
           <p class="eyebrow">Painel interno</p>
-          <h1>Leitura diaria do crescimento</h1>
-          <p>Registe os numeros de Vercel, Google Ads e emails Pro para decidir se deve manter, ajustar ou escalar a campanha.</p>
+          <h1>Subscricoes, receita e uso real</h1>
+          <p>Acompanhe MRR, clientes ativos, acessos Pro e utilizacao do produto. O sinal comercial principal agora e a subscricao Stripe.</p>
         </div>
 
         <aside class="recommendation">
-          <span class="decision" id="decisionBadge">Sem dados</span>
-          <strong id="decisionTitle">Adicione a primeira linha</strong>
-          <p class="note" id="decisionText">O painel calcula taxas e recomenda o proximo passo com base nos dados mais recentes.</p>
+          <span class="decision" id="decisionBadge">A carregar</span>
+          <strong id="decisionTitle">Resumo comercial</strong>
+          <p class="note" id="decisionText">A carregar subscricoes Stripe e contas BatchCutout.</p>
         </aside>
       </section>
 
       <section class="metrics-grid" aria-label="Resumo">
         <article class="metric">
-          <span>Visitantes</span>
-          <strong id="totalVisitors">0</strong>
+          <span>Visitantes 14 dias</span>
+          <strong id="dashboardVisitors">0</strong>
         </article>
         <article class="metric">
-          <span>Uploads</span>
-          <strong id="totalUploads">0</strong>
+          <span>Uploads 14 dias</span>
+          <strong id="dashboardUploads">0</strong>
         </article>
         <article class="metric">
-          <span>Cliques Pro</span>
-          <strong id="totalProClicks">0</strong>
+          <span>Subscricoes ativas</span>
+          <strong id="dashboardActiveSubscriptions">0</strong>
         </article>
         <article class="metric">
-          <span>Leads Pro</span>
-          <strong id="totalLeads">0</strong>
+          <span>MRR estimado</span>
+          <strong id="dashboardMrr">0 EUR</strong>
         </article>
       </section>
 
-      <section class="panel live-panel" aria-label="Dados reais Supabase">
+      <section class="panel live-panel" aria-label="Operacao BatchCutout">
         <div class="panel-head">
           <div>
-            <h2>Dados reais do site</h2>
-            <p class="note">Eventos recolhidos automaticamente pelo Supabase nos ultimos 14 dias.</p>
+            <h2>Operacao BatchCutout</h2>
+            <p class="note">Subscricoes, acessos e eventos recolhidos automaticamente nos ultimos 14 dias.</p>
           </div>
           <div class="actions">
             <button class="secondary" type="button" id="refreshLive">Atualizar</button>
@@ -610,114 +548,15 @@
             <strong id="liveDownloadReady">0</strong>
           </article>
           <article class="live-card">
-            <span>Cliques Pro reais</span>
+            <span>Cliques em planos</span>
             <strong id="liveProClicks">0</strong>
           </article>
           <article class="live-card">
-            <span>Prompts Pro</span>
-            <strong id="liveProPrompts">0</strong>
-          </article>
-          <article class="live-card">
-            <span>Emails iniciados</span>
-            <strong id="liveProEmailStarts">0</strong>
-          </article>
-          <article class="live-card">
-            <span>Email invalido</span>
-            <strong id="liveProEmailInvalid">0</strong>
-          </article>
-          <article class="live-card">
-            <span>Emails Pro enviados</span>
-            <strong id="liveProAttempts">0</strong>
+            <span>Checkouts iniciados</span>
+            <strong id="liveCheckoutStarts">0</strong>
           </article>
         </div>
-        <p class="live-status" id="liveStatus">A carregar dados reais...</p>
-        <section class="source-live-block" aria-label="Origem das visitas">
-          <div class="panel-head compact">
-            <div>
-              <h3>Top origens</h3>
-              <p class="note">Fontes identificadas por UTM, Google Ads ou referrer.</p>
-            </div>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Origem</th>
-                  <th>Visitantes</th>
-                  <th>Page views</th>
-                  <th>Uploads</th>
-                  <th>Imagens</th>
-                  <th>Downloads</th>
-                  <th>ZIP</th>
-                  <th>Cliques Pro</th>
-                  <th>Leads</th>
-                </tr>
-              </thead>
-              <tbody id="sourceRowsBody">
-                <tr>
-                  <td class="empty" colspan="9">A carregar origens.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-        <section class="source-live-block" aria-label="Leads Pro recentes">
-          <div class="panel-head compact">
-            <div>
-              <h3>Leads Pro recentes</h3>
-              <p class="note">Interesse Pro recente com motivo, limite livre e origem.</p>
-            </div>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Email</th>
-                  <th>Motivo</th>
-                  <th>Limite</th>
-                  <th>Imagens feitas</th>
-                  <th>Origem</th>
-                </tr>
-              </thead>
-              <tbody id="recentLeadRowsBody">
-                <tr>
-                  <td class="empty" colspan="6">A carregar leads.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-        <section class="source-live-block" aria-label="Contas Pro">
-          <div class="panel-head compact">
-            <div>
-              <h3>Contas Pro</h3>
-              <p class="note">Gestao direta de acessos Grátis e Pro.</p>
-            </div>
-            <div class="actions">
-              <button class="secondary" type="button" id="refreshProUsers">Atualizar contas</button>
-            </div>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Email</th>
-                  <th>Plano</th>
-                  <th>Lote</th>
-                  <th>Uso mensal</th>
-                  <th>Periodo</th>
-                  <th>Acoes</th>
-                </tr>
-              </thead>
-              <tbody id="proUsersRowsBody">
-                <tr>
-                  <td class="empty" colspan="6">A carregar contas.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
+        <p class="live-status" id="liveStatus">A carregar atividade...</p>
         <section class="source-live-block" aria-label="Subscricoes Stripe">
           <div class="panel-head compact">
             <div>
@@ -776,6 +615,66 @@
             </table>
           </div>
         </section>
+        <section class="source-live-block" aria-label="Contas e acessos">
+          <div class="panel-head compact">
+            <div>
+              <h3>Contas e acessos</h3>
+              <p class="note">Acesso BatchCutout ligado a utilizadores Supabase, incluindo Pro manual sem custos.</p>
+            </div>
+            <div class="actions">
+              <button class="secondary" type="button" id="refreshProUsers">Atualizar contas</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Plano</th>
+                  <th>Lote</th>
+                  <th>Uso mensal</th>
+                  <th>Periodo</th>
+                  <th>Acoes</th>
+                </tr>
+              </thead>
+              <tbody id="proUsersRowsBody">
+                <tr>
+                  <td class="empty" colspan="6">A carregar contas.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <section class="source-live-block" aria-label="Origem das visitas">
+          <div class="panel-head compact">
+            <div>
+              <h3>Top origens</h3>
+              <p class="note">Fontes identificadas por UTM, Google Ads ou referrer.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Origem</th>
+                  <th>Visitantes</th>
+                  <th>Page views</th>
+                  <th>Uploads</th>
+                  <th>Imagens</th>
+                  <th>Downloads</th>
+                  <th>ZIP</th>
+                  <th>Cliques planos</th>
+                  <th>Checkouts</th>
+                </tr>
+              </thead>
+              <tbody id="sourceRowsBody">
+                <tr>
+                  <td class="empty" colspan="9">A carregar origens.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
         <div class="table-wrap">
           <table>
             <thead>
@@ -788,152 +687,32 @@
                 <th>Limite</th>
                 <th>Resultado pronto</th>
                 <th>Downloads</th>
-                <th>Pro</th>
-                <th>Prompt</th>
-                <th>Email iniciado</th>
-                <th>Email invalido</th>
-                <th>Email enviado</th>
+                <th>Cliques planos</th>
+                <th>Checkouts</th>
               </tr>
             </thead>
             <tbody id="liveRowsBody">
               <tr>
-                <td class="empty" colspan="13">A carregar dados reais.</td>
+                <td class="empty" colspan="10">A carregar atividade.</td>
               </tr>
             </tbody>
           </table>
         </div>
       </section>
 
-      <section class="layout">
-        <form class="panel" id="growthForm">
-          <h2>Nova leitura</h2>
-          <div class="form-grid">
-            <div class="field">
-              <label for="date">Data</label>
-              <input id="date" name="date" type="date" required />
-            </div>
-            <div class="field">
-              <label for="visitors">Visitantes</label>
-              <input id="visitors" name="visitors" type="number" min="0" inputmode="numeric" />
-            </div>
-            <div class="field">
-              <label for="uploads">Uploads iniciados</label>
-              <input id="uploads" name="uploads" type="number" min="0" inputmode="numeric" />
-            </div>
-            <div class="field">
-              <label for="acceptedImages">Imagens aceites</label>
-              <input id="acceptedImages" name="acceptedImages" type="number" min="0" inputmode="numeric" />
-            </div>
-            <div class="field">
-              <label for="limitAttempts">Tentativas acima de 2</label>
-              <input id="limitAttempts" name="limitAttempts" type="number" min="0" inputmode="numeric" />
-            </div>
-            <div class="field">
-              <label for="downloads">Downloads PNG/ZIP</label>
-              <input id="downloads" name="downloads" type="number" min="0" inputmode="numeric" />
-            </div>
-            <div class="field">
-              <label for="proClicks">Cliques Pro</label>
-              <input id="proClicks" name="proClicks" type="number" min="0" inputmode="numeric" />
-            </div>
-            <div class="field">
-              <label for="leads">Leads Pro</label>
-              <input id="leads" name="leads" type="number" min="0" inputmode="numeric" />
-            </div>
-            <div class="field">
-              <label for="adCost">Custo Ads EUR</label>
-              <input id="adCost" name="adCost" type="number" min="0" step="0.01" inputmode="decimal" />
-            </div>
-            <div class="field full">
-              <label for="goodTerms">Termos bons</label>
-              <textarea id="goodTerms" name="goodTerms" placeholder="Ex.: bulk background remover, product photo background"></textarea>
-            </div>
-            <div class="field full">
-              <label for="negativeTerms">Termos a excluir</label>
-              <textarea id="negativeTerms" name="negativeTerms" placeholder="Ex.: app, free only, wallpaper"></textarea>
-            </div>
-            <div class="field full">
-              <label for="notes">Notas do dia</label>
-              <textarea id="notes" name="notes" placeholder="Resumo do que aconteceu e decisao tomada"></textarea>
-            </div>
-          </div>
-
-          <div class="actions">
-            <button type="submit">Guardar leitura</button>
-            <button class="secondary" type="button" id="importCsv">Importar CSV</button>
-            <button class="secondary" type="button" id="exportCsv">Exportar CSV</button>
-            <button class="secondary" type="button" id="copySummary">Copiar resumo</button>
-            <button class="danger" type="button" id="clearData">Limpar dados</button>
-          </div>
-          <input id="csvInput" type="file" accept=".csv,text/csv" hidden />
-          <p class="note">Os dados ficam guardados neste browser. Para arquivo externo, use Exportar CSV.</p>
-        </form>
-
-        <section class="panel">
-          <h2>Taxas principais</h2>
-          <div class="rates">
-            <article class="rate">
-              <span>Visita para upload</span>
-              <strong id="rateUpload">0%</strong>
-            </article>
-            <article class="rate">
-              <span>Upload para download</span>
-              <strong id="rateDownload">0%</strong>
-            </article>
-            <article class="rate">
-              <span>Limite para Pro</span>
-              <strong id="ratePro">0%</strong>
-            </article>
-            <article class="rate">
-              <span>Custo por lead</span>
-              <strong id="costPerLead">0 EUR</strong>
-            </article>
-          </div>
-
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Visitantes</th>
-                  <th>Uploads</th>
-                  <th>Limite</th>
-                  <th>Downloads</th>
-                  <th>Pro</th>
-                  <th>Leads</th>
-                  <th>Custo</th>
-                  <th>Decisao</th>
-                </tr>
-              </thead>
-              <tbody id="rowsBody">
-                <tr>
-                  <td class="empty" colspan="9">Sem leituras registadas.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </section>
     </main>
 
     <script>
-      const storageKey = "batchcutout_growth_rows";
       const adminTokenStorageKey = "batchcutout_admin_token";
       const adminTokenExpiryStorageKey = "batchcutout_admin_token_expires";
       const authForm = document.querySelector("#authForm");
       const authError = document.querySelector("#authError");
-      const form = document.querySelector("#growthForm");
-      const rowsBody = document.querySelector("#rowsBody");
       const liveRowsBody = document.querySelector("#liveRowsBody");
       const sourceRowsBody = document.querySelector("#sourceRowsBody");
-      const recentLeadRowsBody = document.querySelector("#recentLeadRowsBody");
       const proUsersRowsBody = document.querySelector("#proUsersRowsBody");
       const subscriptionsRowsBody = document.querySelector("#subscriptionsRowsBody");
       const subscriptionsStatus = document.querySelector("#subscriptionsStatus");
       const liveStatus = document.querySelector("#liveStatus");
-      const csvInput = document.querySelector("#csvInput");
-      const today = new Date().toISOString().slice(0, 10);
-      form.date.value = today;
 
       function getAdminToken() {
         const token = localStorage.getItem(adminTokenStorageKey) || "";
@@ -961,20 +740,6 @@
         localStorage.setItem(adminTokenExpiryStorageKey, String(data.expiresAt));
         unlockAdmin();
         await loadLiveStats();
-      }
-
-      function number(value) {
-        const parsed = Number(String(value || "").replace(",", "."));
-        return Number.isFinite(parsed) ? parsed : 0;
-      }
-
-      function percent(part, total) {
-        if (!total) return "0%";
-        return `${Math.round((part / total) * 100)}%`;
-      }
-
-      function money(value) {
-        return `${number(value).toFixed(2)} EUR`;
       }
 
       function formatCurrencyFromCents(amount, currency = "eur") {
@@ -1025,104 +790,17 @@
           .replaceAll('"', "&quot;");
       }
 
-      function getRows() {
-        try {
-          return JSON.parse(localStorage.getItem(storageKey) || "[]");
-        } catch {
-          return [];
-        }
-      }
-
-      function saveRows(rows) {
-        localStorage.setItem(storageKey, JSON.stringify(rows));
-      }
-
-      function getDecision(row) {
-        const uploadRate = row.visitors ? row.uploads / row.visitors : 0;
-        const downloadRate = row.uploads ? row.downloads / row.uploads : 0;
-        const proRate = row.limitAttempts ? row.proClicks / row.limitAttempts : 0;
-        const costPerLead = row.leads ? row.adCost / row.leads : 0;
-
-        if (!row.visitors) {
-          return { label: "Sem dados", title: "Aguardar visitas", text: "Ainda nao ha volume suficiente para decidir." };
-        }
-        if (uploadRate < 0.08) {
-          return { label: "Ajustar pagina/anuncio", title: "Poucos uploads", text: "O trafego chega, mas nao inicia a ferramenta. Rever promessa inicial, termos de pesquisa e primeiro ecra." };
-        }
-        if (downloadRate < 0.25) {
-          return { label: "Melhorar experiencia", title: "Poucos downloads", text: "As pessoas fazem upload, mas nao chegam ao resultado. Rever qualidade, velocidade e clareza dos botoes." };
-        }
-        if (row.limitAttempts > 0 && proRate < 0.15) {
-          return { label: "Reforcar Pro", title: "Limite gera friccao, nao interesse", text: "Ha procura por mais imagens, mas pouco clique Pro. Melhorar chamada comercial e proposta." };
-        }
-        if (row.leads > 0 && costPerLead <= 8) {
-          return { label: "Escalar com cuidado", title: "Sinal comercial positivo", text: "Ha leads com custo controlado. Manter negativas e testar aumento gradual de orcamento." };
-        }
-        if (row.adCost > 10 && !row.leads) {
-          return { label: "Controlar custo", title: "Gasto sem leads", text: "Nao aumentar orcamento. Rever palavras-chave, termos a excluir e paginas de destino." };
-        }
-        return { label: "Manter teste", title: "Continuar a recolher dados", text: "O funil ainda precisa de mais volume antes de uma decisao forte." };
-      }
-
-      function totals(rows) {
-        return rows.reduce((acc, row) => {
-          for (const key of ["visitors", "uploads", "acceptedImages", "limitAttempts", "downloads", "proClicks", "leads", "adCost"]) {
-            acc[key] = (acc[key] || 0) + number(row[key]);
-          }
-          return acc;
-        }, {});
-      }
-
-      function render() {
-        const rows = getRows().sort((a, b) => a.date.localeCompare(b.date));
-        const total = totals(rows);
-        const latest = rows[rows.length - 1];
-        const decision = latest ? getDecision(latest) : getDecision({});
-
-        document.querySelector("#totalVisitors").textContent = total.visitors || 0;
-        document.querySelector("#totalUploads").textContent = total.uploads || 0;
-        document.querySelector("#totalProClicks").textContent = total.proClicks || 0;
-        document.querySelector("#totalLeads").textContent = total.leads || 0;
-        document.querySelector("#rateUpload").textContent = percent(total.uploads, total.visitors);
-        document.querySelector("#rateDownload").textContent = percent(total.downloads, total.uploads);
-        document.querySelector("#ratePro").textContent = percent(total.proClicks, total.limitAttempts);
-        document.querySelector("#costPerLead").textContent = total.leads ? money(total.adCost / total.leads) : "0 EUR";
-        document.querySelector("#decisionBadge").textContent = decision.label;
-        document.querySelector("#decisionTitle").textContent = decision.title;
-        document.querySelector("#decisionText").textContent = decision.text;
-
-        rowsBody.innerHTML = rows.length
-          ? rows.map((row) => {
-              const rowDecision = getDecision(row);
-              return `
-                <tr>
-                  <td>${row.date}</td>
-                  <td>${row.visitors}</td>
-                  <td>${row.uploads}</td>
-                  <td>${row.limitAttempts}</td>
-                  <td>${row.downloads}</td>
-                  <td>${row.proClicks}</td>
-                  <td>${row.leads}</td>
-                  <td>${money(row.adCost)}</td>
-                  <td>${rowDecision.label}</td>
-                </tr>
-              `;
-            }).join("")
-          : `<tr><td class="empty" colspan="9">Sem leituras registadas.</td></tr>`;
-      }
-
       function renderLiveStats(data) {
         const totals = data.totals || {};
+        document.querySelector("#dashboardVisitors").textContent = totals.visitors || 0;
+        document.querySelector("#dashboardUploads").textContent = totals.uploadsStarted || 0;
         document.querySelector("#liveVisitors").textContent = totals.visitors || 0;
         document.querySelector("#liveUploads").textContent = totals.uploadsStarted || 0;
         document.querySelector("#liveLimit").textContent = totals.limitAttempts || 0;
         document.querySelector("#liveDownloads").textContent = totals.downloads || 0;
         document.querySelector("#liveDownloadReady").textContent = totals.downloadReadyShown || 0;
         document.querySelector("#liveProClicks").textContent = totals.proClicks || 0;
-        document.querySelector("#liveProPrompts").textContent = totals.proPrompts || 0;
-        document.querySelector("#liveProEmailStarts").textContent = totals.proEmailStarts || 0;
-        document.querySelector("#liveProEmailInvalid").textContent = totals.proEmailInvalid || 0;
-        document.querySelector("#liveProAttempts").textContent = totals.proEmailSubmits || totals.proSubmitAttempts || 0;
+        document.querySelector("#liveCheckoutStarts").textContent = totals.checkoutStarts || 0;
 
         liveRowsBody.innerHTML = data.rows?.length
           ? data.rows.slice().reverse().map((row) => {
@@ -1137,14 +815,11 @@
                   <td>${row.downloadReadyShown || 0}</td>
                   <td>${row.downloads}</td>
                   <td>${row.proClicks}</td>
-                  <td>${row.proPrompts || 0}</td>
-                  <td>${row.proEmailStarts || 0}</td>
-                  <td>${row.proEmailInvalid || 0}</td>
-                  <td>${row.proEmailSubmits || row.proSubmitAttempts || 0}</td>
+                  <td>${row.checkoutStarts || 0}</td>
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="13">Ainda nao existem eventos reais no periodo.</td></tr>`;
+          : `<tr><td class="empty" colspan="10">Ainda nao existem eventos reais no periodo.</td></tr>`;
 
         sourceRowsBody.innerHTML = data.sourceBreakdown?.length
           ? data.sourceBreakdown.map((row) => `
@@ -1157,22 +832,10 @@
                 <td>${row.downloads || 0}</td>
                 <td>${row.zipDownloads || 0}</td>
                 <td>${row.proClicks || 0}</td>
-                <td>${row.proEmailSubmits || 0}</td>
+                <td>${row.checkoutStarts || 0}</td>
               </tr>
             `).join("")
           : `<tr><td class="empty" colspan="9">Ainda nao existem origens identificadas.</td></tr>`;
-        recentLeadRowsBody.innerHTML = data.recentProLeads?.length
-          ? data.recentProLeads.map((lead) => `
-              <tr>
-                <td>${lead.date || "-"}</td>
-                <td>${lead.email || "-"}</td>
-                <td>${lead.reason || "-"}</td>
-                <td>${lead.freeLimit || "-"}</td>
-                <td>${lead.processedImages || 0}</td>
-                <td>${lead.source || lead.offer || "-"}</td>
-              </tr>
-            `).join("")
-          : `<tr><td class="empty" colspan="6">Ainda nao existem leads Pro no periodo.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "";
         liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Ultima atualizacao: ${generatedAt}`;
@@ -1201,12 +864,20 @@
 
       function renderSubscriptions(data) {
         const summary = data.summary || {};
-        document.querySelector("#subscriptionMrr").textContent = formatCurrencyFromCents(summary.mrrAmount || 0, summary.currency || "eur");
+        const mrrLabel = formatCurrencyFromCents(summary.mrrAmount || 0, summary.currency || "eur");
+        document.querySelector("#dashboardActiveSubscriptions").textContent = summary.active || 0;
+        document.querySelector("#dashboardMrr").textContent = mrrLabel;
+        document.querySelector("#subscriptionMrr").textContent = mrrLabel;
         document.querySelector("#subscriptionActive").textContent = summary.active || 0;
         document.querySelector("#subscriptionTotal").textContent = summary.total || 0;
         document.querySelector("#subscriptionAttention").textContent = summary.attention || 0;
         document.querySelector("#subscriptionCancelAtPeriodEnd").textContent = summary.cancelAtPeriodEnd || 0;
         document.querySelector("#subscriptionUnlinked").textContent = summary.unlinked || 0;
+        document.querySelector("#decisionBadge").textContent = summary.attention ? "Rever" : "Operacional";
+        document.querySelector("#decisionTitle").textContent = `${summary.active || 0} subscricoes ativas`;
+        document.querySelector("#decisionText").textContent = summary.attention
+          ? `${summary.attention} subscricao ou ligacao precisa de atencao. Verifique estados pendentes, cancelamentos ou contas sem ligacao.`
+          : `MRR estimado: ${mrrLabel}. As subscricoes ativas estao ligadas ao acesso BatchCutout.`;
 
         subscriptionsRowsBody.innerHTML = data.subscriptions?.length
           ? data.subscriptions.map((subscription) => {
@@ -1274,7 +945,7 @@
           }
           renderProUsers(data.users || []);
         } catch {
-          proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Nao foi possivel carregar contas Pro.</td></tr>`;
+          proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Nao foi possivel carregar contas.</td></tr>`;
         }
       }
 
@@ -1321,6 +992,7 @@
         }
 
         await loadProUsers();
+        await loadSubscriptions();
       }
 
       async function cancelSubscription(subscriptionId) {
@@ -1352,7 +1024,7 @@
           return;
         }
 
-        liveStatus.textContent = "A carregar dados reais...";
+        liveStatus.textContent = "A carregar atividade...";
         try {
           const response = await fetch("/api/stats?days=14", {
             headers: {
@@ -1373,142 +1045,13 @@
             localStorage.removeItem(adminTokenExpiryStorageKey);
             document.body.classList.add("locked");
           }
-          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="13">Nao foi possivel carregar dados reais.</td></tr>`;
-          recentLeadRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Nao foi possivel carregar leads Pro.</td></tr>`;
-          proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Nao foi possivel carregar contas Pro.</td></tr>`;
+          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="10">Nao foi possivel carregar atividade.</td></tr>`;
+          proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Nao foi possivel carregar contas.</td></tr>`;
           subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="7">Nao foi possivel carregar subscricoes Stripe.</td></tr>`;
           liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variaveis Vercel.";
           subscriptionsStatus.textContent = "Erro ao carregar subscricoes.";
         }
       }
-
-      function rowFromForm() {
-        const formData = new FormData(form);
-        return {
-          date: formData.get("date") || today,
-          visitors: number(formData.get("visitors")),
-          uploads: number(formData.get("uploads")),
-          acceptedImages: number(formData.get("acceptedImages")),
-          limitAttempts: number(formData.get("limitAttempts")),
-          downloads: number(formData.get("downloads")),
-          proClicks: number(formData.get("proClicks")),
-          leads: number(formData.get("leads")),
-          adCost: number(formData.get("adCost")),
-          goodTerms: formData.get("goodTerms") || "",
-          negativeTerms: formData.get("negativeTerms") || "",
-          notes: formData.get("notes") || "",
-        };
-      }
-
-      function parseCsvLine(line) {
-        const values = [];
-        let current = "";
-        let quoted = false;
-        for (let index = 0; index < line.length; index += 1) {
-          const char = line[index];
-          const next = line[index + 1];
-          if (char === '"' && quoted && next === '"') {
-            current += '"';
-            index += 1;
-          } else if (char === '"') {
-            quoted = !quoted;
-          } else if (char === "," && !quoted) {
-            values.push(current);
-            current = "";
-          } else {
-            current += char;
-          }
-        }
-        values.push(current);
-        return values;
-      }
-
-      function importCsv(text) {
-        const lines = text.split(/\r?\n/).filter(Boolean);
-        const headers = parseCsvLine(lines.shift() || "");
-        const rows = lines.map((line) => {
-          const values = parseCsvLine(line);
-          const row = Object.fromEntries(headers.map((header, index) => [header, values[index] || ""]));
-          return {
-            date: row.date || today,
-            visitors: number(row.visitors),
-            uploads: number(row.uploads),
-            acceptedImages: number(row.acceptedImages),
-            limitAttempts: number(row.limitAttempts),
-            downloads: number(row.downloads),
-            proClicks: number(row.proClicks),
-            leads: number(row.leads),
-            adCost: number(row.adCost),
-            goodTerms: row.goodTerms || "",
-            negativeTerms: row.negativeTerms || "",
-            notes: row.notes || "",
-          };
-        });
-
-        saveRows(rows);
-        render();
-      }
-
-      form.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const nextRow = rowFromForm();
-        const rows = getRows().filter((row) => row.date !== nextRow.date);
-        rows.push(nextRow);
-        saveRows(rows);
-        render();
-      });
-
-      document.querySelector("#exportCsv").addEventListener("click", () => {
-        const rows = getRows();
-        const headers = ["date", "visitors", "uploads", "acceptedImages", "limitAttempts", "downloads", "proClicks", "leads", "adCost", "goodTerms", "negativeTerms", "notes"];
-        const csv = [
-          headers.join(","),
-          ...rows.map((row) => headers.map((key) => `"${String(row[key] ?? "").replaceAll('"', '""')}"`).join(",")),
-        ].join("\n");
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = `batchcutout-growth-${today}.csv`;
-        link.click();
-        URL.revokeObjectURL(url);
-      });
-
-      document.querySelector("#importCsv").addEventListener("click", () => {
-        csvInput.click();
-      });
-
-      csvInput.addEventListener("change", async () => {
-        const file = csvInput.files?.[0];
-        if (!file) return;
-        importCsv(await file.text());
-        csvInput.value = "";
-      });
-
-      document.querySelector("#copySummary").addEventListener("click", async () => {
-        const rows = getRows();
-        const total = totals(rows);
-        const latest = rows[rows.length - 1];
-        const decision = latest ? getDecision(latest) : getDecision({});
-        const summary = [
-          `BatchCutout - resumo ${today}`,
-          `Visitantes: ${total.visitors || 0}`,
-          `Uploads: ${total.uploads || 0}`,
-          `Downloads: ${total.downloads || 0}`,
-          `Tentativas acima de 2: ${total.limitAttempts || 0}`,
-          `Cliques Pro: ${total.proClicks || 0}`,
-          `Leads Pro: ${total.leads || 0}`,
-          `Custo Ads: ${money(total.adCost || 0)}`,
-          `Decisao: ${decision.label} - ${decision.text}`,
-        ].join("\n");
-        await navigator.clipboard.writeText(summary);
-      });
-
-      document.querySelector("#clearData").addEventListener("click", () => {
-        if (!confirm("Limpar todos os dados guardados neste browser?")) return;
-        localStorage.removeItem(storageKey);
-        render();
-      });
 
       document.querySelector("#refreshLive").addEventListener("click", loadLiveStats);
       document.querySelector("#refreshProUsers").addEventListener("click", loadProUsers);
@@ -1557,7 +1100,6 @@
         }
       });
 
-      render();
       if (getAdminToken()) {
         unlockAdmin();
         loadLiveStats();
