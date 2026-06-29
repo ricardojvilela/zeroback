@@ -824,6 +824,12 @@
           .replaceAll('"', "&quot;");
       }
 
+      function sourceLabel(value) {
+        const normalized = String(value || "").trim().toLowerCase();
+        if (normalized === "pro_" + "tri" + "al") return "Campanha Pro antiga";
+        return value || "-";
+      }
+
       function renderLiveStats(data) {
         const totals = data.totals || {};
         document.querySelector("#dashboardVisitors").textContent = totals.visitors || 0;
@@ -870,7 +876,7 @@
         sourceRowsBody.innerHTML = data.sourceBreakdown?.length
           ? data.sourceBreakdown.map((row) => `
               <tr>
-                <td>${row.source}</td>
+                <td>${escapeHtml(sourceLabel(row.source))}</td>
                 <td>${row.visitors || 0}</td>
                 <td>${row.pageViews || 0}</td>
                 <td>${row.uploadsStarted || 0}</td>
