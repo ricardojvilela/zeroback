@@ -252,6 +252,7 @@ h2 {
 
 .account-panel .section-kicker {
   margin: 0;
+  color: #51d7c6;
 }
 
 .account-badge {
@@ -269,7 +270,7 @@ h2 {
 .account-status,
 .account-message {
   margin: 0;
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.88);
   font-size: 0.92rem;
   line-height: 1.45;
 }
@@ -298,6 +299,18 @@ h2 {
 .account-form button,
 .account-actions .ghost-button {
   width: 100%;
+}
+
+.account-panel .ghost-button.small {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.08);
+  color: #f8fafc;
+}
+
+.account-panel .ghost-button.small:hover:not(:disabled) {
+  border-color: rgba(81, 215, 198, 0.55);
+  background: rgba(81, 215, 198, 0.18);
+  color: #ffffff;
 }
 
 .billing-actions {
