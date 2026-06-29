@@ -1,6 +1,12 @@
 import { getSupabaseSettings, readRawRequestBody } from "./_pro.js";
 import { getStripeClient, updateProfileFromSubscription } from "./_stripe.js";
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 function sendWebhookJson(response, status, data) {
   response.setHeader("Content-Type", "application/json");
   response.status(status).json(data);

@@ -46,6 +46,7 @@ const pageParams = new URLSearchParams(window.location.search);
 const requestedLimit = Number(pageParams.get("limit"));
 const requestedCheckoutPlan = pageParams.get("checkout_plan");
 const checkoutStatus = pageParams.get("checkout");
+const checkoutSessionId = pageParams.get("session_id");
 const checkoutPlans = new Set(["monthly", "annual", "early"]);
 let maxFilesPerBatch = [2, 3, 5, 10, 20].includes(requestedLimit)
   ? requestedLimit
@@ -1477,7 +1478,7 @@ async function initAuth() {
   if (!supabaseClient) return;
 
   await refreshAccount();
-  showCheckoutReturnMessage();
+  await showCheckoutReturnMessage();
   await maybeStartRequestedCheckout();
 
   supabaseClient.auth.onAuthStateChange(async (_event, session) => {
@@ -1664,10 +1665,32 @@ async function openBillingPortal() {
   }
 }
 
-function showCheckoutReturnMessage() {
+async function syncCheckoutReturnSession() {
+  if (checkoutStatus !== "success" || !checkoutSessionId) return false;
+
+  const accessToken = await getCurrentAccessToken();
+  if (!accessToken) return false;
+
+  try {
+    const response = await fetch("/api/sync-checkout-session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify({ sessionId: checkoutSessionId }),
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function showCheckoutReturnMessage() {
   if (checkoutStatus === "success") {
     setAccountMessage("billingCheckoutSuccess");
-    setTimeout(() => refreshAccount(), 2500);
+    await syncCheckoutReturnSession();
+    await refreshAccount();
   } else if (checkoutStatus === "cancelled") {
     setAccountMessage("billingCheckoutCancelled");
   }
