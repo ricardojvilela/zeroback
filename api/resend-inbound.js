@@ -45,9 +45,9 @@ export default async function handler(request, response) {
       payload,
       webhookSecret,
       headers: {
-        id: requestHeader(request, "svix-id"),
-        timestamp: requestHeader(request, "svix-timestamp"),
-        signature: requestHeader(request, "svix-signature"),
+        id: requestHeader(request, "webhook-id") || requestHeader(request, "svix-id"),
+        timestamp: requestHeader(request, "webhook-timestamp") || requestHeader(request, "svix-timestamp"),
+        signature: requestHeader(request, "webhook-signature") || requestHeader(request, "svix-signature"),
       },
     });
   } catch {
