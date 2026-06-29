@@ -10,6 +10,8 @@ Use este guião quando enviar o link de teste a utilizadores reais.
 4. Confirmar se os ficheiros PNG ficaram utilizáveis.
 5. Testar uma única imagem e descarregar PNG individual.
 6. Alterar o idioma do site.
+7. Criar conta, iniciar sessão e confirmar que a área Pro é clara.
+8. Abrir um plano Pro e confirmar que o Stripe Checkout abre corretamente.
 
 ## Perguntas de feedback
 
@@ -20,6 +22,8 @@ Use este guião quando enviar o link de teste a utilizadores reais.
 5. Alguma imagem falhou?
 6. O que faltaria para pagar por esta ferramenta?
 7. Preferia pagar por mês, por créditos ou por pacote de imagens?
+8. A proposta Pro ficou clara: 100 imagens por lote e 2.000 por mês?
+9. Viu alguma referência incoerente a teste antigo ou textos em inglês no site PT?
 
 ## Recomendações para o primeiro teste
 
@@ -27,4 +31,4 @@ Use este guião quando enviar o link de teste a utilizadores reais.
 - Incluir produtos com fundo branco, fundo colorido e objetos com detalhes finos.
 - Testar em Chrome e Edge.
 - Testar em janela anónima para simular primeira utilização.
-- Não ativar pagamentos nesta fase.
+- Antes de tráfego pago, fazer uma compra Pro real controlada e validar ativação, limites e cancelamento.

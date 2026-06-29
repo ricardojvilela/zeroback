@@ -109,5 +109,5 @@ Endpoints implementados:
 - `/api/create-billing-portal-session`
 - `/api/stripe-webhook`
 
-O webhook ativa Pro automaticamente quando a assinatura fica `active` ou `trialing`.
+O webhook ativa Pro automaticamente quando a assinatura fica `active`.
 Estados de assinatura sem acesso pago voltam a conta para `free`.

@@ -1,5 +1,21 @@
 # Checklist antes de publicar
 
+## Segurança e pagamentos
+
+1. Rodar qualquer chave Stripe live que tenha sido partilhada fora da Stripe.
+2. Atualizar `STRIPE_SECRET_KEY` na Vercel com a nova chave live.
+3. Confirmar que estes valores existem na Vercel:
+   - `STRIPE_SECRET_KEY`
+   - `STRIPE_WEBHOOK_SECRET`
+   - `STRIPE_PRO_MONTHLY_PRICE_ID`
+   - `STRIPE_PRO_ANNUAL_PRICE_ID`
+   - `STRIPE_PRO_EARLY_PRICE_ID`
+   - `BATCHCUTOUT_SITE_URL`
+4. Fazer uma compra real de baixo valor ou uma compra live controlada.
+5. Confirmar que, depois do pagamento, a conta fica Pro, com 100 imagens por lote e 2.000 imagens por mês.
+6. Confirmar que o portal de faturação abre e permite cancelar/gerir o pagamento.
+7. Confirmar que `support@batchcutout.com` existe ou reencaminha para uma caixa ativa.
+
 ## Vercel
 
 1. Criar conta em https://vercel.com.
@@ -11,7 +27,7 @@
    - Output Directory: `.`
 5. Publicar.
 6. Abrir o link gerado em janela anónima.
-7. Testar upload, remoção, ZIP e troca de idioma.
+7. Testar upload, remoção, ZIP, login, checkout, portal de faturação e troca de idioma.
 
 ## Netlify
 
@@ -28,6 +44,9 @@
 - `script.js`
 - `favicon.svg`
 - `privacidade.html`
+- `termos.html`
+- `reembolsos.html`
+- `contacto.html`
 - `package.json`
 - `vercel.json`
 

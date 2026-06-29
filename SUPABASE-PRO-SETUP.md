@@ -108,31 +108,13 @@ set
 where email = 'cliente@exemplo.com';
 ```
 
-No painel `/admin`, esta ativação também pode ser feita pelos botões `Pro` e `Trial`.
+No painel `/admin`, esta ativação também pode ser feita pelo botão `Pro`.
 
-### 5. Trial manual
-
-Para trial:
-
-```sql
-update public.batchcutout_users
-set
-  plan = 'pro',
-  plan_status = 'trialing',
-  batch_limit = 100,
-  monthly_image_limit = 2000,
-  monthly_images_used = 0,
-  current_period_start = now(),
-  current_period_end = now() + interval '15 days',
-  updated_at = now()
-where email = 'cliente@exemplo.com';
-```
-
-### 6. Stripe
+### 5. Stripe
 
 Criar no Stripe um produto `BatchCutout Pro` com estes Prices:
 
-- Early adopter mensal: `15 EUR` por mes
+- Plano fundador mensal: `15 EUR` por mes
 - Pro mensal: `19 EUR` por mes
 - Pro anual: `190 EUR` por ano
 
@@ -164,7 +146,7 @@ O Checkout e o Customer Portal usam estes endpoints:
 - `/api/create-billing-portal-session`
 - `/api/stripe-webhook`
 
-### 7. Deploy
+### 6. Deploy
 
 Depois de adicionar as variáveis na Vercel, fazer novo deploy para publicar:
 
@@ -176,11 +158,11 @@ Depois de adicionar as variáveis na Vercel, fazer novo deploy para publicar:
 - `api/create-billing-portal-session`
 - `api/stripe-webhook`
 
-### 8. Comportamento atual
+### 7. Comportamento atual
 - Free: 2 imagens por lote
 - Pro: 100 imagens por lote
 - Pro: 2000 imagens por mês
-- Pro Early Adopter: 15 EUR/mês
+- Plano fundador: 15 EUR/mês
 - Pro Mensal: 19 EUR/mês
 - Pro Anual: 190 EUR/ano
 - O site reserva o consumo antes de começar a processar
@@ -188,4 +170,4 @@ Depois de adicionar as variáveis na Vercel, fazer novo deploy para publicar:
 - Novas contas precisam de confirmar o email antes do primeiro login
 - O pagamento é feito por Stripe Checkout
 - O webhook Stripe ativa/remove acesso Pro automaticamente
-- O painel `/admin` permite listar contas e mudar entre `Free`, `Trial`, `Pro` e `Reset uso`
+- O painel `/admin` permite listar contas e mudar entre `Free`, `Pro` e `Reset uso`

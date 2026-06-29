@@ -1151,9 +1151,51 @@ progress::-moz-progress-bar {
   font-size: 1.18rem;
 }
 
-.policy-page p {
+.policy-page p,
+.policy-page li {
   color: #52606d;
   line-height: 1.65;
+}
+
+.policy-page a {
+  color: var(--accent-strong);
+  font-weight: 850;
+}
+
+.policy-meta {
+  margin-top: -8px;
+  font-size: 0.9rem;
+}
+
+.policy-nav,
+.pricing-legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.policy-nav {
+  margin: 18px 0 22px;
+}
+
+.policy-nav a,
+.pricing-legal-links a {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  border: 1px solid rgba(15, 139, 124, 0.22);
+  border-radius: 8px;
+  padding: 0 10px;
+  background: rgba(15, 139, 124, 0.08);
+  color: var(--accent-strong);
+  font-size: 0.88rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.policy-nav a[aria-current="page"] {
+  background: var(--accent);
+  color: #ffffff;
 }
 
 .policy-page .back-link {
@@ -1681,7 +1723,8 @@ progress::-moz-progress-bar {
 }
 
 .pricing-privacy,
-.pricing-message {
+.pricing-message,
+.pricing-legal-links {
   grid-column: 1 / -1;
   margin: 0;
   color: #52606d;
