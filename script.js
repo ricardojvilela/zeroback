@@ -90,6 +90,7 @@ let authConfig = null;
 let currentAccount = null;
 let lastUsageReservation = null;
 let hasStartedRequestedCheckout = false;
+let hasTrackedRequestedCheckoutLoginRequired = false;
 
 const supportedExtensions = [
   ".jpg",
@@ -1724,6 +1725,10 @@ async function showCheckoutReturnMessage() {
 async function maybeStartRequestedCheckout() {
   if (hasStartedRequestedCheckout || !checkoutPlans.has(requestedCheckoutPlan || "")) return;
   if (!currentAccount) {
+    if (!hasTrackedRequestedCheckoutLoginRequired) {
+      hasTrackedRequestedCheckoutLoginRequired = true;
+      trackEvent("pro_checkout_login_required", { plan: requestedCheckoutPlan });
+    }
     setAccountMessage("billingLoginRequired");
     return;
   }
