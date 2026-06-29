@@ -144,7 +144,7 @@ const baseTranslation = {
   benefitPng: "PNG transparente",
   benefitZip: "ZIP pronto para loja",
   fileSuffix: "sem-fundo",
-  cookieText: "Usamos medição simples para perceber visitas e pedidos Pro. Pode aceitar ou continuar sem medição.",
+  cookieText: "Usamos medição simples para perceber visitas e adesões Pro. Pode aceitar ou continuar sem medição.",
   cookieAccept: "Aceitar medição",
   cookieDecline: "Continuar sem medição",
   accountKicker: "Acesso Pro",
