@@ -9,6 +9,7 @@
     "build": "echo Static site ready"
   },
   "dependencies": {
+    "resend": "^6.16.0",
     "stripe": "^22.3.0"
   }
 }

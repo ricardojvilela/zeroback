@@ -56,7 +56,29 @@ No Resend, o domínio `batchcutout.com` está verificado. Os registos DNS foram 
 
 Não guardar a chave API do Resend no repositório. Se a chave for rodada, atualizar apenas o campo `Password` no SMTP do Supabase.
 
-### 2.2 Template de confirmação de conta
+### 2.2 Email de suporte
+
+O endereço publico de suporte e `support@batchcutout.com`.
+
+Rececao recomendada:
+
+- Resend Inbound recebe emails para `support@batchcutout.com`
+- webhook: `https://batchcutout.com/api/resend-inbound`
+- evento: `email.received`
+- a API reencaminha para `SUPPORT_FORWARD_TO`
+
+Variaveis necessarias na Vercel:
+
+- `RESEND_API_KEY`
+- `RESEND_WEBHOOK_SECRET`
+- `SUPPORT_FORWARD_TO=ricardojvilela@gmail.com`
+- `SUPPORT_FORWARD_FROM=support@batchcutout.com`
+- `SUPPORT_INBOUND_ADDRESSES=support@batchcutout.com`
+
+Adicionar na Vercel os MX de rececao indicados pelo Resend para `batchcutout.com`.
+Estes registos sao separados dos registos atuais de envio em `send.batchcutout.com`.
+
+### 2.3 Template de confirmação de conta
 
 Em `Authentication > Email Templates`:
 
