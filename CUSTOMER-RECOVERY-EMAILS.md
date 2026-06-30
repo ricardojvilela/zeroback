@@ -2,6 +2,37 @@
 
 Use these only for users who created an account, started checkout, contacted support, or gave clear consent to receive product emails. Keep unsubscribe handling active for non-transactional messages.
 
+Do not send automatically without a final send confirmation. These are ready-to-use templates for manual or automated recovery once the sending rules are approved.
+
+## Segments to use first
+
+1. `account_no_checkout`
+   - User exists in `batchcutout_users`.
+   - `plan = free`.
+   - No `stripe_customer_id`.
+   - Account created at least 2 hours ago.
+
+2. `checkout_not_paid`
+   - `pro_checkout_started` exists.
+   - No `pro_subscription_paid` after that checkout.
+   - Send after 24 hours.
+
+3. `download_no_pro`
+   - User has email.
+   - `tool_download_png` or `tool_download_zip` exists.
+   - No `pro_checkout_started`.
+   - Send after 24 to 48 hours.
+
+4. `welcome_paid`
+   - `pro_subscription_paid` exists.
+   - Send immediately after payment if transactional welcome email is enabled.
+
+## From/reply setup
+
+- From: `BatchCutout <noreply@batchcutout.com>`
+- Reply-to: `support@batchcutout.com`
+- Footer: include NexaFlow Labs and a clear opt-out line for recovery emails.
+
 ## Sequence 1 - account created, no checkout
 
 Timing: 2 to 4 hours after account creation if no `pro_checkout_started`.
@@ -25,6 +56,9 @@ https://batchcutout.com/pricing/?lang=en&utm_source=email&utm_medium=recovery&ut
 
 Thanks,
 NexaFlow Labs
+
+Plain-text opt-out:
+If you do not want product follow-up emails, reply with "unsubscribe".
 
 ## Sequence 2 - checkout started, no paid subscription
 
@@ -50,6 +84,9 @@ https://batchcutout.com/pricing/?lang=en&utm_source=email&utm_medium=recovery&ut
 Thanks,
 NexaFlow Labs
 
+Plain-text opt-out:
+If you do not want product follow-up emails, reply with "unsubscribe".
+
 ## Sequence 3 - download happened, no Pro click
 
 Timing: 24 to 48 hours after download if the user has an email and no Pro checkout.
@@ -73,6 +110,9 @@ https://batchcutout.com/pricing/?lang=en&utm_source=email&utm_medium=recovery&ut
 
 Thanks,
 NexaFlow Labs
+
+Plain-text opt-out:
+If you do not want product follow-up emails, reply with "unsubscribe".
 
 ## Sequence 4 - paid subscription welcome
 
@@ -114,6 +154,79 @@ Se esta a preparar fotos de produto em lote, o Pro desbloqueia:
 
 Escolha o plano atual aqui:
 https://batchcutout.com/pricing/?utm_source=email&utm_medium=recovery&utm_campaign=account_no_checkout
+
+Obrigado,
+NexaFlow Labs
+
+Linha opt-out:
+Se nao quiser receber emails de acompanhamento do produto, responda com "remover".
+
+## PT variant - checkout started, no paid subscription
+
+Subject:
+Precisa de ajuda a ativar o BatchCutout Pro?
+
+Email:
+Ola,
+
+Abriu o checkout do BatchCutout Pro, mas o pagamento nao ficou concluido.
+
+Se alguma coisa bloqueou o processo, responda a este email e ajudamos. O plano Pro inclui:
+
+- Ate 100 imagens por lote
+- Ate 2.000 imagens por mes
+- PNG transparente e ZIP para fluxos de ecommerce
+
+Continuar:
+https://batchcutout.com/pricing/?utm_source=email&utm_medium=recovery&utm_campaign=checkout_not_paid
+
+Obrigado,
+NexaFlow Labs
+
+Linha opt-out:
+Se nao quiser receber emails de acompanhamento do produto, responda com "remover".
+
+## PT variant - download happened, no Pro click
+
+Subject:
+Trate lotes de fotos de produto mais depressa
+
+Email:
+Ola,
+
+Usou o BatchCutout para exportar imagens. Se precisa de repetir esse fluxo com mais fotos, o Pro remove o limite de 2 imagens por lote.
+
+O Pro inclui:
+
+- 100 imagens por lote
+- 2.000 imagens por mes
+- Exportacao em PNG transparente e ZIP
+
+Ver planos:
+https://batchcutout.com/pricing/?utm_source=email&utm_medium=recovery&utm_campaign=download_no_pro
+
+Obrigado,
+NexaFlow Labs
+
+Linha opt-out:
+Se nao quiser receber emails de acompanhamento do produto, responda com "remover".
+
+## PT variant - paid subscription welcome
+
+Subject:
+O BatchCutout Pro esta ativo
+
+Email:
+Ola,
+
+O seu acesso BatchCutout Pro esta ativo.
+
+Agora pode processar ate 100 imagens por lote e ate 2.000 imagens por mes.
+
+Abrir BatchCutout:
+https://batchcutout.com/?utm_source=email&utm_medium=onboarding&utm_campaign=pro_welcome#tool
+
+Pode gerir a faturacao no painel da sua conta.
 
 Obrigado,
 NexaFlow Labs

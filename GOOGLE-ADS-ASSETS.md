@@ -42,6 +42,15 @@ https://batchcutout.com/en/woocommerce-product-background-remover/?utm_source=go
 Remove white background from product photos:
 https://batchcutout.com/en/remove-white-background-from-product-photos/?utm_source=google_ads&utm_medium=cpc&utm_campaign=remove_white_background_product_photos&utm_content=search
 
+remove.bg alternative:
+https://batchcutout.com/en/remove-bg-alternative-for-bulk-product-photos/?utm_source=google_ads&utm_medium=cpc&utm_campaign=remove_bg_alternative&utm_content=search
+
+Photoroom alternative:
+https://batchcutout.com/en/photoroom-alternative-for-ecommerce/?utm_source=google_ads&utm_medium=cpc&utm_campaign=photoroom_alternative&utm_content=search
+
+Pixelcut alternative:
+https://batchcutout.com/en/pixelcut-alternative-for-product-photos/?utm_source=google_ads&utm_medium=cpc&utm_campaign=pixelcut_alternative&utm_content=search
+
 ## Sitelinks
 
 Bulk Background Remover
@@ -118,3 +127,10 @@ Every 48 hours:
 - Keep keywords that produce uploads, downloads, checkout starts, or paid subscriptions.
 - Pause traffic that only produces page views.
 - Move budget only toward origins with product usage or paid subscriptions.
+
+## Competitor-intent page rules
+
+- Use competitor alternative pages only for users already searching alternatives.
+- Do not claim BatchCutout is universally better.
+- Keep the message narrow: ecommerce batches, transparent PNGs, ZIP export, simple pricing.
+- Exclude paid customers from acquisition campaigns when the `paid_customer` audience is large enough.

@@ -1604,6 +1604,15 @@ progress::-moz-progress-bar {
   font-size: 1rem;
 }
 
+.landing-grid strong a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.landing-grid strong a:hover {
+  color: var(--blue);
+}
+
 .landing-grid p {
   margin: 0;
   color: #52606d;
