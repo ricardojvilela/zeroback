@@ -41,6 +41,12 @@ Operational files:
 - Reply-to: `support@batchcutout.com`
 - Footer: include NexaFlow Labs and a clear opt-out line for recovery emails.
 
+Manual cold outreach must not use personal Gmail. Use:
+
+- From: `Ricardo at BatchCutout <ricardo@batchcutout.com>`
+- Reply-to: `support@batchcutout.com`
+- Sending route: `/api/outreach-send` via Resend, protected by admin token.
+
 ## Sequence 1 - account created, no checkout
 
 Timing: 2 to 4 hours after account creation if no `pro_checkout_started`.

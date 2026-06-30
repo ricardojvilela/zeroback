@@ -106,6 +106,14 @@ Sent on 2026-06-30 from Gmail `ricardojvilela@gmail.com`:
 - Jamies Crafting Creations
 - Featherlite Product Photography
 
+Do not use personal Gmail again for BatchCutout outreach.
+
+Future outreach sender:
+
+- From: `Ricardo at BatchCutout <ricardo@batchcutout.com>`
+- Reply-to: `support@batchcutout.com`
+- Sending route: `/api/outreach-send` via Resend, protected by admin token.
+
 Priority order:
 
 1. Contacts with public email addresses.

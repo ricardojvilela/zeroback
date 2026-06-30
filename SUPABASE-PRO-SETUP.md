@@ -78,6 +78,25 @@ Variaveis necessarias na Vercel:
 Adicionar na Vercel os MX de rececao indicados pelo Resend para `batchcutout.com`.
 Estes registos sao separados dos registos atuais de envio em `send.batchcutout.com`.
 
+### 2.2.1 Email comercial/outreach
+
+Nao usar email pessoal para prospecao BatchCutout.
+
+Envio recomendado:
+
+- From: `Ricardo at BatchCutout <ricardo@batchcutout.com>`
+- Reply-to: `support@batchcutout.com`
+- API: `/api/outreach-send`
+- Protecao: token admin do painel interno
+- Provider: Resend via `RESEND_API_KEY`
+
+Variaveis opcionais na Vercel:
+
+- `OUTREACH_FROM=Ricardo at BatchCutout <ricardo@batchcutout.com>`
+- `OUTREACH_REPLY_TO=support@batchcutout.com`
+
+Se as variaveis opcionais nao existirem, o endpoint usa esses valores por defeito.
+
 ### 2.3 Template de confirmação de conta
 
 Em `Authentication > Email Templates`:
