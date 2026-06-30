@@ -717,6 +717,51 @@
             </table>
           </div>
         </section>
+        <section class="source-live-block" aria-label="Caixa de suporte">
+          <div class="panel-head compact">
+            <div>
+              <h3>Caixa support@batchcutout.com</h3>
+              <p class="note">Emails recebidos via Resend. As respostas saem de support@batchcutout.com, sem usar email pessoal.</p>
+            </div>
+            <div class="actions">
+              <button class="secondary" type="button" id="refreshSupportMailbox">Atualizar caixa</button>
+            </div>
+          </div>
+          <div class="live-grid">
+            <article class="live-card">
+              <span>Recebidos</span>
+              <strong id="supportTotal">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Por responder</span>
+              <strong id="supportUnreplied">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Respondidos</span>
+              <strong id="supportReplied">0</strong>
+            </article>
+          </div>
+          <p class="live-status" id="supportStatus">A carregar caixa de suporte...</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Recebido</th>
+                  <th>De</th>
+                  <th>Assunto</th>
+                  <th>Mensagem</th>
+                  <th>Estado</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody id="supportRowsBody">
+                <tr>
+                  <td class="empty" colspan="6">A carregar emails de suporte.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
         <section class="source-live-block" aria-label="Origem das visitas">
           <div class="panel-head compact">
             <div>
@@ -798,6 +843,8 @@
       const proUsersRowsBody = document.querySelector("#proUsersRowsBody");
       const recoveryRowsBody = document.querySelector("#recoveryRowsBody");
       const recoverySummary = document.querySelector("#recoverySummary");
+      const supportRowsBody = document.querySelector("#supportRowsBody");
+      const supportStatus = document.querySelector("#supportStatus");
       const subscriptionsRowsBody = document.querySelector("#subscriptionsRowsBody");
       const subscriptionsStatus = document.querySelector("#subscriptionsStatus");
       const liveStatus = document.querySelector("#liveStatus");
@@ -1071,6 +1118,45 @@
           : `<tr><td class="empty" colspan="4">Ainda não existem contactos acionáveis.</td></tr>`;
       }
 
+      function replySubject(subject) {
+        const value = String(subject || "").trim();
+        return /^re:/i.test(value) ? value : `Re: ${value || "BatchCutout support"}`;
+      }
+
+      function renderSupportMailbox(data) {
+        const summary = data.summary || {};
+        document.querySelector("#supportTotal").textContent = summary.total || 0;
+        document.querySelector("#supportUnreplied").textContent = summary.unreplied || 0;
+        document.querySelector("#supportReplied").textContent = summary.replied || 0;
+        const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString("pt-PT") : "";
+        supportStatus.textContent = `${summary.total || 0} emails lidos. Última atualização: ${generatedAt}`;
+
+        supportRowsBody.innerHTML = data.messages?.length
+          ? data.messages.map((message) => {
+              const fromEmail = String(message.from || "").match(/[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+\.[a-z]{2,}/i)?.[0] || "";
+              return `
+                <tr>
+                  <td>${message.receivedAt ? new Date(message.receivedAt).toLocaleString("pt-PT") : "-"}</td>
+                  <td>${escapeHtml(message.from || "-")}</td>
+                  <td>${escapeHtml(message.subject || "-")}</td>
+                  <td>${escapeHtml(message.preview || "-")}${message.hasAttachments ? `<span class="muted-small">${message.attachmentCount} anexo(s)</span>` : ""}</td>
+                  <td><span class="pill ${message.replied ? "success" : "warning"}">${message.replied ? "Respondido" : "Por responder"}</span></td>
+                  <td>
+                    <button
+                      class="secondary"
+                      type="button"
+                      data-support-action="reply"
+                      data-support-email-id="${escapeHtml(message.emailId || "")}"
+                      data-support-to="${escapeHtml(fromEmail)}"
+                      data-support-subject="${escapeHtml(replySubject(message.subject))}"
+                    >Responder</button>
+                  </td>
+                </tr>
+              `;
+            }).join("")
+          : `<tr><td class="empty" colspan="6">Ainda não existem emails recebidos em support@batchcutout.com.</td></tr>`;
+      }
+
       function renderSubscriptions(data) {
         const summary = data.summary || {};
         const mrrLabel = formatCurrencyFromCents(summary.mrrAmount || 0, summary.currency || "eur");
@@ -1187,6 +1273,29 @@
         }
       }
 
+      async function loadSupportMailbox() {
+        const token = getAdminToken();
+        if (!token) return;
+
+        supportStatus.textContent = "A carregar caixa de suporte...";
+        try {
+          const response = await fetch("/api/pro-users?view=support-mailbox", {
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await response.json();
+          if (!response.ok || !data.ok) {
+            throw new Error(data.error || "support_mailbox_failed");
+          }
+          renderSupportMailbox(data);
+        } catch {
+          supportRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar a caixa de suporte.</td></tr>`;
+          supportStatus.textContent = "Erro ao carregar emails de suporte.";
+        }
+      }
+
       async function updateProUser(userId, mode) {
         const token = getAdminToken();
         if (!token) return;
@@ -1260,6 +1369,34 @@
         return data;
       }
 
+      async function sendSupportReply(emailId, to, subject, text) {
+        const token = getAdminToken();
+        if (!token) return;
+
+        const response = await fetch("/api/pro-users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            mode: "support-reply",
+            inboundEmailId: emailId,
+            to,
+            subject,
+            text,
+          }),
+        });
+
+        const data = await response.json();
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error || "support_reply_failed");
+        }
+
+        return data;
+      }
+
       async function loadLiveStats() {
         const token = getAdminToken();
         if (!token) {
@@ -1282,6 +1419,7 @@
           renderLiveStats(data);
           await loadProUsers();
           await loadSubscriptions();
+          await loadSupportMailbox();
         } catch (error) {
           if (error.message === "unauthorized") {
             localStorage.removeItem(adminTokenStorageKey);
@@ -1291,6 +1429,7 @@
           liveRowsBody.innerHTML = `<tr><td class="empty" colspan="17">Não foi possível carregar atividade.</td></tr>`;
           proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar contas.</td></tr>`;
           recoveryRowsBody.innerHTML = `<tr><td class="empty" colspan="4">Não foi possível carregar oportunidades comerciais.</td></tr>`;
+          supportRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar a caixa de suporte.</td></tr>`;
           subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="7">Não foi possível carregar subscrições Stripe.</td></tr>`;
           liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variáveis Vercel.";
           subscriptionsStatus.textContent = "Erro ao carregar subscrições.";
@@ -1300,6 +1439,7 @@
       document.querySelector("#refreshLive").addEventListener("click", loadLiveStats);
       document.querySelector("#refreshProUsers").addEventListener("click", loadProUsers);
       document.querySelector("#refreshSubscriptions").addEventListener("click", loadSubscriptions);
+      document.querySelector("#refreshSupportMailbox").addEventListener("click", loadSupportMailbox);
       subscriptionsRowsBody.addEventListener("click", async (event) => {
         const button = event.target.closest("[data-subscription-action]");
         if (!button) return;
@@ -1341,7 +1481,7 @@
         const email = button.dataset.recoveryEmail;
         const segment = button.dataset.recoverySegment;
         if (!email || !segment) return;
-        if (!confirm(`Enviar email via ricardo@batchcutout.com para ${email}?`)) return;
+        if (!confirm(`Enviar email via support@batchcutout.com para ${email}?`)) return;
 
         const originalText = button.textContent;
         button.disabled = true;
@@ -1352,6 +1492,33 @@
         } catch {
           button.textContent = originalText;
           alert("Não foi possível enviar via domínio.");
+        } finally {
+          button.disabled = false;
+        }
+      });
+      supportRowsBody.addEventListener("click", async (event) => {
+        const button = event.target.closest("[data-support-action='reply']");
+        if (!button) return;
+
+        const emailId = button.dataset.supportEmailId;
+        const to = button.dataset.supportTo;
+        const subject = button.dataset.supportSubject;
+        if (!emailId || !to || !subject) return;
+
+        const text = prompt(`Resposta para ${to}`, "Hi,\n\nThanks for contacting BatchCutout.\n\n");
+        if (!text || !text.trim()) return;
+        if (!confirm(`Enviar resposta de support@batchcutout.com para ${to}?`)) return;
+
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = "A enviar...";
+        try {
+          await sendSupportReply(emailId, to, subject, text);
+          button.textContent = "Respondido";
+          await loadSupportMailbox();
+        } catch {
+          button.textContent = originalText;
+          alert("Não foi possível enviar a resposta.");
         } finally {
           button.disabled = false;
         }

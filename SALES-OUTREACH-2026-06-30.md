@@ -97,7 +97,7 @@ Hi, I found your store and thought BatchCutout might help with repeat product-ph
 
 See `sales-outreach-prospects-2026-06-30.csv`.
 
-Sent on 2026-06-30 from Gmail `ricardojvilela@gmail.com`:
+Sent on 2026-06-30 before the domain sender was configured:
 
 - Happy Holmes Fibre Arts
 - Kate Warby Designs
@@ -106,11 +106,11 @@ Sent on 2026-06-30 from Gmail `ricardojvilela@gmail.com`:
 - Jamies Crafting Creations
 - Featherlite Product Photography
 
-Do not use personal Gmail again for BatchCutout outreach.
+Do not use personal email again for BatchCutout outreach.
 
 Future outreach sender:
 
-- From: `Ricardo at BatchCutout <ricardo@batchcutout.com>`
+- From: `BatchCutout <support@batchcutout.com>`
 - Reply-to: `support@batchcutout.com`
 - Sending route: `/api/pro-users` with `mode=send-outreach` via Resend, protected by admin token.
 

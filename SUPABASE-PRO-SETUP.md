@@ -65,15 +65,23 @@ Rececao recomendada:
 - Resend Inbound recebe emails para `support@batchcutout.com`
 - webhook: `https://batchcutout.com/api/resend-inbound`
 - evento: `email.received`
-- a API reencaminha para `SUPPORT_FORWARD_TO`
+- a API guarda a mensagem em `batchcutout_events`
+- o painel `/admin` mostra a caixa `support@batchcutout.com`
+- as respostas saem pelo Resend como `BatchCutout Support <support@batchcutout.com>`
 
 Variaveis necessarias na Vercel:
 
 - `RESEND_API_KEY`
 - `RESEND_WEBHOOK_SECRET`
-- `SUPPORT_FORWARD_TO=ricardojvilela@gmail.com`
-- `SUPPORT_FORWARD_FROM=support@batchcutout.com`
 - `SUPPORT_INBOUND_ADDRESSES=support@batchcutout.com`
+- `SUPPORT_REPLY_FROM=BatchCutout Support <support@batchcutout.com>` opcional
+- `SUPPORT_REPLY_TO=support@batchcutout.com` opcional
+
+Reencaminhamento para outra caixa e opcional e deve ficar desligado por defeito. Se for necessario usar no futuro:
+
+- `SUPPORT_FORWARD_ENABLED=true`
+- `SUPPORT_FORWARD_TO=<caixa operacional>`
+- `SUPPORT_FORWARD_FROM=support@batchcutout.com`
 
 Adicionar na Vercel os MX de rececao indicados pelo Resend para `batchcutout.com`.
 Estes registos sao separados dos registos atuais de envio em `send.batchcutout.com`.
@@ -84,7 +92,7 @@ Nao usar email pessoal para prospecao BatchCutout.
 
 Envio recomendado:
 
-- From: `Ricardo at BatchCutout <ricardo@batchcutout.com>`
+- From: `BatchCutout <support@batchcutout.com>`
 - Reply-to: `support@batchcutout.com`
 - API: `/api/pro-users` com `mode=send-outreach`
 - Protecao: token admin do painel interno
@@ -92,7 +100,7 @@ Envio recomendado:
 
 Variaveis opcionais na Vercel:
 
-- `OUTREACH_FROM=Ricardo at BatchCutout <ricardo@batchcutout.com>`
+- `OUTREACH_FROM=BatchCutout <support@batchcutout.com>`
 - `OUTREACH_REPLY_TO=support@batchcutout.com`
 
 Se as variaveis opcionais nao existirem, o endpoint usa esses valores por defeito.

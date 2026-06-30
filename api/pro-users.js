@@ -3,8 +3,9 @@ import { Resend } from "resend";
 import { getSupabaseSettings, sendJson, readRequestBody, supabaseUpdateByUserId } from "./_pro.js";
 import { getStripeClient } from "./_stripe.js";
 
-const defaultOutreachFrom = "Ricardo at BatchCutout <ricardo@batchcutout.com>";
+const defaultOutreachFrom = "BatchCutout <support@batchcutout.com>";
 const defaultOutreachReplyTo = "support@batchcutout.com";
+const defaultSupportFrom = "BatchCutout Support <support@batchcutout.com>";
 const allowedOutreachDomains = new Set(["batchcutout.com"]);
 
 function verifyAdminToken(request) {
@@ -70,7 +71,19 @@ function cleanText(value, maxLength) {
 
 function outreachSettings() {
   const from = process.env.OUTREACH_FROM || defaultOutreachFrom;
-  const replyTo = process.env.OUTREACH_REPLY_TO || process.env.SUPPORT_FORWARD_FROM || defaultOutreachReplyTo;
+  const replyTo = process.env.OUTREACH_REPLY_TO || defaultOutreachReplyTo;
+  const fromAddress = fromEmail(from);
+  return {
+    from,
+    replyTo,
+    fromAddress,
+    fromDomain: emailDomain(fromAddress),
+  };
+}
+
+function supportSettings() {
+  const from = process.env.SUPPORT_REPLY_FROM || defaultSupportFrom;
+  const replyTo = process.env.SUPPORT_REPLY_TO || "support@batchcutout.com";
   const fromAddress = fromEmail(from);
   return {
     from,
@@ -296,6 +309,159 @@ async function cancelSubscriptionRenewal(subscriptionId) {
   return mapSubscription(subscription);
 }
 
+async function insertSupportEvent(settings, eventName, detail, eventLabel = "") {
+  const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
+  const response = await fetch(`${settings.supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}`, {
+    method: "POST",
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+      "Content-Type": "application/json",
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify({
+      event_name: eventName,
+      event_category: "support",
+      event_label: cleanText(eventLabel || detail.email_id || detail.message_id || "support_email", 160),
+      source: "support_email",
+      campaign: eventName,
+      value: 0,
+      detail,
+      occurred_at: new Date().toISOString(),
+    }),
+  });
+
+  if (!response.ok) {
+    const detailText = await response.text();
+    throw new Error(`support_event_insert_failed:${response.status}:${detailText.slice(0, 300)}`);
+  }
+}
+
+function supportMessageFromEvent(event, replyIds) {
+  const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+  const emailId = cleanText(detail.email_id || event.event_label || "", 120);
+  const text = cleanText(detail.text || "", 5000);
+  const html = cleanText(detail.html || "", 5000);
+  return {
+    id: event.id,
+    emailId,
+    messageId: cleanText(detail.message_id || "", 320),
+    from: cleanText(detail.from || "", 320),
+    to: Array.isArray(detail.to) ? detail.to.slice(0, 10) : [],
+    subject: cleanText(detail.subject || "(sem assunto)", 500),
+    preview: cleanText(text || html.replace(/<[^>]+>/g, " "), 700),
+    receivedAt: event.occurred_at,
+    hasAttachments: Array.isArray(detail.attachments) && detail.attachments.length > 0,
+    attachmentCount: Array.isArray(detail.attachments) ? detail.attachments.length : 0,
+    replied: replyIds.has(emailId),
+  };
+}
+
+async function listSupportMailbox(settings) {
+  const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
+  const query = new URLSearchParams({
+    select: "id,event_name,event_label,detail,occurred_at",
+    event_name: "in.(support_email_received,support_email_replied)",
+    order: "occurred_at.desc",
+    limit: "200",
+  });
+  const response = await fetch(`${settings.supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}?${query}`, {
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+    },
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`support_mailbox_read_failed:${response.status}:${detail.slice(0, 300)}`);
+  }
+
+  const events = await response.json();
+  const replyIds = new Set(
+    events
+      .filter((event) => event.event_name === "support_email_replied")
+      .map((event) => cleanText(event.detail?.in_reply_to_email_id || "", 120))
+      .filter(Boolean),
+  );
+  const messages = events
+    .filter((event) => event.event_name === "support_email_received")
+    .map((event) => supportMessageFromEvent(event, replyIds));
+
+  return {
+    generatedAt: new Date().toISOString(),
+    messages,
+    summary: {
+      total: messages.length,
+      unreplied: messages.filter((message) => !message.replied).length,
+      replied: messages.filter((message) => message.replied).length,
+    },
+  };
+}
+
+async function sendSupportReply(settings, body) {
+  const mailSettings = supportSettings();
+  if (!allowedOutreachDomains.has(mailSettings.fromDomain)) {
+    return { status: 503, body: { ok: false, error: "support_from_domain_not_allowed" } };
+  }
+
+  const resendApiKey = process.env.RESEND_API_KEY || "";
+  if (!resendApiKey) {
+    return { status: 503, body: { ok: false, error: "resend_not_configured" } };
+  }
+
+  const to = normalizeEmail(body.to);
+  const subject = cleanText(body.subject, 160);
+  const text = cleanText(body.text, 5000);
+  const inboundEmailId = cleanText(body.inboundEmailId, 120);
+
+  if (!to || !subject || !text || !inboundEmailId) {
+    return { status: 400, body: { ok: false, error: "invalid_support_reply_payload" } };
+  }
+
+  const payload = {
+    from: mailSettings.from,
+    to,
+    replyTo: mailSettings.replyTo,
+    subject,
+    text,
+    tags: [
+      { name: "source", value: "support_reply" },
+      { name: "product", value: "batchcutout" },
+    ],
+  };
+  const resend = new Resend(resendApiKey);
+  const sent = await resend.emails.send(payload);
+  if (sent.error) {
+    return {
+      status: 502,
+      body: { ok: false, error: "support_reply_failed", detail: sent.error.message },
+    };
+  }
+
+  await insertSupportEvent(settings, "support_email_replied", {
+    in_reply_to_email_id: inboundEmailId,
+    to,
+    from: mailSettings.from,
+    reply_to: mailSettings.replyTo,
+    subject,
+    text,
+    resend_id: sent.data?.id || "",
+  }, inboundEmailId);
+
+  return {
+    status: 200,
+    body: {
+      ok: true,
+      id: sent.data?.id || "",
+      from: payload.from,
+      replyTo: payload.replyTo,
+      to: payload.to,
+      subject: payload.subject,
+    },
+  };
+}
+
 async function sendOutreach(body) {
   const settings = outreachSettings();
   if (!allowedOutreachDomains.has(settings.fromDomain)) {
@@ -389,6 +555,10 @@ export default async function handler(request, response) {
         const subscriptionData = await listSubscriptions(settings);
         return sendJson(response, 200, { ok: true, ...subscriptionData });
       }
+      if (url.searchParams.get("view") === "support-mailbox") {
+        const mailboxData = await listSupportMailbox(settings);
+        return sendJson(response, 200, { ok: true, ...mailboxData });
+      }
 
       const users = await listUsers(settings);
       return sendJson(response, 200, { ok: true, users });
@@ -404,6 +574,11 @@ export default async function handler(request, response) {
 
     if (mode === "send-outreach") {
       const result = await sendOutreach(body);
+      return sendJson(response, result.status, result.body);
+    }
+
+    if (mode === "support-reply") {
+      const result = await sendSupportReply(settings, body);
       return sendJson(response, result.status, result.body);
     }
 

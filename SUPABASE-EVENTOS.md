@@ -92,6 +92,16 @@ Receita:
 - Serve para auditar o envio da conversao paga para Google Ads/GA4 e alimentar o sinal `paid_customer`.
 - `detail.conversion_configured` deve estar `true` em producao.
 
+Suporte:
+
+- `support_email_received`
+- Criado pelo webhook Resend quando entra um email para `support@batchcutout.com`.
+- `event_label` guarda o ID do email recebido ou o `message_id`.
+- `detail` guarda remetente, destinatarios, assunto, previews de texto/html e metadados de anexos.
+- `support_email_replied`
+- Criado pelo painel `/admin` quando uma resposta e enviada por `support@batchcutout.com`.
+- `detail.in_reply_to_email_id` liga a resposta ao email recebido.
+
 ## Consultas uteis
 
 Endpoint interno de leitura agregada:

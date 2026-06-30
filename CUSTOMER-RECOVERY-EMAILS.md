@@ -41,9 +41,9 @@ Operational files:
 - Reply-to: `support@batchcutout.com`
 - Footer: include NexaFlow Labs and a clear opt-out line for recovery emails.
 
-Manual cold outreach must not use personal Gmail. Use:
+Manual outreach must use the domain sender:
 
-- From: `Ricardo at BatchCutout <ricardo@batchcutout.com>`
+- From: `BatchCutout <support@batchcutout.com>`
 - Reply-to: `support@batchcutout.com`
 - Sending route: `/api/pro-users` with `mode=send-outreach` via Resend, protected by admin token.
 

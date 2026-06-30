@@ -14,23 +14,24 @@
 4. Fazer uma compra real de baixo valor ou uma compra live controlada.
 5. Confirmar que, depois do pagamento, a conta fica Pro, com 100 imagens por lote e 2.000 imagens por mês.
 6. Confirmar que o portal de faturação abre e permite cancelar/gerir o pagamento.
-7. Confirmar que `support@batchcutout.com` reencaminha para uma caixa ativa.
+7. Confirmar que `support@batchcutout.com` aparece na caixa de suporte do `/admin`.
 
 ## Email de suporte
 
 1. No Resend, criar um webhook para `https://batchcutout.com/api/resend-inbound`.
 2. Ativar o evento `email.received` no webhook.
 3. Guardar o webhook secret na Vercel como `RESEND_WEBHOOK_SECRET`.
-4. Criar ou reutilizar uma chave API do Resend com acesso suficiente para ler e reencaminhar emails recebidos.
+4. Criar ou reutilizar uma chave API do Resend com acesso suficiente para ler emails recebidos e enviar respostas.
 5. Guardar na Vercel:
    - `RESEND_API_KEY`
    - `RESEND_WEBHOOK_SECRET`
-   - `SUPPORT_FORWARD_TO=ricardojvilela@gmail.com`
-   - `SUPPORT_FORWARD_FROM=support@batchcutout.com`
    - `SUPPORT_INBOUND_ADDRESSES=support@batchcutout.com`
+   - `SUPPORT_REPLY_FROM=BatchCutout Support <support@batchcutout.com>` opcional
+   - `SUPPORT_REPLY_TO=support@batchcutout.com` opcional
 6. No DNS da Vercel, adicionar os MX de receção indicados pelo Resend para `batchcutout.com`.
 7. Confirmar no Resend que a receção ficou verificada.
-8. Enviar um email real para `support@batchcutout.com` e confirmar que chega à caixa de destino.
+8. Enviar um email real para `support@batchcutout.com` e confirmar que aparece no painel `/admin`.
+9. Responder pelo painel `/admin` e confirmar que a resposta sai de `support@batchcutout.com`.
 
 ## Vercel
 
