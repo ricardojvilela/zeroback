@@ -46,9 +46,9 @@ Objetivo: medir contacto comercial antigo/lead manual.
 
 Estado pretendido:
 
-- Otimizacao: principal
+- Otimizacao: secundaria
 - Contagem: uma
-- Usar para lances: sim
+- Usar para lances: nao
 
 Evento no site:
 
@@ -60,7 +60,7 @@ Snippet usado:
 
 Nota: existem duas acoes Lead Pro no Google Ads. O codigo usa `Lead Pro BatchCutout (1)`. Nao criar uma terceira ate haver necessidade.
 
-Nota 2026-06-30: com subscricoes pagas ativas, a otimizacao comercial deve passar a privilegiar `Pro Paid Subscription BatchCutout`. Leads Pro antigos ficam como historico/intencao secundaria.
+Atualizacao 2026-06-30: as duas acoes antigas `Lead Pro BatchCutout` e `Lead Pro BatchCutout (1)` foram passadas para secundarias e removidas dos objetivos ao nivel da conta. Ficam apenas como historico/intencao secundaria.
 
 ## Conversoes secundarias
 
@@ -93,6 +93,17 @@ Snippet usado:
 - `AW-18177126609/prPXCPXD8LMcENHhw9tD`
 
 Nota: o nome no Google Ads ainda diz `Limite 20`, mas hoje representa `batch_limit_exceeded` com limite 3. Idealmente renomear na interface para `Batch Limit BatchCutout`.
+
+### Visualizacao de pagina
+
+Objetivo: historico tecnico criado pela Google tag.
+
+Estado atual:
+
+- Otimizacao: secundaria
+- Usar para lances: nao
+
+Atualizacao 2026-06-30: `Visualizacao de pagina` foi passada para secundaria e removida dos objetivos ao nivel da conta para evitar que campanhas otimizem para visitas em vez de pagamentos.
 
 ## Eventos que nao devem ser conversoes Google Ads
 
