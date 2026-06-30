@@ -1,6 +1,6 @@
 # BatchCutout - focused Search execution
 
-Status: ready to apply. Keep new campaigns paused until the final budget confirmation.
+Status: active and verified on 2026-06-30.
 
 ## Rule for competitor-intent campaigns
 
@@ -13,12 +13,12 @@ https://support.google.com/adspolicy/answer/6118
 
 Do not increase total launch spend above 10 EUR/day yet.
 
-Recommended allocation:
+Current allocation:
 
-- Core ecommerce/background removal intent: 8 EUR/day total.
-- Competitor alternative intent: 2 EUR/day.
+- `Search - BatchCutout - Pro Launch`: 8 EUR/day.
+- `Search - BatchCutout - Alternatives`: 2 EUR/day.
 
-If an existing Search campaign is already spending 10 EUR/day, reduce the weakest current campaign/ad group by 2 EUR/day before enabling the competitor campaign.
+Total active Search budget: 10 EUR/day.
 
 ## New campaign
 
@@ -27,15 +27,22 @@ Search - BatchCutout - Alternatives
 
 Settings:
 
-- Status: paused until final activation.
+- Status: active.
+- Campaign ID: `23991783535`.
 - Network: Google Search only.
 - Search partners: off.
 - Display Network: off.
 - Languages: English.
 - Locations: United States, United Kingdom, Canada, Australia, Ireland.
 - Bid strategy: Maximize conversions.
-- Primary conversion: Pro Paid Subscription BatchCutout.
-- Daily budget after activation: 2 EUR/day.
+- Conversion goal: account default `Subscribe`, backed by `Pro Paid Subscription BatchCutout`.
+- Daily budget: 2 EUR/day.
+
+Verified on 2026-06-30:
+
+- `Search - BatchCutout - Pro Launch` uses account-default conversion goal `Subscrever` and `Maximizar as conversoes`.
+- `Search - BatchCutout - Alternatives` uses account-default conversion goal `Subscrever` and `Maximizar as conversoes`.
+- Broad match and Search Max / Maxima IA recommendations were not applied yet.
 
 ## Ad groups
 
@@ -150,7 +157,7 @@ Files prepared for Google Ads Editor or manual bulk import:
 
 ## First review
 
-Review after 48 hours or 20 clicks, whichever comes first.
+Review after 48 hours from activation or 20 clicks, whichever comes first.
 
 Keep only traffic that creates at least one of these signals:
 

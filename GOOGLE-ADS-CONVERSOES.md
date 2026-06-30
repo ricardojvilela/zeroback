@@ -40,6 +40,10 @@ Atualizacao 2026-06-30: os Termos dos dados de clientes foram aceites no Google 
 
 Atualizacao 2026-06-30: foi adicionado fallback sem login em `/api/sync-checkout-session`. Se o regresso do Stripe perder a sessao Supabase, o browser valida o `session_id` diretamente no Stripe antes de enviar a conversao Google Ads. Isto reduz o risco de pagamentos reais ficarem sem conversao por falha de login local.
 
+Atualizacao 2026-06-30: campanhas ativas verificadas no Google Ads. `Search - BatchCutout - Pro Launch` usa 8,00 EUR/dia, `Maximizar as conversoes` e `Objetivos de conversao: Predefinicao da conta: Subscrever`. `Search - BatchCutout - Alternatives` usa 2,00 EUR/dia, `Maximizar as conversoes` e `Objetivos de conversao: Predefinicao da conta: Subscrever`. Como as conversoes antigas de lead e visualizacao de pagina ficaram secundarias, a aprendizagem das campanhas fica alinhada com a subscricao paga.
+
+Nota operacional: recomendacoes automaticas de correspondencia ampla e Maxima IA nao foram aplicadas nesta verificacao. Manter correspondencia controlada ate haver dados suficientes de subscricoes pagas e termos de pesquisa.
+
 ### Lead Pro BatchCutout
 
 Objetivo: medir contacto comercial antigo/lead manual.

@@ -168,7 +168,8 @@ Decision rules:
 - Added Supabase SQL recovery/proof segments in `CUSTOMER-RECOVERY-SEGMENTS.sql`.
 - Added proof request HTML email templates in `emails/proof-request.html` and `emails/proof-request-pt.html`.
 - Added manual recovery/proof candidate section to `/admin`.
-- New campaign should stay paused until final spend activation is confirmed.
+- Activated `Search - BatchCutout - Alternatives` with 2 EUR/day and kept total active Search spend at 10 EUR/day.
+- Verified both active Search campaigns use the account-default `Subscrever` conversion goal and `Maximizar as conversoes`.
 
 ## First revenue targets
 
