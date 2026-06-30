@@ -717,6 +717,51 @@
             </table>
           </div>
         </section>
+        <section class="source-live-block" aria-label="Prospecção comercial">
+          <div class="panel-head compact">
+            <div>
+              <h3>Prospecção comercial</h3>
+              <p class="note">Lista curta de prospects ecommerce. Contactos por formulário usam mensagem copiada; emails diretos saem pelo domínio.</p>
+            </div>
+            <div class="actions">
+              <button class="secondary" type="button" id="refreshOutreachProspects">Atualizar prospects</button>
+            </div>
+          </div>
+          <div class="live-grid">
+            <article class="live-card">
+              <span>Total</span>
+              <strong id="outreachTotal">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Prontos</span>
+              <strong id="outreachReady">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Já contactados</span>
+              <strong id="outreachSent">0</strong>
+            </article>
+          </div>
+          <p class="live-status" id="outreachStatus">A carregar prospects...</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Prospect</th>
+                  <th>Canal</th>
+                  <th>Ângulo</th>
+                  <th>Estado</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody id="outreachProspectsBody">
+                <tr>
+                  <td class="empty" colspan="6">A carregar prospects.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
         <section class="source-live-block" aria-label="Caixa de suporte">
           <div class="panel-head compact">
             <div>
@@ -843,6 +888,8 @@
       const proUsersRowsBody = document.querySelector("#proUsersRowsBody");
       const recoveryRowsBody = document.querySelector("#recoveryRowsBody");
       const recoverySummary = document.querySelector("#recoverySummary");
+      const outreachProspectsBody = document.querySelector("#outreachProspectsBody");
+      const outreachStatus = document.querySelector("#outreachStatus");
       const supportRowsBody = document.querySelector("#supportRowsBody");
       const supportStatus = document.querySelector("#supportStatus");
       const subscriptionsRowsBody = document.querySelector("#subscriptionsRowsBody");
@@ -986,6 +1033,79 @@
         return copies[segment] || {};
       }
 
+      function parseCsv(text) {
+        const rows = [];
+        let row = [];
+        let value = "";
+        let quoted = false;
+
+        for (let index = 0; index < text.length; index += 1) {
+          const char = text[index];
+          const next = text[index + 1];
+          if (char === '"' && quoted && next === '"') {
+            value += '"';
+            index += 1;
+          } else if (char === '"') {
+            quoted = !quoted;
+          } else if (char === "," && !quoted) {
+            row.push(value);
+            value = "";
+          } else if ((char === "\n" || char === "\r") && !quoted) {
+            if (char === "\r" && next === "\n") index += 1;
+            row.push(value);
+            if (row.some((cell) => cell.trim())) rows.push(row);
+            row = [];
+            value = "";
+          } else {
+            value += char;
+          }
+        }
+
+        row.push(value);
+        if (row.some((cell) => cell.trim())) rows.push(row);
+        return rows;
+      }
+
+      function prospectsFromCsv(text) {
+        const rows = parseCsv(text);
+        const headers = rows.shift()?.map((header) => header.trim()) || [];
+        return rows.map((row) => Object.fromEntries(headers.map((header, index) => [header, row[index] || ""])));
+      }
+
+      function outreachEmailCopy(prospect) {
+        const isPartner = prospect.template === "email_partner" || /photography|partner/i.test(prospect.segment || "");
+        if (isPartner) {
+          return {
+            subject: "Batch background removal for ecommerce photo workflows",
+            body: `Hi,\n\nI saw that you work with product photography / ecommerce visuals.\n\nWe built BatchCutout as a simple batch background remover for product photo workflows. It is not a full design suite; it is focused on repeat cutouts, transparent PNGs, and ZIP export.\n\nIt may be useful when you need to process many simple product shots before final editing or client delivery.\n\nFounder plan:\nhttps://batchcutout.com/pricing/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach\n\nIf helpful, I can send a short before/after example or test a small batch.\n\nThanks,\nRicardo\nNexaFlow Labs`,
+          };
+        }
+        return {
+          subject: "Quick way to clean product photos in batches",
+          body: `Hi,\n\nI found your store and noticed you have product photos that likely need repeat editing for new listings.\n\nWe built BatchCutout for small ecommerce teams that need to remove backgrounds from product photos in batches, export transparent PNGs, and download everything as one ZIP.\n\nThe current founder plan is 15 EUR/month and includes:\n\n- 100 images per batch\n- 2,000 images per month\n- PNG and ZIP export\n\nYou can try it here:\nhttps://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=founder_first_customers#tool\n\nIf you want, reply with 3 to 5 product photos and I can tell you whether BatchCutout is a good fit before you pay.\n\nThanks,\nRicardo\nNexaFlow Labs`,
+        };
+      }
+
+      function outreachContactFormCopy(prospect) {
+        const campaign = prospect.template === "contact_form" ? "founder_first_customers" : "partner_outreach";
+        return `Hi, I found your store and thought BatchCutout might help with repeat product-photo work. It removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP. Founder plan is 15 EUR/month for 100 images per batch and 2,000/month. Try it here: https://batchcutout.com/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${campaign}#tool - Ricardo, NexaFlow Labs`;
+      }
+
+      function outreachStatusLabel(status) {
+        if (String(status || "").startsWith("sent_")) return "Contactado";
+        if (status === "ready") return "Pronto";
+        return status || "-";
+      }
+
+      async function copyText(text) {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+        prompt("Copiar mensagem", text);
+        return false;
+      }
+
       function renderLiveStats(data) {
         const totals = data.totals || {};
         document.querySelector("#dashboardVisitors").textContent = totals.visitors || 0;
@@ -1116,6 +1236,60 @@
               `;
             }).join("")
           : `<tr><td class="empty" colspan="4">Ainda não existem contactos acionáveis.</td></tr>`;
+      }
+
+      function renderOutreachProspects(prospects) {
+        const sentCount = prospects.filter((prospect) => String(prospect.status || "").startsWith("sent_")).length;
+        const readyCount = prospects.filter((prospect) => prospect.status === "ready").length;
+        document.querySelector("#outreachTotal").textContent = prospects.length;
+        document.querySelector("#outreachReady").textContent = readyCount;
+        document.querySelector("#outreachSent").textContent = sentCount;
+        outreachStatus.textContent = `${readyCount} prospects prontos. ${sentCount} já contactados.`;
+
+        outreachProspectsBody.innerHTML = prospects.length
+          ? prospects.map((prospect) => {
+              const priority = Number(prospect.priority || 0) || "-";
+              const isSent = String(prospect.status || "").startsWith("sent_");
+              const isEmail = prospect.channel === "email" && /@/.test(prospect.contact || "");
+              const isForm = prospect.channel === "contact form";
+              const statusClass = isSent ? "success" : "warning";
+              const action = isSent
+                ? `<span class="muted-small">Já contactado</span>`
+                : isEmail
+                  ? `<button
+                      class="secondary"
+                      type="button"
+                      data-outreach-action="send-email"
+                      data-outreach-name="${escapeHtml(prospect.name || "")}"
+                      data-outreach-email="${escapeHtml(prospect.contact || "")}"
+                      data-outreach-template="${escapeHtml(prospect.template || "")}"
+                      data-outreach-segment="${escapeHtml(prospect.segment || "")}"
+                    >Enviar via domínio</button>`
+                  : `<button
+                      class="secondary"
+                      type="button"
+                      data-outreach-action="copy-form"
+                      data-outreach-url="${escapeHtml(prospect.url || "")}"
+                      data-outreach-template="${escapeHtml(prospect.template || "")}"
+                    >Copiar + abrir</button>`;
+              return `
+                <tr>
+                  <td>${priority}</td>
+                  <td>
+                    ${escapeHtml(prospect.name || "-")}
+                    <span class="muted-small">${escapeHtml(prospect.segment || "-")}</span>
+                  </td>
+                  <td>
+                    ${escapeHtml(isForm ? "formulário" : prospect.channel || "-")}
+                    <span class="muted-small">${escapeHtml(isEmail ? prospect.contact : prospect.url || prospect.contact || "-")}</span>
+                  </td>
+                  <td>${escapeHtml(prospect.angle || "-")}</td>
+                  <td><span class="pill ${statusClass}">${escapeHtml(outreachStatusLabel(prospect.status))}</span></td>
+                  <td><div class="table-actions">${action}</div></td>
+                </tr>
+              `;
+            }).join("")
+          : `<tr><td class="empty" colspan="6">Ainda não existem prospects carregados.</td></tr>`;
       }
 
       function replySubject(subject) {
@@ -1307,6 +1481,19 @@
         }
       }
 
+      async function loadOutreachProspects() {
+        outreachStatus.textContent = "A carregar prospects...";
+        try {
+          const response = await fetch("/sales-outreach-prospects-2026-06-30.csv", { cache: "no-store" });
+          if (!response.ok) throw new Error("prospects_failed");
+          const prospects = prospectsFromCsv(await response.text());
+          renderOutreachProspects(prospects);
+        } catch {
+          outreachProspectsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar prospects.</td></tr>`;
+          outreachStatus.textContent = "Erro ao carregar lista comercial.";
+        }
+      }
+
       async function updateProUser(userId, mode) {
         const token = getAdminToken();
         if (!token) return;
@@ -1375,6 +1562,33 @@
         const data = await response.json();
         if (!response.ok || !data.ok) {
           throw new Error(data.error || "recovery_email_send_failed");
+        }
+
+        return data;
+      }
+
+      async function sendOutreachEmail(email, copy) {
+        const token = getAdminToken();
+        if (!token) return;
+
+        const response = await fetch("/api/pro-users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            mode: "send-outreach",
+            to: email,
+            subject: copy.subject || "",
+            text: copy.body || "",
+          }),
+        });
+
+        const data = await response.json();
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error || "outreach_send_failed");
         }
 
         return data;
@@ -1455,6 +1669,7 @@
           renderLiveStats(data);
           await loadProUsers();
           await loadSubscriptions();
+          await loadOutreachProspects();
           await loadSupportMailbox();
         } catch (error) {
           if (error.message === "unauthorized") {
@@ -1465,6 +1680,7 @@
           liveRowsBody.innerHTML = `<tr><td class="empty" colspan="17">Não foi possível carregar atividade.</td></tr>`;
           proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar contas.</td></tr>`;
           recoveryRowsBody.innerHTML = `<tr><td class="empty" colspan="4">Não foi possível carregar oportunidades comerciais.</td></tr>`;
+          outreachProspectsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar prospects.</td></tr>`;
           supportRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar a caixa de suporte.</td></tr>`;
           subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="7">Não foi possível carregar subscrições Stripe.</td></tr>`;
           liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variáveis Vercel.";
@@ -1475,6 +1691,7 @@
       document.querySelector("#refreshLive").addEventListener("click", loadLiveStats);
       document.querySelector("#refreshProUsers").addEventListener("click", loadProUsers);
       document.querySelector("#refreshSubscriptions").addEventListener("click", loadSubscriptions);
+      document.querySelector("#refreshOutreachProspects").addEventListener("click", loadOutreachProspects);
       document.querySelector("#refreshSupportMailbox").addEventListener("click", loadSupportMailbox);
       subscriptionsRowsBody.addEventListener("click", async (event) => {
         const button = event.target.closest("[data-subscription-action]");
@@ -1530,6 +1747,52 @@
           alert("Não foi possível enviar via domínio.");
         } finally {
           button.disabled = false;
+        }
+      });
+      outreachProspectsBody.addEventListener("click", async (event) => {
+        const button = event.target.closest("[data-outreach-action]");
+        if (!button) return;
+
+        const action = button.dataset.outreachAction;
+        const originalText = button.textContent;
+
+        if (action === "copy-form") {
+          const url = button.dataset.outreachUrl || "";
+          const message = outreachContactFormCopy({ template: button.dataset.outreachTemplate || "" });
+          if (url) window.open(url, "_blank", "noopener,noreferrer");
+          button.disabled = true;
+          button.textContent = "A copiar...";
+          try {
+            await copyText(message);
+            button.textContent = "Copiado";
+          } catch {
+            button.textContent = originalText;
+            alert("Não foi possível copiar a mensagem.");
+          } finally {
+            button.disabled = false;
+          }
+          return;
+        }
+
+        if (action === "send-email") {
+          const email = button.dataset.outreachEmail || "";
+          const copy = outreachEmailCopy({
+            template: button.dataset.outreachTemplate || "",
+            segment: button.dataset.outreachSegment || "",
+          });
+          if (!email || !confirm(`Enviar email via support@batchcutout.com para ${email}?`)) return;
+
+          button.disabled = true;
+          button.textContent = "A enviar...";
+          try {
+            await sendOutreachEmail(email, copy);
+            button.textContent = "Enviado";
+          } catch {
+            button.textContent = originalText;
+            alert("Não foi possível enviar o email comercial.");
+          } finally {
+            button.disabled = false;
+          }
         }
       });
       supportRowsBody.addEventListener("click", async (event) => {

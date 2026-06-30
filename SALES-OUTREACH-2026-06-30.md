@@ -97,6 +97,12 @@ Hi, I found your store and thought BatchCutout might help with repeat product-ph
 
 See `sales-outreach-prospects-2026-06-30.csv`.
 
+The `/admin` panel now has a `Prospecção comercial` block that loads this CSV:
+
+- Direct email prospects can be sent through `support@batchcutout.com` when marked ready.
+- Contact-form prospects show a `Copiar + abrir` action for fast manual submission.
+- Nothing is sent automatically.
+
 Sent on 2026-06-30 before the domain sender was configured:
 
 - Happy Holmes Fibre Arts
