@@ -989,7 +989,7 @@ for (const language of Object.keys(translations)) {
 }
 
 let items = [];
-let currentLanguage = localStorage.getItem("language") || detectLanguage();
+let currentLanguage = getRequestedLanguage() || localStorage.getItem("language") || detectLanguage();
 let engineHasLoaded = false;
 let hasTrackedDragIntent = false;
 let hasTrackedDownloadReady = false;
@@ -1317,6 +1317,11 @@ function detectLanguage() {
   return "en";
 }
 
+function getRequestedLanguage() {
+  const requestedLanguage = pageParams.get("lang");
+  return translations[requestedLanguage] ? requestedLanguage : "";
+}
+
 function t(key, params = {}) {
   params = { limit: maxFilesPerBatch, ...params };
   const value = translations[currentLanguage][key] || translations.pt[key] || key;
@@ -1633,7 +1638,14 @@ async function startCheckout(plan = "monthly", triggerButton = null) {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
-      body: JSON.stringify({ plan: selectedPlan }),
+      body: JSON.stringify({
+        plan: selectedPlan,
+        attribution: {
+          ...getAttributionParams(),
+          visitor_id: getVisitorId(),
+          session_id: getSessionId(),
+        },
+      }),
     });
     const data = await response.json().catch(() => ({}));
 

@@ -72,7 +72,21 @@ Pagina Pro:
 - `pro_form_started`
 - `pro_volume_selected`
 - `pro_submit_attempt`
-- `pro_waitlist_submitted`
+- `pro_checkout_interest_submitted`
+- `pro_checkout_login_required`
+- `pro_checkout_started`
+- `billing_portal_opened`
+- `account_signup_started`
+- `account_signup_succeeded`
+- `account_login_succeeded`
+
+Receita:
+
+- `pro_subscription_paid`
+- Criado pelo webhook Stripe quando uma sessao de checkout com subscricao termina com sucesso.
+- `event_label` guarda o `checkout.session.id`, para reduzir duplicacao em replays do webhook.
+- `value` guarda o valor pago em euros.
+- `detail` guarda IDs Stripe, plano, moeda e atribuicao UTM.
 
 ## Consultas uteis
 
@@ -106,7 +120,9 @@ select
   count(*) filter (where event_name = 'batch_limit_exceeded') as tentativas_acima_3,
   count(*) filter (where event_name in ('tool_download_png', 'tool_download_zip')) as downloads,
   count(*) filter (where event_name = 'tool_pro_clicked') as cliques_pro,
-  count(*) filter (where event_name = 'pro_submit_attempt') as tentativas_pro
+  count(*) filter (where event_name = 'pro_checkout_started') as checkouts,
+  count(*) filter (where event_name = 'pro_subscription_paid') as subscricoes_pagas,
+  sum(value) filter (where event_name = 'pro_subscription_paid') as receita
 from public.batchcutout_events
 group by 1
 order by 1 desc;

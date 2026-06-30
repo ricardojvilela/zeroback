@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shopify Product Photo Background Remover | BatchCutout</title>
+    <meta
+      name="description"
+      content="Prepare Shopify product photos faster. Remove backgrounds in batch and export transparent PNGs or a ZIP."
+    />
+    <meta property="og:title" content="Shopify Product Photo Background Remover" />
+    <meta
+      property="og:description"
+      content="Clean Shopify catalog photos in batch before uploading product pages, collections, ads, and store updates."
+    />
+    <meta property="og:url" content="https://batchcutout.com/en/remove-background-for-shopify/" />
+    <meta property="og:type" content="website" />
+    <link rel="canonical" href="https://batchcutout.com/en/remove-background-for-shopify/" />
+    <link rel="alternate" hreflang="pt-PT" href="https://batchcutout.com/remove-background-for-shopify/" />
+    <link rel="alternate" hreflang="en" href="https://batchcutout.com/en/remove-background-for-shopify/" />
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18177126609"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      const batchCutoutConsent = localStorage.getItem("batchcutout_consent");
+      const batchCutoutConsentGranted = batchCutoutConsent === "accepted";
+      gtag("consent", "default", {
+        ad_storage: batchCutoutConsentGranted ? "granted" : "denied",
+        ad_user_data: batchCutoutConsentGranted ? "granted" : "denied",
+        ad_personalization: batchCutoutConsentGranted ? "granted" : "denied",
+        analytics_storage: batchCutoutConsentGranted ? "granted" : "denied",
+      });
+      gtag("js", new Date());
+      gtag("config", "AW-18177126609");
+    </script>
+    <link rel="stylesheet" href="../../styles.css?v=20260629-growth" />
+    <script defer src="/_vercel/insights/script.js"></script>
+  </head>
+  <body class="landing-page">
+    <main class="landing-shell">
+      <nav class="landing-nav" aria-label="BatchCutout">
+        <a class="landing-logo" href="/en/remove-background-for-shopify/">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span>BatchCutout</span>
+        </a>
+        <span class="landing-parent-brand">NexaFlow Labs</span>
+        <a href="/pricing/?lang=en&utm_source=seo&utm_medium=en_landing&utm_campaign=shopify_background_remover" data-preserve-utm>View Pro plans</a>
+      </nav>
+
+      <section class="landing-hero">
+        <div class="landing-copy">
+          <p class="section-kicker">Shopify workflow</p>
+          <h1>Remove backgrounds from Shopify product photos in batch</h1>
+          <p>
+            Clean product photos before catalog updates, collections, paid ads, or seasonal launches.
+            Test 2 images free. Use Pro for batches up to 100 images.
+          </p>
+          <div class="landing-actions">
+            <a class="landing-button" href="/?lang=en&utm_source=google_ads&utm_medium=cpc&utm_campaign=shopify_background_remover&utm_content=en_landing#tool" data-preserve-utm>Test Shopify photos</a>
+            <a class="landing-secondary" href="/?lang=en&checkout_plan=early&utm_source=landing&utm_medium=shopify_en&utm_campaign=founder_plan#accountTitle" data-preserve-utm>Founder plan - EUR 15/month</a>
+          </div>
+        </div>
+        <figure class="landing-visual">
+          <img src="../../assets/product-before-after-v5.png" alt="Shopify product photo before and after background removal" />
+        </figure>
+      </section>
+
+      <section class="landing-metrics" aria-label="BatchCutout Pro Shopify limits">
+        <span><strong>100</strong> images per Pro batch</span>
+        <span><strong>2,000</strong> images per month</span>
+        <span><strong>PNG</strong> and ZIP export</span>
+      </section>
+
+      <section class="landing-section" aria-labelledby="shopify-use-title">
+        <p class="section-kicker">Where Shopify teams save time</p>
+        <h2 id="shopify-use-title">Cleaner product images before they reach the store</h2>
+        <div class="landing-grid">
+          <article>
+            <strong>New product drops</strong>
+            <p>Prepare launch photos and variants without repeating the same cutout manually.</p>
+          </article>
+          <article>
+            <strong>Collection refreshes</strong>
+            <p>Keep product grids visually consistent across updates, ads, and category pages.</p>
+          </article>
+          <article>
+            <strong>Catalog handoff</strong>
+            <p>Export one ZIP that is easier to upload, share, or archive.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="landing-section" aria-labelledby="shopify-offer-title">
+        <p class="section-kicker">Pro offer</p>
+        <h2 id="shopify-offer-title">For stores that update catalog photos every month</h2>
+        <div class="landing-offer">
+          <div>
+            <p>Payment runs through Stripe Checkout. After payment, Pro access is linked to your account.</p>
+            <ul>
+              <li>Founder plan: EUR 15/month.</li>
+              <li>Pro monthly: EUR 19/month.</li>
+              <li>Pro annual: EUR 190/year.</li>
+              <li>Cancel from the customer billing portal.</li>
+            </ul>
+          </div>
+          <a class="landing-button" href="/?lang=en&checkout_plan=monthly&utm_source=landing&utm_medium=shopify_en&utm_campaign=pro_monthly#accountTitle" data-preserve-utm>Buy Pro monthly</a>
+        </div>
+      </section>
+    </main>
+    <script>
+      const preservedParams = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "gbraid", "wbraid"];
+      document.querySelectorAll("[data-preserve-utm]").forEach(function (link) {
+        const current = new URL(window.location.href);
+        const target = new URL(link.getAttribute("href"), window.location.origin);
+        preservedParams.forEach(function (key) {
+          if (current.searchParams.has(key) && !target.searchParams.has(key)) {
+            target.searchParams.set(key, current.searchParams.get(key));
+          }
+        });
+        link.href = target.pathname + target.search + target.hash;
+      });
+    </script>
+  </body>
+</html>

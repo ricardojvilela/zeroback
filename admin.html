@@ -556,6 +556,14 @@
             <strong id="liveCheckoutStarts">0</strong>
           </article>
           <article class="live-card">
+            <span>Subscrições pagas</span>
+            <strong id="livePaidSubscriptions">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Receita atribuída</span>
+            <strong id="liveRevenue">0 EUR</strong>
+          </article>
+          <article class="live-card">
             <span>Checkout sem login</span>
             <strong id="liveCheckoutLoginRequired">0</strong>
           </article>
@@ -693,12 +701,14 @@
                   <th>Contas</th>
                   <th>Logins</th>
                   <th>Checkouts</th>
+                  <th>Pagas</th>
+                  <th>Receita</th>
                   <th>Portal</th>
                 </tr>
               </thead>
               <tbody id="sourceRowsBody">
                 <tr>
-                  <td class="empty" colspan="14">A carregar origens.</td>
+                  <td class="empty" colspan="16">A carregar origens.</td>
                 </tr>
               </tbody>
             </table>
@@ -722,12 +732,14 @@
                 <th>Contas</th>
                 <th>Logins</th>
                 <th>Checkouts</th>
+                <th>Pagas</th>
+                <th>Receita</th>
                 <th>Portal</th>
               </tr>
             </thead>
             <tbody id="liveRowsBody">
               <tr>
-                <td class="empty" colspan="15">A carregar atividade.</td>
+                <td class="empty" colspan="17">A carregar atividade.</td>
               </tr>
             </tbody>
           </table>
@@ -789,6 +801,19 @@
         }
       }
 
+      function formatCurrency(amount, currency = "eur") {
+        const normalizedCurrency = String(currency || "eur").toUpperCase();
+        try {
+          return new Intl.NumberFormat("pt-PT", {
+            style: "currency",
+            currency: normalizedCurrency,
+            maximumFractionDigits: 2,
+          }).format(Number(amount || 0) || 0);
+        } catch {
+          return `${(Number(amount || 0) || 0).toFixed(2)} ${normalizedCurrency}`;
+        }
+      }
+
       function formatDate(value) {
         if (!value) return "-";
         const date = new Date(value);
@@ -841,6 +866,8 @@
         document.querySelector("#liveDownloadReady").textContent = totals.downloadReadyShown || 0;
         document.querySelector("#liveProClicks").textContent = totals.proClicks || 0;
         document.querySelector("#liveCheckoutStarts").textContent = totals.checkoutStarts || 0;
+        document.querySelector("#livePaidSubscriptions").textContent = totals.paidSubscriptions || 0;
+        document.querySelector("#liveRevenue").textContent = formatCurrency(totals.revenue || 0);
         document.querySelector("#liveCheckoutLoginRequired").textContent = totals.checkoutLoginRequired || 0;
         document.querySelector("#liveAccountSignupStarts").textContent = totals.accountSignupStarts || 0;
         document.querySelector("#liveAccountSignups").textContent = totals.accountSignups || 0;
@@ -867,11 +894,13 @@
                   <td>${row.accountSignups || 0}</td>
                   <td>${row.accountLogins || 0}</td>
                   <td>${row.checkoutStarts || 0}</td>
+                  <td>${row.paidSubscriptions || 0}</td>
+                  <td>${formatCurrency(row.revenue || 0)}</td>
                   <td>${row.billingPortalOpens || 0}</td>
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="15">Ainda não existem eventos reais no período.</td></tr>`;
+          : `<tr><td class="empty" colspan="17">Ainda não existem eventos reais no período.</td></tr>`;
 
         sourceRowsBody.innerHTML = data.sourceBreakdown?.length
           ? data.sourceBreakdown.map((row) => `
@@ -889,10 +918,12 @@
                 <td>${row.accountSignups || 0}</td>
                 <td>${row.accountLogins || 0}</td>
                 <td>${row.checkoutStarts || 0}</td>
+                <td>${row.paidSubscriptions || 0}</td>
+                <td>${formatCurrency(row.revenue || 0)}</td>
                 <td>${row.billingPortalOpens || 0}</td>
               </tr>
             `).join("")
-          : `<tr><td class="empty" colspan="14">Ainda não existem origens identificadas.</td></tr>`;
+          : `<tr><td class="empty" colspan="16">Ainda não existem origens identificadas.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "";
         liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Última atualização: ${generatedAt}`;
@@ -1107,7 +1138,7 @@
             localStorage.removeItem(adminTokenExpiryStorageKey);
             document.body.classList.add("locked");
           }
-          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="15">Não foi possível carregar atividade.</td></tr>`;
+          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="17">Não foi possível carregar atividade.</td></tr>`;
           proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar contas.</td></tr>`;
           subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="7">Não foi possível carregar subscrições Stripe.</td></tr>`;
           liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variáveis Vercel.";

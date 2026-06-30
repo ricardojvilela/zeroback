@@ -26,6 +26,7 @@ export function getSiteUrl() {
 
 export function getStripePriceId(plan) {
   const normalized = String(plan || "monthly").toLowerCase();
+  const selectedPlan = ["monthly", "annual", "early"].includes(normalized) ? normalized : "monthly";
   const priceIds = {
     monthly: process.env.STRIPE_PRO_MONTHLY_PRICE_ID || process.env.STRIPE_PRO_PRICE_ID || "",
     annual: process.env.STRIPE_PRO_ANNUAL_PRICE_ID || "",
@@ -33,8 +34,8 @@ export function getStripePriceId(plan) {
   };
 
   return {
-    plan: ["monthly", "annual", "early"].includes(normalized) ? normalized : "monthly",
-    priceId: priceIds[normalized] || "",
+    plan: selectedPlan,
+    priceId: priceIds[selectedPlan] || "",
   };
 }
 

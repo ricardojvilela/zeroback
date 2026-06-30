@@ -37,6 +37,8 @@ function emptyDay(date) {
     proClicks: 0,
     checkoutLoginRequired: 0,
     checkoutStarts: 0,
+    paidSubscriptions: 0,
+    revenue: 0,
     accountSignupStarts: 0,
     accountSignups: 0,
     accountLogins: 0,
@@ -119,6 +121,8 @@ function emptySourceRow(source) {
     proClicks: 0,
     checkoutLoginRequired: 0,
     checkoutStarts: 0,
+    paidSubscriptions: 0,
+    revenue: 0,
     accountSignupStarts: 0,
     accountSignups: 0,
     accountLogins: 0,
@@ -279,6 +283,12 @@ export default async function handler(request, response) {
           row.checkoutStarts += 1;
           sourceRow.checkoutStarts += 1;
           break;
+        case "pro_subscription_paid":
+          row.paidSubscriptions += 1;
+          sourceRow.paidSubscriptions += 1;
+          row.revenue += Number(event.value || 0) || 0;
+          sourceRow.revenue += Number(event.value || 0) || 0;
+          break;
         case "account_signup_started":
           row.accountSignupStarts += 1;
           sourceRow.accountSignupStarts += 1;
@@ -317,7 +327,13 @@ export default async function handler(request, response) {
       return acc;
     }, {});
     const sourceBreakdown = Array.from(bySource.values())
-      .sort((a, b) => b.visitors - a.visitors || b.pageViews - a.pageViews || b.events - a.events)
+      .sort((a, b) =>
+        b.revenue - a.revenue ||
+        b.paidSubscriptions - a.paidSubscriptions ||
+        b.visitors - a.visitors ||
+        b.pageViews - a.pageViews ||
+        b.events - a.events
+      )
       .slice(0, 20);
 
     return sendJson(response, 200, {

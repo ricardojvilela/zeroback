@@ -22,23 +22,23 @@ Métrica principal:
 ## URLs de destino
 
 Bulk:
-https://batchcutout.com/bulk-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=bulk_background_remover&utm_content=search
+https://batchcutout.com/en/bulk-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=bulk_background_remover&utm_content=search
 
 Shopify:
-https://batchcutout.com/remove-background-for-shopify/?utm_source=google_ads&utm_medium=cpc&utm_campaign=shopify_background_remover&utm_content=search
+https://batchcutout.com/en/remove-background-for-shopify/?utm_source=google_ads&utm_medium=cpc&utm_campaign=shopify_background_remover&utm_content=search
 
 Etsy:
-https://batchcutout.com/etsy-product-photo-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=etsy_background_remover&utm_content=search
+https://batchcutout.com/en/etsy-product-photo-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=etsy_background_remover&utm_content=search
 
 Pricing:
-https://batchcutout.com/pricing/?utm_source=google_ads&utm_medium=cpc&utm_campaign=pro_pricing&utm_content=search
+https://batchcutout.com/pricing/?lang=en&utm_source=google_ads&utm_medium=cpc&utm_campaign=pro_pricing&utm_content=search
 
 ## Campaign 1: Bulk background remover
 
 Budget: 4 EUR/day
 
 Landing page:
-https://batchcutout.com/bulk-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=bulk_background_remover&utm_content=search
+https://batchcutout.com/en/bulk-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=bulk_background_remover&utm_content=search
 
 ### Keywords
 
@@ -81,7 +81,7 @@ https://batchcutout.com/bulk-background-remover/?utm_source=google_ads&utm_mediu
 Budget: 3 EUR/day
 
 Landing page:
-https://batchcutout.com/remove-background-for-shopify/?utm_source=google_ads&utm_medium=cpc&utm_campaign=shopify_background_remover&utm_content=search
+https://batchcutout.com/en/remove-background-for-shopify/?utm_source=google_ads&utm_medium=cpc&utm_campaign=shopify_background_remover&utm_content=search
 
 ### Keywords
 
@@ -119,7 +119,7 @@ https://batchcutout.com/remove-background-for-shopify/?utm_source=google_ads&utm
 Budget: 3 EUR/day
 
 Landing page:
-https://batchcutout.com/etsy-product-photo-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=etsy_background_remover&utm_content=search
+https://batchcutout.com/en/etsy-product-photo-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=etsy_background_remover&utm_content=search
 
 ### Keywords
 
@@ -155,16 +155,16 @@ https://batchcutout.com/etsy-product-photo-background-remover/?utm_source=google
 ## Sitelinks
 
 Bulk Background Remover:
-https://batchcutout.com/bulk-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_bulk
+https://batchcutout.com/en/bulk-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_bulk
 
 Shopify Photos:
-https://batchcutout.com/remove-background-for-shopify/?utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_shopify
+https://batchcutout.com/en/remove-background-for-shopify/?utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_shopify
 
 Etsy Photos:
-https://batchcutout.com/etsy-product-photo-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_etsy
+https://batchcutout.com/en/etsy-product-photo-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_etsy
 
 Plans:
-https://batchcutout.com/pricing/?utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_pricing
+https://batchcutout.com/pricing/?lang=en&utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_pricing
 
 ## Callouts
 

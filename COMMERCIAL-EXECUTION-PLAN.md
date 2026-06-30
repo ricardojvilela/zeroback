@@ -19,6 +19,8 @@ Secondary KPIs:
 - Checkout sem login
 - Contas criadas
 - Checkouts iniciados
+- Subscricoes pagas
+- Receita atribuida por origem
 - Portal aberto
 
 ## Positioning
@@ -50,8 +52,8 @@ Do not add more paid plans until at least 20 paying customers exist.
 
 Future upsell:
 
-- Pro Plus: 39 EUR/month, higher monthly image volume
-- Agency: 79 EUR/month, higher volume and priority support
+- Deferred for now. Do not increase prices or add higher tiers until there is enough paid demand and usage data.
+- Revisit only after at least 20 paying customers or repeated monthly limit pressure.
 
 ## 30-day execution
 
@@ -104,7 +106,7 @@ Success signal:
 - Keep campaigns with measurable product usage.
 - Pause campaigns that only generate visits.
 - If annual plan has low uptake, test copy: "2 months free".
-- If users hit monthly limits, prepare Pro Plus.
+- If users hit monthly limits, record the demand and review limits later without changing prices now.
 
 Success signal:
 
@@ -121,6 +123,8 @@ Open `/admin` once per day and record:
 - Checkout without login
 - Signups
 - Checkouts
+- Paid subscriptions
+- Attributed revenue
 - Active subscriptions
 - Renewable MRR
 

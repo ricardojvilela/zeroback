@@ -1885,6 +1885,95 @@ progress::-moz-progress-bar {
   gap: 10px;
 }
 
+.pricing-checkout-panel {
+  display: grid;
+  gap: 14px;
+  align-self: start;
+  border: 1px solid rgba(23, 32, 42, 0.12);
+  border-radius: 8px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.pricing-checkout-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 12px;
+  align-items: start;
+}
+
+.pricing-checkout-head .section-kicker,
+.pricing-checkout-head h3 {
+  margin: 0;
+}
+
+.pricing-checkout-head h3 {
+  color: var(--charcoal);
+  font-size: 1.35rem;
+  line-height: 1.12;
+}
+
+.pricing-account-badge {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  border: 1px solid rgba(23, 32, 42, 0.16);
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #ffffff;
+  color: #52606d;
+  font-size: 0.76rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.pricing-account-badge.is-ready {
+  border-color: rgba(15, 139, 124, 0.28);
+  background: rgba(15, 139, 124, 0.1);
+  color: var(--accent-strong);
+}
+
+.pricing-auth-status,
+.pricing-checkout-note {
+  margin: 0;
+  color: #52606d;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.pricing-auth-form {
+  display: grid;
+  gap: 10px;
+}
+
+.pricing-auth-form input {
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 14px;
+  background: #ffffff;
+  color: var(--charcoal);
+  font: inherit;
+}
+
+.pricing-auth-form input:focus {
+  outline: 2px solid rgba(15, 139, 124, 0.2);
+  border-color: rgba(15, 139, 124, 0.45);
+}
+
+.pricing-auth-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.pricing-auth-actions button,
+.pricing-checkout-panel .pricing-plan-actions button {
+  width: 100%;
+  justify-content: center;
+  min-height: 48px;
+  text-align: center;
+}
+
 .pricing-plan-actions {
   display: grid;
   gap: 10px;

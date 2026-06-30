@@ -172,8 +172,49 @@
             <li data-i18n="formPointPriority">Plano fundador: 15 EUR/mês.</li>
           </ul>
         </div>
+        <section class="pricing-checkout-panel" aria-labelledby="pricing-account-title">
+          <div class="pricing-checkout-head">
+            <p class="section-kicker" data-i18n="checkoutKicker">Checkout direto</p>
+            <h3 id="pricing-account-title" data-i18n="checkoutTitle">Entre e escolha o plano</h3>
+            <span class="pricing-account-badge" id="pricingAccountBadge" data-i18n="checkoutBadgeGuest">Sem sessão</span>
+          </div>
+          <p id="pricingAccountStatus" class="pricing-auth-status" data-i18n="checkoutStatusGuest">
+            Use o seu email para criar conta ou entrar. Depois abrimos o Stripe Checkout automaticamente.
+          </p>
+          <form class="pricing-auth-form" id="pricingAccountForm" novalidate>
+            <input
+              id="pricingAccountEmail"
+              type="email"
+              autocomplete="email"
+              required
+              placeholder="O seu email"
+              data-i18n-placeholder="checkoutEmailPlaceholder"
+            />
+            <input
+              id="pricingAccountPassword"
+              type="password"
+              autocomplete="current-password"
+              required
+              minlength="6"
+              placeholder="A sua password"
+              data-i18n-placeholder="checkoutPasswordPlaceholder"
+            />
+            <div class="pricing-auth-actions">
+              <button type="submit" class="landing-secondary" id="pricingLoginButton" data-i18n="checkoutLogin">Entrar</button>
+              <button type="button" class="landing-secondary" id="pricingCreateButton" data-i18n="checkoutCreate">Criar conta</button>
+            </div>
+          </form>
+          <div class="pricing-plan-actions" id="pricingCheckoutActions">
+            <button type="button" class="landing-button" data-pricing-checkout-plan="early" data-i18n="earlyPlanCta">Plano fundador - 15 EUR/mês</button>
+            <button type="button" class="landing-button" data-pricing-checkout-plan="monthly" data-i18n="monthlyPlanCta">Pro mensal - 19 EUR/mês</button>
+            <button type="button" class="landing-secondary" data-pricing-checkout-plan="annual" data-i18n="annualPlanCta">Pro anual - 190 EUR/ano</button>
+          </div>
+          <p class="pricing-checkout-note" data-i18n="checkoutNote">
+            Se já tiver sessão iniciada, o pagamento abre logo. Se ainda não tiver conta, escolha o plano e crie conta em seguida.
+          </p>
+        </section>
         <form
-          class="pricing-form"
+          class="pricing-form hidden"
           action="https://formsubmit.co/ajax/support@batchcutout.com"
           method="POST"
           novalidate
@@ -189,12 +230,7 @@
             <input type="hidden" name="monthly_limit" value="2000" />
             <input type="hidden" name="planned_monthly_limit" value="2000" />
           <input type="text" name="_honey" class="honeypot-field" tabindex="-1" autocomplete="off" />
-          <div class="pricing-plan-actions">
-            <a class="landing-button" href="/?checkout_plan=early&utm_source=pricing&utm_medium=plan_card&utm_campaign=pro_early#accountTitle" data-i18n="earlyPlanCta">Plano fundador - 15 EUR/mês</a>
-            <a class="landing-button" href="/?checkout_plan=monthly&utm_source=pricing&utm_medium=plan_card&utm_campaign=pro_monthly#accountTitle" data-i18n="monthlyPlanCta">Pro mensal - 19 EUR/mês</a>
-            <a class="landing-secondary" href="/?checkout_plan=annual&utm_source=pricing&utm_medium=plan_card&utm_campaign=pro_annual#accountTitle" data-i18n="annualPlanCta">Pro anual - 190 EUR/ano</a>
-          </div>
-          <button class="hidden" type="submit" data-i18n="formButton">Comprar Pro</button>
+          <button class="hidden" type="submit" data-pricing-fallback-submit data-i18n="formButton">Comprar Pro</button>
         </form>
         <p class="pricing-privacy" data-i18n="privacy">É necessário criar conta ou iniciar sessão antes do pagamento para ligar a assinatura ao acesso Pro. Consulte os termos, cancelamento e reembolsos antes de comprar.</p>
         <p class="pricing-legal-links">
@@ -254,6 +290,24 @@
           formPointPayment: "Mensal: 19 EUR/mês.",
           formPointReply: "Anual: 190 EUR/ano.",
           formPointPriority: "Plano fundador: 15 EUR/mês.",
+          checkoutKicker: "Checkout direto",
+          checkoutTitle: "Entre e escolha o plano",
+          checkoutBadgeGuest: "Sem sessão",
+          checkoutBadgeReady: "Conta pronta",
+          checkoutStatusGuest: "Use o seu email para criar conta ou entrar. Depois abrimos o Stripe Checkout automaticamente.",
+          checkoutStatusReady: "Conta validada. Escolha o plano para abrir o pagamento seguro.",
+          checkoutStatusChoosePlan: "Plano selecionado. Entre ou crie conta para abrir o pagamento.",
+          checkoutEmailPlaceholder: "O seu email",
+          checkoutPasswordPlaceholder: "A sua password",
+          checkoutLogin: "Entrar",
+          checkoutCreate: "Criar conta",
+          checkoutLoggingIn: "A entrar...",
+          checkoutCreating: "A criar conta...",
+          checkoutOpening: "A abrir Stripe...",
+          checkoutCreatedCheckEmail: "Conta criada. Se a confirmação por email estiver ativa, verifique a sua caixa de entrada antes de continuar.",
+          checkoutAuthError: "Não foi possível validar a conta agora.",
+          checkoutError: "Não foi possível abrir o pagamento agora.",
+          checkoutNote: "Se já tiver sessão iniciada, o pagamento abre logo. Se ainda não tiver conta, escolha o plano e crie conta em seguida.",
           earlyPlanCta: "Plano fundador - 15 EUR/mês",
           monthlyPlanCta: "Pro mensal - 19 EUR/mês",
           annualPlanCta: "Pro anual - 190 EUR/ano",
@@ -320,6 +374,24 @@
           formPointPayment: "Monthly: EUR 19/month.",
           formPointReply: "Annual: EUR 190/year.",
           formPointPriority: "Founder plan: EUR 15/month.",
+          checkoutKicker: "Direct checkout",
+          checkoutTitle: "Sign in and choose a plan",
+          checkoutBadgeGuest: "No session",
+          checkoutBadgeReady: "Account ready",
+          checkoutStatusGuest: "Use your email to create an account or sign in. Then we open Stripe Checkout automatically.",
+          checkoutStatusReady: "Account verified. Choose a plan to open secure payment.",
+          checkoutStatusChoosePlan: "Plan selected. Sign in or create an account to open payment.",
+          checkoutEmailPlaceholder: "Your email",
+          checkoutPasswordPlaceholder: "Your password",
+          checkoutLogin: "Sign in",
+          checkoutCreate: "Create account",
+          checkoutLoggingIn: "Signing in...",
+          checkoutCreating: "Creating account...",
+          checkoutOpening: "Opening Stripe...",
+          checkoutCreatedCheckEmail: "Account created. If email confirmation is active, check your inbox before continuing.",
+          checkoutAuthError: "We could not verify the account right now.",
+          checkoutError: "We could not open payment right now.",
+          checkoutNote: "If you are already signed in, payment opens immediately. If not, choose the plan and create your account next.",
           earlyPlanCta: "Founder plan - EUR 15/month",
           monthlyPlanCta: "Pro monthly - EUR 19/month",
           annualPlanCta: "Pro annual - EUR 190/year",
@@ -344,8 +416,9 @@
       const pricingForm = document.querySelector(".pricing-form");
       const pricingMessage = document.createElement("p");
       const languageSelect = document.querySelector("#pricingLanguage");
-      const pricingSubmitButton = pricingForm.querySelector("button");
-      const debugMode = new URLSearchParams(window.location.search).get("debug") === "1";
+      const pricingSubmitButton = pricingForm.querySelector("[data-pricing-fallback-submit]");
+      const pricingPageParams = new URLSearchParams(window.location.search);
+      const debugMode = pricingPageParams.get("debug") === "1";
       const debugEventsStorageKey = "batchcutout_debug_events";
       const visitorStorageKey = "batchcutout_visitor_id";
       const sessionStorageKey = "batchcutout_session_id";
@@ -480,6 +553,8 @@
       }
 
       function detectPricingLanguage() {
+        const requestedLanguage = pricingPageParams.get("lang");
+        if (requestedLanguage === "pt" || requestedLanguage === "en") return requestedLanguage;
         const saved = localStorage.getItem("language");
         if (saved === "pt" || saved === "en") return saved;
         const browserLanguage = (navigator.language || "en").toLowerCase();
@@ -639,6 +714,345 @@
           submitButton.disabled = false;
         }
       });
+    </script>
+    <script type="module">
+      import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+      const pricingPageParams = new URLSearchParams(window.location.search);
+      const pricingCheckoutPlans = new Set(["early", "monthly", "annual"]);
+      const pricingAuthForm = document.querySelector("#pricingAccountForm");
+      const pricingEmail = document.querySelector("#pricingAccountEmail");
+      const pricingPassword = document.querySelector("#pricingAccountPassword");
+      const pricingLoginButton = document.querySelector("#pricingLoginButton");
+      const pricingCreateButton = document.querySelector("#pricingCreateButton");
+      const pricingAccountStatus = document.querySelector("#pricingAccountStatus");
+      const pricingAccountBadge = document.querySelector("#pricingAccountBadge");
+      const pricingCheckoutActions = document.querySelector("#pricingCheckoutActions");
+      const pricingVisitorStorageKey = "batchcutout_visitor_id";
+      const pricingSessionStorageKey = "batchcutout_session_id";
+      let pricingSupabase = null;
+      let pricingAccount = null;
+      let selectedPricingPlan = pricingCheckoutPlans.has(pricingPageParams.get("checkout_plan"))
+        ? pricingPageParams.get("checkout_plan")
+        : "monthly";
+      let hasStartedPricingCheckout = false;
+
+      function pricingDictionary() {
+        return pricingTranslations[languageSelect?.value || "pt"] || pricingTranslations.en;
+      }
+
+      function pricingText(key) {
+        return pricingDictionary()[key] || key;
+      }
+
+      function setPricingStatus(keyOrText, isRaw = false) {
+        if (!pricingAccountStatus) return;
+        pricingAccountStatus.textContent = isRaw ? keyOrText : pricingText(keyOrText);
+      }
+
+      function getPricingStableId(storage, key) {
+        try {
+          const existing = storage.getItem(key);
+          if (existing) return existing;
+          const next = crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+          storage.setItem(key, next);
+          return next;
+        } catch {
+          return "";
+        }
+      }
+
+      function pricingAttribution() {
+        const keys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "gbraid", "wbraid"];
+        const detail = {
+          page_path: window.location.pathname,
+          page_location: window.location.href.split("#")[0],
+          language: languageSelect?.value || document.documentElement.lang || "unknown",
+          visitor_id: getPricingStableId(localStorage, pricingVisitorStorageKey),
+          session_id: getPricingStableId(sessionStorage, pricingSessionStorageKey),
+        };
+        for (const key of keys) {
+          const value = pricingPageParams.get(key);
+          if (value) detail[key] = value;
+        }
+        try {
+          const stored = JSON.parse(localStorage.getItem("batchcutout_attribution") || "{}");
+          for (const [key, value] of Object.entries(stored || {})) {
+            if (typeof value === "string" && value && !detail[key]) detail[key] = value.slice(0, 500);
+          }
+        } catch {
+          // Attribution is helpful, not required for checkout.
+        }
+        return detail;
+      }
+
+      function trackPricingCheckoutEvent(name, detail = {}) {
+        const eventParams = {
+          event_category: "commercial_intent",
+          event_label: detail.plan || detail.label || name,
+          ...pricingAttribution(),
+          ...detail,
+        };
+        window.dataLayer?.push({ event: name, ...eventParams });
+        window.gtag?.("event", name, eventParams);
+
+        const payload = JSON.stringify({
+          name,
+          detail: eventParams,
+          visitorId: getPricingStableId(localStorage, pricingVisitorStorageKey),
+          sessionId: getPricingStableId(sessionStorage, pricingSessionStorageKey),
+        });
+
+        try {
+          if (navigator.sendBeacon) {
+            const sent = navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" }));
+            if (sent) return;
+          }
+        } catch {
+          // Ignore measurement transport errors.
+        }
+
+        fetch("/api/track", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload,
+          keepalive: true,
+        }).catch(() => {});
+      }
+
+      function pricingPlanLabel(plan) {
+        if (plan === "annual") return pricingText("annualPlanCta");
+        if (plan === "early") return pricingText("earlyPlanCta");
+        return pricingText("monthlyPlanCta");
+      }
+
+      function updatePricingAccountUi() {
+        const ready = Boolean(pricingAccount?.email);
+        pricingAccountBadge.textContent = ready ? pricingText("checkoutBadgeReady") : pricingText("checkoutBadgeGuest");
+        pricingAccountBadge.classList.toggle("is-ready", ready);
+        if (ready) {
+          setPricingStatus("checkoutStatusReady");
+        }
+      }
+
+      async function currentPricingAccessToken() {
+        if (!pricingSupabase) return "";
+        const { data } = await pricingSupabase.auth.getSession();
+        return data?.session?.access_token || "";
+      }
+
+      async function refreshPricingAccount() {
+        const accessToken = await currentPricingAccessToken();
+        if (!accessToken) {
+          pricingAccount = null;
+          updatePricingAccountUi();
+          return null;
+        }
+
+        try {
+          const response = await fetch("/api/account", {
+            headers: { Authorization: `Bearer ${accessToken}` },
+          });
+          const data = await response.json().catch(() => ({}));
+          pricingAccount = response.ok ? data.account : null;
+        } catch {
+          pricingAccount = null;
+        }
+        updatePricingAccountUi();
+        return pricingAccount;
+      }
+
+      async function startPricingCheckout(plan = selectedPricingPlan) {
+        const selectedPlan = pricingCheckoutPlans.has(plan) ? plan : "monthly";
+        selectedPricingPlan = selectedPlan;
+        const accessToken = await currentPricingAccessToken();
+        if (!accessToken) {
+          trackPricingCheckoutEvent("pro_checkout_login_required", { plan: selectedPlan, source: "pricing_page" });
+          setPricingStatus("checkoutStatusChoosePlan");
+          pricingEmail?.focus();
+          return;
+        }
+
+        for (const button of pricingCheckoutActions.querySelectorAll("[data-pricing-checkout-plan]")) {
+          button.disabled = true;
+        }
+        setPricingStatus("checkoutOpening");
+
+        try {
+          const response = await fetch("/api/create-checkout-session", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({
+              plan: selectedPlan,
+              attribution: pricingAttribution(),
+            }),
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || !data.url) {
+            throw new Error(data.error || "checkout_failed");
+          }
+
+          trackPricingCheckoutEvent("pro_checkout_started", {
+            plan: selectedPlan,
+            label: data.label || pricingPlanLabel(selectedPlan),
+            value: selectedPlan === "annual" ? 190 : selectedPlan === "early" ? 15 : 19,
+            currency: "EUR",
+            source: "pricing_page",
+          });
+          window.location.href = data.url;
+        } catch {
+          setPricingStatus("checkoutError");
+          for (const button of pricingCheckoutActions.querySelectorAll("[data-pricing-checkout-plan]")) {
+            button.disabled = false;
+          }
+        }
+      }
+
+      async function handlePricingLogin(event) {
+        event.preventDefault();
+        if (!pricingSupabase) {
+          setPricingStatus("checkoutAuthError");
+          return;
+        }
+        if (!pricingEmail.value.trim() || !pricingPassword.value) {
+          pricingAuthForm.reportValidity();
+          return;
+        }
+
+        pricingLoginButton.disabled = true;
+        pricingLoginButton.textContent = pricingText("checkoutLoggingIn");
+        try {
+          const { error } = await pricingSupabase.auth.signInWithPassword({
+            email: pricingEmail.value.trim(),
+            password: pricingPassword.value,
+          });
+          if (error) throw error;
+          trackPricingCheckoutEvent("account_login_succeeded", {
+            source: "pricing_page",
+            has_requested_checkout: true,
+            plan: selectedPricingPlan,
+          });
+          await refreshPricingAccount();
+          hasStartedPricingCheckout = true;
+          await startPricingCheckout(selectedPricingPlan);
+        } catch {
+          setPricingStatus("checkoutAuthError");
+        } finally {
+          pricingLoginButton.disabled = false;
+          pricingLoginButton.textContent = pricingText("checkoutLogin");
+        }
+      }
+
+      async function handlePricingCreateAccount() {
+        if (!pricingSupabase) {
+          setPricingStatus("checkoutAuthError");
+          return;
+        }
+        if (!pricingEmail.value.trim() || !pricingPassword.value) {
+          pricingAuthForm.reportValidity();
+          return;
+        }
+
+        pricingCreateButton.disabled = true;
+        pricingCreateButton.textContent = pricingText("checkoutCreating");
+        trackPricingCheckoutEvent("account_signup_started", {
+          source: "pricing_page",
+          has_requested_checkout: true,
+          plan: selectedPricingPlan,
+        });
+
+        try {
+          const redirectTo = `${window.location.origin}${window.location.pathname}${window.location.search}`;
+          const { data, error } = await pricingSupabase.auth.signUp({
+            email: pricingEmail.value.trim(),
+            password: pricingPassword.value,
+            options: { emailRedirectTo: redirectTo },
+          });
+          if (error) throw error;
+          trackPricingCheckoutEvent("account_signup_succeeded", {
+            source: "pricing_page",
+            has_requested_checkout: true,
+            plan: selectedPricingPlan,
+          });
+          if (data?.session) {
+            await refreshPricingAccount();
+            hasStartedPricingCheckout = true;
+            await startPricingCheckout(selectedPricingPlan);
+          } else {
+            setPricingStatus("checkoutCreatedCheckEmail");
+          }
+        } catch {
+          setPricingStatus("checkoutAuthError");
+        } finally {
+          pricingCreateButton.disabled = false;
+          pricingCreateButton.textContent = pricingText("checkoutCreate");
+        }
+      }
+
+      async function initPricingCheckout() {
+        try {
+          const response = await fetch("/api/auth-config");
+          const data = await response.json().catch(() => ({}));
+          if (data?.ok && data.url && data.anonKey) {
+            pricingSupabase = createClient(data.url, data.anonKey, {
+              auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true,
+              },
+            });
+          }
+        } catch {
+          pricingSupabase = null;
+        }
+
+        if (!pricingSupabase) {
+          setPricingStatus("checkoutAuthError");
+          return;
+        }
+
+        await refreshPricingAccount();
+        pricingSupabase.auth.onAuthStateChange(async (_event, session) => {
+          if (!session?.access_token) {
+            pricingAccount = null;
+            updatePricingAccountUi();
+            return;
+          }
+          await refreshPricingAccount();
+          if (!hasStartedPricingCheckout && pricingCheckoutPlans.has(pricingPageParams.get("checkout_plan"))) {
+            hasStartedPricingCheckout = true;
+            await startPricingCheckout(selectedPricingPlan);
+          }
+        });
+
+        if (pricingCheckoutPlans.has(pricingPageParams.get("checkout_plan"))) {
+          if (pricingAccount) {
+            hasStartedPricingCheckout = true;
+            await startPricingCheckout(selectedPricingPlan);
+          } else {
+            setPricingStatus("checkoutStatusChoosePlan");
+          }
+        }
+      }
+
+      pricingAuthForm?.addEventListener("submit", handlePricingLogin);
+      pricingCreateButton?.addEventListener("click", handlePricingCreateAccount);
+      pricingCheckoutActions?.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-pricing-checkout-plan]");
+        if (!button) return;
+        selectedPricingPlan = button.dataset.pricingCheckoutPlan;
+        trackPricingCheckoutEvent("pro_cta_clicked", {
+          plan: selectedPricingPlan,
+          label: button.textContent.trim(),
+          source: "pricing_page_checkout_panel",
+        });
+        startPricingCheckout(selectedPricingPlan);
+      });
+
+      initPricingCheckout();
     </script>
   </body>
 </html>

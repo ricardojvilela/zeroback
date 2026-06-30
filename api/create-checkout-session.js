@@ -14,6 +14,52 @@ import {
   getStripePriceId,
 } from "./_stripe.js";
 
+const attributionMetadataKeys = [
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+  "utm_term",
+  "gclid",
+  "gbraid",
+  "wbraid",
+  "source",
+  "medium",
+  "campaign",
+  "first_source",
+  "first_campaign",
+  "first_landing_page",
+  "last_source",
+  "last_campaign",
+  "last_landing_page",
+  "page_path",
+  "page_location",
+  "language",
+  "visitor_id",
+  "session_id",
+  "limit_variant",
+  "free_limit",
+];
+
+function metadataString(value, maxLength = 450) {
+  if (value === null || value === undefined) return "";
+  return String(value).slice(0, maxLength);
+}
+
+function sanitizeAttribution(input) {
+  if (!input || typeof input !== "object" || Array.isArray(input)) return {};
+
+  const attribution = {};
+  for (const key of attributionMetadataKeys) {
+    const value = input[key];
+    if (value === null || value === undefined || value === "") continue;
+    if (!["string", "number", "boolean"].includes(typeof value)) continue;
+    attribution[key] = metadataString(value);
+  }
+
+  return attribution;
+}
+
 export default async function handler(request, response) {
   if (request.method === "OPTIONS") {
     return sendJson(response, 200, { ok: true });
@@ -46,6 +92,7 @@ export default async function handler(request, response) {
 
     const body = await readRequestBody(request);
     const { plan, priceId } = getStripePriceId(body?.plan);
+    const attribution = sanitizeAttribution(body?.attribution);
     if (!priceId) {
       return sendJson(response, 503, { ok: false, error: "stripe_price_not_configured", plan });
     }
@@ -66,6 +113,12 @@ export default async function handler(request, response) {
     }
 
     const siteUrl = getSiteUrl();
+    const metadata = {
+      supabase_user_id: user.id,
+      batchcutout_plan: "pro",
+      batchcutout_price_plan: plan,
+      ...attribution,
+    };
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       customer: customerId,
@@ -75,17 +128,9 @@ export default async function handler(request, response) {
       success_url: `${siteUrl}/?checkout=success&session_id={CHECKOUT_SESSION_ID}#accountTitle`,
       cancel_url: `${siteUrl}/pricing/?checkout=cancelled`,
       subscription_data: {
-        metadata: {
-          supabase_user_id: user.id,
-          batchcutout_plan: "pro",
-          batchcutout_price_plan: plan,
-        },
+        metadata,
       },
-      metadata: {
-        supabase_user_id: user.id,
-        batchcutout_plan: "pro",
-        batchcutout_price_plan: plan,
-      },
+      metadata,
       customer_update: {
         name: "auto",
         address: "auto",
