@@ -97,6 +97,15 @@ Hi, I found your store and thought BatchCutout might help with repeat product-ph
 
 See `sales-outreach-prospects-2026-06-30.csv`.
 
+Sent on 2026-06-30 from Gmail `ricardojvilela@gmail.com`:
+
+- Happy Holmes Fibre Arts
+- Kate Warby Designs
+- Naturalista Distributors
+- Handmade by JenAd
+- Jamies Crafting Creations
+- Featherlite Product Photography
+
 Priority order:
 
 1. Contacts with public email addresses.

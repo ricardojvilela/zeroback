@@ -1,10 +1,10 @@
 priority,name,segment,channel,contact,url,angle,status,template
-1,Happy Holmes Fibre Arts,handmade craft,email,happyholmesfibrearts@hotmail.com,https://happy-holmes-fibre-arts.myshopify.com/pages/contact-us,handmade products with repeat catalog photos,ready,email_store_owner
-2,Kate Warby Designs,handmade design,email,katewarbydesigns@bigpond.com,https://kate-warby-designs-5783.myshopify.com/pages/contact,handmade product catalog and product updates,ready,email_store_owner
-3,Naturalista Distributors,handmade natural products,email,naturalistaja@gmail.com,https://naturalista-distributors.myshopify.com/pages/contact-us,natural handmade product range with ecommerce photos,ready,email_store_owner
-4,Handmade by JenAd,handmade products,email,products@handmadebyjenad.com,https://handmadebyjenad.myshopify.com/pages/contact,product-info mailbox for handmade catalog,ready,email_store_owner
-5,Jamies Crafting Creations,custom handmade,email,jamiehuppmann@gmail.com,https://jamies-crafting-creations.myshopify.com/pages/contact,custom handmade crafts with product listings,ready,email_store_owner
-6,Featherlite Product Photography,product photography,email,hello@featherliteproductphoto.com,https://www.featherliteproductphotography.com/pages/contact-us,possible workflow partner for batch background removal,ready,email_partner
+1,Happy Holmes Fibre Arts,handmade craft,email,happyholmesfibrearts@hotmail.com,https://happy-holmes-fibre-arts.myshopify.com/pages/contact-us,handmade products with repeat catalog photos,sent_2026-06-30,email_store_owner
+2,Kate Warby Designs,handmade design,email,katewarbydesigns@bigpond.com,https://kate-warby-designs-5783.myshopify.com/pages/contact,handmade product catalog and product updates,sent_2026-06-30,email_store_owner
+3,Naturalista Distributors,handmade natural products,email,naturalistaja@gmail.com,https://naturalista-distributors.myshopify.com/pages/contact-us,natural handmade product range with ecommerce photos,sent_2026-06-30,email_store_owner
+4,Handmade by JenAd,handmade products,email,products@handmadebyjenad.com,https://handmadebyjenad.myshopify.com/pages/contact,product-info mailbox for handmade catalog,sent_2026-06-30,email_store_owner
+5,Jamies Crafting Creations,custom handmade,email,jamiehuppmann@gmail.com,https://jamies-crafting-creations.myshopify.com/pages/contact,custom handmade crafts with product listings,sent_2026-06-30,email_store_owner
+6,Featherlite Product Photography,product photography,email,hello@featherliteproductphoto.com,https://www.featherliteproductphotography.com/pages/contact-us,possible workflow partner for batch background removal,sent_2026-06-30,email_partner
 7,Toriara Naturals,natural cosmetics,contact form,form,https://toriara-naturals.myshopify.com/pages/contact-us,natural face and body products need clean catalog photos,ready,contact_form
 8,Sixty Vines Candles,candles,contact form,form,https://sixtyvines-ergo.myshopify.com/pages/contact,candle product catalog with repeat product shots,ready,contact_form
 9,Kramer + Co Boutique,boutique,contact form,form,https://kramerandco.myshopify.com/pages/contact,boutique products and handmade items,ready,contact_form
