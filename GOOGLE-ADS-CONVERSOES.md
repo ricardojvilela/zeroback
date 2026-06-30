@@ -38,7 +38,7 @@ Nota: este evento so deve disparar depois de `/api/sync-checkout-session` confir
 
 Atualizacao 2026-06-30: os Termos dos dados de clientes foram aceites no Google Ads e as conversoes melhoradas ficaram ativas ao nivel da conta, geridas pela etiqueta Google. O estado mostrado na interface ficou como `A registar conversoes melhoradas`.
 
-Atualizacao 2026-06-30: foi adicionado fallback por `/api/checkout-conversion`. Se o regresso do Stripe perder a sessao Supabase, o browser valida o `session_id` diretamente no Stripe antes de enviar a conversao Google Ads. Isto reduz o risco de pagamentos reais ficarem sem conversao por falha de login local.
+Atualizacao 2026-06-30: foi adicionado fallback sem login em `/api/sync-checkout-session`. Se o regresso do Stripe perder a sessao Supabase, o browser valida o `session_id` diretamente no Stripe antes de enviar a conversao Google Ads. Isto reduz o risco de pagamentos reais ficarem sem conversao por falha de login local.
 
 ### Lead Pro BatchCutout
 

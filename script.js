@@ -1859,7 +1859,7 @@ async function fetchCheckoutConversionDetails() {
   if (checkoutStatus !== "success" || !checkoutSessionId) return null;
 
   try {
-    const response = await fetch("/api/checkout-conversion", {
+    const response = await fetch("/api/sync-checkout-session", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

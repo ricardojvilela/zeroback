@@ -43,6 +43,28 @@ function checkoutAmountCents(session, subscription) {
   return sessionAmount || subscriptionAmountCents(subscription);
 }
 
+function checkoutConversionPayload(session, subscription) {
+  const amountCents = checkoutAmountCents(session, subscription);
+  const price = firstSubscriptionPrice(subscription);
+  const metadata = {
+    ...(session?.metadata || {}),
+    ...(subscription?.metadata || {}),
+  };
+
+  return {
+    ok: true,
+    paid: true,
+    synced: false,
+    sessionId: session.id,
+    subscriptionId: subscription.id,
+    amountCents,
+    amount: Math.round(amountCents) / 100,
+    currency: asText(session.currency || price?.currency || subscription.currency || "eur", 20).toUpperCase(),
+    checkoutPlan: asText(metadata.batchcutout_price_plan || "monthly", 80),
+    priceId: asText(price?.id, 120),
+  };
+}
+
 function asText(value, maxLength = 500) {
   if (value === null || value === undefined) return "";
   return String(value).slice(0, maxLength);
@@ -62,26 +84,39 @@ export default async function handler(request, response) {
     return sendJson(response, 503, { ok: false, error: "stripe_not_configured" });
   }
 
-  const settings = getSupabaseSettings();
-  if (!settings.supabaseUrl || !settings.serviceRoleKey) {
-    return sendJson(response, 503, { ok: false, error: "supabase_not_configured" });
+  const body = await readRequestBody(request);
+  const sessionId = String(body?.sessionId || "").trim();
+  if (!sessionId.startsWith("cs_")) {
+    return sendJson(response, 400, { ok: false, error: "invalid_session_id" });
   }
 
   const accessToken = getAccessToken(request);
   if (!accessToken) {
-    return sendJson(response, 401, { ok: false, error: "missing_access_token" });
+    try {
+      const { session, subscription } = await getSessionSubscription(stripe, sessionId);
+      if (session.mode !== "subscription" || session.payment_status !== "paid" || !subscription) {
+        return sendJson(response, 409, { ok: false, error: "checkout_not_paid" });
+      }
+
+      return sendJson(response, 200, checkoutConversionPayload(session, subscription));
+    } catch (error) {
+      return sendJson(response, 500, {
+        ok: false,
+        error: "checkout_conversion_lookup_failed",
+        detail: error instanceof Error ? error.message : "unknown_error",
+      });
+    }
+  }
+
+  const settings = getSupabaseSettings();
+  if (!settings.supabaseUrl || !settings.serviceRoleKey) {
+    return sendJson(response, 503, { ok: false, error: "supabase_not_configured" });
   }
 
   try {
     const user = await getSupabaseUser(settings, accessToken);
     if (!user?.id) {
       return sendJson(response, 401, { ok: false, error: "invalid_access_token" });
-    }
-
-    const body = await readRequestBody(request);
-    const sessionId = String(body?.sessionId || "").trim();
-    if (!sessionId.startsWith("cs_")) {
-      return sendJson(response, 400, { ok: false, error: "invalid_session_id" });
     }
 
     const { session, subscription } = await getSessionSubscription(stripe, sessionId);
