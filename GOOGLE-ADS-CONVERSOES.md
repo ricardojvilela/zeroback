@@ -1,6 +1,6 @@
 # BatchCutout - Conversoes Google Ads
 
-Estado revisto em 2026-05-28.
+Estado revisto em 2026-06-30.
 
 ## Mapa atual
 
@@ -14,9 +14,31 @@ Tag:
 
 ## Conversoes principais
 
+### Pro Paid Subscription BatchCutout
+
+Objetivo: medir subscricao paga confirmada pelo Stripe.
+
+Estado pretendido:
+
+- Otimizacao: principal
+- Categoria: Subscrever
+- Contagem: uma
+- Valor: variavel por transacao, fallback 19 EUR
+- Usar para lances: sim
+
+Evento no site:
+
+- `pro_purchase_conversion_sent`
+
+Snippet usado:
+
+- `AW-18177126609/fpcoCP2kmMgcENHhw9tD`
+
+Nota: este evento so deve disparar depois de `/api/sync-checkout-session` confirmar que a sessao Stripe ficou paga e sincronizada. Nao disparar em clique de checkout.
+
 ### Lead Pro BatchCutout
 
-Objetivo: medir contacto comercial real.
+Objetivo: medir contacto comercial antigo/lead manual.
 
 Estado pretendido:
 
@@ -33,6 +55,8 @@ Snippet usado:
 - `AW-18177126609/riWOCOiI67McENHhw9tD`
 
 Nota: existem duas acoes Lead Pro no Google Ads. O codigo usa `Lead Pro BatchCutout (1)`. Nao criar uma terceira ate haver necessidade.
+
+Nota 2026-06-30: com subscricoes pagas ativas, a otimizacao comercial deve passar a privilegiar `Pro Paid Subscription BatchCutout`. Leads Pro antigos ficam como historico/intencao secundaria.
 
 ## Conversoes secundarias
 
@@ -78,13 +102,18 @@ Estes eventos ficam apenas no Supabase/admin/debug:
 - `tool_processing_completed`
 - `tool_pro_clicked`
 - `pro_submit_attempt`
+- `pro_checkout_login_required`
+- `pro_checkout_started`
 
 Motivo: sao sinais de funil, mas ainda nao devem orientar lances do Google Ads. Transformar estes eventos em conversoes cedo demais pode fazer a campanha otimizar para curiosidade em vez de intencao comercial.
 
+Excecao: `pro_purchase_conversion_sent` e conversao principal porque representa subscricao paga.
+
 ## Proxima verificacao
 
-Quando houver leads reais:
+Quando houver dados reais:
 
-1. Confirmar se `Lead Pro BatchCutout (1)` passa de inativo para ativo.
-2. Se houver muitos `tool_pro_clicked` e poucos leads, melhorar formulario/proposta antes de criar nova conversao Ads.
-3. Se houver muitos `batch_limit_exceeded` com bons termos de pesquisa, considerar criar campanha dedicada para lotes grandes.
+1. Confirmar se `Pro Paid Subscription BatchCutout` passa de configuracao incorreta/inativo para ativo apos o primeiro pagamento vindo do site publicado.
+2. Se houver muitos `pro_checkout_started` e poucos pagamentos, rever preco, confianca e fluxo Stripe.
+3. Se houver muitos `tool_pro_clicked` e poucos checkouts, reforcar CTA e contraste Free vs Pro.
+4. Se houver muitos `batch_limit_exceeded` com bons termos de pesquisa, considerar campanha dedicada para lotes grandes.

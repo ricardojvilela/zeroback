@@ -126,6 +126,12 @@
         </aside>
       </section>
 
+      <section class="pricing-reassurance" aria-label="Garantias de compra" data-i18n-aria="reassuranceLabel">
+        <span><strong data-i18n="reassuranceCancelTitle">Cancele quando quiser</strong><em data-i18n="reassuranceCancelText">Sem fidelização.</em></span>
+        <span><strong data-i18n="reassuranceAccessTitle">Ativação automática</strong><em data-i18n="reassuranceAccessText">O Pro fica ligado à conta depois do pagamento.</em></span>
+        <span><strong data-i18n="reassuranceSecureTitle">Stripe Checkout</strong><em data-i18n="reassuranceSecureText">Pagamento seguro e recibo por email.</em></span>
+      </section>
+
       <section class="pricing-proof" aria-label="Quem precisa do BatchCutout Pro" data-i18n-aria="whoLabel">
         <article>
           <span>01</span>
@@ -260,6 +266,13 @@
           metricFree: "imagens por lote no Pro",
           metricResolution: "exportação mínima",
           metricZip: "imagens por mês",
+          reassuranceLabel: "Garantias de compra",
+          reassuranceCancelTitle: "Cancele quando quiser",
+          reassuranceCancelText: "Sem fidelização.",
+          reassuranceAccessTitle: "Ativação automática",
+          reassuranceAccessText: "O Pro fica ligado à conta depois do pagamento.",
+          reassuranceSecureTitle: "Stripe Checkout",
+          reassuranceSecureText: "Pagamento seguro e recibo por email.",
           heroImageAlt: "Exemplo antes e depois de uma foto de produto",
           planKicker: "Plano recomendado",
           planTitle: "19 EUR/mês para volume real",
@@ -344,6 +357,13 @@
           metricFree: "images per Pro batch",
           metricResolution: "minimum export",
           metricZip: "images per month",
+          reassuranceLabel: "Purchase reassurance",
+          reassuranceCancelTitle: "Cancel anytime",
+          reassuranceCancelText: "No long-term lock-in.",
+          reassuranceAccessTitle: "Automatic access",
+          reassuranceAccessText: "Pro is linked to your account after payment.",
+          reassuranceSecureTitle: "Stripe Checkout",
+          reassuranceSecureText: "Secure payment and email receipt.",
           heroImageAlt: "Before and after example of a product photo",
           planKicker: "Recommended plan",
           planTitle: "EUR 19/month for real volume",
@@ -826,6 +846,29 @@
         return pricingText("monthlyPlanCta");
       }
 
+      function pricingPlanValue(plan) {
+        if (plan === "annual") return 190;
+        if (plan === "early") return 15;
+        return 19;
+      }
+
+      function trackPricingBeginCheckout(plan) {
+        window.gtag?.("event", "begin_checkout", {
+          currency: "EUR",
+          value: pricingPlanValue(plan),
+          checkout_step: 1,
+          checkout_option: plan,
+          source: "pricing_page",
+          items: [{
+            item_id: `batchcutout_pro_${plan}`,
+            item_name: plan === "annual" ? "BatchCutout Pro Annual" : plan === "early" ? "BatchCutout Founder" : "BatchCutout Pro Monthly",
+            item_category: "subscription",
+            price: pricingPlanValue(plan),
+            quantity: 1,
+          }],
+        });
+      }
+
       function updatePricingAccountUi() {
         const ready = Boolean(pricingAccount?.email);
         pricingAccountBadge.textContent = ready ? pricingText("checkoutBadgeReady") : pricingText("checkoutBadgeGuest");
@@ -898,10 +941,11 @@
           trackPricingCheckoutEvent("pro_checkout_started", {
             plan: selectedPlan,
             label: data.label || pricingPlanLabel(selectedPlan),
-            value: selectedPlan === "annual" ? 190 : selectedPlan === "early" ? 15 : 19,
+            value: pricingPlanValue(selectedPlan),
             currency: "EUR",
             source: "pricing_page",
           });
+          trackPricingBeginCheckout(selectedPlan);
           window.location.href = data.url;
         } catch {
           setPricingStatus("checkoutError");

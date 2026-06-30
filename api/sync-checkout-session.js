@@ -26,6 +26,28 @@ async function getSessionSubscription(stripe, sessionId) {
   return { session, subscription: session.subscription };
 }
 
+function firstSubscriptionPrice(subscription) {
+  return subscription?.items?.data?.[0]?.price || null;
+}
+
+function subscriptionAmountCents(subscription) {
+  return (subscription?.items?.data || []).reduce((total, item) => {
+    const quantity = Number(item.quantity || 1) || 1;
+    const unitAmount = Number(item.price?.unit_amount || 0) || 0;
+    return total + unitAmount * quantity;
+  }, 0);
+}
+
+function checkoutAmountCents(session, subscription) {
+  const sessionAmount = Number(session?.amount_total || 0) || 0;
+  return sessionAmount || subscriptionAmountCents(subscription);
+}
+
+function asText(value, maxLength = 500) {
+  if (value === null || value === undefined) return "";
+  return String(value).slice(0, maxLength);
+}
+
 export default async function handler(request, response) {
   if (request.method === "OPTIONS") {
     return sendJson(response, 200, { ok: true });
@@ -72,9 +94,25 @@ export default async function handler(request, response) {
     }
 
     const profile = await updateProfileFromSubscription(settings, subscription, user.id);
+    const amountCents = checkoutAmountCents(session, subscription);
+    const price = firstSubscriptionPrice(subscription);
+    const metadata = {
+      ...(session?.metadata || {}),
+      ...(subscription?.metadata || {}),
+    };
+
     return sendJson(response, 200, {
       ok: true,
       synced: true,
+      sessionId: session.id,
+      subscriptionId: subscription.id,
+      customerId: typeof session.customer === "string" ? session.customer : session.customer?.id || "",
+      customerEmail: asText(session.customer_details?.email || user.email || ""),
+      amountCents,
+      amount: Math.round(amountCents) / 100,
+      currency: asText(session.currency || price?.currency || subscription.currency || "eur", 20).toUpperCase(),
+      checkoutPlan: asText(metadata.batchcutout_price_plan || profile.plan || "monthly", 80),
+      priceId: asText(price?.id, 120),
       plan: profile.plan,
       planStatus: profile.plan_status,
       batchLimit: profile.batch_limit,

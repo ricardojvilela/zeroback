@@ -22,6 +22,7 @@ const allowedEvents = new Set([
   "pro_checkout_interest_submitted",
   "pro_checkout_login_required",
   "pro_checkout_started",
+  "pro_purchase_conversion_sent",
   "pro_subscription_paid",
   "billing_portal_opened",
   "account_signup_started",

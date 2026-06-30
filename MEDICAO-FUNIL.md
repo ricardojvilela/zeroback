@@ -149,3 +149,12 @@ Atualizacao em 2026-05-28 - conversoes Google Ads:
 - `Download ZIP BatchCutout` e `Limite 20 BatchCutout` estao ativos como conversoes secundarias.
 - Nao foi criada nova conversao para `tool_pro_clicked`/`pro_submit_attempt` para evitar otimizar a campanha cedo demais para sinais fracos.
 - Criado `GOOGLE-ADS-CONVERSOES.md` com mapa de conversoes, snippets e regra de otimizacao.
+
+Atualizacao em 2026-06-30 - subscricoes pagas:
+
+- Criada no Google Ads a conversao principal `Pro Paid Subscription BatchCutout`, categoria `Subscrever`.
+- O snippet usado pelo site e `AW-18177126609/fpcoCP2kmMgcENHhw9tD`.
+- A homepage passa a enviar `begin_checkout` quando o utilizador inicia checkout e `purchase`/conversao Google Ads apenas quando o Stripe confirma pagamento no regresso do checkout.
+- O evento interno `pro_purchase_conversion_sent` fica guardado no Supabase para auditar conversoes Ads enviadas pelo browser.
+- Foram adicionados sinais de publico para remarketing: upload iniciado, resultado pronto, interesse Pro, login exigido para checkout, checkout iniciado e cliente pago.
+- Foram adicionadas 8 paginas SEO em ingles ao sitemap para captacao long-tail ligada a ecommerce, marketplaces e PNG transparente.

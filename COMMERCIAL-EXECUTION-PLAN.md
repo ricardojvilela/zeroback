@@ -137,6 +137,17 @@ Decision rules:
 - Accounts without checkout: offer or checkout friction.
 - Checkout without payment: payment trust, price or Stripe flow issue.
 
+## Executed growth work - 2026-06-30
+
+- Added paid subscription conversion tracking for Google Ads: `Pro Paid Subscription BatchCutout`.
+- Added checkout and paid purchase ecommerce events for Google Analytics/Google Ads.
+- Added browser-side audit event `pro_purchase_conversion_sent` after Stripe checkout sync.
+- Added remarketing audience signals for upload intent, result readiness, Pro interest, checkout intent and paid-customer exclusion.
+- Added Free vs Pro contrast on the main tool page and purchase reassurance on `/pricing/`.
+- Added 8 English long-tail SEO pages and included them in `sitemap.xml`.
+- Kept current prices unchanged: Founder 15 EUR/month, Pro 19 EUR/month, annual 190 EUR/year.
+- No recovery or promotional emails were sent automatically.
+
 ## First revenue targets
 
 Target 1:

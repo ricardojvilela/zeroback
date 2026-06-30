@@ -16,6 +16,32 @@ https://batchcutout.com/en/etsy-product-photo-background-remover/?utm_source=goo
 Pricing:
 https://batchcutout.com/pricing/?lang=en&utm_source=google_ads&utm_medium=cpc&utm_campaign=pro_pricing&utm_content=search
 
+Long-tail SEO/search pages:
+
+Product photo background remover:
+https://batchcutout.com/en/product-photo-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=product_photo_background_remover&utm_content=search
+
+Ecommerce background remover:
+https://batchcutout.com/en/background-remover-for-ecommerce/?utm_source=google_ads&utm_medium=cpc&utm_campaign=ecommerce_background_remover&utm_content=search
+
+Transparent PNG batch converter:
+https://batchcutout.com/en/transparent-png-batch-converter/?utm_source=google_ads&utm_medium=cpc&utm_campaign=transparent_png_batch_converter&utm_content=search
+
+AI product cutout tool:
+https://batchcutout.com/en/ai-product-photo-cutout-tool/?utm_source=google_ads&utm_medium=cpc&utm_campaign=ai_product_cutout_tool&utm_content=search
+
+Amazon product background remover:
+https://batchcutout.com/en/amazon-product-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=amazon_background_remover&utm_content=search
+
+eBay product background remover:
+https://batchcutout.com/en/ebay-product-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=ebay_background_remover&utm_content=search
+
+WooCommerce product background remover:
+https://batchcutout.com/en/woocommerce-product-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=woocommerce_background_remover&utm_content=search
+
+Remove white background from product photos:
+https://batchcutout.com/en/remove-white-background-from-product-photos/?utm_source=google_ads&utm_medium=cpc&utm_campaign=remove_white_background_product_photos&utm_content=search
+
 ## Sitelinks
 
 Bulk Background Remover
@@ -70,6 +96,19 @@ Values:
 - Product cutouts
 - Catalog images
 - Listing photos
+
+## Remarketing signals
+
+The site sends a Google event named `batchcutout_audience_signal` for these funnel signals:
+
+- `upload_started`: user started uploading product photos.
+- `result_ready`: processed result became available.
+- `pro_interest`: user clicked a Pro plan/CTA.
+- `checkout_login_required`: user tried checkout before login.
+- `checkout_started`: user reached Stripe checkout.
+- `paid_customer`: paid subscription confirmed; use as exclusion from acquisition campaigns.
+
+Build audiences from these signals when volume is sufficient. Start with observation/remarketing only; do not optimize cold search traffic to soft signals while paid subscription data is still sparse.
 
 ## Review routine
 

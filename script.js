@@ -56,12 +56,14 @@ const defaultProBatchLimit = 100;
 const defaultProMonthlyLimit = 2000;
 const downloadZipConversionId = "AW-18177126609/2EdRCMzF7bMcENHhw9tD";
 const batchLimitConversionId = "AW-18177126609/prPXCPXD8LMcENHhw9tD";
+const paidSubscriptionConversionId = "AW-18177126609/fpcoCP2kmMgcENHhw9tD";
 const consentStorageKey = "batchcutout_consent";
 const debugMode = pageParams.get("debug") === "1";
 const debugEventsStorageKey = "batchcutout_debug_events";
 const attributionStorageKey = "batchcutout_attribution";
 const visitorStorageKey = "batchcutout_visitor_id";
 const sessionStorageKey = "batchcutout_session_id";
+const paidConversionStorageKey = "batchcutout_paid_conversion_sessions";
 const serverEventNames = new Set([
   "tool_page_view",
   "tool_drag_upload_intent",
@@ -79,6 +81,7 @@ const serverEventNames = new Set([
   "pro_submit_attempt",
   "pro_checkout_login_required",
   "pro_checkout_started",
+  "pro_purchase_conversion_sent",
   "billing_portal_opened",
   "account_signup_started",
   "account_signup_succeeded",
@@ -132,6 +135,15 @@ const baseTranslation = {
   proInlineTitle: "Desbloqueie até 100 imagens por lote",
   proInlineLead: "Escolha um plano Pro para processar até 100 imagens por lote e 2.000 imagens por mês.",
   proInlineBenefits: "Pro mensal 19 EUR/mês. Plano fundador 15 EUR/mês. Anual 190 EUR/ano.",
+  proPlanContrastLabel: "Comparação entre grátis e Pro",
+  proFreeLabel: "Grátis",
+  proFreeLimit: "2 imagens por lote",
+  proBatchLabel: "Pro",
+  proBatchLimit: "100 imagens por lote",
+  proMonthlyLabel: "Mensal",
+  proMonthlyLimit: "2.000 imagens por mês",
+  proCancelLabel: "Controlo",
+  proCancelText: "Cancele quando quiser",
   proEmailPlaceholder: "O seu email",
   proInlineButton: "Comprar Pro",
   proInlineSuccess: "A abrir pagamento Pro.",
@@ -264,6 +276,15 @@ const translations = {
     proInlineTitle: "Unlock up to 100 images per batch",
     proInlineLead: "Choose a Pro plan to process up to 100 images per batch and 2,000 images per month.",
     proInlineBenefits: "Monthly Pro EUR 19/month. Founder plan EUR 15/month. Annual EUR 190/year.",
+    proPlanContrastLabel: "Free versus Pro comparison",
+    proFreeLabel: "Free",
+    proFreeLimit: "2 images per batch",
+    proBatchLabel: "Pro",
+    proBatchLimit: "100 images per batch",
+    proMonthlyLabel: "Monthly",
+    proMonthlyLimit: "2,000 images per month",
+    proCancelLabel: "Control",
+    proCancelText: "Cancel anytime",
     proEmailPlaceholder: "Your email",
     proInlineButton: "Buy Pro",
     proInlineSuccess: "Opening Pro payment.",
@@ -1012,6 +1033,7 @@ const analyticsEvents = {
   pro_submit_attempt: { category: "commercial_intent", label: "pro_submit_attempt", step: 9 },
   pro_checkout_login_required: { category: "commercial_intent", label: "checkout_login_required", step: 10 },
   pro_checkout_started: { category: "commercial_intent", label: "checkout_started", step: 11 },
+  pro_purchase_conversion_sent: { category: "revenue", label: "purchase_conversion", step: 12 },
   billing_portal_opened: { category: "account", label: "billing_portal_opened" },
   account_signup_started: { category: "account", label: "signup_started" },
   account_signup_succeeded: { category: "account", label: "signup_succeeded" },
@@ -1032,6 +1054,15 @@ const analyticsEvents = {
   post_download_feedback_selected: { category: "feedback", label: "post_download" },
 };
 
+const audienceSignals = {
+  tool_upload_started: "upload_started",
+  download_ready_shown: "result_ready",
+  tool_pro_clicked: "pro_interest",
+  pro_checkout_login_required: "checkout_login_required",
+  pro_checkout_started: "checkout_started",
+  pro_purchase_conversion_sent: "paid_customer",
+};
+
 function trackEvent(name, detail = {}) {
   const config = analyticsEvents[name] || { category: "interaction", label: name };
   const numericValue = Number(detail.count || detail.totalInQueue || detail.accepted || detail.value || 0);
@@ -1049,6 +1080,13 @@ function trackEvent(name, detail = {}) {
   window.dispatchEvent(new CustomEvent("rfel:analytics", { detail: { name, ...detail } }));
   window.dataLayer?.push({ event: name, ...eventParams });
   window.gtag?.("event", name, eventParams);
+  if (audienceSignals[name]) {
+    window.gtag?.("event", "batchcutout_audience_signal", {
+      ...eventParams,
+      event_label: audienceSignals[name],
+      audience_signal: audienceSignals[name],
+    });
+  }
   recordDebugEvent(name, eventParams);
   sendServerEvent(name, eventParams);
 }
@@ -1175,14 +1213,105 @@ function persistAttribution() {
   recordDebugEvent("attribution_saved", next);
 }
 
-function trackGoogleAdsConversion(sendTo, { value = 1.0, currency = "EUR" } = {}) {
+function trackGoogleAdsConversion(sendTo, { value = 1.0, currency = "EUR", transaction_id = "" } = {}) {
   if (!sendTo) return;
-  window.gtag?.("event", "conversion", {
+  const payload = {
     send_to: sendTo,
     value,
     currency,
+  };
+  if (transaction_id) payload.transaction_id = transaction_id;
+  window.gtag?.("event", "conversion", payload);
+  recordDebugEvent("google_ads_conversion", payload);
+}
+
+function getTrackedPaidSessions() {
+  try {
+    const sessions = JSON.parse(localStorage.getItem(paidConversionStorageKey) || "[]");
+    return Array.isArray(sessions) ? sessions : [];
+  } catch {
+    return [];
+  }
+}
+
+function rememberPaidSession(sessionId) {
+  if (!sessionId) return;
+  const sessions = getTrackedPaidSessions().filter(Boolean);
+  if (!sessions.includes(sessionId)) sessions.push(sessionId);
+  localStorage.setItem(paidConversionStorageKey, JSON.stringify(sessions.slice(-20)));
+}
+
+function hasTrackedPaidSession(sessionId) {
+  return Boolean(sessionId && getTrackedPaidSessions().includes(sessionId));
+}
+
+function checkoutValueForPlan(plan = "monthly") {
+  if (plan === "annual") return 190;
+  if (plan === "early") return 15;
+  return 19;
+}
+
+function googleCommerceItem(plan = "monthly") {
+  return {
+    item_id: `batchcutout_pro_${plan}`,
+    item_name: plan === "annual" ? "BatchCutout Pro Annual" : plan === "early" ? "BatchCutout Founder" : "BatchCutout Pro Monthly",
+    item_category: "subscription",
+    price: checkoutValueForPlan(plan),
+    quantity: 1,
+  };
+}
+
+function trackBeginCheckout(plan = "monthly", source = "app") {
+  const value = checkoutValueForPlan(plan);
+  window.gtag?.("event", "begin_checkout", {
+    currency: "EUR",
+    value,
+    checkout_step: 1,
+    checkout_option: plan,
+    source,
+    items: [googleCommerceItem(plan)],
   });
-  recordDebugEvent("google_ads_conversion", { send_to: sendTo, value, currency });
+}
+
+function setGoogleUserData(email = "") {
+  if (!email || localStorage.getItem(consentStorageKey) !== "accepted") return;
+  window.gtag?.("set", "user_data", {
+    email,
+  });
+}
+
+function trackPaidSubscriptionConversion(details = {}) {
+  const sessionId = details.sessionId || details.stripe_session_id || checkoutSessionId;
+  if (!sessionId || hasTrackedPaidSession(sessionId)) return;
+
+  const plan = details.checkoutPlan || details.plan || "monthly";
+  const amount = Number(details.amount || 0) || checkoutValueForPlan(plan);
+  const currency = String(details.currency || "EUR").toUpperCase();
+  const customerEmail = details.customerEmail || currentAccount?.email || "";
+
+  setGoogleUserData(customerEmail);
+  window.gtag?.("event", "purchase", {
+    transaction_id: sessionId,
+    value: amount,
+    currency,
+    affiliation: "Stripe Checkout",
+    items: [googleCommerceItem(plan)],
+  });
+  trackGoogleAdsConversion(paidSubscriptionConversionId, {
+    value: amount,
+    currency,
+    transaction_id: sessionId,
+  });
+  trackEvent("pro_purchase_conversion_sent", {
+    plan,
+    value: amount,
+    currency,
+    stripe_session_id: sessionId,
+    stripe_subscription_id: details.subscriptionId || "",
+    stripe_price_id: details.priceId || "",
+    conversion_configured: Boolean(paidSubscriptionConversionId),
+  });
+  rememberPaidSession(sessionId);
 }
 
 function getDebugEvents() {
@@ -1659,6 +1788,7 @@ async function startCheckout(plan = "monthly", triggerButton = null) {
       value: selectedPlan === "annual" ? 190 : selectedPlan === "early" ? 15 : 19,
       currency: "EUR",
     });
+    trackBeginCheckout(selectedPlan, "app");
     window.location.href = data.url;
   } catch {
     setAccountMessage("billingCheckoutError");
@@ -1704,10 +1834,10 @@ async function openBillingPortal() {
 }
 
 async function syncCheckoutReturnSession() {
-  if (checkoutStatus !== "success" || !checkoutSessionId) return false;
+  if (checkoutStatus !== "success" || !checkoutSessionId) return null;
 
   const accessToken = await getCurrentAccessToken();
-  if (!accessToken) return false;
+  if (!accessToken) return null;
 
   try {
     const response = await fetch("/api/sync-checkout-session", {
@@ -1718,17 +1848,21 @@ async function syncCheckoutReturnSession() {
       },
       body: JSON.stringify({ sessionId: checkoutSessionId }),
     });
-    return response.ok;
+    const data = await response.json().catch(() => ({}));
+    return response.ok ? data : null;
   } catch {
-    return false;
+    return null;
   }
 }
 
 async function showCheckoutReturnMessage() {
   if (checkoutStatus === "success") {
     setAccountMessage("billingCheckoutSuccess");
-    await syncCheckoutReturnSession();
+    const checkoutDetails = await syncCheckoutReturnSession();
     await refreshAccount();
+    if (checkoutDetails?.synced) {
+      trackPaidSubscriptionConversion(checkoutDetails);
+    }
   } else if (checkoutStatus === "cancelled") {
     setAccountMessage("billingCheckoutCancelled");
   }
