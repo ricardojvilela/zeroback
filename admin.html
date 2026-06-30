@@ -939,15 +939,6 @@
         return copies[segment] || {};
       }
 
-      function mailtoFor(user, segment) {
-        const copy = recoveryCopy(segment);
-        const params = new URLSearchParams({
-          subject: copy.subject || "",
-          body: copy.body || "",
-        });
-        return `mailto:${encodeURIComponent(user.email || "")}?${params.toString()}`;
-      }
-
       function renderLiveStats(data) {
         const totals = data.totals || {};
         document.querySelector("#dashboardVisitors").textContent = totals.visitors || 0;
@@ -1065,7 +1056,15 @@
                   <td><span class="pill ${segment === "proof" ? "success" : "warning"}">${escapeHtml(copy.label || segment)}</span></td>
                   <td>${escapeHtml(user.email || "-")}</td>
                   <td>${escapeHtml(copy.reason || "-")}</td>
-                  <td><a class="subscription-link" href="${escapeHtml(mailtoFor(user, segment))}">Abrir email</a></td>
+                  <td>
+                    <button
+                      class="secondary"
+                      type="button"
+                      data-recovery-action="send"
+                      data-recovery-email="${escapeHtml(user.email || "")}"
+                      data-recovery-segment="${escapeHtml(segment)}"
+                    >Enviar via domínio</button>
+                  </td>
                 </tr>
               `;
             }).join("")
@@ -1233,6 +1232,34 @@
         await loadSubscriptions();
       }
 
+      async function sendRecoveryEmail(email, segment) {
+        const token = getAdminToken();
+        if (!token) return;
+
+        const copy = recoveryCopy(segment);
+        const response = await fetch("/api/pro-users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            mode: "send-outreach",
+            to: email,
+            subject: copy.subject || "",
+            text: copy.body || "",
+          }),
+        });
+
+        const data = await response.json();
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error || "recovery_email_send_failed");
+        }
+
+        return data;
+      }
+
       async function loadLiveStats() {
         const token = getAdminToken();
         if (!token) {
@@ -1303,6 +1330,28 @@
           await updateProUser(userId, mode);
         } catch {
           alert("Não foi possível atualizar a conta.");
+        } finally {
+          button.disabled = false;
+        }
+      });
+      recoveryRowsBody.addEventListener("click", async (event) => {
+        const button = event.target.closest("[data-recovery-action='send']");
+        if (!button) return;
+
+        const email = button.dataset.recoveryEmail;
+        const segment = button.dataset.recoverySegment;
+        if (!email || !segment) return;
+        if (!confirm(`Enviar email via ricardo@batchcutout.com para ${email}?`)) return;
+
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.textContent = "A enviar...";
+        try {
+          await sendRecoveryEmail(email, segment);
+          button.textContent = "Enviado";
+        } catch {
+          button.textContent = originalText;
+          alert("Não foi possível enviar via domínio.");
         } finally {
           button.disabled = false;
         }
