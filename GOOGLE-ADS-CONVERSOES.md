@@ -36,6 +36,8 @@ Snippet usado:
 
 Nota: este evento so deve disparar depois de `/api/sync-checkout-session` confirmar que a sessao Stripe ficou paga e sincronizada. Nao disparar em clique de checkout.
 
+Atualizacao 2026-06-30: os Termos dos dados de clientes foram aceites no Google Ads e as conversoes melhoradas ficaram ativas ao nivel da conta, geridas pela etiqueta Google. O estado mostrado na interface ficou como `A registar conversoes melhoradas`.
+
 ### Lead Pro BatchCutout
 
 Objetivo: medir contacto comercial antigo/lead manual.
