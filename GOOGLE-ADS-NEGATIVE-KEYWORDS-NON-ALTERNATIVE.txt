@@ -1,0 +1,5 @@
+[removebg]
+[remove.bg]
+[remove bg]
+[photoroom]
+[pixelcut]

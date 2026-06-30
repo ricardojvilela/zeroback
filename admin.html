@@ -677,6 +677,46 @@
             </table>
           </div>
         </section>
+        <section class="source-live-block" aria-label="Recuperação e prova">
+          <div class="panel-head compact">
+            <div>
+              <h3>Recuperação e prova</h3>
+              <p class="note">Candidatos para contacto manual. Não envia emails automaticamente.</p>
+            </div>
+          </div>
+          <div class="live-grid">
+            <article class="live-card">
+              <span>Conta sem checkout</span>
+              <strong id="recoveryAccountNoCheckout">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Checkout sem pagamento</span>
+              <strong id="recoveryCheckoutNotPaid">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Pedir prova real</span>
+              <strong id="recoveryProofCandidates">0</strong>
+            </article>
+          </div>
+          <p class="live-status" id="recoverySummary">A carregar oportunidades comerciais...</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Segmento</th>
+                  <th>Email</th>
+                  <th>Motivo</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody id="recoveryRowsBody">
+                <tr>
+                  <td class="empty" colspan="4">A carregar oportunidades.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
         <section class="source-live-block" aria-label="Origem das visitas">
           <div class="panel-head compact">
             <div>
@@ -756,6 +796,8 @@
       const liveRowsBody = document.querySelector("#liveRowsBody");
       const sourceRowsBody = document.querySelector("#sourceRowsBody");
       const proUsersRowsBody = document.querySelector("#proUsersRowsBody");
+      const recoveryRowsBody = document.querySelector("#recoveryRowsBody");
+      const recoverySummary = document.querySelector("#recoverySummary");
       const subscriptionsRowsBody = document.querySelector("#subscriptionsRowsBody");
       const subscriptionsStatus = document.querySelector("#subscriptionsStatus");
       const liveStatus = document.querySelector("#liveStatus");
@@ -855,6 +897,57 @@
         return value || "-";
       }
 
+      function hoursSince(value) {
+        const date = new Date(value || 0);
+        if (Number.isNaN(date.getTime())) return 0;
+        return (Date.now() - date.getTime()) / 36e5;
+      }
+
+      function recoverySegment(user) {
+        const isPro = user.plan === "pro" || Number(user.monthlyLimit || 0) > 0;
+        if (isPro) return "proof";
+        if (user.plan === "free" && user.stripeCustomerId && !user.stripeSubscriptionId && hoursSince(user.updatedAt || user.createdAt) >= 24) {
+          return "checkout_not_paid";
+        }
+        if (user.plan === "free" && !user.stripeCustomerId && hoursSince(user.createdAt || user.updatedAt) >= 2) {
+          return "account_no_checkout";
+        }
+        return "";
+      }
+
+      function recoveryCopy(segment) {
+        const copies = {
+          account_no_checkout: {
+            label: "Conta sem checkout",
+            subject: "Finish setting up BatchCutout Pro",
+            body: `Hi,\n\nYou created a BatchCutout account but did not choose a Pro plan yet.\n\nIf you are preparing product photos in batches, Pro unlocks:\n\n- Up to 100 images per batch\n- Up to 2,000 images per month\n- ZIP export for product workflows\n\nChoose the current plan here:\nhttps://batchcutout.com/pricing/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=account_no_checkout\n\nThanks,\nNexaFlow Labs`,
+            reason: "Conta gratuita criada há mais de 2 horas sem cliente Stripe.",
+          },
+          checkout_not_paid: {
+            label: "Checkout sem pagamento",
+            subject: "Need help activating BatchCutout Pro?",
+            body: `Hi,\n\nIt looks like you opened BatchCutout Pro checkout but did not complete payment.\n\nIf anything blocked you, reply to this email and we will help. The current Pro offer keeps the same limits:\n\n- 100 images per batch\n- 2,000 images per month\n- Monthly, founder, and annual billing options\n\nContinue checkout:\nhttps://batchcutout.com/pricing/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=checkout_not_paid\n\nThanks,\nNexaFlow Labs`,
+            reason: "Cliente Stripe criado, mas sem subscrição ativa após 24 horas.",
+          },
+          proof: {
+            label: "Pedir prova real",
+            subject: "Can we feature your BatchCutout workflow?",
+            body: `Hi,\n\nThanks for using BatchCutout.\n\nWe are collecting a few real ecommerce workflows to show how sellers prepare product photos in batches. Would you be open to sharing:\n\n- 1 before image and 1 after image;\n- your store type, for example Shopify, Etsy, WooCommerce, Amazon, or eBay;\n- one short sentence about what BatchCutout helped you do;\n- permission for NexaFlow Labs to show that example on the BatchCutout website and marketing pages.\n\nWe can show your store name or keep it anonymous.\n\nThanks,\nNexaFlow Labs`,
+            reason: "Cliente Pro/manual com acesso ativo, bom candidato para testemunho.",
+          },
+        };
+        return copies[segment] || {};
+      }
+
+      function mailtoFor(user, segment) {
+        const copy = recoveryCopy(segment);
+        const params = new URLSearchParams({
+          subject: copy.subject || "",
+          body: copy.body || "",
+        });
+        return `mailto:${encodeURIComponent(user.email || "")}?${params.toString()}`;
+      }
+
       function renderLiveStats(data) {
         const totals = data.totals || {};
         document.querySelector("#dashboardVisitors").textContent = totals.visitors || 0;
@@ -930,6 +1023,7 @@
       }
 
       function renderProUsers(users) {
+        renderRecoveryActions(users || []);
         proUsersRowsBody.innerHTML = users?.length
           ? users.map((user) => `
               <tr>
@@ -948,6 +1042,34 @@
               </tr>
             `).join("")
           : `<tr><td class="empty" colspan="6">Ainda não existem contas registadas.</td></tr>`;
+      }
+
+      function renderRecoveryActions(users) {
+        const rows = users
+          .map((user) => ({ user, segment: recoverySegment(user) }))
+          .filter((row) => row.segment);
+        const accountNoCheckout = rows.filter((row) => row.segment === "account_no_checkout").length;
+        const checkoutNotPaid = rows.filter((row) => row.segment === "checkout_not_paid").length;
+        const proofCandidates = rows.filter((row) => row.segment === "proof").length;
+
+        document.querySelector("#recoveryAccountNoCheckout").textContent = accountNoCheckout;
+        document.querySelector("#recoveryCheckoutNotPaid").textContent = checkoutNotPaid;
+        document.querySelector("#recoveryProofCandidates").textContent = proofCandidates;
+        recoverySummary.textContent = `${rows.length} contactos manuais potenciais. Use apenas com consentimento ou relação comercial válida.`;
+
+        recoveryRowsBody.innerHTML = rows.length
+          ? rows.map(({ user, segment }) => {
+              const copy = recoveryCopy(segment);
+              return `
+                <tr>
+                  <td><span class="pill ${segment === "proof" ? "success" : "warning"}">${escapeHtml(copy.label || segment)}</span></td>
+                  <td>${escapeHtml(user.email || "-")}</td>
+                  <td>${escapeHtml(copy.reason || "-")}</td>
+                  <td><a class="subscription-link" href="${escapeHtml(mailtoFor(user, segment))}">Abrir email</a></td>
+                </tr>
+              `;
+            }).join("")
+          : `<tr><td class="empty" colspan="4">Ainda não existem contactos acionáveis.</td></tr>`;
       }
 
       function renderSubscriptions(data) {
@@ -1039,6 +1161,7 @@
           renderProUsers(data.users || []);
         } catch {
           proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar contas.</td></tr>`;
+          recoveryRowsBody.innerHTML = `<tr><td class="empty" colspan="4">Não foi possível carregar oportunidades comerciais.</td></tr>`;
         }
       }
 
@@ -1140,6 +1263,7 @@
           }
           liveRowsBody.innerHTML = `<tr><td class="empty" colspan="17">Não foi possível carregar atividade.</td></tr>`;
           proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar contas.</td></tr>`;
+          recoveryRowsBody.innerHTML = `<tr><td class="empty" colspan="4">Não foi possível carregar oportunidades comerciais.</td></tr>`;
           subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="7">Não foi possível carregar subscrições Stripe.</td></tr>`;
           liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variáveis Vercel.";
           subscriptionsStatus.textContent = "Erro ao carregar subscrições.";

@@ -160,6 +160,16 @@ Decision rules:
 - Added `FIRST-CUSTOMER-PROOF-KIT.md` to collect real before/after proof with consent.
 - No recovery or promotional emails were sent automatically.
 
+## Executed growth work - campaign activation pack
+
+- Added focused Search execution plan in `GOOGLE-ADS-SEARCH-EXECUTION.md`.
+- Added Google Ads import files under `google-ads-imports/` for the competitor alternative campaign.
+- Separated competitor-name negatives from the general negative list so alternative campaigns are not blocked.
+- Added Supabase SQL recovery/proof segments in `CUSTOMER-RECOVERY-SEGMENTS.sql`.
+- Added proof request HTML email templates in `emails/proof-request.html` and `emails/proof-request-pt.html`.
+- Added manual recovery/proof candidate section to `/admin`.
+- New campaign should stay paused until final spend activation is confirmed.
+
 ## First revenue targets
 
 Target 1:

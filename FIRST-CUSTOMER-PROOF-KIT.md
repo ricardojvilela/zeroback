@@ -8,6 +8,12 @@ Goal: collect real proof without inventing testimonials or publishing customer i
 - Free users who downloaded PNG/ZIP and replied positively.
 - Store owners or assistants who can show product photos publicly.
 
+Operational support:
+
+- `/admin` now lists Pro/manual users as proof candidates.
+- Email templates are available in `emails/proof-request.html` and `emails/proof-request-pt.html`.
+- SQL review query is available in `CUSTOMER-RECOVERY-SEGMENTS.sql`.
+
 ## Message to request permission
 
 Subject:

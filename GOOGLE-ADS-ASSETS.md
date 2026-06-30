@@ -134,3 +134,6 @@ Every 48 hours:
 - Do not claim BatchCutout is universally better.
 - Keep the message narrow: ecommerce batches, transparent PNGs, ZIP export, simple pricing.
 - Exclude paid customers from acquisition campaigns when the `paid_customer` audience is large enough.
+- Import/search execution files are in `GOOGLE-ADS-SEARCH-EXECUTION.md` and `google-ads-imports/`.
+- Do not use competitor names in ad headlines/descriptions. Keep them in keywords and factual landing pages.
+- Do not apply `[removebg]`, `[remove.bg]`, `[photoroom]` or `[pixelcut]` as account-level negatives, otherwise the alternative campaign can be blocked.

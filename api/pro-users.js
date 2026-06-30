@@ -39,6 +39,7 @@ function mapUser(row) {
     periodEnd: row.current_period_end || "",
     stripeCustomerId: row.stripe_customer_id || "",
     stripeSubscriptionId: row.stripe_subscription_id || "",
+    createdAt: row.created_at || "",
     updatedAt: row.updated_at || row.created_at || "",
   };
 }

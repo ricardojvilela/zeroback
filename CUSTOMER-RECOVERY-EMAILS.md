@@ -4,6 +4,13 @@ Use these only for users who created an account, started checkout, contacted sup
 
 Do not send automatically without a final send confirmation. These are ready-to-use templates for manual or automated recovery once the sending rules are approved.
 
+Operational files:
+
+- SQL segments: `CUSTOMER-RECOVERY-SEGMENTS.sql`
+- HTML templates: `emails/recovery-account-no-checkout.html`, `emails/recovery-checkout-not-paid.html`, `emails/recovery-download-no-pro.html`, `emails/pro-welcome.html`
+- Proof request templates: `emails/proof-request.html`, `emails/proof-request-pt.html`
+- Admin panel: `/admin` shows manual recovery and proof candidates after login.
+
 ## Segments to use first
 
 1. `account_no_checkout`
@@ -22,6 +29,7 @@ Do not send automatically without a final send confirmation. These are ready-to-
    - `tool_download_png` or `tool_download_zip` exists.
    - No `pro_checkout_started`.
    - Send after 24 to 48 hours.
+   - Current limitation: anonymous downloads do not expose email. Use this only when the user is also identifiable through an account, support contact, or consented email capture.
 
 4. `welcome_paid`
    - `pro_subscription_paid` exists.
