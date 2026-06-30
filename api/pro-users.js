@@ -1,6 +1,11 @@
 import crypto from "node:crypto";
+import { Resend } from "resend";
 import { getSupabaseSettings, sendJson, readRequestBody, supabaseUpdateByUserId } from "./_pro.js";
 import { getStripeClient } from "./_stripe.js";
+
+const defaultOutreachFrom = "Ricardo at BatchCutout <ricardo@batchcutout.com>";
+const defaultOutreachReplyTo = "support@batchcutout.com";
+const allowedOutreachDomains = new Set(["batchcutout.com"]);
 
 function verifyAdminToken(request) {
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -41,6 +46,37 @@ function mapUser(row) {
     stripeSubscriptionId: row.stripe_subscription_id || "",
     createdAt: row.created_at || "",
     updatedAt: row.updated_at || row.created_at || "",
+  };
+}
+
+function normalizeEmail(value) {
+  const email = String(value || "").trim().toLowerCase();
+  const valid = /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(email);
+  return valid ? email : "";
+}
+
+function emailDomain(value) {
+  return normalizeEmail(value).split("@")[1] || "";
+}
+
+function fromEmail(value) {
+  const match = String(value || "").match(/<([^<>]+)>/);
+  return normalizeEmail(match?.[1] || value);
+}
+
+function cleanText(value, maxLength) {
+  return String(value || "").trim().slice(0, maxLength);
+}
+
+function outreachSettings() {
+  const from = process.env.OUTREACH_FROM || defaultOutreachFrom;
+  const replyTo = process.env.OUTREACH_REPLY_TO || process.env.SUPPORT_FORWARD_FROM || defaultOutreachReplyTo;
+  const fromAddress = fromEmail(from);
+  return {
+    from,
+    replyTo,
+    fromAddress,
+    fromDomain: emailDomain(fromAddress),
   };
 }
 
@@ -260,6 +296,78 @@ async function cancelSubscriptionRenewal(subscriptionId) {
   return mapSubscription(subscription);
 }
 
+async function sendOutreach(body) {
+  const settings = outreachSettings();
+  if (!allowedOutreachDomains.has(settings.fromDomain)) {
+    return { status: 503, body: { ok: false, error: "outreach_from_domain_not_allowed" } };
+  }
+
+  const resendApiKey = process.env.RESEND_API_KEY || "";
+  if (!resendApiKey) {
+    return { status: 503, body: { ok: false, error: "resend_not_configured" } };
+  }
+
+  const to = normalizeEmail(body.to);
+  const subject = cleanText(body.subject, 160);
+  const text = cleanText(body.text, 5000);
+  const dryRun = Boolean(body.dryRun);
+
+  if (!to || !subject || !text) {
+    return { status: 400, body: { ok: false, error: "invalid_email_payload" } };
+  }
+
+  const payload = {
+    from: settings.from,
+    to,
+    replyTo: settings.replyTo,
+    subject,
+    text,
+    tags: [
+      { name: "source", value: "manual_outreach" },
+      { name: "product", value: "batchcutout" },
+    ],
+  };
+
+  if (dryRun) {
+    return {
+      status: 200,
+      body: {
+        ok: true,
+        dryRun: true,
+        from: payload.from,
+        replyTo: payload.replyTo,
+        to: payload.to,
+        subject: payload.subject,
+      },
+    };
+  }
+
+  const resend = new Resend(resendApiKey);
+  const sent = await resend.emails.send(payload);
+  if (sent.error) {
+    return {
+      status: 502,
+      body: {
+        ok: false,
+        error: "outreach_send_failed",
+        detail: sent.error.message,
+      },
+    };
+  }
+
+  return {
+    status: 200,
+    body: {
+      ok: true,
+      id: sent.data?.id || "",
+      from: payload.from,
+      replyTo: payload.replyTo,
+      to: payload.to,
+      subject: payload.subject,
+    },
+  };
+}
+
 export default async function handler(request, response) {
   if (request.method === "OPTIONS") {
     return sendJson(response, 200, { ok: true });
@@ -293,6 +401,11 @@ export default async function handler(request, response) {
     const body = await readRequestBody(request);
     const userId = String(body?.userId || "").trim();
     const mode = String(body?.mode || "").trim();
+
+    if (mode === "send-outreach") {
+      const result = await sendOutreach(body);
+      return sendJson(response, result.status, result.body);
+    }
 
     if (mode === "cancel-subscription") {
       const subscriptionId = String(body?.subscriptionId || "").trim();

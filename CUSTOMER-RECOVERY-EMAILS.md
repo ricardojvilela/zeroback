@@ -45,7 +45,7 @@ Manual cold outreach must not use personal Gmail. Use:
 
 - From: `Ricardo at BatchCutout <ricardo@batchcutout.com>`
 - Reply-to: `support@batchcutout.com`
-- Sending route: `/api/outreach-send` via Resend, protected by admin token.
+- Sending route: `/api/pro-users` with `mode=send-outreach` via Resend, protected by admin token.
 
 ## Sequence 1 - account created, no checkout
 

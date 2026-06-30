@@ -86,7 +86,7 @@ Envio recomendado:
 
 - From: `Ricardo at BatchCutout <ricardo@batchcutout.com>`
 - Reply-to: `support@batchcutout.com`
-- API: `/api/outreach-send`
+- API: `/api/pro-users` com `mode=send-outreach`
 - Protecao: token admin do painel interno
 - Provider: Resend via `RESEND_API_KEY`
 
