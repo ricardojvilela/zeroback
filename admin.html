@@ -737,7 +737,7 @@
               <strong id="supportUnreplied">0</strong>
             </article>
             <article class="live-card">
-              <span>Respondidos</span>
+              <span>Fechados</span>
               <strong id="supportReplied">0</strong>
             </article>
           </div>
@@ -1127,30 +1127,41 @@
         const summary = data.summary || {};
         document.querySelector("#supportTotal").textContent = summary.total || 0;
         document.querySelector("#supportUnreplied").textContent = summary.unreplied || 0;
-        document.querySelector("#supportReplied").textContent = summary.replied || 0;
+        document.querySelector("#supportReplied").textContent = summary.closed ?? summary.replied ?? 0;
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString("pt-PT") : "";
         supportStatus.textContent = `${summary.total || 0} emails lidos. Última atualização: ${generatedAt}`;
 
         supportRowsBody.innerHTML = data.messages?.length
           ? data.messages.map((message) => {
               const fromEmail = String(message.from || "").match(/[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+\.[a-z]{2,}/i)?.[0] || "";
+              const statusLabel = message.replied ? "Respondido" : message.resolved ? "Resolvido" : "Por responder";
+              const statusClass = message.closed ? "success" : "warning";
+              const replyButton = fromEmail
+                ? `<button
+                    class="secondary"
+                    type="button"
+                    data-support-action="reply"
+                    data-support-email-id="${escapeHtml(message.emailId || "")}"
+                    data-support-to="${escapeHtml(fromEmail)}"
+                    data-support-subject="${escapeHtml(replySubject(message.subject))}"
+                  >Responder</button>`
+                : "";
+              const resolveButton = message.closed
+                ? `<span class="muted-small">Fechado</span>`
+                : `<button
+                    class="secondary"
+                    type="button"
+                    data-support-action="resolve"
+                    data-support-email-id="${escapeHtml(message.emailId || "")}"
+                  >Resolver</button>`;
               return `
                 <tr>
                   <td>${message.receivedAt ? new Date(message.receivedAt).toLocaleString("pt-PT") : "-"}</td>
                   <td>${escapeHtml(message.from || "-")}</td>
                   <td>${escapeHtml(message.subject || "-")}</td>
                   <td>${escapeHtml(message.preview || "-")}${message.hasAttachments ? `<span class="muted-small">${message.attachmentCount} anexo(s)</span>` : ""}</td>
-                  <td><span class="pill ${message.replied ? "success" : "warning"}">${message.replied ? "Respondido" : "Por responder"}</span></td>
-                  <td>
-                    <button
-                      class="secondary"
-                      type="button"
-                      data-support-action="reply"
-                      data-support-email-id="${escapeHtml(message.emailId || "")}"
-                      data-support-to="${escapeHtml(fromEmail)}"
-                      data-support-subject="${escapeHtml(replySubject(message.subject))}"
-                    >Responder</button>
-                  </td>
+                  <td><span class="pill ${statusClass}">${statusLabel}</span></td>
+                  <td><div class="table-actions">${replyButton}${resolveButton}</div></td>
                 </tr>
               `;
             }).join("")
@@ -1397,6 +1408,31 @@
         return data;
       }
 
+      async function resolveSupportEmail(emailId) {
+        const token = getAdminToken();
+        if (!token) return;
+
+        const response = await fetch("/api/pro-users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            mode: "support-resolve",
+            inboundEmailId: emailId,
+          }),
+        });
+
+        const data = await response.json();
+        if (!response.ok || !data.ok) {
+          throw new Error(data.error || "support_resolve_failed");
+        }
+
+        return data;
+      }
+
       async function loadLiveStats() {
         const token = getAdminToken();
         if (!token) {
@@ -1497,13 +1533,36 @@
         }
       });
       supportRowsBody.addEventListener("click", async (event) => {
-        const button = event.target.closest("[data-support-action='reply']");
+        const button = event.target.closest("[data-support-action]");
         if (!button) return;
 
+        const action = button.dataset.supportAction;
         const emailId = button.dataset.supportEmailId;
+        if (!emailId) return;
+
+        if (action === "resolve") {
+          if (!confirm("Marcar este email como resolvido sem enviar resposta?")) return;
+
+          const originalText = button.textContent;
+          button.disabled = true;
+          button.textContent = "A resolver...";
+          try {
+            await resolveSupportEmail(emailId);
+            await loadSupportMailbox();
+          } catch {
+            button.textContent = originalText;
+            alert("Não foi possível marcar como resolvido.");
+          } finally {
+            button.disabled = false;
+          }
+          return;
+        }
+
+        if (action !== "reply") return;
+
         const to = button.dataset.supportTo;
         const subject = button.dataset.supportSubject;
-        if (!emailId || !to || !subject) return;
+        if (!to || !subject) return;
 
         const text = prompt(`Resposta para ${to}`, "Hi,\n\nThanks for contacting BatchCutout.\n\n");
         if (!text || !text.trim()) return;

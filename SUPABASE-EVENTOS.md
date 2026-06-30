@@ -101,6 +101,9 @@ Suporte:
 - `support_email_replied`
 - Criado pelo painel `/admin` quando uma resposta e enviada por `support@batchcutout.com`.
 - `detail.in_reply_to_email_id` liga a resposta ao email recebido.
+- `support_email_resolved`
+- Criado pelo painel `/admin` quando um email e fechado sem envio de resposta.
+- Usado para testes internos, spam ou mensagens que nao precisam de resposta.
 
 ## Consultas uteis
 

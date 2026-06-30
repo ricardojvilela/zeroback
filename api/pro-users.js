@@ -337,11 +337,13 @@ async function insertSupportEvent(settings, eventName, detail, eventLabel = "") 
   }
 }
 
-function supportMessageFromEvent(event, replyIds) {
+function supportMessageFromEvent(event, replyIds, resolvedIds) {
   const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
   const emailId = cleanText(detail.email_id || event.event_label || "", 120);
   const text = cleanText(detail.text || "", 5000);
   const html = cleanText(detail.html || "", 5000);
+  const replied = replyIds.has(emailId);
+  const resolved = resolvedIds.has(emailId);
   return {
     id: event.id,
     emailId,
@@ -353,7 +355,9 @@ function supportMessageFromEvent(event, replyIds) {
     receivedAt: event.occurred_at,
     hasAttachments: Array.isArray(detail.attachments) && detail.attachments.length > 0,
     attachmentCount: Array.isArray(detail.attachments) ? detail.attachments.length : 0,
-    replied: replyIds.has(emailId),
+    replied,
+    resolved,
+    closed: replied || resolved,
   };
 }
 
@@ -361,7 +365,7 @@ async function listSupportMailbox(settings) {
   const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
   const query = new URLSearchParams({
     select: "id,event_name,event_label,detail,occurred_at",
-    event_name: "in.(support_email_received,support_email_replied)",
+    event_name: "in.(support_email_received,support_email_replied,support_email_resolved)",
     order: "occurred_at.desc",
     limit: "200",
   });
@@ -384,17 +388,45 @@ async function listSupportMailbox(settings) {
       .map((event) => cleanText(event.detail?.in_reply_to_email_id || "", 120))
       .filter(Boolean),
   );
+  const resolvedIds = new Set(
+    events
+      .filter((event) => event.event_name === "support_email_resolved")
+      .map((event) => cleanText(event.detail?.in_reply_to_email_id || "", 120))
+      .filter(Boolean),
+  );
   const messages = events
     .filter((event) => event.event_name === "support_email_received")
-    .map((event) => supportMessageFromEvent(event, replyIds));
+    .map((event) => supportMessageFromEvent(event, replyIds, resolvedIds));
 
   return {
     generatedAt: new Date().toISOString(),
     messages,
     summary: {
       total: messages.length,
-      unreplied: messages.filter((message) => !message.replied).length,
+      unreplied: messages.filter((message) => !message.closed).length,
       replied: messages.filter((message) => message.replied).length,
+      resolved: messages.filter((message) => message.resolved && !message.replied).length,
+      closed: messages.filter((message) => message.closed).length,
+    },
+  };
+}
+
+async function resolveSupportEmail(settings, body) {
+  const inboundEmailId = cleanText(body.inboundEmailId, 120);
+  if (!inboundEmailId) {
+    return { status: 400, body: { ok: false, error: "invalid_support_resolve_payload" } };
+  }
+
+  await insertSupportEvent(settings, "support_email_resolved", {
+    in_reply_to_email_id: inboundEmailId,
+    resolved_by: "admin",
+  }, inboundEmailId);
+
+  return {
+    status: 200,
+    body: {
+      ok: true,
+      inboundEmailId,
     },
   };
 }
@@ -579,6 +611,11 @@ export default async function handler(request, response) {
 
     if (mode === "support-reply") {
       const result = await sendSupportReply(settings, body);
+      return sendJson(response, result.status, result.body);
+    }
+
+    if (mode === "support-resolve") {
+      const result = await resolveSupportEmail(settings, body);
       return sendJson(response, result.status, result.body);
     }
 
