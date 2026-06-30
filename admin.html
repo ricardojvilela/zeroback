@@ -395,6 +395,36 @@
         background: #fff;
       }
 
+      table.outreach-table {
+        min-width: 1040px;
+        table-layout: fixed;
+      }
+
+      .outreach-table th:nth-child(1),
+      .outreach-table td:nth-child(1) {
+        width: 44px;
+      }
+
+      .outreach-table th:nth-child(2),
+      .outreach-table td:nth-child(2) {
+        width: 210px;
+      }
+
+      .outreach-table th:nth-child(3),
+      .outreach-table td:nth-child(3) {
+        width: 210px;
+      }
+
+      .outreach-table th:nth-child(5),
+      .outreach-table td:nth-child(5) {
+        width: 130px;
+      }
+
+      .outreach-table th:nth-child(6),
+      .outreach-table td:nth-child(6) {
+        width: 150px;
+      }
+
       th,
       td {
         border-bottom: 1px solid var(--line);
@@ -743,7 +773,7 @@
           </div>
           <p class="live-status" id="outreachStatus">A carregar prospects...</p>
           <div class="table-wrap">
-            <table>
+            <table class="outreach-table">
               <thead>
                 <tr>
                   <th>#</th>
