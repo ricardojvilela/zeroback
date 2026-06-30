@@ -1855,13 +1855,32 @@ async function syncCheckoutReturnSession() {
   }
 }
 
+async function fetchCheckoutConversionDetails() {
+  if (checkoutStatus !== "success" || !checkoutSessionId) return null;
+
+  try {
+    const response = await fetch("/api/checkout-conversion", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ sessionId: checkoutSessionId }),
+    });
+    const data = await response.json().catch(() => ({}));
+    return response.ok && data?.paid ? data : null;
+  } catch {
+    return null;
+  }
+}
+
 async function showCheckoutReturnMessage() {
   if (checkoutStatus === "success") {
     setAccountMessage("billingCheckoutSuccess");
     const checkoutDetails = await syncCheckoutReturnSession();
     await refreshAccount();
-    if (checkoutDetails?.synced) {
-      trackPaidSubscriptionConversion(checkoutDetails);
+    const conversionDetails = checkoutDetails?.synced ? checkoutDetails : await fetchCheckoutConversionDetails();
+    if (conversionDetails?.synced || conversionDetails?.paid) {
+      trackPaidSubscriptionConversion(conversionDetails);
     }
   } else if (checkoutStatus === "cancelled") {
     setAccountMessage("billingCheckoutCancelled");
