@@ -205,7 +205,7 @@ h2 {
 
 .brand-cta {
   width: 100%;
-  margin-bottom: 22px;
+  margin-bottom: 14px;
   background: #ffffff;
   color: var(--charcoal);
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.18);
@@ -214,6 +214,34 @@ h2 {
 .brand-cta:hover:not(:disabled) {
   background: #e9fffb;
   color: var(--charcoal);
+}
+
+.free-test-flow {
+  display: grid;
+  gap: 9px;
+  margin: 0 0 16px;
+  padding: 12px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.13);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.13);
+}
+
+.free-test-flow span {
+  display: grid;
+  gap: 2px;
+}
+
+.free-test-flow strong {
+  color: #ffffff;
+  font-size: 0.87rem;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.free-test-flow em {
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.8rem;
+  font-style: normal;
+  line-height: 1.35;
 }
 
 .brand-pro-link {
@@ -539,6 +567,16 @@ h2 {
   margin-top: 7px;
   color: var(--muted);
   font-size: 0.98rem;
+}
+
+.dropzone-helper {
+  display: block;
+  max-width: 31rem;
+  margin-top: 12px;
+  color: var(--accent-strong);
+  font-size: 0.92rem;
+  font-weight: 900;
+  line-height: 1.35;
 }
 
 .info-list {
@@ -1797,10 +1835,10 @@ progress::-moz-progress-bar {
 }
 
 .pricing-copy h1 {
-  max-width: 12ch;
+  max-width: 15ch;
   margin-bottom: 18px;
   color: #ffffff;
-  font-size: clamp(3rem, 6.5vw, 5.4rem);
+  font-size: clamp(3rem, 5.4vw, 4.4rem);
   line-height: 0.94;
 }
 
@@ -1812,6 +1850,24 @@ progress::-moz-progress-bar {
   border-color: rgba(255, 255, 255, 0.24);
   background: rgba(255, 255, 255, 0.08);
   color: #ffffff;
+}
+
+.pricing-free-test-note {
+  margin: 14px 0 0;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.96rem;
+}
+
+.pricing-free-test-note a {
+  color: #51d7c6;
+  font-weight: 900;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(81, 215, 198, 0.48);
+}
+
+.pricing-free-test-note a:hover {
+  color: #ffffff;
+  border-bottom-color: #ffffff;
 }
 
 .pricing-copy p:not(.section-kicker),

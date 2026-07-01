@@ -178,6 +178,12 @@ Decision rules:
 - Added scoring, contact source, next action, follow-up date, Resend send ID and notes to the prospect CSV.
 - Updated `/admin` prospecting panel with score, filters, qualified count, follow-up count and niche-specific templates.
 - Sent a controlled batch of 20 qualified direct emails through `support@batchcutout.com`.
+
+## Executed growth work - self-service free test
+
+- Strengthened the homepage message around testing 2 images free before paying.
+- Added a compact "upload, inspect PNG, upgrade for volume" flow in the first screen.
+- Added a pricing-page prompt for users who reached plans before testing the product.
 - Kept remaining ready leads staged instead of sending the full list at once, to protect sender reputation.
 
 ## First revenue targets
