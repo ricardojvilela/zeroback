@@ -171,6 +171,15 @@ Decision rules:
 - Activated `Search - BatchCutout - Alternatives` with 2 EUR/day and kept total active Search spend at 10 EUR/day.
 - Verified both active Search campaigns use the account-default `Subscrever` conversion goal and `Maximizar as conversoes`.
 
+## Executed growth work - prospecting system
+
+- Added `SALES-PROSPECTION-SYSTEM.md` with lead scoring, outreach rules, statuses, next actions, follow-up copy and proof collection rules.
+- Expanded the outreach pipeline from 30 to 80 prospects in `sales-outreach-prospects-2026-06-30.csv`.
+- Added scoring, contact source, next action, follow-up date, Resend send ID and notes to the prospect CSV.
+- Updated `/admin` prospecting panel with score, filters, qualified count, follow-up count and niche-specific templates.
+- Sent a controlled batch of 20 qualified direct emails through `support@batchcutout.com`.
+- Kept remaining ready leads staged instead of sending the full list at once, to protect sender reputation.
+
 ## First revenue targets
 
 Target 1:

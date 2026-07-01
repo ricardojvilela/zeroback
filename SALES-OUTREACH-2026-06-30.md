@@ -139,6 +139,36 @@ Domain email outreach sent through `support@batchcutout.com`:
 - 2026-07-01: Beastly Threads - `802667f6-b310-4ee3-8691-328eb21ee48b`
 - 2026-07-01: BEEYARND - `5cbde1d8-3672-4b79-b097-b2b63b30ec8f`
 
+Qualified prospecting batch sent through `support@batchcutout.com`:
+
+- 2026-07-01: Healing & Feel Good Candles - `e6328985-e214-413c-ad52-f04cfd36d06e`
+- 2026-07-01: Estel's Creations - `43965534-d200-4bd3-bb2c-450a863f1bef`
+- 2026-07-01: The Perfume & Skincare Company - `6ec45ca8-1f77-4fe5-bfe8-e754d656fc6f`
+- 2026-07-01: Foxxi Foamz - `f4e798e4-715e-45b9-ab03-576bec42bf27`
+- 2026-07-01: Candle Cola - `3c642655-3394-41c1-998b-66e114109b11`
+- 2026-07-01: Yancy Spa Candles and Scents - `2127728a-b1c5-433d-be25-022be98999b2`
+- 2026-07-01: L and J Designs 21 - `b8f48df7-e6e9-43bc-a15f-67fe8af82295`
+- 2026-07-01: The Milky Mudra - `1026ca07-d0f8-49c9-938a-a77a168dd505`
+- 2026-07-01: Isvara Candles - `94762275-9d2d-4809-b564-e1a8afc38e7b`
+- 2026-07-01: 3BlessingsCreations - `3397461b-f6af-4bff-b9b5-bebc2b80708a`
+- 2026-07-01: HicksCreations - `95da8b12-11b4-4824-9156-65770515ae2a`
+- 2026-07-01: Mountain Lily Collective - `c4010f89-44f1-4d04-86ca-223b14450943`
+- 2026-07-01: Black Sheep Creations - `0df9f76a-1517-43d0-8b5a-ac1d6c8071c1`
+- 2026-07-01: Maiyan Benyona - `9e8b8577-087a-4ab5-9d9d-b90e250eab38`
+- 2026-07-01: Body Butter Lady - `af9a6911-886c-4bd6-b26c-95d0638b2c6a`
+- 2026-07-01: MiLeo Scents - `f7c3ca6e-403b-4764-9726-4ae912b3b22d`
+- 2026-07-01: MT Peak Market - `159c3e63-41e7-44bd-ad5c-8f970a52c92d`
+- 2026-07-01: K Fancy Club - `827ed042-cef2-40f5-a665-c893baa10436`
+- 2026-07-01: iMakeUpMe Skincare - `fbbed8dd-aa60-42c4-ad59-4b801be579a9`
+- 2026-07-01: The Peachy Cactus Boutique - `7eac3144-745f-4e77-80b3-2a5ede15ece2`
+
+Pipeline update:
+
+- `sales-outreach-prospects-2026-06-30.csv` now has 80 prospects.
+- New columns: score, contact source, next action, follow-up date, Resend send ID and notes.
+- Follow-up date for the 2026-07-01 direct email batch: 2026-07-07.
+- Follow-up should be sent only once and only if there is no reply or opt-out.
+
 Contact forms not submitted:
 
 - Ronnies Candles LLC: no usable contact form found on the redirected page.

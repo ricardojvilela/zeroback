@@ -295,6 +295,11 @@
         color: var(--danger);
       }
 
+      .pill.muted {
+        background: #eef2f6;
+        color: var(--muted);
+      }
+
       .subscription-link {
         color: var(--blue);
         font-weight: 900;
@@ -382,6 +387,18 @@
         margin-top: 14px;
       }
 
+      .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
+
       .table-wrap {
         overflow-x: auto;
         border: 1px solid var(--line);
@@ -396,7 +413,7 @@
       }
 
       table.outreach-table {
-        min-width: 1040px;
+        min-width: 1320px;
         table-layout: fixed;
       }
 
@@ -412,17 +429,38 @@
 
       .outreach-table th:nth-child(3),
       .outreach-table td:nth-child(3) {
+        width: 74px;
+      }
+
+      .outreach-table th:nth-child(4),
+      .outreach-table td:nth-child(4) {
         width: 210px;
       }
 
-      .outreach-table th:nth-child(5),
-      .outreach-table td:nth-child(5) {
+      .outreach-table th:nth-child(7),
+      .outreach-table td:nth-child(7) {
         width: 130px;
       }
 
-      .outreach-table th:nth-child(6),
-      .outreach-table td:nth-child(6) {
+      .outreach-table th:nth-child(8),
+      .outreach-table td:nth-child(8) {
         width: 150px;
+      }
+
+      .outreach-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .outreach-controls select {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 9px 10px;
+        background: #fff;
+        color: var(--text);
+        font: inherit;
+        font-weight: 800;
       }
 
       th,
@@ -751,9 +789,20 @@
           <div class="panel-head compact">
             <div>
               <h3>Prospecção comercial</h3>
-              <p class="note">Lista curta de prospects ecommerce. Contactos por formulário usam mensagem copiada; emails diretos saem pelo domínio.</p>
+              <p class="note">Pipeline qualificado por score, nicho e próxima ação. Emails diretos saem pelo domínio; formulários usam mensagem copiada.</p>
             </div>
             <div class="actions">
+              <label class="outreach-controls">
+                <span class="sr-only">Filtrar prospects</span>
+                <select id="outreachFilter">
+                  <option value="all">Todos</option>
+                  <option value="ready">Prontos</option>
+                  <option value="forms">Formulários</option>
+                  <option value="follow_up">Follow-up</option>
+                  <option value="sent">Contactados</option>
+                  <option value="blocked">Bloqueados</option>
+                </select>
+              </label>
               <button class="secondary" type="button" id="refreshOutreachProspects">Atualizar prospects</button>
             </div>
           </div>
@@ -763,12 +812,20 @@
               <strong id="outreachTotal">0</strong>
             </article>
             <article class="live-card">
+              <span>Qualificados</span>
+              <strong id="outreachQualified">0</strong>
+            </article>
+            <article class="live-card">
               <span>Prontos</span>
               <strong id="outreachReady">0</strong>
             </article>
             <article class="live-card">
               <span>Já contactados</span>
               <strong id="outreachSent">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Follow-up</span>
+              <strong id="outreachFollowUp">0</strong>
             </article>
           </div>
           <p class="live-status" id="outreachStatus">A carregar prospects...</p>
@@ -778,15 +835,17 @@
                 <tr>
                   <th>#</th>
                   <th>Prospect</th>
+                  <th>Score</th>
                   <th>Canal</th>
                   <th>Ângulo</th>
+                  <th>Próxima ação</th>
                   <th>Estado</th>
                   <th>Ação</th>
                 </tr>
               </thead>
               <tbody id="outreachProspectsBody">
                 <tr>
-                  <td class="empty" colspan="6">A carregar prospects.</td>
+                  <td class="empty" colspan="8">A carregar prospects.</td>
                 </tr>
               </tbody>
             </table>
@@ -920,10 +979,12 @@
       const recoverySummary = document.querySelector("#recoverySummary");
       const outreachProspectsBody = document.querySelector("#outreachProspectsBody");
       const outreachStatus = document.querySelector("#outreachStatus");
+      const outreachFilter = document.querySelector("#outreachFilter");
       const supportRowsBody = document.querySelector("#supportRowsBody");
       const supportStatus = document.querySelector("#supportStatus");
       const subscriptionsRowsBody = document.querySelector("#subscriptionsRowsBody");
       const subscriptionsStatus = document.querySelector("#subscriptionsStatus");
+      let outreachProspects = [];
       const liveStatus = document.querySelector("#liveStatus");
 
       function getAdminToken() {
@@ -1102,29 +1163,82 @@
         return rows.map((row) => Object.fromEntries(headers.map((header, index) => [header, row[index] || ""])));
       }
 
+      function outreachTemplateKey(prospect) {
+        const template = String(prospect.template || "").trim();
+        const segment = `${prospect.segment || ""} ${prospect.angle || ""}`.toLowerCase();
+        if (template === "email_partner" || /photography|partner|agency|studio/.test(segment)) return "email_partner";
+        if (/candle|wax|scent|fragrance|diffuser|home aroma/.test(segment)) return "email_candles";
+        if (/jewelry|jewellery|bracelet|ring|necklace|crystal/.test(segment)) return "email_jewelry";
+        if (/bath|body|skincare|soap|beauty|cosmetic|butter/.test(segment)) return "email_bath_body";
+        if (/pet|dog|cat|animal/.test(segment)) return "email_pet_accessories";
+        if (/tumbler|custom|favor|gift|boutique/.test(segment)) return "email_custom_gifts";
+        if (/home|decor|ceramic|fiber|textile|wood|fabric|craft/.test(segment)) return "email_handmade_home";
+        return template || "email_store_owner";
+      }
+
+      function outreachIntro(prospect) {
+        const name = prospect.name || "your store";
+        const key = outreachTemplateKey(prospect);
+        const intros = {
+          email_candles: `I found ${name} and noticed your candle/home fragrance photos could benefit from a faster way to create clean, consistent catalog images.`,
+          email_jewelry: `I found ${name} and noticed your jewelry photos could benefit from a faster way to create clean, consistent catalog images.`,
+          email_bath_body: `I found ${name} and noticed your bath/body product photos could benefit from a faster way to create clean, consistent catalog images.`,
+          email_pet_accessories: `I found ${name} and noticed your pet product photos could benefit from a faster way to create clean, consistent catalog images.`,
+          email_custom_gifts: `I found ${name} and noticed your custom product photos could benefit from a faster way to create clean, consistent catalog images.`,
+          email_handmade_home: `I found ${name} and noticed your handmade/home decor photos could benefit from a faster way to create clean, consistent catalog images.`,
+          email_partner: "I saw that you work with product photography / ecommerce visuals.",
+        };
+        return intros[key] || `I found ${name} and noticed you have product photos that likely need repeat editing for new listings.`;
+      }
+
+      function outreachCampaign(prospect) {
+        const key = outreachTemplateKey(prospect).replace(/^email_/, "");
+        return key === "store_owner" ? "founder_first_customers" : key;
+      }
+
       function outreachEmailCopy(prospect) {
-        const isPartner = prospect.template === "email_partner" || /photography|partner/i.test(prospect.segment || "");
-        if (isPartner) {
+        const key = outreachTemplateKey(prospect);
+        const campaign = outreachCampaign(prospect);
+        const toolUrl = `https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=${campaign}#tool`;
+        if (key === "email_partner") {
           return {
             subject: "Batch background removal for ecommerce photo workflows",
-            body: `Hi,\n\nI saw that you work with product photography / ecommerce visuals.\n\nWe built BatchCutout as a simple batch background remover for product photo workflows. It is not a full design suite; it is focused on repeat cutouts, transparent PNGs, and ZIP export.\n\nIt may be useful when you need to process many simple product shots before final editing or client delivery.\n\nFounder plan:\nhttps://batchcutout.com/pricing/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach\n\nIf helpful, I can send a short before/after example or test a small batch.\n\nThanks,\nRicardo\nNexaFlow Labs`,
+            body: `Hi,\n\n${outreachIntro(prospect)}\n\nWe built BatchCutout as a simple batch background remover for product photo workflows. It is not a full design suite; it is focused on repeat cutouts, transparent PNGs, and ZIP export.\n\nIt may be useful when you need to process many simple product shots before final editing or client delivery.\n\nFounder plan:\nhttps://batchcutout.com/pricing/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach\n\nIf helpful, I can send a short before/after example or test a small batch.\n\nIf this is not relevant, reply "no thanks" and I will not contact you again.\n\nThanks,\nRicardo\nNexaFlow Labs`,
           };
         }
         return {
           subject: "Quick way to clean product photos in batches",
-          body: `Hi,\n\nI found your store and noticed you have product photos that likely need repeat editing for new listings.\n\nWe built BatchCutout for small ecommerce teams that need to remove backgrounds from product photos in batches, export transparent PNGs, and download everything as one ZIP.\n\nThe current founder plan is 15 EUR/month and includes:\n\n- 100 images per batch\n- 2,000 images per month\n- PNG and ZIP export\n\nYou can try it here:\nhttps://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=founder_first_customers#tool\n\nIf you want, reply with 3 to 5 product photos and I can tell you whether BatchCutout is a good fit before you pay.\n\nThanks,\nRicardo\nNexaFlow Labs`,
+          body: `Hi,\n\n${outreachIntro(prospect)}\n\nWe built BatchCutout for small ecommerce teams that need to remove backgrounds from product photos in batches, export transparent PNGs, and download everything as one ZIP.\n\nThe current founder plan is 15 EUR/month and includes:\n\n- 100 images per batch\n- 2,000 images per month\n- PNG and ZIP export\n\nYou can try it here:\n${toolUrl}\n\nIf you want, reply with 3 to 5 product photos and I can tell you whether BatchCutout is a good fit before you pay.\n\nIf this is not relevant, reply "no thanks" and I will not contact you again.\n\nThanks,\nRicardo\nNexaFlow Labs`,
         };
       }
 
       function outreachContactFormCopy(prospect) {
-        const campaign = prospect.template === "contact_form" ? "founder_first_customers" : "partner_outreach";
-        return `Hi, I found your store and thought BatchCutout might help with repeat product-photo work. It removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP. Founder plan is 15 EUR/month for 100 images per batch and 2,000/month. Try it here: https://batchcutout.com/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${campaign}#tool - Ricardo, NexaFlow Labs`;
+        const campaign = outreachCampaign(prospect);
+        return `Hi, ${outreachIntro(prospect)} BatchCutout removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP. Founder plan is 15 EUR/month for 100 images per batch and 2,000/month. Try it here: https://batchcutout.com/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${campaign}#tool - Ricardo, NexaFlow Labs`;
       }
 
       function outreachStatusLabel(status) {
         if (String(status || "").startsWith("sent_")) return "Contactado";
+        if (status === "ready_form") return "Formulário";
         if (status === "ready") return "Pronto";
+        if (status === "replied") return "Respondeu";
+        if (status === "converted") return "Converteu";
+        if (String(status || "").startsWith("blocked")) return "Bloqueado";
         return status || "-";
+      }
+
+      function outreachActionLabel(prospect) {
+        const action = prospect.next_action || "";
+        const labels = {
+          send_domain_email: "Enviar email",
+          submit_contact_form: "Submeter formulário",
+          follow_up_if_no_reply: "Follow-up se não responder",
+          watch_replies: "Aguardar resposta",
+          ask_for_proof: "Pedir prova real",
+          do_not_contact: "Não contactar",
+        };
+        const date = prospect.follow_up_date ? ` (${prospect.follow_up_date})` : "";
+        return `${labels[action] || action || "-"}${date}`;
       }
 
       async function copyText(text) {
@@ -1269,22 +1383,60 @@
       }
 
       function renderOutreachProspects(prospects) {
+        const filter = outreachFilter?.value || "all";
+        const today = new Date().toISOString().slice(0, 10);
+        const isFollowUpDue = (prospect) => {
+          const sent = String(prospect.status || "").startsWith("sent_");
+          return sent && prospect.follow_up_date && prospect.follow_up_date <= today;
+        };
         const sentCount = prospects.filter((prospect) => String(prospect.status || "").startsWith("sent_")).length;
-        const readyCount = prospects.filter((prospect) => prospect.status === "ready").length;
+        const readyCount = prospects.filter((prospect) => prospect.status === "ready" || prospect.status === "ready_form").length;
+        const qualifiedCount = prospects.filter((prospect) => (Number(prospect.score || 0) || 0) >= 70).length;
+        const followUpCount = prospects.filter(isFollowUpDue).length;
         document.querySelector("#outreachTotal").textContent = prospects.length;
+        document.querySelector("#outreachQualified").textContent = qualifiedCount;
         document.querySelector("#outreachReady").textContent = readyCount;
         document.querySelector("#outreachSent").textContent = sentCount;
-        outreachStatus.textContent = `${readyCount} prospects prontos. ${sentCount} já contactados.`;
+        document.querySelector("#outreachFollowUp").textContent = followUpCount;
 
-        outreachProspectsBody.innerHTML = prospects.length
-          ? prospects.map((prospect) => {
+        const filteredProspects = prospects.filter((prospect) => {
+          const status = String(prospect.status || "");
+          if (filter === "ready") return status === "ready";
+          if (filter === "forms") return status === "ready_form";
+          if (filter === "follow_up") return isFollowUpDue(prospect);
+          if (filter === "sent") return status.startsWith("sent_");
+          if (filter === "blocked") return status.startsWith("blocked");
+          return true;
+        }).slice().sort((a, b) => {
+          const rank = (prospect) => {
+            const status = String(prospect.status || "");
+            if (status === "ready") return 0;
+            if (status === "ready_form") return 1;
+            if (status.startsWith("sent_")) return 2;
+            if (status.startsWith("blocked")) return 4;
+            return 3;
+          };
+          const aRank = rank(a);
+          const bRank = rank(b);
+          if (aRank !== bRank) return aRank - bRank;
+          const aPriority = Number(a.priority || 9999) || 9999;
+          const bPriority = Number(b.priority || 9999) || 9999;
+          if (aPriority !== bPriority) return aPriority - bPriority;
+          return (Number(b.score || 0) || 0) - (Number(a.score || 0) || 0);
+        });
+
+        outreachStatus.textContent = `${readyCount} prospects prontos. ${qualifiedCount} com score >= 70. ${sentCount} já contactados.`;
+
+        outreachProspectsBody.innerHTML = filteredProspects.length
+          ? filteredProspects.map((prospect) => {
               const priority = Number(prospect.priority || 0) || "-";
               const isSent = String(prospect.status || "").startsWith("sent_");
+              const isBlocked = String(prospect.status || "").startsWith("blocked");
               const isEmail = prospect.channel === "email" && /@/.test(prospect.contact || "");
               const isForm = prospect.channel === "contact form";
-              const statusClass = isSent ? "success" : "warning";
-              const action = isSent
-                ? `<span class="muted-small">Já contactado</span>`
+              const statusClass = isSent ? "success" : isBlocked ? "muted" : "warning";
+              const action = isSent || isBlocked
+                ? `<span class="muted-small">${isBlocked ? "Sem ação" : "Já contactado"}</span>`
                 : isEmail
                   ? `<button
                       class="secondary"
@@ -1294,6 +1446,7 @@
                       data-outreach-email="${escapeHtml(prospect.contact || "")}"
                       data-outreach-template="${escapeHtml(prospect.template || "")}"
                       data-outreach-segment="${escapeHtml(prospect.segment || "")}"
+                      data-outreach-angle="${escapeHtml(prospect.angle || "")}"
                     >Enviar via domínio</button>`
                   : `<button
                       class="secondary"
@@ -1301,6 +1454,9 @@
                       data-outreach-action="copy-form"
                       data-outreach-url="${escapeHtml(prospect.url || "")}"
                       data-outreach-template="${escapeHtml(prospect.template || "")}"
+                      data-outreach-segment="${escapeHtml(prospect.segment || "")}"
+                      data-outreach-name="${escapeHtml(prospect.name || "")}"
+                      data-outreach-angle="${escapeHtml(prospect.angle || "")}"
                     >Copiar + abrir</button>`;
               return `
                 <tr>
@@ -1309,17 +1465,19 @@
                     ${escapeHtml(prospect.name || "-")}
                     <span class="muted-small">${escapeHtml(prospect.segment || "-")}</span>
                   </td>
+                  <td>${escapeHtml(prospect.score || "-")}</td>
                   <td>
                     ${escapeHtml(isForm ? "formulário" : prospect.channel || "-")}
                     <span class="muted-small">${escapeHtml(isEmail ? prospect.contact : prospect.url || prospect.contact || "-")}</span>
                   </td>
                   <td>${escapeHtml(prospect.angle || "-")}</td>
+                  <td>${escapeHtml(outreachActionLabel(prospect))}</td>
                   <td><span class="pill ${statusClass}">${escapeHtml(outreachStatusLabel(prospect.status))}</span></td>
                   <td><div class="table-actions">${action}</div></td>
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="6">Ainda não existem prospects carregados.</td></tr>`;
+          : `<tr><td class="empty" colspan="8">Nenhum prospect neste filtro.</td></tr>`;
       }
 
       function replySubject(subject) {
@@ -1516,10 +1674,10 @@
         try {
           const response = await fetch("/sales-outreach-prospects-2026-06-30.csv", { cache: "no-store" });
           if (!response.ok) throw new Error("prospects_failed");
-          const prospects = prospectsFromCsv(await response.text());
-          renderOutreachProspects(prospects);
+          outreachProspects = prospectsFromCsv(await response.text());
+          renderOutreachProspects(outreachProspects);
         } catch {
-          outreachProspectsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar prospects.</td></tr>`;
+          outreachProspectsBody.innerHTML = `<tr><td class="empty" colspan="8">Não foi possível carregar prospects.</td></tr>`;
           outreachStatus.textContent = "Erro ao carregar lista comercial.";
         }
       }
@@ -1710,7 +1868,7 @@
           liveRowsBody.innerHTML = `<tr><td class="empty" colspan="17">Não foi possível carregar atividade.</td></tr>`;
           proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar contas.</td></tr>`;
           recoveryRowsBody.innerHTML = `<tr><td class="empty" colspan="4">Não foi possível carregar oportunidades comerciais.</td></tr>`;
-          outreachProspectsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar prospects.</td></tr>`;
+          outreachProspectsBody.innerHTML = `<tr><td class="empty" colspan="8">Não foi possível carregar prospects.</td></tr>`;
           supportRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar a caixa de suporte.</td></tr>`;
           subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="7">Não foi possível carregar subscrições Stripe.</td></tr>`;
           liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variáveis Vercel.";
@@ -1722,6 +1880,7 @@
       document.querySelector("#refreshProUsers").addEventListener("click", loadProUsers);
       document.querySelector("#refreshSubscriptions").addEventListener("click", loadSubscriptions);
       document.querySelector("#refreshOutreachProspects").addEventListener("click", loadOutreachProspects);
+      outreachFilter?.addEventListener("change", () => renderOutreachProspects(outreachProspects));
       document.querySelector("#refreshSupportMailbox").addEventListener("click", loadSupportMailbox);
       subscriptionsRowsBody.addEventListener("click", async (event) => {
         const button = event.target.closest("[data-subscription-action]");
@@ -1788,7 +1947,12 @@
 
         if (action === "copy-form") {
           const url = button.dataset.outreachUrl || "";
-          const message = outreachContactFormCopy({ template: button.dataset.outreachTemplate || "" });
+          const message = outreachContactFormCopy({
+            name: button.dataset.outreachName || "",
+            template: button.dataset.outreachTemplate || "",
+            segment: button.dataset.outreachSegment || "",
+            angle: button.dataset.outreachAngle || "",
+          });
           if (url) window.open(url, "_blank", "noopener,noreferrer");
           button.disabled = true;
           button.textContent = "A copiar...";
@@ -1807,8 +1971,10 @@
         if (action === "send-email") {
           const email = button.dataset.outreachEmail || "";
           const copy = outreachEmailCopy({
+            name: button.dataset.outreachName || "",
             template: button.dataset.outreachTemplate || "",
             segment: button.dataset.outreachSegment || "",
+            angle: button.dataset.outreachAngle || "",
           });
           if (!email || !confirm(`Enviar email via support@batchcutout.com para ${email}?`)) return;
 
