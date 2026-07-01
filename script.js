@@ -4,8 +4,13 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const fileInput = document.querySelector("#fileInput");
 const dropzone = document.querySelector("#dropzone");
+const dropzoneBadge = document.querySelector(".dropzone-badge");
+const dropzoneHelper = document.querySelector(".dropzone-helper");
 const languageSelect = document.querySelector("#languageSelect");
 const brandCta = document.querySelector("#brandCta");
+const brandLead = document.querySelector(".lead");
+const brandProLink = document.querySelector(".brand-pro-link");
+const freeTestFlow = document.querySelector(".free-test-flow");
 const processButton = document.querySelector("#processButton");
 const pngButton = document.querySelector("#pngButton");
 const zipButton = document.querySelector("#zipButton");
@@ -40,6 +45,7 @@ const accountRefresh = document.querySelector("#accountRefresh");
 const accountLogout = document.querySelector("#accountLogout");
 const billingActions = document.querySelector("#billingActions");
 const billingPortal = document.querySelector("#billingPortal");
+const batchLimitNote = document.querySelector("[data-i18n='batchLimitNote']");
 
 const defaultMaxFilesPerBatch = 2;
 const pageParams = new URLSearchParams(window.location.search);
@@ -926,6 +932,8 @@ const proTranslations = {
     proLimitCta: "Ver planos Pro",
     proNoCommitment: "Pagamento seguro por Stripe Checkout para quem trabalha com volume.",
     brandCta: "Testar grátis com {limit} imagens",
+    brandCtaPro: "Carregar fotos",
+    leadPro: "Conta Pro ativa: remova fundos em lotes até {limit} imagens e exporte PNGs transparentes ou ZIP pronto para loja.",
     freeTestFlowLabel: "Como testar grátis",
     freeTestStepOneTitle: "1. Carregue {limit} fotos",
     freeTestStepOneText: "Sem conta e sem cartão.",
@@ -951,7 +959,10 @@ const proTranslations = {
     demoBefore: "Antes",
     demoAfter: "Depois",
     freeLimitBadge: "{limit} imagens gr\u00e1tis por lote",
+    proLimitBadge: "Pro ativo: até {limit} imagens por lote",
     dropzoneHelper: "Teste com {limit} imagens grátis. O Pro é só para quem precisa de lotes maiores.",
+    dropzoneHelperPro: "Use o seu acesso Pro para processar lotes maiores nesta conta.",
+    batchLimitNotePro: "Conta Pro ativa: até {limit} imagens por lote e {monthlyLimit} imagens por mês.",
     audienceKicker: "Criado para volume",
     audienceTitle: "Para quem trata imagens todos os dias",
     audienceStoresTitle: "Lojas online",
@@ -976,6 +987,8 @@ const proTranslations = {
     proLimitCta: "View Pro plans",
     proNoCommitment: "Secure Stripe Checkout for high-volume workflows.",
     brandCta: "Start free with {limit} images",
+    brandCtaPro: "Upload photos",
+    leadPro: "Pro account active: remove backgrounds in batches up to {limit} images and export transparent PNGs or a store-ready ZIP.",
     freeTestFlowLabel: "How to test free",
     freeTestStepOneTitle: "1. Upload {limit} photos",
     freeTestStepOneText: "No account and no card.",
@@ -1001,7 +1014,10 @@ const proTranslations = {
     demoBefore: "Before",
     demoAfter: "After",
     freeLimitBadge: "{limit} free images per batch",
+    proLimitBadge: "Pro active: up to {limit} images per batch",
     dropzoneHelper: "Test with {limit} free images. Pro is only for larger batches.",
+    dropzoneHelperPro: "Use your Pro access to process larger batches on this account.",
+    batchLimitNotePro: "Pro account active: up to {limit} images per batch and {monthlyLimit} images per month.",
     audienceKicker: "Built for volume",
     audienceTitle: "For teams handling images every day",
     audienceStoresTitle: "Online stores",
@@ -1482,7 +1498,7 @@ function setStatus(key, progress = 0, params = {}) {
   statusText.dataset.statusParams = JSON.stringify(params);
   statusText.textContent = t(key, params);
   progressBar.value = progress;
-  proPromptButton.classList.toggle("hidden", key !== "statusTooManyFiles");
+  proPromptButton.classList.toggle("hidden", canUsePaidAccess() || key !== "statusTooManyFiles");
 }
 
 function refreshStatusText() {
@@ -1531,15 +1547,53 @@ function canUsePaidAccess() {
   return Boolean(currentAccount?.access?.canUsePro);
 }
 
+function getPaidAccessParams() {
+  const access = currentAccount?.access || {};
+  return {
+    limit: Number(access.batchLimit || 0) || defaultProBatchLimit,
+    monthlyLimit: Number(access.monthlyLimit || 0) || defaultProMonthlyLimit,
+    monthlyRemaining: access.monthlyRemaining ?? access.monthlyLimit ?? defaultProMonthlyLimit,
+  };
+}
+
 function syncBatchLimit() {
   const nextLimit = Math.max(defaultMaxFilesPerBatch, getRequestedBatchLimit(), getAccountBatchLimit());
   maxFilesPerBatch = nextLimit;
+}
+
+function syncPaidAccessUi() {
+  const paidAccess = canUsePaidAccess();
+  const paidParams = getPaidAccessParams();
+
+  document.body.classList.toggle("account-pro-active", paidAccess);
+  brandProLink?.classList.toggle("hidden", paidAccess);
+  freeTestFlow?.classList.toggle("hidden", paidAccess);
+  inlineProCta?.classList.toggle("hidden", paidAccess);
+
+  if (paidAccess) {
+    proPromptButton?.classList.add("hidden");
+    zipProCta?.classList.add("hidden");
+    proInterestPanel?.classList.add("hidden");
+    if (brandCta) brandCta.textContent = t("brandCtaPro", paidParams);
+    if (brandLead) brandLead.textContent = t("leadPro", paidParams);
+    if (dropzoneBadge) dropzoneBadge.textContent = t("proLimitBadge", paidParams);
+    if (dropzoneHelper) dropzoneHelper.textContent = t("dropzoneHelperPro", paidParams);
+    if (batchLimitNote) batchLimitNote.textContent = t("batchLimitNotePro", paidParams);
+    return;
+  }
+
+  if (brandCta) brandCta.textContent = t("brandCta");
+  if (brandLead) brandLead.textContent = t("lead");
+  if (dropzoneBadge) dropzoneBadge.textContent = t("freeLimitBadge");
+  if (dropzoneHelper) dropzoneHelper.textContent = t("dropzoneHelper");
+  if (batchLimitNote) batchLimitNote.textContent = t("batchLimitNote");
 }
 
 function updateAccountUi() {
   if (!accountPanel || !accountBadge || !accountStatus) return;
 
   syncBatchLimit();
+  refreshStatusText();
 
   if (!authConfig?.configured) {
     accountBadge.textContent = t("accountBadgeGuest");
@@ -1548,6 +1602,8 @@ function updateAccountUi() {
     accountActions?.classList.add("hidden");
     billingActions?.classList.add("hidden");
     billingPortal?.classList.add("hidden");
+    syncPaidAccessUi();
+    updateControls();
     return;
   }
 
@@ -1558,6 +1614,8 @@ function updateAccountUi() {
     accountActions?.classList.add("hidden");
     billingActions?.classList.add("hidden");
     billingPortal?.classList.add("hidden");
+    syncPaidAccessUi();
+    updateControls();
     return;
   }
 
@@ -1578,6 +1636,8 @@ function updateAccountUi() {
   accountActions?.classList.remove("hidden");
   billingActions?.classList.toggle("hidden", Boolean(access.canUsePro));
   billingPortal?.classList.toggle("hidden", !access.canUsePro || !currentAccount?.billing?.hasStripeCustomer);
+  syncPaidAccessUi();
+  updateControls();
 }
 
 async function fetchAuthConfig() {
@@ -2333,6 +2393,11 @@ function showProInterest(reason = "manual") {
 }
 
 function showProPrompt(reason = "post_download") {
+  if (canUsePaidAccess()) {
+    proInterestPanel?.classList.add("hidden");
+    return;
+  }
+
   if (!proInterestPanel) return;
 
   const wasHidden = proInterestPanel.classList.contains("hidden");

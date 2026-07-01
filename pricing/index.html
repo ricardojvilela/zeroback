@@ -313,8 +313,10 @@
           checkoutTitle: "Entre e escolha o plano",
           checkoutBadgeGuest: "Sem sessão",
           checkoutBadgeReady: "Conta pronta",
+          checkoutBadgePro: "Pro ativo",
           checkoutStatusGuest: "Use o seu email para criar conta ou entrar. Depois abrimos o Stripe Checkout automaticamente.",
           checkoutStatusReady: "Conta validada. Escolha o plano para abrir o pagamento seguro.",
+          checkoutStatusPro: "Esta conta já tem Pro ativo. Volte à ferramenta para processar até {batchLimit} imagens por lote.",
           checkoutStatusChoosePlan: "Plano selecionado. Entre ou crie conta para abrir o pagamento.",
           checkoutEmailPlaceholder: "O seu email",
           checkoutPasswordPlaceholder: "A sua password",
@@ -327,6 +329,7 @@
           checkoutAuthError: "Não foi possível validar a conta agora.",
           checkoutError: "Não foi possível abrir o pagamento agora.",
           checkoutNote: "Se já tiver sessão iniciada, o pagamento abre logo. Se ainda não tiver conta, escolha o plano e crie conta em seguida.",
+          checkoutNotePro: "A subscrição já está ativa nesta conta. Pode gerir o pagamento no painel principal.",
           earlyPlanCta: "Plano fundador - 15 EUR/mês",
           monthlyPlanCta: "Pro mensal - 19 EUR/mês",
           annualPlanCta: "Pro anual - 190 EUR/ano",
@@ -406,8 +409,10 @@
           checkoutTitle: "Sign in and choose a plan",
           checkoutBadgeGuest: "No session",
           checkoutBadgeReady: "Account ready",
+          checkoutBadgePro: "Pro active",
           checkoutStatusGuest: "Use your email to create an account or sign in. Then we open Stripe Checkout automatically.",
           checkoutStatusReady: "Account verified. Choose a plan to open secure payment.",
+          checkoutStatusPro: "This account already has Pro active. Return to the tool to process up to {batchLimit} images per batch.",
           checkoutStatusChoosePlan: "Plan selected. Sign in or create an account to open payment.",
           checkoutEmailPlaceholder: "Your email",
           checkoutPasswordPlaceholder: "Your password",
@@ -420,6 +425,7 @@
           checkoutAuthError: "We could not verify the account right now.",
           checkoutError: "We could not open payment right now.",
           checkoutNote: "If you are already signed in, payment opens immediately. If not, choose the plan and create your account next.",
+          checkoutNotePro: "The subscription is already active on this account. You can manage payment from the main tool page.",
           earlyPlanCta: "Founder plan - EUR 15/month",
           monthlyPlanCta: "Pro monthly - EUR 19/month",
           annualPlanCta: "Pro annual - EUR 190/year",
@@ -756,6 +762,9 @@
       const pricingAccountStatus = document.querySelector("#pricingAccountStatus");
       const pricingAccountBadge = document.querySelector("#pricingAccountBadge");
       const pricingCheckoutActions = document.querySelector("#pricingCheckoutActions");
+      const pricingHeroActions = document.querySelector(".pricing-copy .landing-actions");
+      const pricingFreeTestNote = document.querySelector(".pricing-free-test-note");
+      const pricingCheckoutNote = document.querySelector(".pricing-checkout-note");
       const pricingVisitorStorageKey = "batchcutout_visitor_id";
       const pricingSessionStorageKey = "batchcutout_session_id";
       let pricingSupabase = null;
@@ -769,13 +778,17 @@
         return pricingTranslations[languageSelect?.value || "pt"] || pricingTranslations.en;
       }
 
-      function pricingText(key) {
-        return pricingDictionary()[key] || key;
+      function pricingText(key, params = {}) {
+        const value = pricingDictionary()[key] || key;
+        return Object.entries(params).reduce(
+          (text, [name, replacement]) => text.replace(`{${name}}`, replacement),
+          value,
+        );
       }
 
-      function setPricingStatus(keyOrText, isRaw = false) {
+      function setPricingStatus(keyOrText, isRaw = false, params = {}) {
         if (!pricingAccountStatus) return;
-        pricingAccountStatus.textContent = isRaw ? keyOrText : pricingText(keyOrText);
+        pricingAccountStatus.textContent = isRaw ? keyOrText : pricingText(keyOrText, params);
       }
 
       function getPricingStableId(storage, key) {
@@ -879,8 +892,28 @@
 
       function updatePricingAccountUi() {
         const ready = Boolean(pricingAccount?.email);
-        pricingAccountBadge.textContent = ready ? pricingText("checkoutBadgeReady") : pricingText("checkoutBadgeGuest");
+        const hasPro = Boolean(pricingAccount?.access?.canUsePro);
+        const batchLimit = pricingAccount?.access?.batchLimit || 100;
+        pricingAccountBadge.textContent = hasPro
+          ? pricingText("checkoutBadgePro")
+          : ready
+            ? pricingText("checkoutBadgeReady")
+            : pricingText("checkoutBadgeGuest");
         pricingAccountBadge.classList.toggle("is-ready", ready);
+        document.body.classList.toggle("pricing-pro-active", hasPro);
+        pricingAuthForm?.classList.toggle("hidden", hasPro);
+        pricingCheckoutActions?.classList.toggle("hidden", hasPro);
+        pricingHeroActions?.classList.toggle("hidden", hasPro);
+        pricingFreeTestNote?.classList.toggle("hidden", hasPro);
+        if (pricingCheckoutNote) {
+          pricingCheckoutNote.textContent = pricingText(hasPro ? "checkoutNotePro" : "checkoutNote");
+        }
+
+        if (hasPro) {
+          setPricingStatus("checkoutStatusPro", false, { batchLimit });
+          return;
+        }
+
         if (ready) {
           setPricingStatus("checkoutStatusReady");
         }
@@ -916,6 +949,11 @@
       async function startPricingCheckout(plan = selectedPricingPlan) {
         const selectedPlan = pricingCheckoutPlans.has(plan) ? plan : "monthly";
         selectedPricingPlan = selectedPlan;
+        if (pricingAccount?.access?.canUsePro) {
+          updatePricingAccountUi();
+          return;
+        }
+
         const accessToken = await currentPricingAccessToken();
         if (!accessToken) {
           trackPricingCheckoutEvent("pro_checkout_login_required", { plan: selectedPlan, source: "pricing_page" });
@@ -1082,8 +1120,12 @@
 
         if (pricingCheckoutPlans.has(pricingPageParams.get("checkout_plan"))) {
           if (pricingAccount) {
-            hasStartedPricingCheckout = true;
-            await startPricingCheckout(selectedPricingPlan);
+            if (pricingAccount.access?.canUsePro) {
+              updatePricingAccountUi();
+            } else {
+              hasStartedPricingCheckout = true;
+              await startPricingCheckout(selectedPricingPlan);
+            }
           } else {
             setPricingStatus("checkoutStatusChoosePlan");
           }
@@ -1092,6 +1134,7 @@
 
       pricingAuthForm?.addEventListener("submit", handlePricingLogin);
       pricingCreateButton?.addEventListener("click", handlePricingCreateAccount);
+      languageSelect?.addEventListener("change", updatePricingAccountUi);
       pricingCheckoutActions?.addEventListener("click", (event) => {
         const button = event.target.closest("[data-pricing-checkout-plan]");
         if (!button) return;
