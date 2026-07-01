@@ -60,7 +60,7 @@ The current founder plan is 15 EUR/month and includes:
 You can try it here:
 https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=founder_first_customers#tool
 
-If you want, reply with 3 to 5 product photos and I can tell you whether BatchCutout is a good fit before you pay.
+You can test 2 images free in the browser, no account or card needed. If you need larger batches after testing, Pro unlocks up to 100 images per batch and 2,000 images per month.
 
 Thanks,
 Ricardo
@@ -83,7 +83,8 @@ It may be useful when you need to process many simple product shots before final
 Founder plan:
 https://batchcutout.com/pricing/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach
 
-If helpful, I can send a short before/after example or test a small batch.
+You can test 2 images free here, no card needed:
+https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach#tool
 
 Thanks,
 Ricardo
@@ -91,7 +92,7 @@ NexaFlow Labs
 
 ## Contact form template
 
-Hi, I found your store and thought BatchCutout might help with repeat product-photo work. It removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP. Founder plan is 15 EUR/month for 100 images per batch and 2,000/month. Try it here: https://batchcutout.com/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=founder_first_customers#tool - Ricardo, NexaFlow Labs
+Hi, I found your store and thought BatchCutout might help with repeat product-photo work. It removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP. You can test 2 images free, no account or card needed: https://batchcutout.com/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=founder_first_customers#tool Founder plan is 15 EUR/month for 100 images per batch and 2,000/month. - Ricardo, NexaFlow Labs
 
 ## Today target list
 
@@ -182,6 +183,7 @@ Pipeline update:
 - New columns: score, contact source, next action, follow-up date, Resend send ID and notes.
 - Follow-up date for the 2026-07-01 direct email batch: 2026-07-07.
 - Follow-up should be sent only once and only if there is no reply or opt-out.
+- Do not send a correction email about the old optional image-reply line. Use the normal follow-up and point prospects to the free 2-image self-service test.
 
 Contact form attempt on 2026-07-01:
 
@@ -226,6 +228,8 @@ Quick follow-up. BatchCutout is useful if you regularly prepare product photos f
 
 You can test it free with 2 images:
 https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=founder_first_customers_followup#tool
+
+No account or card is needed for the free test. If you need larger batches after testing, Pro unlocks up to 100 images per batch and 2,000 images per month.
 
 Thanks,
 Ricardo

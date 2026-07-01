@@ -1203,18 +1203,18 @@
         if (key === "email_partner") {
           return {
             subject: "Batch background removal for ecommerce photo workflows",
-            body: `Hi,\n\n${outreachIntro(prospect)}\n\nWe built BatchCutout as a simple batch background remover for product photo workflows. It is not a full design suite; it is focused on repeat cutouts, transparent PNGs, and ZIP export.\n\nIt may be useful when you need to process many simple product shots before final editing or client delivery.\n\nFounder plan:\nhttps://batchcutout.com/pricing/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach\n\nIf helpful, I can send a short before/after example or test a small batch.\n\nIf this is not relevant, reply "no thanks" and I will not contact you again.\n\nThanks,\nRicardo\nNexaFlow Labs`,
+            body: `Hi,\n\n${outreachIntro(prospect)}\n\nWe built BatchCutout as a simple batch background remover for product photo workflows. It is not a full design suite; it is focused on repeat cutouts, transparent PNGs, and ZIP export.\n\nIt may be useful when you need to process many simple product shots before final editing or client delivery.\n\nYou can test 2 images free here, no card needed:\nhttps://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach#tool\n\nFounder plan:\nhttps://batchcutout.com/pricing/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach\n\nIf this is not relevant, reply "no thanks" and I will not contact you again.\n\nThanks,\nRicardo\nNexaFlow Labs`,
           };
         }
         return {
           subject: "Quick way to clean product photos in batches",
-          body: `Hi,\n\n${outreachIntro(prospect)}\n\nWe built BatchCutout for small ecommerce teams that need to remove backgrounds from product photos in batches, export transparent PNGs, and download everything as one ZIP.\n\nThe current founder plan is 15 EUR/month and includes:\n\n- 100 images per batch\n- 2,000 images per month\n- PNG and ZIP export\n\nYou can try it here:\n${toolUrl}\n\nIf you want, reply with 3 to 5 product photos and I can tell you whether BatchCutout is a good fit before you pay.\n\nIf this is not relevant, reply "no thanks" and I will not contact you again.\n\nThanks,\nRicardo\nNexaFlow Labs`,
+          body: `Hi,\n\n${outreachIntro(prospect)}\n\nWe built BatchCutout for small ecommerce teams that need to remove backgrounds from product photos in batches, export transparent PNGs, and download everything as one ZIP.\n\nThe current founder plan is 15 EUR/month and includes:\n\n- 100 images per batch\n- 2,000 images per month\n- PNG and ZIP export\n\nYou can test 2 images free here, no account or card needed:\n${toolUrl}\n\nIf you need larger batches after testing, Pro unlocks up to 100 images per batch and 2,000 images per month.\n\nIf this is not relevant, reply "no thanks" and I will not contact you again.\n\nThanks,\nRicardo\nNexaFlow Labs`,
         };
       }
 
       function outreachContactFormCopy(prospect) {
         const campaign = outreachCampaign(prospect);
-        return `Hi, ${outreachIntro(prospect)} BatchCutout removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP. Founder plan is 15 EUR/month for 100 images per batch and 2,000/month. Try it here: https://batchcutout.com/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${campaign}#tool - Ricardo, NexaFlow Labs`;
+        return `Hi, ${outreachIntro(prospect)} BatchCutout removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP. You can test 2 images free, no account or card needed: https://batchcutout.com/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${campaign}#tool Founder plan is 15 EUR/month for 100 images per batch and 2,000/month. - Ricardo, NexaFlow Labs`;
       }
 
       function outreachStatusLabel(status) {

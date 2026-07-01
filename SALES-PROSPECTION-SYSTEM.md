@@ -76,7 +76,7 @@ The current founder plan is 15 EUR/month and includes:
 You can try it here:
 https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=[niche]#tool
 
-If you want, reply with 3 to 5 product photos and I can tell you whether BatchCutout is a good fit before you pay.
+You can test 2 images free in the browser, no account or card needed. If you need larger batches after testing, Pro unlocks up to 100 images per batch and 2,000 images per month.
 
 If this is not relevant, reply "no thanks" and I will not contact you again.
 
@@ -90,6 +90,12 @@ Subject:
 Batch background removal for ecommerce photo workflows
 
 Use this for product photographers, ecommerce assistants and small agencies. The message should position BatchCutout as a utility for repeat cutouts before final editing or client delivery, not as a replacement for their service.
+
+The partner email must also point to the self-service test:
+
+https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach#tool
+
+Do not ask the prospect to send product images for evaluation. If they reply with images anyway, answer normally and also point them to the free test.
 
 ## Follow-up
 
@@ -107,6 +113,8 @@ Quick follow-up. BatchCutout is useful if you regularly prepare product photos f
 You can test it free with 2 images:
 https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=founder_first_customers_followup#tool
 
+No account or card is needed for the free test. If you need larger batches after testing, Pro unlocks up to 100 images per batch and 2,000 images per month.
+
 If this is not relevant, reply "no thanks" and I will not contact you again.
 
 Thanks,
@@ -114,7 +122,7 @@ Ricardo
 
 ## Proof collection
 
-When a user replies positively, pays, or sends example photos:
+When a user replies positively, pays, or shares approved example photos:
 
 - Ask for permission before using images.
 - Collect one before image, one after image, store type, country and one short quote.
