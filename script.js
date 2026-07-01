@@ -11,6 +11,7 @@ const brandCta = document.querySelector("#brandCta");
 const brandLead = document.querySelector(".lead");
 const brandProLink = document.querySelector(".brand-pro-link");
 const freeTestFlow = document.querySelector(".free-test-flow");
+const proSubscriberPromoBlocks = document.querySelectorAll("[data-pro-subscriber-promo]");
 const processButton = document.querySelector("#processButton");
 const pngButton = document.querySelector("#pngButton");
 const zipButton = document.querySelector("#zipButton");
@@ -1569,6 +1570,9 @@ function syncPaidAccessUi() {
   brandProLink?.classList.toggle("hidden", paidAccess);
   freeTestFlow?.classList.toggle("hidden", paidAccess);
   inlineProCta?.classList.toggle("hidden", paidAccess);
+  for (const block of proSubscriberPromoBlocks) {
+    block.classList.toggle("hidden", paidAccess);
+  }
 
   if (paidAccess) {
     proPromptButton?.classList.add("hidden");
