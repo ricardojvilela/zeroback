@@ -114,6 +114,26 @@ Sent on 2026-06-30 before the domain sender was configured:
 
 Do not use personal email again for BatchCutout outreach.
 
+Contact forms submitted:
+
+- 2026-06-30: Toriara Naturals
+- 2026-06-30: NVsisters HandMade
+- 2026-06-30: Amelia Jane Handmade Creations
+- 2026-06-30: Color Freak Boutique
+- 2026-07-01: Sixty Vines Candles
+- 2026-07-01: Kramer + Co Boutique
+- 2026-07-01: Sassy C's Boutique
+- 2026-07-01: Rych Wicks Candles
+- 2026-07-01: CHIYAN Jewelry
+
+Contact forms not submitted:
+
+- Ronnies Candles LLC: no usable contact form found on the redirected page.
+- Mazi Scented Candles: page only exposed a newsletter signup form.
+- Handmade with Love - Eleni Pantagis: store unavailable.
+- Park Cities Jewelry & Gifts: store unavailable.
+- Lark & Lily Handmade: storefront password page.
+
 Future outreach sender:
 
 - From: `BatchCutout <support@batchcutout.com>`

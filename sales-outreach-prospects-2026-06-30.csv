@@ -5,17 +5,17 @@ priority,name,segment,channel,contact,url,angle,status,template
 4,Handmade by JenAd,handmade products,email,products@handmadebyjenad.com,https://handmadebyjenad.myshopify.com/pages/contact,product-info mailbox for handmade catalog,sent_2026-06-30,email_store_owner
 5,Jamies Crafting Creations,custom handmade,email,jamiehuppmann@gmail.com,https://jamies-crafting-creations.myshopify.com/pages/contact,custom handmade crafts with product listings,sent_2026-06-30,email_store_owner
 6,Featherlite Product Photography,product photography,email,hello@featherliteproductphoto.com,https://www.featherliteproductphotography.com/pages/contact-us,possible workflow partner for batch background removal,sent_2026-06-30,email_partner
-7,Toriara Naturals,natural cosmetics,contact form,form,https://toriara-naturals.myshopify.com/pages/contact-us,natural face and body products need clean catalog photos,ready,contact_form
-8,Sixty Vines Candles,candles,contact form,form,https://sixtyvines-ergo.myshopify.com/pages/contact,candle product catalog with repeat product shots,ready,contact_form
-9,Kramer + Co Boutique,boutique,contact form,form,https://kramerandco.myshopify.com/pages/contact,boutique products and handmade items,ready,contact_form
-10,Sassy C's Boutique,fashion boutique,contact form,form,https://xczi1b-we.myshopify.com/pages/contact,boutique apparel catalog and seasonal products,ready,contact_form
-11,NVsisters HandMade,handmade,contact form,form,https://nvsisters-handmade.myshopify.com/pages/contact,handmade products with ecommerce catalog needs,ready,contact_form
-12,Ronnies Candles LLC,candles,contact form,form,https://ronnies-candles.myshopify.com/pages/contact-us,multiple candle collections with repeat photos,ready,contact_form
-13,Rych Wicks Candles,candles,contact form,form,https://rychwickscandlesllc.myshopify.com/pages/contact,candle product catalog with repeat listing photos,ready,contact_form
-14,Mazi Scented Candles,candles,contact form,form,https://mazi-scented-candles.myshopify.com/pages/contact-us,scented candle catalog and product images,ready,contact_form
-15,CHIYAN Jewelry,jewelry,contact form,form,https://chiyan-jewelry.myshopify.com/pages/contact-us,jewelry product photos and collection updates,ready,contact_form
-16,Handmade with Love - Eleni Pantagis,jewelry,contact form,form,https://handmade-with-love-from-greece.myshopify.com/pages/contact-us,handmade jewelry catalog and VIP deals,ready,contact_form
-17,Park Cities Jewelry & Gifts,jewelry,contact form,form,https://parkcitiesjewelry.myshopify.com/pages/contact,jewelry and gifts catalog,ready,contact_form
-18,Lark & Lily Handmade,handmade,contact form,form,https://lark-lily-handmade.myshopify.com/pages/contact,handmade products with social channels,ready,contact_form
-19,Amelia Jane Handmade Creations,handmade,contact form,form,https://amelia-jane-handmade-creations.myshopify.com/pages/contact,handmade catalog and simple product pages,ready,contact_form
-20,Color Freak Boutique,fashion boutique,contact form,form,https://colorfreakboutique.myshopify.com/pages/contact,apparel/product catalog with repeat image work,ready,contact_form
+7,Toriara Naturals,natural cosmetics,contact form,form,https://toriara-naturals.myshopify.com/pages/contact-us,natural face and body products need clean catalog photos,sent_2026-06-30,contact_form
+8,Sixty Vines Candles,candles,contact form,form,https://sixtyvines-ergo.myshopify.com/pages/contact,candle product catalog with repeat product shots,sent_2026-07-01,contact_form
+9,Kramer + Co Boutique,boutique,contact form,form,https://kramerandco.myshopify.com/pages/contact,boutique products and handmade items,sent_2026-07-01,contact_form
+10,Sassy C's Boutique,fashion boutique,contact form,form,https://xczi1b-we.myshopify.com/pages/contact,boutique apparel catalog and seasonal products,sent_2026-07-01,contact_form
+11,NVsisters HandMade,handmade,contact form,form,https://nvsisters-handmade.myshopify.com/pages/contact,handmade products with ecommerce catalog needs,sent_2026-06-30,contact_form
+12,Ronnies Candles LLC,candles,contact form,form,https://ronnies-candles.myshopify.com/pages/contact-us,multiple candle collections with repeat photos,blocked_no_contact_form,contact_form
+13,Rych Wicks Candles,candles,contact form,form,https://rychwickscandlesllc.myshopify.com/pages/contact,candle product catalog with repeat listing photos,sent_2026-07-01,contact_form
+14,Mazi Scented Candles,candles,contact form,form,https://mazi-scented-candles.myshopify.com/pages/contact-us,scented candle catalog and product images,blocked_newsletter_only,contact_form
+15,CHIYAN Jewelry,jewelry,contact form,form,https://chiyan-jewelry.myshopify.com/pages/contact-us,jewelry product photos and collection updates,sent_2026-07-01,contact_form
+16,Handmade with Love - Eleni Pantagis,jewelry,contact form,form,https://handmade-with-love-from-greece.myshopify.com/pages/contact-us,handmade jewelry catalog and VIP deals,blocked_store_unavailable,contact_form
+17,Park Cities Jewelry & Gifts,jewelry,contact form,form,https://parkcitiesjewelry.myshopify.com/pages/contact,jewelry and gifts catalog,blocked_store_unavailable,contact_form
+18,Lark & Lily Handmade,handmade,contact form,form,https://lark-lily-handmade.myshopify.com/pages/contact,handmade products with social channels,blocked_password,contact_form
+19,Amelia Jane Handmade Creations,handmade,contact form,form,https://amelia-jane-handmade-creations.myshopify.com/pages/contact,handmade catalog and simple product pages,sent_2026-06-30,contact_form
+20,Color Freak Boutique,fashion boutique,contact form,form,https://colorfreakboutique.myshopify.com/pages/contact,apparel/product catalog with repeat image work,sent_2026-06-30,contact_form
