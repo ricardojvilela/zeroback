@@ -185,6 +185,14 @@ Pipeline update:
 - Follow-up should be sent only once and only if there is no reply or opt-out.
 - Do not send a correction email about the old optional image-reply line. Use the normal follow-up and point prospects to the free 2-image self-service test.
 
+Daily queue update on 2026-07-01:
+
+- The pipeline now has 93 prospects.
+- 13 new direct-email prospects were added as `ready`.
+- These contacts were verified from public business pages and staged for the next controlled outreach window.
+- No new emails were sent automatically in this update.
+- Use `SALES-PROSPECTION-DAILY-QUEUE.md` for the daily cap and priority order.
+
 Contact form attempt on 2026-07-01:
 
 - 16 `ready_form` leads were checked for automated submission.

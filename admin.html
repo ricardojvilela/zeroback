@@ -807,6 +807,7 @@
                   <option value="ready">Prontos</option>
                   <option value="forms">Formulários</option>
                   <option value="follow_up">Follow-up</option>
+                  <option value="today">Enviados hoje</option>
                   <option value="sent">Contactados</option>
                   <option value="blocked">Bloqueados</option>
                 </select>
@@ -830,6 +831,10 @@
             <article class="live-card">
               <span>Já contactados</span>
               <strong id="outreachSent">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Hoje</span>
+              <strong id="outreachToday">0</strong>
             </article>
             <article class="live-card">
               <span>Follow-up</span>
@@ -1445,6 +1450,7 @@
           return sent && prospect.follow_up_date && prospect.follow_up_date <= today;
         };
         const sentCount = prospects.filter((prospect) => String(prospect.status || "").startsWith("sent_")).length;
+        const sentTodayCount = prospects.filter((prospect) => String(prospect.status || "") === `sent_${today}`).length;
         const readyCount = prospects.filter((prospect) => prospect.status === "ready" || prospect.status === "ready_form").length;
         const qualifiedCount = prospects.filter((prospect) => (Number(prospect.score || 0) || 0) >= 70).length;
         const followUpCount = prospects.filter(isFollowUpDue).length;
@@ -1452,6 +1458,7 @@
         document.querySelector("#outreachQualified").textContent = qualifiedCount;
         document.querySelector("#outreachReady").textContent = readyCount;
         document.querySelector("#outreachSent").textContent = sentCount;
+        document.querySelector("#outreachToday").textContent = sentTodayCount;
         document.querySelector("#outreachFollowUp").textContent = followUpCount;
 
         const filteredProspects = prospects.filter((prospect) => {
@@ -1459,6 +1466,7 @@
           if (filter === "ready") return status === "ready";
           if (filter === "forms") return status === "ready_form";
           if (filter === "follow_up") return isFollowUpDue(prospect);
+          if (filter === "today") return status === `sent_${today}`;
           if (filter === "sent") return status.startsWith("sent_");
           if (filter === "blocked") return status.startsWith("blocked");
           return true;
@@ -1480,7 +1488,7 @@
           return (Number(b.score || 0) || 0) - (Number(a.score || 0) || 0);
         });
 
-        outreachStatus.textContent = `${readyCount} prospects prontos. ${qualifiedCount} com score >= 70. ${sentCount} já contactados.`;
+        outreachStatus.textContent = `${readyCount} prospects prontos. ${sentTodayCount} enviados hoje. ${qualifiedCount} com score >= 70. ${sentCount} já contactados.`;
 
         outreachProspectsBody.innerHTML = filteredProspects.length
           ? filteredProspects.map((prospect) => {
