@@ -186,6 +186,20 @@ Decision rules:
 - Added a pricing-page prompt for users who reached plans before testing the product.
 - Kept remaining ready leads staged instead of sending the full list at once, to protect sender reputation.
 
+## Executed growth work - lead capture, proof and partners
+
+- Added optional post-download email capture for free/anonymous users without blocking the free test.
+- Added lead capture events to Supabase tracking, source breakdown and `/admin` recovery queue.
+- Strengthened Google Ads enhanced conversion readiness by setting user email in Google tag only after measurement consent.
+- Added `SoftwareApplication` structured data improvements for free and paid offers.
+- Added public pages:
+  - `/customer-results/`
+  - `/partners/`
+- Added partner and launch operating docs:
+  - `PARTNER-PROGRAM.md`
+  - `LAUNCH-DIRECTORIES-PLAN.md`
+- Added directory source classification for Product Hunt, Uneed, BetaList, Indie Hackers and SaaSHub.
+
 ## First revenue targets
 
 Target 1:

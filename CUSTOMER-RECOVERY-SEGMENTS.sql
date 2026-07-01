@@ -48,3 +48,18 @@ from public.batchcutout_users
 where plan = 'pro'
   and plan_status in ('active', 'manual')
 order by monthly_images_used desc, updated_at desc;
+
+-- 4) Free-test lead captured after download.
+-- Use only for emails voluntarily submitted in the post-download form.
+select
+  detail->>'email' as email,
+  detail->>'language' as language,
+  detail->>'downloadType' as download_type,
+  detail->>'count' as image_count,
+  source,
+  campaign,
+  occurred_at
+from public.batchcutout_events
+where event_name = 'lead_capture_submitted'
+  and occurred_at <= now() - interval '2 hours'
+order by occurred_at desc;

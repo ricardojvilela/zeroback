@@ -431,6 +431,56 @@ async function resolveSupportEmail(settings, body) {
   };
 }
 
+async function listLeadCaptures(settings) {
+  const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
+  const query = new URLSearchParams({
+    select: "id,event_name,event_label,detail,source,campaign,occurred_at",
+    event_name: "eq.lead_capture_submitted",
+    order: "occurred_at.desc",
+    limit: "250",
+  });
+
+  const response = await fetch(`${settings.supabaseUrl}/rest/v1/${tableName}?${query}`, {
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+    },
+  });
+
+  if (!response.ok) {
+    const detailText = await response.text();
+    throw new Error(`lead_capture_read_failed:${response.status}:${detailText.slice(0, 300)}`);
+  }
+
+  const seen = new Set();
+  const leads = [];
+  const events = await response.json();
+  for (const event of events) {
+    const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+    const email = normalizeEmail(detail.email);
+    if (!email || seen.has(email)) continue;
+    seen.add(email);
+    leads.push({
+      email,
+      language: cleanText(detail.language, 20) || "en",
+      source: cleanText(detail.source || event.source || detail.utm_source || detail.last_source || detail.first_source, 160),
+      campaign: cleanText(event.campaign || detail.utm_campaign || detail.last_campaign || detail.first_campaign, 160),
+      downloadType: cleanText(detail.downloadType, 80),
+      count: Number(detail.count || 0) || 0,
+      capturedAt: event.occurred_at || "",
+      pageLocation: cleanText(detail.page_location, 1000),
+    });
+  }
+
+  return {
+    leads,
+    summary: {
+      total: leads.length,
+    },
+    generatedAt: new Date().toISOString(),
+  };
+}
+
 async function sendSupportReply(settings, body) {
   const mailSettings = supportSettings();
   if (!allowedOutreachDomains.has(mailSettings.fromDomain)) {
@@ -590,6 +640,10 @@ export default async function handler(request, response) {
       if (url.searchParams.get("view") === "support-mailbox") {
         const mailboxData = await listSupportMailbox(settings);
         return sendJson(response, 200, { ok: true, ...mailboxData });
+      }
+      if (url.searchParams.get("view") === "lead-captures") {
+        const leadData = await listLeadCaptures(settings);
+        return sendJson(response, 200, { ok: true, ...leadData });
       }
 
       const users = await listUsers(settings);

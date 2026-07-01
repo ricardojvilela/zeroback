@@ -63,6 +63,7 @@
             "@id": "https://batchcutout.com/#app",
             "name": "BatchCutout",
             "applicationCategory": "MultimediaApplication",
+            "applicationSubCategory": "Background remover for ecommerce product photos",
             "publisher": {
               "@id": "https://batchcutout.com/#organization"
             },
@@ -72,13 +73,39 @@
             },
             "operatingSystem": "Web",
             "url": "https://batchcutout.com/",
+            "isAccessibleForFree": true,
             "image": "https://batchcutout.com/assets/product-before-after-v5.png",
             "description": "Removedor de fundo em lote para fotos de produto. Carregue várias imagens, remova fundos e exporte PNGs transparentes individualmente ou num ZIP.",
-            "offers": {
-              "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "EUR"
-            },
+            "offers": [
+              {
+                "@type": "Offer",
+                "name": "Teste gratuito",
+                "price": "0",
+                "priceCurrency": "EUR",
+                "url": "https://batchcutout.com/#tool"
+              },
+              {
+                "@type": "Offer",
+                "name": "Plano fundador",
+                "price": "15",
+                "priceCurrency": "EUR",
+                "url": "https://batchcutout.com/pricing/"
+              },
+              {
+                "@type": "Offer",
+                "name": "Pro mensal",
+                "price": "19",
+                "priceCurrency": "EUR",
+                "url": "https://batchcutout.com/pricing/"
+              },
+              {
+                "@type": "Offer",
+                "name": "Pro anual",
+                "price": "190",
+                "priceCurrency": "EUR",
+                "url": "https://batchcutout.com/pricing/"
+              }
+            ],
             "audience": {
               "@type": "Audience",
               "audienceType": "Vendedores ecommerce, lojas online, vendedores de marketplaces e equipas de catálogo"
@@ -124,7 +151,7 @@
         ]
       }
     </script>
-    <link rel="stylesheet" href="./styles.css?v=20260629-account-contrast" />
+    <link rel="stylesheet" href="./styles.css?v=20260701-growth-leads" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
   <body>
@@ -319,6 +346,32 @@
           </p>
         </section>
 
+        <section class="lead-capture hidden" id="leadCapturePanel" aria-labelledby="lead-capture-title">
+          <div>
+            <p class="section-kicker" data-i18n="leadCaptureKicker">Guardar contacto</p>
+            <h2 id="lead-capture-title" data-i18n="leadCaptureTitle">Quer receber o link para voltar à ferramenta?</h2>
+            <p data-i18n="leadCaptureText">
+              Deixe o email e enviamos apenas atualizações úteis sobre BatchCutout e fluxos de fotos de produto.
+            </p>
+          </div>
+          <form class="lead-capture-form" id="leadCaptureForm" novalidate>
+            <input
+              id="leadCaptureEmail"
+              type="email"
+              autocomplete="email"
+              required
+              placeholder="O seu email"
+              data-i18n-placeholder="leadCapturePlaceholder"
+            />
+            <button type="submit" data-i18n="leadCaptureSubmit">Receber link</button>
+            <button class="ghost-button" id="leadCaptureDismiss" type="button" data-i18n="leadCaptureDismiss">Agora não</button>
+          </form>
+          <p class="lead-capture-note" data-i18n="leadCaptureNote">
+            Pode pedir remoção respondendo ao email. Não enviamos as suas imagens.
+          </p>
+          <p class="lead-capture-message" id="leadCaptureMessage" aria-live="polite"></p>
+        </section>
+
         <section class="pro-interest hidden" id="proInterestPanel" aria-labelledby="pro-interest-title">
           <div>
             <p class="section-kicker" data-i18n="proInlineKicker">BatchCutout Pro</p>
@@ -409,12 +462,20 @@
               <strong>Editor de fotos em lote</strong>
               <span>Remova fundos e exporte PNGs transparentes em lote.</span>
             </a>
+            <a href="/customer-results/">
+              <strong>Exemplos de resultados</strong>
+              <span>Veja como o fluxo prepara fotos de produto para PNG e ZIP.</span>
+            </a>
+            <a href="/partners/">
+              <strong>Parceiros ecommerce</strong>
+              <span>Fluxo para fotógrafos, assistentes e agências que tratam fotos de produto.</span>
+            </a>
           </div>
         </section>
       </section>
     </main>
 
-    <script type="module" src="./script.js?v=20260701-paid-workspace-copy"></script>
+    <script type="module" src="./script.js?v=20260701-growth-leads"></script>
   </body>
 </html>
 

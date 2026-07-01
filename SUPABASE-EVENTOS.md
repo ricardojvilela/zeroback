@@ -80,6 +80,18 @@ Pagina Pro:
 - `account_signup_succeeded`
 - `account_login_succeeded`
 
+Leads:
+
+- `lead_capture_shown`
+- Mostrado quando um utilizador gratuito/anónimo descarrega resultados e vê o formulário opcional de contacto.
+- `lead_capture_submitted`
+- Criado quando o utilizador submete voluntariamente o email no formulário pós-download.
+- `detail.email` guarda o email, `detail.consent` deve estar `true`, e `detail.downloadType` indica PNG ou ZIP.
+- `lead_capture_dismissed`
+- Criado quando o utilizador fecha/dispensa o formulário.
+- `lead_capture_invalid`
+- Criado quando há tentativa com email inválido.
+
 Receita:
 
 - `pro_subscription_paid`

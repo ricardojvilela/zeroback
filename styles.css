@@ -781,6 +781,73 @@ h2 {
   font-weight: 850;
 }
 
+.lead-capture {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  border: 1px solid rgba(38, 70, 216, 0.2);
+  border-radius: 8px;
+  padding: 16px;
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(26, 39, 57, 0.08);
+}
+
+.lead-capture h2 {
+  max-width: 34rem;
+  color: var(--charcoal);
+  font-size: 1.08rem;
+}
+
+.lead-capture p:not(.section-kicker) {
+  max-width: 42rem;
+  margin: 6px 0 0;
+  color: #52606d;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.lead-capture-form {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.lead-capture-form input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid rgba(202, 213, 226, 0.94);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: #f8fafc;
+  color: var(--ink);
+  font: inherit;
+}
+
+.lead-capture-form button {
+  min-height: 42px;
+  padding: 0 14px;
+  font-size: 0.86rem;
+  white-space: nowrap;
+}
+
+.lead-capture-form .ghost-button {
+  border: 1px solid rgba(202, 213, 226, 0.94);
+  background: #ffffff;
+  color: var(--muted);
+}
+
+.lead-capture-note,
+.lead-capture-message {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.lead-capture-message {
+  color: var(--accent-strong);
+  font-weight: 850;
+}
+
 .audience-section {
   margin-top: 20px;
   border-radius: 8px;
@@ -2635,6 +2702,7 @@ progress::-moz-progress-bar {
   .seo-link-grid,
   .feedback-options,
   .post-download-options,
+  .lead-capture-form,
   .pro-plan-contrast,
   .pro-form {
     grid-template-columns: 1fr;

@@ -648,6 +648,10 @@
             <strong id="liveAccountLogins">0</strong>
           </article>
           <article class="live-card">
+            <span>Leads capturados</span>
+            <strong id="liveLeadCaptures">0</strong>
+          </article>
+          <article class="live-card">
             <span>Conta sem checkout</span>
             <strong id="liveAccountCheckoutGap">0</strong>
           </article>
@@ -760,6 +764,10 @@
             <article class="live-card">
               <span>Checkout sem pagamento</span>
               <strong id="recoveryCheckoutNotPaid">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Leads grátis</span>
+              <strong id="recoveryLeadCaptures">0</strong>
             </article>
             <article class="live-card">
               <span>Pedir prova real</span>
@@ -919,6 +927,7 @@
                   <th>Registos</th>
                   <th>Contas</th>
                   <th>Logins</th>
+                  <th>Leads</th>
                   <th>Checkouts</th>
                   <th>Pagas</th>
                   <th>Receita</th>
@@ -927,7 +936,7 @@
               </thead>
               <tbody id="sourceRowsBody">
                 <tr>
-                  <td class="empty" colspan="16">A carregar origens.</td>
+                  <td class="empty" colspan="17">A carregar origens.</td>
                 </tr>
               </tbody>
             </table>
@@ -950,6 +959,7 @@
                 <th>Registos</th>
                 <th>Contas</th>
                 <th>Logins</th>
+                <th>Leads</th>
                 <th>Checkouts</th>
                 <th>Pagas</th>
                 <th>Receita</th>
@@ -958,7 +968,7 @@
             </thead>
             <tbody id="liveRowsBody">
               <tr>
-                <td class="empty" colspan="17">A carregar atividade.</td>
+                <td class="empty" colspan="18">A carregar atividade.</td>
               </tr>
             </tbody>
           </table>
@@ -985,6 +995,8 @@
       const subscriptionsRowsBody = document.querySelector("#subscriptionsRowsBody");
       const subscriptionsStatus = document.querySelector("#subscriptionsStatus");
       let outreachProspects = [];
+      let recoveryUsers = [];
+      let capturedLeads = [];
       const liveStatus = document.querySelector("#liveStatus");
 
       function getAdminToken() {
@@ -1119,6 +1131,18 @@
             subject: "Can we feature your BatchCutout workflow?",
             body: `Hi,\n\nThanks for using BatchCutout.\n\nWe are collecting a few real ecommerce workflows to show how sellers prepare product photos in batches. Would you be open to sharing:\n\n- 1 before image and 1 after image;\n- your store type, for example Shopify, Etsy, WooCommerce, Amazon, or eBay;\n- one short sentence about what BatchCutout helped you do;\n- permission for NexaFlow Labs to show that example on the BatchCutout website and marketing pages.\n\nWe can show your store name or keep it anonymous.\n\nThanks,\nNexaFlow Labs`,
             reason: "Cliente Pro/manual com acesso ativo, bom candidato para testemunho.",
+          },
+          lead_capture: {
+            label: "Lead grátis",
+            subject: "Your BatchCutout link",
+            body: `Hi,\n\nYou asked to receive BatchCutout updates after testing the tool.\n\nHere is the link to come back and process product photos:\nhttps://batchcutout.com/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#tool\n\nIf you need larger batches, the founder plan includes:\n\n- 100 images per batch\n- 2,000 images per month\n- Transparent PNG and ZIP export\n\nPlans:\nhttps://batchcutout.com/pricing/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup\n\nIf this is not useful, reply "unsubscribe" and we will not send product follow-ups.\n\nThanks,\nNexaFlow Labs`,
+            reason: "Email deixado voluntariamente após testar/descarregar.",
+          },
+          lead_capture_pt: {
+            label: "Lead grátis PT",
+            subject: "O seu link BatchCutout",
+            body: `Ola,\n\nPediu para receber novidades do BatchCutout depois de testar a ferramenta.\n\nAqui fica o link para voltar e tratar fotos de produto:\nhttps://batchcutout.com/?utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#tool\n\nSe precisar de lotes maiores, o plano fundador inclui:\n\n- 100 imagens por lote\n- 2.000 imagens por mes\n- PNG transparente e exportacao ZIP\n\nPlanos:\nhttps://batchcutout.com/pricing/?utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup\n\nSe nao quiser receber emails de acompanhamento, responda com "remover".\n\nObrigado,\nNexaFlow Labs`,
+            reason: "Email deixado voluntariamente após testar/descarregar.",
           },
         };
         return copies[segment] || {};
@@ -1268,6 +1292,7 @@
         document.querySelector("#liveAccountSignupStarts").textContent = totals.accountSignupStarts || 0;
         document.querySelector("#liveAccountSignups").textContent = totals.accountSignups || 0;
         document.querySelector("#liveAccountLogins").textContent = totals.accountLogins || 0;
+        document.querySelector("#liveLeadCaptures").textContent = totals.leadCaptures || 0;
         document.querySelector("#liveBillingPortalOpens").textContent = totals.billingPortalOpens || 0;
         const accountEntrants = (totals.accountSignups || 0) + (totals.accountLogins || 0);
         document.querySelector("#liveAccountCheckoutGap").textContent = Math.max(accountEntrants - (totals.checkoutStarts || 0), 0);
@@ -1289,6 +1314,7 @@
                   <td>${row.accountSignupStarts || 0}</td>
                   <td>${row.accountSignups || 0}</td>
                   <td>${row.accountLogins || 0}</td>
+                  <td>${row.leadCaptures || 0}</td>
                   <td>${row.checkoutStarts || 0}</td>
                   <td>${row.paidSubscriptions || 0}</td>
                   <td>${formatCurrency(row.revenue || 0)}</td>
@@ -1296,7 +1322,7 @@
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="17">Ainda não existem eventos reais no período.</td></tr>`;
+          : `<tr><td class="empty" colspan="18">Ainda não existem eventos reais no período.</td></tr>`;
 
         sourceRowsBody.innerHTML = data.sourceBreakdown?.length
           ? data.sourceBreakdown.map((row) => `
@@ -1313,20 +1339,22 @@
                 <td>${row.accountSignupStarts || 0}</td>
                 <td>${row.accountSignups || 0}</td>
                 <td>${row.accountLogins || 0}</td>
+                <td>${row.leadCaptures || 0}</td>
                 <td>${row.checkoutStarts || 0}</td>
                 <td>${row.paidSubscriptions || 0}</td>
                 <td>${formatCurrency(row.revenue || 0)}</td>
                 <td>${row.billingPortalOpens || 0}</td>
               </tr>
             `).join("")
-          : `<tr><td class="empty" colspan="16">Ainda não existem origens identificadas.</td></tr>`;
+          : `<tr><td class="empty" colspan="17">Ainda não existem origens identificadas.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "";
         liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Última atualização: ${generatedAt}`;
       }
 
       function renderProUsers(users) {
-        renderRecoveryActions(users || []);
+        recoveryUsers = users || [];
+        renderRecoveryActions();
         proUsersRowsBody.innerHTML = users?.length
           ? users.map((user) => `
               <tr>
@@ -1347,33 +1375,59 @@
           : `<tr><td class="empty" colspan="6">Ainda não existem contas registadas.</td></tr>`;
       }
 
-      function renderRecoveryActions(users) {
-        const rows = users
-          .map((user) => ({ user, segment: recoverySegment(user) }))
+      function leadRecoverySegment(lead) {
+        return String(lead.language || "").toLowerCase().startsWith("pt") ? "lead_capture_pt" : "lead_capture";
+      }
+
+      function renderRecoveryActions() {
+        const userRows = recoveryUsers
+          .map((user) => ({ type: "user", user, email: user.email || "", segment: recoverySegment(user) }))
           .filter((row) => row.segment);
+        const proEmails = new Set(
+          recoveryUsers
+            .filter((user) => user.plan === "pro" || Number(user.monthlyLimit || 0) > 0)
+            .map((user) => String(user.email || "").toLowerCase())
+            .filter(Boolean),
+        );
+        const userEmails = new Set(recoveryUsers.map((user) => String(user.email || "").toLowerCase()).filter(Boolean));
+        const leadRows = capturedLeads
+          .filter((lead) => lead.email && !proEmails.has(String(lead.email).toLowerCase()))
+          .filter((lead) => !userEmails.has(String(lead.email).toLowerCase()))
+          .map((lead) => ({
+            type: "lead",
+            lead,
+            email: lead.email || "",
+            segment: leadRecoverySegment(lead),
+          }));
+        const rows = [...userRows, ...leadRows];
         const accountNoCheckout = rows.filter((row) => row.segment === "account_no_checkout").length;
         const checkoutNotPaid = rows.filter((row) => row.segment === "checkout_not_paid").length;
+        const leadCaptures = rows.filter((row) => row.segment === "lead_capture" || row.segment === "lead_capture_pt").length;
         const proofCandidates = rows.filter((row) => row.segment === "proof").length;
 
         document.querySelector("#recoveryAccountNoCheckout").textContent = accountNoCheckout;
         document.querySelector("#recoveryCheckoutNotPaid").textContent = checkoutNotPaid;
+        document.querySelector("#recoveryLeadCaptures").textContent = leadCaptures;
         document.querySelector("#recoveryProofCandidates").textContent = proofCandidates;
         recoverySummary.textContent = `${rows.length} contactos manuais potenciais. Use apenas com consentimento ou relação comercial válida.`;
 
         recoveryRowsBody.innerHTML = rows.length
-          ? rows.map(({ user, segment }) => {
+          ? rows.map(({ user, lead, email, segment }) => {
               const copy = recoveryCopy(segment);
+              const reason = lead
+                ? `${copy.reason || "-"} ${lead.count ? `${lead.count} imagem(ns), ${lead.downloadType || "download"}.` : ""}`
+                : copy.reason || "-";
               return `
                 <tr>
                   <td><span class="pill ${segment === "proof" ? "success" : "warning"}">${escapeHtml(copy.label || segment)}</span></td>
-                  <td>${escapeHtml(user.email || "-")}</td>
-                  <td>${escapeHtml(copy.reason || "-")}</td>
+                  <td>${escapeHtml(email || user?.email || "-")}</td>
+                  <td>${escapeHtml(reason)}</td>
                   <td>
                     <button
                       class="secondary"
                       type="button"
                       data-recovery-action="send"
-                      data-recovery-email="${escapeHtml(user.email || "")}"
+                      data-recovery-email="${escapeHtml(email || user?.email || "")}"
                       data-recovery-segment="${escapeHtml(segment)}"
                     >Enviar via domínio</button>
                   </td>
@@ -1624,6 +1678,29 @@
         }
       }
 
+      async function loadLeadCaptures() {
+        const token = getAdminToken();
+        if (!token) return;
+
+        try {
+          const response = await fetch("/api/pro-users?view=lead-captures", {
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await response.json();
+          if (!response.ok || !data.ok) {
+            throw new Error(data.error || "lead_captures_failed");
+          }
+          capturedLeads = data.leads || [];
+          renderRecoveryActions();
+        } catch {
+          capturedLeads = [];
+          renderRecoveryActions();
+        }
+      }
+
       async function loadSubscriptions() {
         const token = getAdminToken();
         if (!token) return;
@@ -1857,6 +1934,7 @@
           }
           renderLiveStats(data);
           await loadProUsers();
+          await loadLeadCaptures();
           await loadSubscriptions();
           await loadOutreachProspects();
           await loadSupportMailbox();
@@ -1866,7 +1944,7 @@
             localStorage.removeItem(adminTokenExpiryStorageKey);
             document.body.classList.add("locked");
           }
-          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="17">Não foi possível carregar atividade.</td></tr>`;
+          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="18">Não foi possível carregar atividade.</td></tr>`;
           proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar contas.</td></tr>`;
           recoveryRowsBody.innerHTML = `<tr><td class="empty" colspan="4">Não foi possível carregar oportunidades comerciais.</td></tr>`;
           outreachProspectsBody.innerHTML = `<tr><td class="empty" colspan="8">Não foi possível carregar prospects.</td></tr>`;

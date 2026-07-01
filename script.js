@@ -28,6 +28,11 @@ const countText = document.querySelector("#countText");
 const postDownloadFeedback = document.querySelector("#postDownloadFeedback");
 const postDownloadOptions = document.querySelector("#postDownloadOptions");
 const postDownloadThanks = document.querySelector("#postDownloadThanks");
+const leadCapturePanel = document.querySelector("#leadCapturePanel");
+const leadCaptureForm = document.querySelector("#leadCaptureForm");
+const leadCaptureEmail = document.querySelector("#leadCaptureEmail");
+const leadCaptureDismiss = document.querySelector("#leadCaptureDismiss");
+const leadCaptureMessage = document.querySelector("#leadCaptureMessage");
 const proInterestPanel = document.querySelector("#proInterestPanel");
 const proInlineForm = document.querySelector("#proInlineForm");
 const proInlineMessage = document.querySelector("#proInlineMessage");
@@ -71,6 +76,8 @@ const attributionStorageKey = "batchcutout_attribution";
 const visitorStorageKey = "batchcutout_visitor_id";
 const sessionStorageKey = "batchcutout_session_id";
 const paidConversionStorageKey = "batchcutout_paid_conversion_sessions";
+const leadCaptureEmailStorageKey = "batchcutout_lead_capture_email";
+const leadCaptureDismissedStorageKey = "batchcutout_lead_capture_dismissed";
 const serverEventNames = new Set([
   "tool_page_view",
   "tool_drag_upload_intent",
@@ -89,6 +96,10 @@ const serverEventNames = new Set([
   "pro_checkout_login_required",
   "pro_checkout_started",
   "pro_purchase_conversion_sent",
+  "lead_capture_shown",
+  "lead_capture_submitted",
+  "lead_capture_dismissed",
+  "lead_capture_invalid",
   "billing_portal_opened",
   "account_signup_started",
   "account_signup_succeeded",
@@ -138,6 +149,15 @@ const baseTranslation = {
   postDownloadNeedsQuality: "Precisa de melhor recorte",
   postDownloadLargerBatches: "Preciso de lotes maiores",
   postDownloadThanks: "Obrigado. A sua resposta ajuda-nos a melhorar a ferramenta.",
+  leadCaptureKicker: "Guardar contacto",
+  leadCaptureTitle: "Quer receber o link para voltar à ferramenta?",
+  leadCaptureText: "Deixe o email e enviamos apenas atualizações úteis sobre BatchCutout e fluxos de fotos de produto.",
+  leadCapturePlaceholder: "O seu email",
+  leadCaptureSubmit: "Receber link",
+  leadCaptureDismiss: "Agora não",
+  leadCaptureNote: "Pode pedir remoção respondendo ao email. Não enviamos as suas imagens.",
+  leadCaptureSuccess: "Obrigado. Ficou registado para receber novidades úteis do BatchCutout.",
+  leadCaptureInvalid: "Introduza um email válido.",
   proInlineKicker: "BatchCutout Pro",
   proInlineTitle: "Desbloqueie até 100 imagens por lote",
   proInlineLead: "Escolha um plano Pro para processar até 100 imagens por lote e 2.000 imagens por mês.",
@@ -279,6 +299,15 @@ const translations = {
     postDownloadNeedsQuality: "Needs better cutout",
     postDownloadLargerBatches: "I need larger batches",
     postDownloadThanks: "Thanks. This helps us improve the tool.",
+    leadCaptureKicker: "Stay in touch",
+    leadCaptureTitle: "Want the link to come back to the tool?",
+    leadCaptureText: "Leave your email and we will only send useful BatchCutout and product-photo workflow updates.",
+    leadCapturePlaceholder: "Your email",
+    leadCaptureSubmit: "Send link",
+    leadCaptureDismiss: "Not now",
+    leadCaptureNote: "You can opt out by replying to the email. We do not send your images.",
+    leadCaptureSuccess: "Thanks. You are registered to receive useful BatchCutout updates.",
+    leadCaptureInvalid: "Enter a valid email.",
     proInlineKicker: "BatchCutout Pro",
     proInlineTitle: "Unlock up to 100 images per batch",
     proInlineLead: "Choose a Pro plan to process up to 100 images per batch and 2,000 images per month.",
@@ -1067,6 +1096,10 @@ const analyticsEvents = {
   pro_checkout_login_required: { category: "commercial_intent", label: "checkout_login_required", step: 10 },
   pro_checkout_started: { category: "commercial_intent", label: "checkout_started", step: 11 },
   pro_purchase_conversion_sent: { category: "revenue", label: "purchase_conversion", step: 12 },
+  lead_capture_shown: { category: "lead", label: "lead_capture_shown", step: 7 },
+  lead_capture_submitted: { category: "lead", label: "lead_capture_submitted", step: 8 },
+  lead_capture_dismissed: { category: "lead", label: "lead_capture_dismissed", step: 8 },
+  lead_capture_invalid: { category: "lead", label: "lead_capture_invalid", step: 8 },
   billing_portal_opened: { category: "account", label: "billing_portal_opened" },
   account_signup_started: { category: "account", label: "signup_started" },
   account_signup_succeeded: { category: "account", label: "signup_succeeded" },
@@ -1093,6 +1126,7 @@ const audienceSignals = {
   tool_pro_clicked: "pro_interest",
   pro_checkout_login_required: "checkout_login_required",
   pro_checkout_started: "checkout_started",
+  lead_capture_submitted: "lead_capture",
   pro_purchase_conversion_sent: "paid_customer",
 };
 
@@ -1313,6 +1347,23 @@ function setGoogleUserData(email = "") {
   });
 }
 
+function normalizeEmail(value = "") {
+  return String(value || "").trim().toLowerCase();
+}
+
+function isValidEmail(value = "") {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(normalizeEmail(value));
+}
+
+function getCapturedLeadEmail() {
+  return normalizeEmail(localStorage.getItem(leadCaptureEmailStorageKey) || "");
+}
+
+function setKnownGoogleUserData() {
+  const knownEmail = currentAccount?.email || getCapturedLeadEmail();
+  setGoogleUserData(knownEmail);
+}
+
 function trackPaidSubscriptionConversion(details = {}) {
   const sessionId = details.sessionId || details.stripe_session_id || checkoutSessionId;
   if (!sessionId || hasTrackedPaidSession(sessionId)) return;
@@ -1434,6 +1485,7 @@ function updateConsent(consent) {
     ad_personalization: granted ? "granted" : "denied",
     analytics_storage: granted ? "granted" : "denied",
   });
+  if (granted) setKnownGoogleUserData();
 }
 
 function showConsentBanner() {
@@ -1578,6 +1630,7 @@ function syncPaidAccessUi() {
     proPromptButton?.classList.add("hidden");
     zipProCta?.classList.add("hidden");
     proInterestPanel?.classList.add("hidden");
+    leadCapturePanel?.classList.add("hidden");
     if (brandCta) brandCta.textContent = t("brandCtaPro", paidParams);
     if (brandLead) brandLead.textContent = t("leadPro", paidParams);
     if (dropzoneBadge) dropzoneBadge.textContent = t("proLimitBadge", paidParams);
@@ -1624,6 +1677,7 @@ function updateAccountUi() {
   }
 
   const { access = {}, email = "" } = currentAccount;
+  setGoogleUserData(email);
   const statusKey = access.canUsePro ? "accountStatusPro" : "accountStatusFree";
   const badgeKey = access.canUsePro ? "accountBadgePro" : "accountBadgeFree";
   const statusTextValue = access.canUsePro
@@ -1745,6 +1799,7 @@ async function handleAccountLogin(event) {
     });
 
     if (error) throw error;
+    setGoogleUserData(email);
     trackEvent("account_login_succeeded", {
       source: requestedCheckoutPlan ? "checkout_plan" : "account_panel",
       has_requested_checkout: Boolean(requestedCheckoutPlan),
@@ -1790,6 +1845,7 @@ async function handleAccountCreate() {
     });
 
     if (error) throw error;
+    setGoogleUserData(email);
     trackEvent("account_signup_succeeded", {
       source: requestedCheckoutPlan ? "checkout_plan" : "account_panel",
       has_requested_checkout: Boolean(requestedCheckoutPlan),
@@ -1868,6 +1924,7 @@ async function startCheckout(plan = "monthly", triggerButton = null) {
       value: selectedPlan === "annual" ? 190 : selectedPlan === "early" ? 15 : 19,
       currency: "EUR",
     });
+    setKnownGoogleUserData();
     trackBeginCheckout(selectedPlan, "app");
     window.location.href = data.url;
   } catch {
@@ -2427,8 +2484,74 @@ function showPostDownloadFeedback(downloadType, count) {
   postDownloadFeedback?.classList.remove("hidden");
   postDownloadFeedback?.setAttribute("data-download-type", downloadType);
   postDownloadFeedback?.setAttribute("data-download-count", String(count));
+  showLeadCapture(downloadType, count);
   showProPrompt(`post_download_${downloadType}`);
   postDownloadFeedback?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function shouldShowLeadCapture() {
+  if (!leadCapturePanel || canUsePaidAccess() || currentAccount?.email) return false;
+  if (localStorage.getItem(leadCaptureDismissedStorageKey)) return false;
+  return !getCapturedLeadEmail();
+}
+
+function showLeadCapture(downloadType = "unknown", count = 0) {
+  if (!shouldShowLeadCapture()) return;
+
+  leadCapturePanel.classList.remove("hidden");
+  leadCapturePanel.dataset.downloadType = downloadType;
+  leadCapturePanel.dataset.downloadCount = String(count);
+  if (leadCaptureMessage) leadCaptureMessage.textContent = "";
+  trackEvent("lead_capture_shown", {
+    downloadType,
+    count,
+    has_account: Boolean(currentAccount?.email),
+  });
+}
+
+function hideLeadCapture() {
+  leadCapturePanel?.classList.add("hidden");
+}
+
+async function handleLeadCaptureSubmit(event) {
+  event.preventDefault();
+  if (!leadCaptureEmail || !leadCaptureForm) return;
+
+  const email = normalizeEmail(leadCaptureEmail.value);
+  const downloadType = leadCapturePanel?.dataset.downloadType || "unknown";
+  const count = Number(leadCapturePanel?.dataset.downloadCount || 0) || 0;
+
+  if (!isValidEmail(email)) {
+    if (leadCaptureMessage) leadCaptureMessage.textContent = t("leadCaptureInvalid");
+    trackEvent("lead_capture_invalid", { downloadType, count });
+    leadCaptureEmail.focus();
+    return;
+  }
+
+  localStorage.setItem(leadCaptureEmailStorageKey, email);
+  localStorage.removeItem(leadCaptureDismissedStorageKey);
+  setGoogleUserData(email);
+  trackEvent("lead_capture_submitted", {
+    email,
+    consent: true,
+    downloadType,
+    count,
+    source: "post_download",
+  });
+
+  if (leadCaptureMessage) leadCaptureMessage.textContent = t("leadCaptureSuccess");
+  leadCaptureForm.querySelectorAll("input, button").forEach((element) => {
+    element.disabled = true;
+  });
+}
+
+function dismissLeadCapture() {
+  localStorage.setItem(leadCaptureDismissedStorageKey, new Date().toISOString());
+  trackEvent("lead_capture_dismissed", {
+    downloadType: leadCapturePanel?.dataset.downloadType || "unknown",
+    count: Number(leadCapturePanel?.dataset.downloadCount || 0) || 0,
+  });
+  hideLeadCapture();
 }
 
 function selectPostDownloadFeedback(answer) {
@@ -2487,6 +2610,8 @@ billingActions?.addEventListener("click", (event) => {
   startCheckout(button.dataset.checkoutPlan, button);
 });
 billingPortal?.addEventListener("click", openBillingPortal);
+leadCaptureForm?.addEventListener("submit", handleLeadCaptureSubmit);
+leadCaptureDismiss?.addEventListener("click", dismissLeadCapture);
 postDownloadOptions?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-post-download-feedback]");
   selectPostDownloadFeedback(button?.dataset.postDownloadFeedback);

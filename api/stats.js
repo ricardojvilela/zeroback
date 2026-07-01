@@ -42,6 +42,7 @@ function emptyDay(date) {
     accountSignupStarts: 0,
     accountSignups: 0,
     accountLogins: 0,
+    leadCaptures: 0,
     billingPortalOpens: 0,
   };
 }
@@ -92,6 +93,9 @@ function classifySource(event, detail) {
     return "Google Ads";
   }
   if (raw.includes("saashub")) return "SaaSHub";
+  if (raw.includes("uneed")) return "Uneed";
+  if (raw.includes("betalist") || raw.includes("beta list")) return "BetaList";
+  if (raw.includes("indiehackers") || raw.includes("indie hackers")) return "Indie Hackers";
   if (raw.includes("zearches")) return "Zearches";
   if (raw.includes("listai")) return "ListAI";
   if (raw.includes("thenextai") || raw.includes("the next ai")) return "The Next AI";
@@ -126,6 +130,7 @@ function emptySourceRow(source) {
     accountSignupStarts: 0,
     accountSignups: 0,
     accountLogins: 0,
+    leadCaptures: 0,
     billingPortalOpens: 0,
     events: 0,
   };
@@ -300,6 +305,10 @@ export default async function handler(request, response) {
         case "account_login_succeeded":
           row.accountLogins += 1;
           sourceRow.accountLogins += 1;
+          break;
+        case "lead_capture_submitted":
+          row.leadCaptures += 1;
+          sourceRow.leadCaptures += 1;
           break;
         case "billing_portal_opened":
           row.billingPortalOpens += 1;

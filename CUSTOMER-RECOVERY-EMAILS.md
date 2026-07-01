@@ -35,6 +35,12 @@ Operational files:
    - `pro_subscription_paid` exists.
    - Send immediately after payment if transactional welcome email is enabled.
 
+5. `lead_capture_followup`
+   - `lead_capture_submitted` exists.
+   - The email was voluntarily submitted after a free test/download.
+   - No known paid subscription for that email.
+   - Send manually from `/admin` after reviewing the queue.
+
 ## From/reply setup
 
 - From: `BatchCutout <noreply@batchcutout.com>`
@@ -150,6 +156,35 @@ Manage billing from your account panel whenever needed.
 Thanks,
 NexaFlow Labs
 
+## Sequence 5 - free test lead captured
+
+Timing: 2 to 24 hours after `lead_capture_submitted`, only when the user voluntarily submitted email.
+
+Subject:
+Your BatchCutout link
+
+Email:
+Hi,
+
+You asked to receive BatchCutout updates after testing the tool.
+
+Here is the link to come back and process product photos:
+https://batchcutout.com/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#tool
+
+If you need larger batches, the founder plan includes:
+
+- 100 images per batch
+- 2,000 images per month
+- Transparent PNG and ZIP export
+
+Plans:
+https://batchcutout.com/pricing/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup
+
+If this is not useful, reply "unsubscribe" and we will not send product follow-ups.
+
+Thanks,
+NexaFlow Labs
+
 ## PT variant - account created, no checkout
 
 Subject:
@@ -241,6 +276,33 @@ Abrir BatchCutout:
 https://batchcutout.com/?utm_source=email&utm_medium=onboarding&utm_campaign=pro_welcome#tool
 
 Pode gerir a faturacao no painel da sua conta.
+
+Obrigado,
+NexaFlow Labs
+
+## PT variant - free test lead captured
+
+Subject:
+O seu link BatchCutout
+
+Email:
+Ola,
+
+Pediu para receber novidades do BatchCutout depois de testar a ferramenta.
+
+Aqui fica o link para voltar e tratar fotos de produto:
+https://batchcutout.com/?utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#tool
+
+Se precisar de lotes maiores, o plano fundador inclui:
+
+- 100 imagens por lote
+- 2.000 imagens por mes
+- PNG transparente e exportacao ZIP
+
+Planos:
+https://batchcutout.com/pricing/?utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup
+
+Se nao quiser receber emails de acompanhamento, responda com "remover".
 
 Obrigado,
 NexaFlow Labs

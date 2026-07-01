@@ -44,6 +44,8 @@ Atualizacao 2026-06-30: campanhas ativas verificadas no Google Ads. `Search - Ba
 
 Nota operacional: recomendacoes automaticas de correspondencia ampla e Maxima IA nao foram aplicadas nesta verificacao. Manter correspondencia controlada ate haver dados suficientes de subscricoes pagas e termos de pesquisa.
 
+Atualizacao 2026-07-01: o site passou a definir `gtag("set", "user_data", { email })` quando existe email conhecido e o utilizador aceitou a medicao. Isto cobre login, criacao de conta, checkout e novo formulario opcional de lead pós-download. A submissao do lead gera `lead_capture_submitted` no Supabase, mas nao deve ser conversao principal de Google Ads.
+
 ### Lead Pro BatchCutout
 
 Objetivo: medir contacto comercial antigo/lead manual.
@@ -123,6 +125,7 @@ Estes eventos ficam apenas no Supabase/admin/debug:
 - `pro_submit_attempt`
 - `pro_checkout_login_required`
 - `pro_checkout_started`
+- `lead_capture_submitted`
 
 Motivo: sao sinais de funil, mas ainda nao devem orientar lances do Google Ads. Transformar estes eventos em conversoes cedo demais pode fazer a campanha otimizar para curiosidade em vez de intencao comercial.
 
