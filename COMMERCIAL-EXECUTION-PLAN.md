@@ -187,6 +187,13 @@ Decision rules:
 - Updated `/admin` to show contacts sent today separately from total contacted prospects.
 - No new emails were sent automatically from this update.
 
+## Executed growth work - demo video
+
+- Added horizontal and vertical silent demo videos under `assets/video/`.
+- Added `DEMO-VIDEO-ASSETS.md` with public URLs, usage notes and short captions.
+- Embedded the horizontal demo on `/customer-results/`.
+- Added `tools/create-demo-video.mjs` so the asset can be regenerated from the current before/after image.
+
 ## Executed growth work - self-service free test
 
 - Strengthened the homepage message around testing 2 images free before paying.
