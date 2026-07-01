@@ -162,12 +162,34 @@ Qualified prospecting batch sent through `support@batchcutout.com`:
 - 2026-07-01: iMakeUpMe Skincare - `fbbed8dd-aa60-42c4-ad59-4b801be579a9`
 - 2026-07-01: The Peachy Cactus Boutique - `7eac3144-745f-4e77-80b3-2a5ede15ece2`
 
+Second qualified email batch sent through `support@batchcutout.com`:
+
+- 2026-07-01: Crazy K Farm - `aeca7204-8c88-4fd3-9e30-4c5d8a312216`
+- 2026-07-01: Mama Zuri Style - `962df088-a4a5-4da8-a551-6d8dd36471a1`
+- 2026-07-01: Kernow Pet Supplies - `6631b91a-7935-415f-9f40-196419838655`
+- 2026-07-01: The Sterling Gypsy - `d9bc376a-cbba-4b4d-b779-99754b21b0b6`
+- 2026-07-01: The Orchard She Shed - `07a4ce97-ed67-4b2c-8790-cf0bff3546b8`
+- 2026-07-01: THE BODY FIX - `b4976e4a-b9e6-46e5-9d20-07ecba852dd1`
+- 2026-07-01: Lorena Young Jewelry - `e7ec6a59-e6ac-4b15-a516-bd7df9fd738e`
+- 2026-07-01: DV Jewelry Designs - `7990e30e-9a0e-4f76-ab87-aee22e2b128d`
+- 2026-07-01: TND Customs - `171349b2-872c-4605-8520-fb6fb72b0a4b`
+- 2026-07-01: Alrossa - `70833d7c-457d-43fd-816d-c2d6aeca3e7e`
+- 2026-07-01: eCommerce Images - `5c272777-d167-4323-8cf7-b5b1eda4d526`
+
 Pipeline update:
 
 - `sales-outreach-prospects-2026-06-30.csv` now has 80 prospects.
 - New columns: score, contact source, next action, follow-up date, Resend send ID and notes.
 - Follow-up date for the 2026-07-01 direct email batch: 2026-07-07.
 - Follow-up should be sent only once and only if there is no reply or opt-out.
+
+Contact form attempt on 2026-07-01:
+
+- 16 `ready_form` leads were checked for automated submission.
+- All 16 forms exposed CAPTCHA/hCaptcha protection.
+- No CAPTCHA was bypassed.
+- These leads were marked `blocked_captcha` with next action `manual_captcha_required`.
+- If pursued later, they require manual submission with human CAPTCHA handling.
 
 Contact forms not submitted:
 

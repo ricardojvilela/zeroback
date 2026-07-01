@@ -41,6 +41,7 @@ Best-fit niches:
 - `sent_YYYY-MM-DD`: contacted through domain email or form.
 - `replied`: prospect replied and needs manual handling.
 - `converted`: prospect became a paying customer.
+- `blocked_captcha`: contact form requires CAPTCHA/hCaptcha; do not automate or bypass.
 - `blocked_*`: do not contact for now.
 
 ## Next action values
@@ -50,6 +51,7 @@ Best-fit niches:
 - `follow_up_if_no_reply`: send one short follow-up on the follow-up date if there was no reply.
 - `watch_replies`: monitor support inbox.
 - `ask_for_proof`: ask a happy user for before/after proof with permission.
+- `manual_captcha_required`: submit manually only if a human is available to solve the CAPTCHA.
 - `do_not_contact`: leave out of outreach.
 
 ## First email structure
@@ -128,4 +130,3 @@ The consent text is kept in `FIRST-CUSTOMER-PROOF-KIT.md`.
 3. Send or submit only the highest-score ready prospects.
 4. Record status, follow-up date and notes in `sales-outreach-prospects-2026-06-30.csv`.
 5. Stop contacting any lead that replies negatively.
-
