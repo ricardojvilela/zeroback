@@ -126,6 +126,19 @@ Contact forms submitted:
 - 2026-07-01: Rych Wicks Candles
 - 2026-07-01: CHIYAN Jewelry
 
+Domain email outreach sent through `support@batchcutout.com`:
+
+- 2026-07-01: Js Harmony - `937c6f02-e604-4f0f-9ad4-a55e5d77c7d0`
+- 2026-07-01: Tadley Crafts - `9319cb10-940b-4e50-af97-3b5ac13bd702`
+- 2026-07-01: Madera Design Studio - `4d29672a-4c2b-432e-8b0e-b1f8eeded9b5`
+- 2026-07-01: Out of the Adirondacks - `f0ac1fba-dcda-4954-90f4-254e6a4eef29`
+- 2026-07-01: GraviPaw - `9db20671-36ef-4919-9873-a98d945e761e`
+- 2026-07-01: SC HOME SCENTS - `5983186e-3a4d-45ff-9a6c-1ee170531f9b`
+- 2026-07-01: Rinse Bath & Body - `3c515dd3-6755-43b6-832a-bf4a33d4d198`
+- 2026-07-01: Happy Times Favors - `db324295-c8eb-4af9-a1e2-9ee94a612db0`
+- 2026-07-01: Beastly Threads - `802667f6-b310-4ee3-8691-328eb21ee48b`
+- 2026-07-01: BEEYARND - `5cbde1d8-3672-4b79-b097-b2b63b30ec8f`
+
 Contact forms not submitted:
 
 - Ronnies Candles LLC: no usable contact form found on the redirected page.
