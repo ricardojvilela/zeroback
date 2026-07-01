@@ -308,6 +308,9 @@ const translations = {
     leadCaptureNote: "You can opt out by replying to the email. We do not send your images.",
     leadCaptureSuccess: "Thanks. You are registered to receive useful BatchCutout updates.",
     leadCaptureInvalid: "Enter a valid email.",
+    cookieText: "We use simple measurement to understand visits and Pro signups. You can accept or continue without measurement.",
+    cookieAccept: "Accept measurement",
+    cookieDecline: "Continue without measurement",
     proInlineKicker: "BatchCutout Pro",
     proInlineTitle: "Unlock up to 100 images per batch",
     proInlineLead: "Choose a Pro plan to process up to 100 images per batch and 2,000 images per month.",
@@ -963,6 +966,7 @@ const proTranslations = {
     proNoCommitment: "Pagamento seguro por Stripe Checkout para quem trabalha com volume.",
     brandCta: "Testar grátis com {limit} imagens",
     brandCtaPro: "Carregar fotos",
+    brandProLink: "Precisa de mais volume? Ver planos Pro",
     leadPro: "Conta ativa: remova fundos em lotes até {limit} imagens e exporte PNGs transparentes ou ZIP pronto para loja.",
     freeTestFlowLabel: "Como testar grátis",
     freeTestStepOneTitle: "1. Carregue {limit} fotos",
@@ -1018,6 +1022,7 @@ const proTranslations = {
     proNoCommitment: "Secure Stripe Checkout for high-volume workflows.",
     brandCta: "Start free with {limit} images",
     brandCtaPro: "Upload photos",
+    brandProLink: "Need more volume? View Pro plans",
     leadPro: "Account active: remove backgrounds in batches up to {limit} images and export transparent PNGs or a store-ready ZIP.",
     freeTestFlowLabel: "How to test free",
     freeTestStepOneTitle: "1. Upload {limit} photos",
@@ -1495,10 +1500,10 @@ function showConsentBanner() {
   banner.className = "consent-banner";
   banner.setAttribute("aria-label", "Cookie consent");
   banner.innerHTML = `
-    <p>${t("cookieText")}</p>
+    <p data-i18n="cookieText">${t("cookieText")}</p>
     <div>
-      <button type="button" class="consent-decline">${t("cookieDecline")}</button>
-      <button type="button" class="consent-accept">${t("cookieAccept")}</button>
+      <button type="button" class="consent-decline" data-i18n="cookieDecline">${t("cookieDecline")}</button>
+      <button type="button" class="consent-accept" data-i18n="cookieAccept">${t("cookieAccept")}</button>
     </div>
   `;
 
@@ -1538,7 +1543,14 @@ function getRequestedLanguage() {
 
 function t(key, params = {}) {
   params = { limit: maxFilesPerBatch, ...params };
-  const value = translations[currentLanguage][key] || translations.pt[key] || key;
+  const currentValues = translations[currentLanguage] || translations.en || translations.pt;
+  let value = currentValues[key];
+
+  if (currentLanguage !== "pt" && value === baseTranslation[key] && translations.en?.[key]) {
+    value = translations.en[key];
+  }
+
+  value = value || translations.en?.[key] || translations.pt[key] || key;
 
   return Object.entries(params).reduce(
     (text, [name, replacement]) => text.replace(`{${name}}`, replacement),
