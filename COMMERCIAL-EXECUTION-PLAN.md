@@ -194,7 +194,8 @@ Decision rules:
 - Embedded the horizontal demo on `/customer-results/`.
 - Added `tools/create-demo-video.mjs` so the asset can be regenerated from the current before/after image.
 - Connected the demo page to `/admin` outreach templates and staged the 13 ready prospects with `outreach_variant=demo_video`.
-- No demo outreach emails were sent automatically from this update.
+- Sent the 13 ready demo-variant direct emails through `support@batchcutout.com` on 2026-07-02.
+- Follow-up for this demo batch is scheduled for 2026-07-08 if there is no reply.
 
 ## Executed growth work - self-service free test
 
