@@ -412,6 +412,10 @@
         background: #fff;
       }
 
+      table.subscriptions-table {
+        min-width: 1340px;
+      }
+
       table.outreach-table {
         min-width: 1320px;
         table-layout: fixed;
@@ -677,7 +681,11 @@
               <strong id="subscriptionMrr">0 EUR</strong>
             </article>
             <article class="live-card">
-              <span>Ativas</span>
+              <span>Clientes pagantes</span>
+              <strong id="subscriptionPaidCustomers">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Ativas Stripe</span>
               <strong id="subscriptionActive">0</strong>
             </article>
             <article class="live-card">
@@ -697,17 +705,22 @@
               <strong id="subscriptionUnlinked">0</strong>
             </article>
             <article class="live-card">
-              <span>Não MRR</span>
+              <span>Pro manual/grátis</span>
               <strong id="subscriptionNonRevenueRenewing">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Canceladas</span>
+              <strong id="subscriptionCanceled">0</strong>
             </article>
           </div>
           <p class="live-status" id="subscriptionsStatus">A carregar subscrições...</p>
           <div class="table-wrap">
-            <table>
+            <table class="subscriptions-table">
               <thead>
                 <tr>
                   <th>Cliente</th>
                   <th>Estado</th>
+                  <th>Tipo</th>
                   <th>Plano Stripe</th>
                   <th>Valor</th>
                   <th>Renovação</th>
@@ -717,7 +730,7 @@
               </thead>
               <tbody id="subscriptionsRowsBody">
                 <tr>
-                  <td class="empty" colspan="7">A carregar subscrições.</td>
+                  <td class="empty" colspan="8">A carregar subscrições.</td>
                 </tr>
               </tbody>
             </table>
@@ -1087,6 +1100,31 @@
         if (status === "active" && !cancelAtPeriodEnd) return "success";
         if (status === "canceled" || status === "unpaid" || status === "incomplete_expired") return "danger";
         return "warning";
+      }
+
+      function subscriptionBusinessType(subscription) {
+        if (subscription.businessType?.label) return subscription.businessType;
+
+        const status = String(subscription.status || "");
+        if (status === "canceled") {
+          return { label: "Cancelada", tone: "muted", note: "Histórico Stripe, não conta para MRR." };
+        }
+        if (subscription.cancelAtPeriodEnd) {
+          return { label: "Fim de período", tone: "warning", note: "Ativa só até ao fim do período atual." };
+        }
+        if (subscription.revenueExcluded || subscription.accessStatus === "manual") {
+          return { label: "Pro manual/grátis", tone: "warning", note: "Acesso interno ou cortesia, não conta para MRR." };
+        }
+        if (["incomplete", "incomplete_expired", "past_due", "unpaid", "paused"].includes(status)) {
+          return { label: "Pagamento pendente", tone: "danger", note: "Rever pagamento ou tentativa incompleta." };
+        }
+        if (!subscription.linkedToSupabase) {
+          return { label: "Sem ligação", tone: "warning", note: "Existe no Stripe mas não está ligada a uma conta BatchCutout." };
+        }
+        if (status === "active") {
+          return { label: "Cliente pagante", tone: "success", note: "Conta paga recorrente, conta para MRR." };
+        }
+        return { label: "Rever", tone: "warning", note: "Estado Stripe pouco comum." };
       }
 
       function escapeHtml(value) {
@@ -1613,18 +1651,21 @@
 
       function renderSubscriptions(data) {
         const summary = data.summary || {};
+        const businessTypes = summary.businessTypes || {};
         const mrrLabel = formatCurrencyFromCents(summary.mrrAmount || 0, summary.currency || "eur");
         const renewingSubscriptions = summary.renewing ?? summary.active ?? 0;
-        const nonRevenueRenewing = summary.nonRevenueRenewing || 0;
+        const nonRevenueRenewing = businessTypes.manual_pro ?? summary.nonRevenueRenewing ?? 0;
         document.querySelector("#dashboardActiveSubscriptions").textContent = renewingSubscriptions;
         document.querySelector("#dashboardMrr").textContent = mrrLabel;
         document.querySelector("#subscriptionMrr").textContent = mrrLabel;
+        document.querySelector("#subscriptionPaidCustomers").textContent = businessTypes.paid_customer ?? renewingSubscriptions;
         document.querySelector("#subscriptionActive").textContent = summary.active || 0;
         document.querySelector("#subscriptionTotal").textContent = summary.total || 0;
         document.querySelector("#subscriptionAttention").textContent = summary.attention || 0;
         document.querySelector("#subscriptionCancelAtPeriodEnd").textContent = summary.cancelAtPeriodEnd || 0;
         document.querySelector("#subscriptionUnlinked").textContent = summary.unlinked || 0;
         document.querySelector("#subscriptionNonRevenueRenewing").textContent = nonRevenueRenewing;
+        document.querySelector("#subscriptionCanceled").textContent = businessTypes.canceled ?? summary.canceled ?? 0;
         document.querySelector("#decisionBadge").textContent = summary.attention ? "Rever" : "Operacional";
         const attentionCount = summary.attention || 0;
         const attentionLabel = attentionCount === 1
@@ -1635,13 +1676,14 @@
           : `${nonRevenueRenewing} subscrições internas/manuais ativas no Stripe não entram no MRR`;
         document.querySelector("#decisionTitle").textContent = `${renewingSubscriptions} subscrições pagas a renovar`;
         document.querySelector("#decisionText").textContent = attentionCount
-          ? `${attentionLabel}. ${nonRevenueRenewing ? `${nonRevenueText}. ` : ""}Verifique estados pendentes, cancelamentos ou contas sem ligação.`
+          ? `${attentionLabel}. ${nonRevenueRenewing ? `${nonRevenueText}. ` : ""}Verifique estados pendentes, contas manuais, cancelamentos ou contas sem ligação.`
           : `MRR pago renovável: ${mrrLabel}. As subscrições pagas a renovar estão ligadas ao acesso BatchCutout.`;
 
         subscriptionsRowsBody.innerHTML = data.subscriptions?.length
           ? data.subscriptions.map((subscription) => {
               const statusClass = subscriptionStatusClass(subscription.status, subscription.cancelAtPeriodEnd);
               const statusLabel = subscriptionStatusLabel(subscription.status, subscription.cancelAtPeriodEnd);
+              const businessType = subscriptionBusinessType(subscription);
               const customerEmail = subscription.customerEmail || subscription.profileEmail || "-";
               const accessLabel = subscription.linkedToSupabase
                 ? `${subscription.accessPlan || "free"} / ${subscription.accessStatus || "active"}`
@@ -1649,9 +1691,6 @@
               const usageLabel = subscription.linkedToSupabase
                 ? `${subscription.monthlyUsed || 0} / ${subscription.monthlyLimit || 0} imagens`
                 : "sem utilizador ligado";
-              const revenueNote = subscription.revenueExcluded
-                ? `<span class="muted-small">Pro manual/grátis - não conta para MRR</span>`
-                : "";
               const periodText = subscription.currentPeriodEnd
                 ? formatDate(subscription.currentPeriodEnd)
                 : formatDate(subscription.canceledAt);
@@ -1664,13 +1703,16 @@
                   </td>
                   <td><span class="pill ${statusClass}">${escapeHtml(statusLabel)}</span></td>
                   <td>
+                    <span class="pill ${escapeHtml(businessType.tone || "warning")}">${escapeHtml(businessType.label || "Rever")}</span>
+                    <span class="muted-small">${escapeHtml(businessType.note || "")}</span>
+                  </td>
+                  <td>
                     ${escapeHtml(subscription.planName || "Plano Stripe")}
                     <span class="muted-small">${escapeHtml(subscription.priceId || "-")}</span>
                   </td>
                   <td>
                     ${formatCurrencyFromCents(subscription.amount || 0, subscription.currency)}
                     <span class="muted-small">${escapeHtml(subscription.interval || "-")}</span>
-                    ${revenueNote}
                   </td>
                   <td>${periodText}</td>
                   <td>
@@ -1685,7 +1727,7 @@
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="7">Ainda não existem subscrições Stripe.</td></tr>`;
+          : `<tr><td class="empty" colspan="8">Ainda não existem subscrições Stripe.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString("pt-PT") : "";
         subscriptionsStatus.textContent = `${summary.total || 0} subscrições lidas. Última atualização: ${generatedAt}`;
@@ -1754,7 +1796,7 @@
           }
           renderSubscriptions(data);
         } catch {
-          subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="7">Não foi possível carregar subscrições Stripe.</td></tr>`;
+          subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="8">Não foi possível carregar subscrições Stripe.</td></tr>`;
           subscriptionsStatus.textContent = "Erro ao carregar Stripe. Verificar chave Stripe e permissão do admin.";
         }
       }
@@ -1984,7 +2026,7 @@
           recoveryRowsBody.innerHTML = `<tr><td class="empty" colspan="4">Não foi possível carregar oportunidades comerciais.</td></tr>`;
           outreachProspectsBody.innerHTML = `<tr><td class="empty" colspan="8">Não foi possível carregar prospects.</td></tr>`;
           supportRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar a caixa de suporte.</td></tr>`;
-          subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="7">Não foi possível carregar subscrições Stripe.</td></tr>`;
+          subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="8">Não foi possível carregar subscrições Stripe.</td></tr>`;
           liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variáveis Vercel.";
           subscriptionsStatus.textContent = "Erro ao carregar subscrições.";
         }

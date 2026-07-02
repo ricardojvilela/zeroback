@@ -159,10 +159,78 @@ function subscriptionPricing(subscription) {
   };
 }
 
+function subscriptionBusinessType(subscription, profile = null) {
+  const status = String(subscription?.status || "");
+  const manualAccess = profile?.plan === "pro" && profile?.planStatus === "manual";
+  const linked = Boolean(profile?.userId);
+
+  if (status === "canceled") {
+    return {
+      key: "canceled",
+      label: "Cancelada",
+      tone: "muted",
+      note: "Historico Stripe, nao conta para MRR.",
+    };
+  }
+
+  if (subscription?.cancel_at_period_end) {
+    return {
+      key: "canceling",
+      label: "Fim de periodo",
+      tone: "warning",
+      note: "Cliente ativo ate ao fim do periodo; nao deve ser tratado como renovacao futura.",
+    };
+  }
+
+  if (manualAccess) {
+    return {
+      key: "manual_pro",
+      label: "Pro manual/gratis",
+      tone: "warning",
+      note: "Acesso interno ou cortesia; nao conta para MRR.",
+    };
+  }
+
+  if (["incomplete", "incomplete_expired", "past_due", "unpaid", "paused"].includes(status)) {
+    return {
+      key: "payment_issue",
+      label: "Pagamento pendente",
+      tone: "danger",
+      note: "Rever pagamento, estado Stripe ou tentativa incompleta.",
+    };
+  }
+
+  if (!linked) {
+    return {
+      key: "unlinked",
+      label: "Sem ligacao",
+      tone: "warning",
+      note: "Existe no Stripe mas ainda nao esta ligada a uma conta BatchCutout.",
+    };
+  }
+
+  if (status === "active") {
+    return {
+      key: "paid_customer",
+      label: "Cliente pagante",
+      tone: "success",
+      note: "Conta paga recorrente; conta para MRR.",
+    };
+  }
+
+  return {
+    key: "review",
+    label: "Rever",
+    tone: "warning",
+    note: "Estado Stripe pouco comum; confirmar manualmente.",
+  };
+}
+
 function mapSubscription(subscription, profile = null) {
   const customer = getCustomer(subscription);
   const pricing = subscriptionPricing(subscription);
   const manualAccess = profile?.plan === "pro" && profile?.planStatus === "manual";
+  const businessType = subscriptionBusinessType(subscription, profile);
 
   return {
     id: subscription.id,
@@ -178,6 +246,7 @@ function mapSubscription(subscription, profile = null) {
     linkedToSupabase: Boolean(profile?.userId),
     accessPlan: profile?.plan || "",
     accessStatus: profile?.planStatus || "",
+    businessType,
     revenueExcluded: Boolean(manualAccess),
     revenueExclusionReason: manualAccess ? "manual_pro_access" : "",
     monthlyUsed: profile?.monthlyUsed || 0,
@@ -204,9 +273,20 @@ function summarizeSubscriptions(subscriptions) {
     mrrAmount: 0,
     excludedMrrAmount: 0,
     currency: "eur",
+    businessTypes: {
+      paid_customer: 0,
+      manual_pro: 0,
+      canceling: 0,
+      canceled: 0,
+      payment_issue: 0,
+      unlinked: 0,
+      review: 0,
+    },
   };
 
   for (const subscription of subscriptions) {
+    const typeKey = subscription.businessType?.key || "review";
+    summary.businessTypes[typeKey] = (summary.businessTypes[typeKey] || 0) + 1;
     if (subscription.currency) summary.currency = subscription.currency;
     if (subscription.status === "active") {
       summary.active += 1;
