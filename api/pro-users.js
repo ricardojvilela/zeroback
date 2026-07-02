@@ -162,6 +162,7 @@ function subscriptionPricing(subscription) {
 function mapSubscription(subscription, profile = null) {
   const customer = getCustomer(subscription);
   const pricing = subscriptionPricing(subscription);
+  const manualAccess = profile?.plan === "pro" && profile?.planStatus === "manual";
 
   return {
     id: subscription.id,
@@ -177,6 +178,8 @@ function mapSubscription(subscription, profile = null) {
     linkedToSupabase: Boolean(profile?.userId),
     accessPlan: profile?.plan || "",
     accessStatus: profile?.planStatus || "",
+    revenueExcluded: Boolean(manualAccess),
+    revenueExclusionReason: manualAccess ? "manual_pro_access" : "",
     monthlyUsed: profile?.monthlyUsed || 0,
     monthlyLimit: profile?.monthlyLimit || 0,
     monthlyRemaining: profile?.monthlyRemaining || 0,
@@ -192,11 +195,14 @@ function summarizeSubscriptions(subscriptions) {
     total: subscriptions.length,
     active: 0,
     renewing: 0,
+    stripeRenewing: 0,
+    nonRevenueRenewing: 0,
     canceled: 0,
     attention: 0,
     cancelAtPeriodEnd: 0,
     unlinked: 0,
     mrrAmount: 0,
+    excludedMrrAmount: 0,
     currency: "eur",
   };
 
@@ -205,8 +211,14 @@ function summarizeSubscriptions(subscriptions) {
     if (subscription.status === "active") {
       summary.active += 1;
       if (!subscription.cancelAtPeriodEnd) {
-        summary.renewing += 1;
-        summary.mrrAmount += Number(subscription.monthlyAmount || 0) || 0;
+        summary.stripeRenewing += 1;
+        if (subscription.revenueExcluded) {
+          summary.nonRevenueRenewing += 1;
+          summary.excludedMrrAmount += Number(subscription.monthlyAmount || 0) || 0;
+        } else {
+          summary.renewing += 1;
+          summary.mrrAmount += Number(subscription.monthlyAmount || 0) || 0;
+        }
       }
     }
     if (subscription.status === "canceled") summary.canceled += 1;
@@ -216,6 +228,9 @@ function summarizeSubscriptions(subscriptions) {
       subscription.cancelAtPeriodEnd ||
       ["incomplete", "incomplete_expired", "past_due", "unpaid", "paused"].includes(subscription.status)
     ) {
+      summary.attention += 1;
+    }
+    if (subscription.status === "active" && !subscription.cancelAtPeriodEnd && subscription.revenueExcluded) {
       summary.attention += 1;
     }
   }

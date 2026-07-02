@@ -555,7 +555,7 @@
         <div class="hero-main">
           <p class="eyebrow">Painel interno</p>
           <h1>Subscrições, receita e uso real</h1>
-          <p>Acompanhe MRR, clientes ativos, acessos Pro e utilização do produto. O sinal comercial principal agora é a subscrição Stripe.</p>
+          <p>Acompanhe MRR pago, clientes ativos, acessos Pro e utilização do produto. O sinal comercial principal agora é a subscrição Stripe paga.</p>
         </div>
 
         <aside class="recommendation">
@@ -575,11 +575,11 @@
           <strong id="dashboardUploads">0</strong>
         </article>
         <article class="metric">
-          <span>Subscrições a renovar</span>
+          <span>Subscrições pagas a renovar</span>
           <strong id="dashboardActiveSubscriptions">0</strong>
         </article>
         <article class="metric">
-          <span>MRR renovável</span>
+          <span>MRR pago renovável</span>
           <strong id="dashboardMrr">0 EUR</strong>
         </article>
       </section>
@@ -665,7 +665,7 @@
           <div class="panel-head compact">
             <div>
               <h3>Subscrições Stripe</h3>
-              <p class="note">Acompanhamento de pagamentos recorrentes, renovações e ligação ao acesso Pro.</p>
+              <p class="note">Acompanhamento de pagamentos recorrentes, renovações pagas e acessos Pro manuais/grátis.</p>
             </div>
             <div class="actions">
               <button class="secondary" type="button" id="refreshSubscriptions">Atualizar subscrições</button>
@@ -673,7 +673,7 @@
           </div>
           <div class="live-grid">
             <article class="live-card">
-              <span>MRR renovável</span>
+              <span>MRR pago renovável</span>
               <strong id="subscriptionMrr">0 EUR</strong>
             </article>
             <article class="live-card">
@@ -695,6 +695,10 @@
             <article class="live-card">
               <span>Sem ligação</span>
               <strong id="subscriptionUnlinked">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Não MRR</span>
+              <strong id="subscriptionNonRevenueRenewing">0</strong>
             </article>
           </div>
           <p class="live-status" id="subscriptionsStatus">A carregar subscrições...</p>
@@ -1611,6 +1615,7 @@
         const summary = data.summary || {};
         const mrrLabel = formatCurrencyFromCents(summary.mrrAmount || 0, summary.currency || "eur");
         const renewingSubscriptions = summary.renewing ?? summary.active ?? 0;
+        const nonRevenueRenewing = summary.nonRevenueRenewing || 0;
         document.querySelector("#dashboardActiveSubscriptions").textContent = renewingSubscriptions;
         document.querySelector("#dashboardMrr").textContent = mrrLabel;
         document.querySelector("#subscriptionMrr").textContent = mrrLabel;
@@ -1619,15 +1624,19 @@
         document.querySelector("#subscriptionAttention").textContent = summary.attention || 0;
         document.querySelector("#subscriptionCancelAtPeriodEnd").textContent = summary.cancelAtPeriodEnd || 0;
         document.querySelector("#subscriptionUnlinked").textContent = summary.unlinked || 0;
+        document.querySelector("#subscriptionNonRevenueRenewing").textContent = nonRevenueRenewing;
         document.querySelector("#decisionBadge").textContent = summary.attention ? "Rever" : "Operacional";
         const attentionCount = summary.attention || 0;
         const attentionLabel = attentionCount === 1
           ? "1 subscrição ou ligação precisa de atenção"
           : `${attentionCount} subscrições ou ligações precisam de atenção`;
-        document.querySelector("#decisionTitle").textContent = `${renewingSubscriptions} subscrições a renovar`;
+        const nonRevenueText = nonRevenueRenewing === 1
+          ? "1 subscrição interna/manual ativa no Stripe não entra no MRR"
+          : `${nonRevenueRenewing} subscrições internas/manuais ativas no Stripe não entram no MRR`;
+        document.querySelector("#decisionTitle").textContent = `${renewingSubscriptions} subscrições pagas a renovar`;
         document.querySelector("#decisionText").textContent = attentionCount
-          ? `${attentionLabel}. Verifique estados pendentes, cancelamentos ou contas sem ligação.`
-          : `MRR renovável: ${mrrLabel}. As subscrições a renovar estão ligadas ao acesso BatchCutout.`;
+          ? `${attentionLabel}. ${nonRevenueRenewing ? `${nonRevenueText}. ` : ""}Verifique estados pendentes, cancelamentos ou contas sem ligação.`
+          : `MRR pago renovável: ${mrrLabel}. As subscrições pagas a renovar estão ligadas ao acesso BatchCutout.`;
 
         subscriptionsRowsBody.innerHTML = data.subscriptions?.length
           ? data.subscriptions.map((subscription) => {
@@ -1640,6 +1649,9 @@
               const usageLabel = subscription.linkedToSupabase
                 ? `${subscription.monthlyUsed || 0} / ${subscription.monthlyLimit || 0} imagens`
                 : "sem utilizador ligado";
+              const revenueNote = subscription.revenueExcluded
+                ? `<span class="muted-small">Pro manual/grátis - não conta para MRR</span>`
+                : "";
               const periodText = subscription.currentPeriodEnd
                 ? formatDate(subscription.currentPeriodEnd)
                 : formatDate(subscription.canceledAt);
@@ -1658,6 +1670,7 @@
                   <td>
                     ${formatCurrencyFromCents(subscription.amount || 0, subscription.currency)}
                     <span class="muted-small">${escapeHtml(subscription.interval || "-")}</span>
+                    ${revenueNote}
                   </td>
                   <td>${periodText}</td>
                   <td>
