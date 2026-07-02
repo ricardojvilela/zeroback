@@ -1039,6 +1039,8 @@
       let outreachProspects = [];
       let recoveryUsers = [];
       let capturedLeads = [];
+      let checkoutRecoveries = [];
+      let sentRecoveryEmailKeys = new Set();
       const liveStatus = document.querySelector("#liveStatus");
 
       function getAdminToken() {
@@ -1170,6 +1172,17 @@
         return (Date.now() - date.getTime()) / 36e5;
       }
 
+      function recoverySentKey(email, segment) {
+        const normalizedEmail = String(email || "").trim().toLowerCase();
+        const normalizedSegment = String(segment || "").trim();
+        return normalizedEmail && normalizedSegment ? `${normalizedEmail}|${normalizedSegment}` : "";
+      }
+
+      function recoveryAlreadySent(email, segment) {
+        const key = recoverySentKey(email, segment);
+        return key ? sentRecoveryEmailKeys.has(key) : false;
+      }
+
       function recoverySegment(user) {
         const isPro = user.plan === "pro" || Number(user.monthlyLimit || 0) > 0;
         if (isPro) return "proof";
@@ -1182,7 +1195,12 @@
         return "";
       }
 
-      function recoveryCopy(segment) {
+      function recoveryPlanUrl(plan = "monthly") {
+        const checkoutPlan = ["early", "monthly", "annual"].includes(plan) ? plan : "monthly";
+        return `https://batchcutout.com/pricing/?lang=en&checkout_plan=${checkoutPlan}&utm_source=email&utm_medium=recovery&utm_campaign=checkout_not_paid#pricing-account-title`;
+      }
+
+      function recoveryCopy(segment, context = {}) {
         const copies = {
           account_no_checkout: {
             label: "Conta sem checkout",
@@ -1193,7 +1211,7 @@
           checkout_not_paid: {
             label: "Checkout sem pagamento",
             subject: "Need help activating BatchCutout Pro?",
-            body: `Hi,\n\nIt looks like you opened BatchCutout Pro checkout but did not complete payment.\n\nIf anything blocked you, reply to this email and we will help. The current Pro offer keeps the same limits:\n\n- 100 images per batch\n- 2,000 images per month\n- Monthly, founder, and annual billing options\n\nContinue checkout:\nhttps://batchcutout.com/pricing/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=checkout_not_paid\n\nThanks,\nNexaFlow Labs`,
+            body: `Hi,\n\nIt looks like you opened BatchCutout Pro checkout but did not complete payment.\n\nIf anything blocked you, reply to this email and we will help. The current Pro offer keeps the same limits:\n\n- 100 images per batch\n- 2,000 images per month\n- Monthly, founder, and annual billing options\n\nContinue checkout:\n${recoveryPlanUrl(context.plan)}\n\nThanks,\nNexaFlow Labs`,
             reason: "Cliente Stripe criado, mas sem subscrição ativa após 24 horas.",
           },
           proof: {
@@ -1464,9 +1482,6 @@
       }
 
       function renderRecoveryActions() {
-        const userRows = recoveryUsers
-          .map((user) => ({ type: "user", user, email: user.email || "", segment: recoverySegment(user) }))
-          .filter((row) => row.segment);
         const proEmails = new Set(
           recoveryUsers
             .filter((user) => user.plan === "pro" || Number(user.monthlyLimit || 0) > 0)
@@ -1474,6 +1489,22 @@
             .filter(Boolean),
         );
         const userEmails = new Set(recoveryUsers.map((user) => String(user.email || "").toLowerCase()).filter(Boolean));
+        const checkoutRows = checkoutRecoveries
+          .filter((checkout) => checkout.email && checkout.recoverable && !checkout.recoverySentAt)
+          .filter((checkout) => !proEmails.has(String(checkout.email).toLowerCase()))
+          .filter((checkout) => !recoveryAlreadySent(checkout.email, "checkout_not_paid"))
+          .map((checkout) => ({
+            type: "checkout",
+            checkout,
+            email: checkout.email || "",
+            segment: "checkout_not_paid",
+          }));
+        const checkoutEmails = new Set(checkoutRows.map((row) => String(row.email || "").toLowerCase()).filter(Boolean));
+        const userRows = recoveryUsers
+          .map((user) => ({ type: "user", user, email: user.email || "", segment: recoverySegment(user) }))
+          .filter((row) => row.segment)
+          .filter((row) => !(row.segment === "checkout_not_paid" && checkoutEmails.has(String(row.email || "").toLowerCase())))
+          .filter((row) => !recoveryAlreadySent(row.email, row.segment));
         const leadRows = capturedLeads
           .filter((lead) => lead.email && !proEmails.has(String(lead.email).toLowerCase()))
           .filter((lead) => !userEmails.has(String(lead.email).toLowerCase()))
@@ -1483,8 +1514,9 @@
             lead,
             email: lead.email || "",
             segment: leadRecoverySegment(lead),
-          }));
-        const rows = [...userRows, ...leadRows];
+          }))
+          .filter((row) => !recoveryAlreadySent(row.email, row.segment));
+        const rows = [...checkoutRows, ...userRows, ...leadRows];
         const accountNoCheckout = rows.filter((row) => row.segment === "account_no_checkout").length;
         const checkoutNotPaid = rows.filter((row) => row.segment === "checkout_not_paid").length;
         const leadCaptures = rows.filter((row) => row.segment === "lead_capture" || row.segment === "lead_capture_pt").length;
@@ -1496,14 +1528,16 @@
         document.querySelector("#recoveryLeadCaptures").textContent = leadCaptures;
         document.querySelector("#recoveryAutoLeadReplies").textContent = autoLeadReplies;
         document.querySelector("#recoveryProofCandidates").textContent = proofCandidates;
-        recoverySummary.textContent = `${rows.length} contactos manuais potenciais. ${autoLeadReplies} lead(s) ja receberam o link automaticamente. Use contacto manual apenas com consentimento ou relação comercial válida.`;
+        recoverySummary.textContent = `${rows.length} contactos manuais potenciais. ${autoLeadReplies} lead(s) ja receberam o link automaticamente. ${sentRecoveryEmailKeys.size} recuperacao(oes) manuais ja registadas. Use contacto manual apenas com consentimento ou relação comercial válida.`;
 
         recoveryRowsBody.innerHTML = rows.length
-          ? rows.map(({ user, lead, email, segment }) => {
-              const copy = recoveryCopy(segment);
-              const reason = lead
-                ? `${copy.reason || "-"} ${lead.count ? `${lead.count} imagem(ns), ${lead.downloadType || "download"}.` : ""}${lead.autoReplyFailedAt ? ` Auto email falhou: ${lead.autoReplyFailureReason || "ver Resend"}.` : ""}`
-                : copy.reason || "-";
+          ? rows.map(({ user, lead, checkout, email, segment }) => {
+              const copy = recoveryCopy(segment, checkout || {});
+              const reason = checkout
+                ? `${copy.reason || "-"} Plano: ${checkout.plan || "monthly"}. Sessão Stripe há ${checkout.hoursSinceCreated || 0}h.`
+                : lead
+                  ? `${copy.reason || "-"} ${lead.count ? `${lead.count} imagem(ns), ${lead.downloadType || "download"}.` : ""}${lead.autoReplyFailedAt ? ` Auto email falhou: ${lead.autoReplyFailureReason || "ver Resend"}.` : ""}`
+                  : copy.reason || "-";
               return `
                 <tr>
                   <td><span class="pill ${segment === "proof" ? "success" : "warning"}">${escapeHtml(copy.label || segment)}</span></td>
@@ -1516,6 +1550,8 @@
                       data-recovery-action="send"
                       data-recovery-email="${escapeHtml(email || user?.email || "")}"
                       data-recovery-segment="${escapeHtml(segment)}"
+                      data-recovery-plan="${escapeHtml(checkout?.plan || "")}"
+                      data-recovery-session="${escapeHtml(checkout?.stripeSessionId || "")}"
                     >Enviar via domínio</button>
                   </td>
                 </tr>
@@ -1789,6 +1825,33 @@
         }
       }
 
+      async function loadRecoveryEmails() {
+        const token = getAdminToken();
+        if (!token) return;
+
+        try {
+          const response = await fetch("/api/pro-users?view=recovery-emails", {
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await response.json();
+          if (!response.ok || !data.ok) {
+            throw new Error(data.error || "recovery_emails_failed");
+          }
+          sentRecoveryEmailKeys = new Set(
+            (data.emails || [])
+              .map((email) => recoverySentKey(email.email, email.segment))
+              .filter(Boolean),
+          );
+          renderRecoveryActions();
+        } catch {
+          sentRecoveryEmailKeys = new Set();
+          renderRecoveryActions();
+        }
+      }
+
       async function loadLeadCaptures() {
         const token = getAdminToken();
         if (!token) return;
@@ -1808,6 +1871,29 @@
           renderRecoveryActions();
         } catch {
           capturedLeads = [];
+          renderRecoveryActions();
+        }
+      }
+
+      async function loadCheckoutRecoveries() {
+        const token = getAdminToken();
+        if (!token) return;
+
+        try {
+          const response = await fetch("/api/pro-users?view=checkout-recoveries", {
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await response.json();
+          if (!response.ok || !data.ok) {
+            throw new Error(data.error || "checkout_recoveries_failed");
+          }
+          checkoutRecoveries = data.recoveries || [];
+          renderRecoveryActions();
+        } catch {
+          checkoutRecoveries = [];
           renderRecoveryActions();
         }
       }
@@ -1916,11 +2002,11 @@
         await loadSubscriptions();
       }
 
-      async function sendRecoveryEmail(email, segment) {
+      async function sendRecoveryEmail(email, segment, context = {}) {
         const token = getAdminToken();
         if (!token) return;
 
-        const copy = recoveryCopy(segment);
+        const copy = recoveryCopy(segment, context);
         const response = await fetch("/api/pro-users", {
           method: "POST",
           headers: {
@@ -1933,6 +2019,9 @@
             to: email,
             subject: copy.subject || "",
             text: copy.body || "",
+            recoverySegment: segment,
+            recoveryPlan: context.plan || "",
+            stripeSessionId: context.stripeSessionId || "",
           }),
         });
 
@@ -2045,7 +2134,9 @@
           }
           renderLiveStats(data);
           await loadProUsers();
+          await loadRecoveryEmails();
           await loadLeadCaptures();
+          await loadCheckoutRecoveries();
           await loadSubscriptions();
           await loadOutreachProspects();
           await loadSupportMailbox();
@@ -2112,6 +2203,8 @@
 
         const email = button.dataset.recoveryEmail;
         const segment = button.dataset.recoverySegment;
+        const plan = button.dataset.recoveryPlan || "";
+        const stripeSessionId = button.dataset.recoverySession || "";
         if (!email || !segment) return;
         if (!confirm(`Enviar email via support@batchcutout.com para ${email}?`)) return;
 
@@ -2119,8 +2212,11 @@
         button.disabled = true;
         button.textContent = "A enviar...";
         try {
-          await sendRecoveryEmail(email, segment);
+          await sendRecoveryEmail(email, segment, { plan, stripeSessionId });
           button.textContent = "Enviado";
+          await loadRecoveryEmails();
+          await loadLeadCaptures();
+          await loadCheckoutRecoveries();
         } catch {
           button.textContent = originalText;
           alert("Não foi possível enviar via domínio.");

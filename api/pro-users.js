@@ -460,6 +460,34 @@ async function insertSupportEvent(settings, eventName, detail, eventLabel = "") 
   }
 }
 
+async function insertCommercialEvent(settings, eventName, detail, eventLabel = "") {
+  const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
+  const response = await fetch(`${settings.supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}`, {
+    method: "POST",
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+      "Content-Type": "application/json",
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify({
+      event_name: eventName,
+      event_category: "commercial_recovery",
+      event_label: cleanText(eventLabel || detail.email || detail.stripe_session_id || eventName, 160),
+      source: "email",
+      campaign: cleanText(detail.segment || eventName, 160),
+      value: 0,
+      detail,
+      occurred_at: new Date().toISOString(),
+    }),
+  });
+
+  if (!response.ok) {
+    const detailText = await response.text();
+    throw new Error(`commercial_event_insert_failed:${response.status}:${detailText.slice(0, 300)}`);
+  }
+}
+
 function supportMessageFromEvent(event, replyIds, resolvedIds) {
   const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
   const emailId = cleanText(detail.email_id || event.event_label || "", 120);
@@ -644,6 +672,182 @@ async function listLeadCaptures(settings) {
   };
 }
 
+function recoveryEmailFromEvent(event) {
+  const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+  return {
+    id: event.id,
+    email: normalizeEmail(detail.email),
+    segment: cleanText(detail.segment, 80),
+    stripeSessionId: cleanText(detail.stripe_session_id, 160),
+    plan: cleanText(detail.plan, 80),
+    subject: cleanText(detail.subject, 160),
+    sentAt: event.occurred_at || "",
+    resendId: cleanText(detail.resend_id, 120),
+  };
+}
+
+async function listRecoveryEmails(settings) {
+  const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
+  const query = new URLSearchParams({
+    select: "id,event_name,event_label,detail,occurred_at",
+    event_name: "eq.recovery_email_sent",
+    order: "occurred_at.desc",
+    limit: "1000",
+  });
+  const response = await fetch(`${settings.supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}?${query}`, {
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+    },
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`recovery_emails_read_failed:${response.status}:${detail.slice(0, 300)}`);
+  }
+
+  const emails = (await response.json())
+    .map(recoveryEmailFromEvent)
+    .filter((email) => email.email && email.segment);
+
+  return {
+    emails,
+    summary: {
+      total: emails.length,
+      checkoutNotPaid: emails.filter((email) => email.segment === "checkout_not_paid").length,
+      accountNoCheckout: emails.filter((email) => email.segment === "account_no_checkout").length,
+      leads: emails.filter((email) => email.segment === "lead_capture" || email.segment === "lead_capture_pt").length,
+      proof: emails.filter((email) => email.segment === "proof").length,
+    },
+    generatedAt: new Date().toISOString(),
+  };
+}
+
+function profileHasProAccess(profile = null) {
+  return profile?.plan === "pro" || Number(profile?.monthlyLimit || 0) > 0;
+}
+
+function checkoutRecoveryFromEvent(event, profile, recoveryEvent = null) {
+  const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+  const recoveryDetail = recoveryEvent?.detail && typeof recoveryEvent.detail === "object" ? recoveryEvent.detail : {};
+  const createdAt = event.occurred_at || "";
+  const hoursSinceCreated = createdAt
+    ? Math.max((Date.now() - new Date(createdAt).getTime()) / 36e5, 0)
+    : 0;
+  const plan = cleanText(detail.plan || detail.price_plan || event.event_label || "monthly", 80);
+
+  return {
+    email: profile?.email || "",
+    userId: cleanText(detail.supabase_user_id || profile?.userId || "", 120),
+    plan,
+    stripeSessionId: cleanText(detail.stripe_session_id || "", 160),
+    stripeCustomerId: cleanText(detail.stripe_customer_id || profile?.stripeCustomerId || "", 160),
+    source: cleanText(detail.utm_source || detail.source || event.source || detail.last_source || detail.first_source, 160),
+    campaign: cleanText(event.campaign || detail.utm_campaign || detail.campaign || detail.last_campaign || detail.first_campaign, 160),
+    pageLocation: cleanText(detail.page_location, 1000),
+    createdAt,
+    hoursSinceCreated: Math.round(hoursSinceCreated * 10) / 10,
+    recoverable: hoursSinceCreated >= 2 && !recoveryEvent,
+    tooFresh: hoursSinceCreated < 2,
+    recoverySentAt: recoveryEvent?.occurred_at || "",
+    recoveryResendId: cleanText(recoveryDetail.resend_id, 120),
+  };
+}
+
+async function listCheckoutRecoveries(settings) {
+  const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
+  const eventQuery = new URLSearchParams({
+    select: "id,event_name,event_label,detail,source,campaign,occurred_at",
+    event_name: "in.(pro_checkout_session_created,pro_subscription_paid,recovery_email_sent)",
+    order: "occurred_at.desc",
+    limit: "750",
+  });
+
+  const [eventsResponse, profiles] = await Promise.all([
+    fetch(`${settings.supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}?${eventQuery}`, {
+      headers: {
+        apikey: settings.serviceRoleKey,
+        Authorization: `Bearer ${settings.serviceRoleKey}`,
+      },
+    }),
+    listUsers(settings),
+  ]);
+
+  if (!eventsResponse.ok) {
+    const detail = await eventsResponse.text();
+    throw new Error(`checkout_recoveries_read_failed:${eventsResponse.status}:${detail.slice(0, 300)}`);
+  }
+
+  const profilesByUser = new Map();
+  const profilesByCustomer = new Map();
+  for (const profile of profiles) {
+    if (profile.userId) profilesByUser.set(profile.userId, profile);
+    if (profile.stripeCustomerId) profilesByCustomer.set(profile.stripeCustomerId, profile);
+  }
+
+  const events = await eventsResponse.json();
+  const paidSessionIds = new Set();
+  const recoveryBySession = new Map();
+  const recoveryByEmail = new Map();
+  const checkoutEvents = [];
+
+  for (const event of events) {
+    const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+    const stripeSessionId = cleanText(detail.stripe_session_id || event.event_label || "", 160);
+    const email = normalizeEmail(detail.email || event.event_label);
+
+    if (event.event_name === "pro_subscription_paid") {
+      if (stripeSessionId) paidSessionIds.add(stripeSessionId);
+      continue;
+    }
+
+    if (event.event_name === "recovery_email_sent") {
+      if (detail.segment === "checkout_not_paid" && stripeSessionId && !recoveryBySession.has(stripeSessionId)) {
+        recoveryBySession.set(stripeSessionId, event);
+      }
+      if (detail.segment === "checkout_not_paid" && email && !recoveryByEmail.has(email)) {
+        recoveryByEmail.set(email, event);
+      }
+      continue;
+    }
+
+    if (event.event_name === "pro_checkout_session_created") {
+      checkoutEvents.push(event);
+    }
+  }
+
+  const seenKeys = new Set();
+  const recoveries = [];
+  for (const event of checkoutEvents) {
+    const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+    const stripeSessionId = cleanText(detail.stripe_session_id || "", 160);
+    if (!stripeSessionId || paidSessionIds.has(stripeSessionId)) continue;
+
+    const profile = profilesByUser.get(cleanText(detail.supabase_user_id, 120)) ||
+      profilesByCustomer.get(cleanText(detail.stripe_customer_id, 160)) ||
+      null;
+    if (!profile?.email || profileHasProAccess(profile)) continue;
+
+    const key = normalizeEmail(profile.email) || stripeSessionId;
+    if (seenKeys.has(key)) continue;
+    seenKeys.add(key);
+
+    const recoveryEvent = recoveryBySession.get(stripeSessionId) || recoveryByEmail.get(normalizeEmail(profile.email)) || null;
+    recoveries.push(checkoutRecoveryFromEvent(event, profile, recoveryEvent));
+  }
+
+  return {
+    recoveries,
+    summary: {
+      total: recoveries.length,
+      ready: recoveries.filter((recovery) => recovery.recoverable).length,
+      tooFresh: recoveries.filter((recovery) => recovery.tooFresh).length,
+      alreadySent: recoveries.filter((recovery) => recovery.recoverySentAt).length,
+    },
+    generatedAt: new Date().toISOString(),
+  };
+}
+
 async function sendSupportReply(settings, body) {
   const mailSettings = supportSettings();
   if (!allowedOutreachDomains.has(mailSettings.fromDomain)) {
@@ -707,9 +911,9 @@ async function sendSupportReply(settings, body) {
   };
 }
 
-async function sendOutreach(body) {
-  const settings = outreachSettings();
-  if (!allowedOutreachDomains.has(settings.fromDomain)) {
+async function sendOutreach(supabaseSettings, body) {
+  const mailSettings = outreachSettings();
+  if (!allowedOutreachDomains.has(mailSettings.fromDomain)) {
     return { status: 503, body: { ok: false, error: "outreach_from_domain_not_allowed" } };
   }
 
@@ -722,15 +926,18 @@ async function sendOutreach(body) {
   const subject = cleanText(body.subject, 160);
   const text = cleanText(body.text, 5000);
   const dryRun = Boolean(body.dryRun);
+  const recoverySegment = cleanText(body.recoverySegment, 80);
+  const stripeSessionId = cleanText(body.stripeSessionId, 160);
+  const recoveryPlan = cleanText(body.recoveryPlan, 80);
 
   if (!to || !subject || !text) {
     return { status: 400, body: { ok: false, error: "invalid_email_payload" } };
   }
 
   const payload = {
-    from: settings.from,
+    from: mailSettings.from,
     to,
-    replyTo: settings.replyTo,
+    replyTo: mailSettings.replyTo,
     subject,
     text,
     tags: [
@@ -764,6 +971,19 @@ async function sendOutreach(body) {
         detail: sent.error.message,
       },
     };
+  }
+
+  if (recoverySegment) {
+    await insertCommercialEvent(supabaseSettings, "recovery_email_sent", {
+      email: to,
+      segment: recoverySegment,
+      stripe_session_id: stripeSessionId,
+      plan: recoveryPlan,
+      from: payload.from,
+      reply_to: payload.replyTo,
+      subject: payload.subject,
+      resend_id: sent.data?.id || "",
+    }, stripeSessionId || to);
   }
 
   return {
@@ -808,6 +1028,14 @@ export default async function handler(request, response) {
         const leadData = await listLeadCaptures(settings);
         return sendJson(response, 200, { ok: true, ...leadData });
       }
+      if (url.searchParams.get("view") === "recovery-emails") {
+        const recoveryEmails = await listRecoveryEmails(settings);
+        return sendJson(response, 200, { ok: true, ...recoveryEmails });
+      }
+      if (url.searchParams.get("view") === "checkout-recoveries") {
+        const recoveryData = await listCheckoutRecoveries(settings);
+        return sendJson(response, 200, { ok: true, ...recoveryData });
+      }
 
       const users = await listUsers(settings);
       return sendJson(response, 200, { ok: true, users });
@@ -822,7 +1050,7 @@ export default async function handler(request, response) {
     const mode = String(body?.mode || "").trim();
 
     if (mode === "send-outreach") {
-      const result = await sendOutreach(body);
+      const result = await sendOutreach(settings, body);
       return sendJson(response, result.status, result.body);
     }
 
