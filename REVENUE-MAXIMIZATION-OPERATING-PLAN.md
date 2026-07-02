@@ -65,3 +65,8 @@ Interpretation:
 3. Review Google Ads search terms and negatives before increasing spend.
 4. Prepare 2026-07-06 and 2026-07-07 follow-ups, but send only when due.
 5. Prepare directory launch assets for Product Hunt/Uneed after the conversion path is improved.
+
+## Executed conversion fixes
+
+- The app now preserves the selected Pro plan through login so a user who clicks a plan before signing in is sent to the same Stripe Checkout after authentication.
+- Pricing hero CTAs now stay on `/pricing/` and jump to the direct checkout panel with the plan selected, instead of sending high-intent users back to the homepage.
