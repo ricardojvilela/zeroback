@@ -1229,21 +1229,29 @@
         const key = outreachTemplateKey(prospect);
         const campaign = outreachCampaign(prospect);
         const toolUrl = `https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=${campaign}#tool`;
+        const demoUrl = `https://batchcutout.com/customer-results/?utm_source=manual_outreach&utm_medium=email&utm_campaign=${campaign}_demo`;
+        const usesDemo = prospect.outreach_variant === "demo_video";
+        const demoBlock = usesDemo
+          ? `\n\nI made a 22-second demo so you can see the flow before testing it:\n${demoUrl}`
+          : "";
         if (key === "email_partner") {
           return {
             subject: "Batch background removal for ecommerce photo workflows",
-            body: `Hi,\n\n${outreachIntro(prospect)}\n\nWe built BatchCutout as a simple batch background remover for product photo workflows. It is not a full design suite; it is focused on repeat cutouts, transparent PNGs, and ZIP export.\n\nIt may be useful when you need to process many simple product shots before final editing or client delivery.\n\nYou can test 2 images free here, no card needed:\nhttps://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach#tool\n\nFounder plan:\nhttps://batchcutout.com/pricing/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach\n\nIf this is not relevant, reply "no thanks" and I will not contact you again.\n\nThanks,\nRicardo\nNexaFlow Labs`,
+            body: `Hi,\n\n${outreachIntro(prospect)}\n\nBatchCutout is a simple batch background remover for product photo workflows. It is not a full design suite; it is focused on repeat cutouts, transparent PNGs, and ZIP export.${demoBlock}\n\nYou can also test 2 images free here, no card needed:\nhttps://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach#tool\n\nFounder plan:\nhttps://batchcutout.com/pricing/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach\n\nIf this is not relevant, reply "no thanks" and I will not contact you again.\n\nThanks,\nRicardo\nNexaFlow Labs`,
           };
         }
         return {
           subject: "Quick way to clean product photos in batches",
-          body: `Hi,\n\n${outreachIntro(prospect)}\n\nWe built BatchCutout for small ecommerce teams that need to remove backgrounds from product photos in batches, export transparent PNGs, and download everything as one ZIP.\n\nThe current founder plan is 15 EUR/month and includes:\n\n- 100 images per batch\n- 2,000 images per month\n- PNG and ZIP export\n\nYou can test 2 images free here, no account or card needed:\n${toolUrl}\n\nIf you need larger batches after testing, Pro unlocks up to 100 images per batch and 2,000 images per month.\n\nIf this is not relevant, reply "no thanks" and I will not contact you again.\n\nThanks,\nRicardo\nNexaFlow Labs`,
+          body: `Hi,\n\n${outreachIntro(prospect)}\n\nBatchCutout removes backgrounds from product photos in batches, exports transparent PNGs, and downloads everything as one ZIP.${demoBlock}\n\nYou can test 2 images free here, no account or card needed:\n${toolUrl}\n\nIf you need larger batches after testing, Pro unlocks up to 100 images per batch and 2,000 images per month. The current founder plan is 15 EUR/month.\n\nIf this is not relevant, reply "no thanks" and I will not contact you again.\n\nThanks,\nRicardo\nNexaFlow Labs`,
         };
       }
 
       function outreachContactFormCopy(prospect) {
         const campaign = outreachCampaign(prospect);
-        return `Hi, ${outreachIntro(prospect)} BatchCutout removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP. You can test 2 images free, no account or card needed: https://batchcutout.com/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${campaign}#tool Founder plan is 15 EUR/month for 100 images per batch and 2,000/month. - Ricardo, NexaFlow Labs`;
+        const demoLine = prospect.outreach_variant === "demo_video"
+          ? ` I made a 22-second demo here: https://batchcutout.com/customer-results/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${campaign}_demo`
+          : "";
+        return `Hi, ${outreachIntro(prospect)} BatchCutout removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP.${demoLine} You can also test 2 images free, no account or card needed: https://batchcutout.com/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${campaign}#tool Founder plan is 15 EUR/month for 100 images per batch and 2,000/month. - Ricardo, NexaFlow Labs`;
       }
 
       function outreachStatusLabel(status) {
@@ -1258,6 +1266,7 @@
 
       function outreachActionLabel(prospect) {
         const action = prospect.next_action || "";
+        const date = prospect.follow_up_date ? ` (${prospect.follow_up_date})` : "";
         const labels = {
           send_domain_email: "Enviar email",
           submit_contact_form: "Submeter formulário",
@@ -1267,7 +1276,9 @@
           manual_captcha_required: "CAPTCHA manual",
           do_not_contact: "Não contactar",
         };
-        const date = prospect.follow_up_date ? ` (${prospect.follow_up_date})` : "";
+        if (action === "send_domain_email" && prospect.outreach_variant === "demo_video") {
+          return `Enviar email + demo${date}`;
+        }
         return `${labels[action] || action || "-"}${date}`;
       }
 
@@ -1497,6 +1508,7 @@
               const isBlocked = String(prospect.status || "").startsWith("blocked");
               const isEmail = prospect.channel === "email" && /@/.test(prospect.contact || "");
               const isForm = prospect.channel === "contact form";
+              const hasDemoVariant = prospect.outreach_variant === "demo_video";
               const statusClass = isSent ? "success" : isBlocked ? "muted" : "warning";
               const action = isSent || isBlocked
                 ? `<span class="muted-small">${isBlocked ? "Sem ação" : "Já contactado"}</span>`
@@ -1510,7 +1522,8 @@
                       data-outreach-template="${escapeHtml(prospect.template || "")}"
                       data-outreach-segment="${escapeHtml(prospect.segment || "")}"
                       data-outreach-angle="${escapeHtml(prospect.angle || "")}"
-                    >Enviar via domínio</button>`
+                      data-outreach-variant="${escapeHtml(prospect.outreach_variant || "")}"
+                    >${hasDemoVariant ? "Enviar com demo" : "Enviar via domínio"}</button>`
                   : `<button
                       class="secondary"
                       type="button"
@@ -1520,6 +1533,7 @@
                       data-outreach-segment="${escapeHtml(prospect.segment || "")}"
                       data-outreach-name="${escapeHtml(prospect.name || "")}"
                       data-outreach-angle="${escapeHtml(prospect.angle || "")}"
+                      data-outreach-variant="${escapeHtml(prospect.outreach_variant || "")}"
                     >Copiar + abrir</button>`;
               return `
                 <tr>
@@ -2039,6 +2053,7 @@
             template: button.dataset.outreachTemplate || "",
             segment: button.dataset.outreachSegment || "",
             angle: button.dataset.outreachAngle || "",
+            outreach_variant: button.dataset.outreachVariant || "",
           });
           if (url) window.open(url, "_blank", "noopener,noreferrer");
           button.disabled = true;
@@ -2062,6 +2077,7 @@
             template: button.dataset.outreachTemplate || "",
             segment: button.dataset.outreachSegment || "",
             angle: button.dataset.outreachAngle || "",
+            outreach_variant: button.dataset.outreachVariant || "",
           });
           if (!email || !confirm(`Enviar email via support@batchcutout.com para ${email}?`)) return;
 

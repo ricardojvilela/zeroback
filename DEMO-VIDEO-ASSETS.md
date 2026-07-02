@@ -1,6 +1,6 @@
 # BatchCutout - demo video assets
 
-Updated: 2026-07-01
+Updated: 2026-07-02
 
 ## Files
 
@@ -27,6 +27,8 @@ Generation script:
 ## Where it is used
 
 - The horizontal MP4 is embedded on `/customer-results/`.
+- `/admin` outreach templates link to `/customer-results/` when a prospect has `outreach_variant=demo_video`.
+- The current 13 ready direct-email prospects are staged with `outreach_variant=demo_video`.
 - Use the vertical MP4 for short-form social posts or direct social messages.
 - Do not attach video files to cold outreach emails while the domain is warming. Prefer linking to the public page or video URL.
 
@@ -35,6 +37,10 @@ Generation script:
 Short line for manual outreach:
 
 > I also made a 22-second demo so you can see the flow before testing it: https://batchcutout.com/customer-results/
+
+For measurable manual outreach, use:
+
+`https://batchcutout.com/customer-results/?utm_source=manual_outreach&utm_medium=email&utm_campaign=[niche]_demo`
 
 ## LinkedIn / social caption
 

@@ -1,18 +1,19 @@
 # BatchCutout - daily prospecting queue
 
-Updated: 2026-07-01
+Updated: 2026-07-02
 
 ## Current pipeline
 
 - Total prospects: 93.
 - Ready for domain email: 13.
+- Ready with demo email variant: 13.
 - Already contacted: 56.
 - Blocked or not usable: 24.
 - Follow-ups due next: 2026-07-06 and 2026-07-07.
 
 ## Today's rule
 
-The domain already sent a meaningful batch on 2026-07-01. Do not send the full new queue immediately. Keep the new leads staged and send a small controlled batch through `/admin` only when ready to continue outreach.
+The domain already sent a meaningful batch on 2026-07-01. Do not send the full new queue automatically. Keep the new leads staged and send a small controlled batch through `/admin` only when ready to continue outreach.
 
 Recommended cap while the domain is still warming:
 
@@ -23,7 +24,7 @@ Recommended cap while the domain is still warming:
 
 ## New ready queue
 
-Prioritize these first because each has a public email and a visual product category where product cutouts can matter:
+Prioritize these first because each has a public email, a visual product category where product cutouts can matter, and `outreach_variant=demo_video`:
 
 1. West Glow Studio - candles - `hello@westglowstudio.com`
 2. TIA by Tia Hayek - jewelry - `info@tiahayek.com`
@@ -44,12 +45,13 @@ Prioritize these first because each has a public email and a visual product cate
 1. Open `/admin`.
 2. Check `support@batchcutout.com` replies first.
 3. Filter `Prospecção comercial` by `Prontos`.
-4. Send 10 to 15 highest-score prospects through the domain email.
+4. Send 10 to 15 highest-score prospects through the domain email using `Enviar com demo`.
 5. Update the CSV row after sending:
    - `status`: `sent_YYYY-MM-DD`
    - `next_action`: `follow_up_if_no_reply`
    - `follow_up_date`: 3 to 4 business days later
    - `send_id`: Resend ID from the panel
+   - keep `outreach_variant`: `demo_video`
 6. If a prospect replies negatively, set `status` to `blocked_opt_out` and `next_action` to `do_not_contact`.
 7. If a prospect replies positively, handle manually and ask for proof only after they are satisfied.
 
@@ -58,4 +60,3 @@ Prioritize these first because each has a public email and a visual product cate
 - Previous 2026-06-30 batch: follow-up from 2026-07-06 if no reply.
 - Previous 2026-07-01 batch: follow-up from 2026-07-07 if no reply.
 - New ready queue: follow-up should be 3 to 4 business days after each actual send date.
-

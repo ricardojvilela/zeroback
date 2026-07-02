@@ -193,6 +193,14 @@ Daily queue update on 2026-07-01:
 - No new emails were sent automatically in this update.
 - Use `SALES-PROSPECTION-DAILY-QUEUE.md` for the daily cap and priority order.
 
+Demo outreach preparation on 2026-07-02:
+
+- Added `outreach_variant` to the prospect CSV.
+- Marked the 13 ready direct-email prospects with `outreach_variant=demo_video`.
+- Updated `/admin` email and contact-form copy to link to `/customer-results/` before the free 2-image test.
+- Demo outreach links use UTM campaigns ending in `_demo` so they can be compared with normal outreach.
+- No emails were sent automatically in this update.
+
 Contact form attempt on 2026-07-01:
 
 - 16 `ready_form` leads were checked for automated submission.

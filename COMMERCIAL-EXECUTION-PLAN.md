@@ -193,6 +193,8 @@ Decision rules:
 - Added `DEMO-VIDEO-ASSETS.md` with public URLs, usage notes and short captions.
 - Embedded the horizontal demo on `/customer-results/`.
 - Added `tools/create-demo-video.mjs` so the asset can be regenerated from the current before/after image.
+- Connected the demo page to `/admin` outreach templates and staged the 13 ready prospects with `outreach_variant=demo_video`.
+- No demo outreach emails were sent automatically from this update.
 
 ## Executed growth work - self-service free test
 

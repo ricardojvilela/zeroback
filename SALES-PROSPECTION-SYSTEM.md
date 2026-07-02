@@ -33,6 +33,7 @@ Best-fit niches:
 - Stop immediately on any negative reply or opt-out.
 - Keep daily direct email batches small while the domain is still building reputation.
 - Use `BatchCutout <support@batchcutout.com>` and reply-to `support@batchcutout.com`.
+- When using the demo variant, link to `/customer-results/`; do not attach video files to cold outreach emails.
 
 ## Status workflow
 
@@ -54,6 +55,12 @@ Best-fit niches:
 - `manual_captcha_required`: submit manually only if a human is available to solve the CAPTCHA.
 - `do_not_contact`: leave out of outreach.
 
+## Outreach variants
+
+- `outreach_variant=demo_video`: use the short demo page before asking the prospect to test the 2 free images.
+- Demo email links must use `/customer-results/?utm_source=manual_outreach&utm_medium=email&utm_campaign=[niche]_demo`.
+- Keep the normal tool link after the demo link so the prospect can self-test immediately.
+
 ## First email structure
 
 Subject:
@@ -67,16 +74,13 @@ I found [store] and noticed your [niche] photos could benefit from a faster way 
 
 We built BatchCutout for small ecommerce teams that need to remove backgrounds from product photos in batches, export transparent PNGs, and download everything as one ZIP.
 
-The current founder plan is 15 EUR/month and includes:
+I made a 22-second demo so you can see the flow before testing it:
+https://batchcutout.com/customer-results/?utm_source=manual_outreach&utm_medium=email&utm_campaign=[niche]_demo
 
-- 100 images per batch
-- 2,000 images per month
-- PNG and ZIP export
-
-You can try it here:
+You can test 2 images free here, no account or card needed:
 https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=[niche]#tool
 
-You can test 2 images free in the browser, no account or card needed. If you need larger batches after testing, Pro unlocks up to 100 images per batch and 2,000 images per month.
+If you need larger batches after testing, Pro unlocks up to 100 images per batch and 2,000 images per month. The current founder plan is 15 EUR/month.
 
 If this is not relevant, reply "no thanks" and I will not contact you again.
 
@@ -91,7 +95,11 @@ Batch background removal for ecommerce photo workflows
 
 Use this for product photographers, ecommerce assistants and small agencies. The message should position BatchCutout as a utility for repeat cutouts before final editing or client delivery, not as a replacement for their service.
 
-The partner email must also point to the self-service test:
+The partner email must link to the demo first:
+
+https://batchcutout.com/customer-results/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach_demo
+
+Then point to the self-service test:
 
 https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach#tool
 
@@ -136,5 +144,5 @@ The consent text is kept in `FIRST-CUSTOMER-PROOF-KIT.md`.
 1. Open `/admin`.
 2. Review replies in `support@batchcutout.com`.
 3. Send or submit only the highest-score ready prospects.
-4. Record status, follow-up date and notes in `sales-outreach-prospects-2026-06-30.csv`.
+4. Record status, follow-up date, `outreach_variant` and notes in `sales-outreach-prospects-2026-06-30.csv`.
 5. Stop contacting any lead that replies negatively.
