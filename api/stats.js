@@ -169,6 +169,16 @@ function verifyAdminToken(request) {
   }
 }
 
+function isInternalValidationEvent(event) {
+  const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+  return (
+    detail.event_category === "validation" ||
+    detail.source === "codex_validation" ||
+    event.source === "codex_validation" ||
+    event.visitor_id === "codex-validation-visitor"
+  );
+}
+
 export default async function handler(request, response) {
   if (request.method === "OPTIONS") {
     return sendJson(response, 200, { ok: true });
@@ -225,7 +235,7 @@ export default async function handler(request, response) {
       }
 
       const pageEvents = await supabaseResponse.json();
-      events.push(...pageEvents);
+      events.push(...pageEvents.filter((event) => !isInternalValidationEvent(event)));
       if (pageEvents.length < pageSize) break;
     }
 
