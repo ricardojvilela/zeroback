@@ -556,23 +556,55 @@ async function resolveSupportEmail(settings, body) {
 
 async function listLeadCaptures(settings) {
   const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
-  const query = new URLSearchParams({
+  const leadQuery = new URLSearchParams({
     select: "id,event_name,event_label,detail,source,campaign,occurred_at",
     event_name: "eq.lead_capture_submitted",
     order: "occurred_at.desc",
     limit: "250",
   });
-
-  const response = await fetch(`${settings.supabaseUrl}/rest/v1/${tableName}?${query}`, {
-    headers: {
-      apikey: settings.serviceRoleKey,
-      Authorization: `Bearer ${settings.serviceRoleKey}`,
-    },
+  const replyQuery = new URLSearchParams({
+    select: "id,event_name,event_label,detail,occurred_at",
+    event_name: "in.(lead_capture_autoreply_sent,lead_capture_autoreply_failed)",
+    order: "occurred_at.desc",
+    limit: "500",
   });
+
+  const [response, replyResponse] = await Promise.all([
+    fetch(`${settings.supabaseUrl}/rest/v1/${tableName}?${leadQuery}`, {
+      headers: {
+        apikey: settings.serviceRoleKey,
+        Authorization: `Bearer ${settings.serviceRoleKey}`,
+      },
+    }),
+    fetch(`${settings.supabaseUrl}/rest/v1/${tableName}?${replyQuery}`, {
+      headers: {
+        apikey: settings.serviceRoleKey,
+        Authorization: `Bearer ${settings.serviceRoleKey}`,
+      },
+    }),
+  ]);
 
   if (!response.ok) {
     const detailText = await response.text();
     throw new Error(`lead_capture_read_failed:${response.status}:${detailText.slice(0, 300)}`);
+  }
+  if (!replyResponse.ok) {
+    const detailText = await replyResponse.text();
+    throw new Error(`lead_capture_reply_read_failed:${replyResponse.status}:${detailText.slice(0, 300)}`);
+  }
+
+  const repliesByEmail = new Map();
+  const replyEvents = await replyResponse.json();
+  for (const event of replyEvents) {
+    const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+    const email = normalizeEmail(event.event_label || detail.email);
+    if (!email || repliesByEmail.has(email)) continue;
+    repliesByEmail.set(email, {
+      eventName: event.event_name || "",
+      occurredAt: event.occurred_at || "",
+      reason: cleanText(detail.reason, 200),
+      resendId: cleanText(detail.resend_id, 120),
+    });
   }
 
   const seen = new Set();
@@ -583,6 +615,7 @@ async function listLeadCaptures(settings) {
     const email = normalizeEmail(detail.email);
     if (!email || seen.has(email)) continue;
     seen.add(email);
+    const reply = repliesByEmail.get(email) || null;
     leads.push({
       email,
       language: cleanText(detail.language, 20) || "en",
@@ -592,6 +625,10 @@ async function listLeadCaptures(settings) {
       count: Number(detail.count || 0) || 0,
       capturedAt: event.occurred_at || "",
       pageLocation: cleanText(detail.page_location, 1000),
+      autoReplySentAt: reply?.eventName === "lead_capture_autoreply_sent" ? reply.occurredAt : "",
+      autoReplyFailedAt: reply?.eventName === "lead_capture_autoreply_failed" ? reply.occurredAt : "",
+      autoReplyFailureReason: reply?.eventName === "lead_capture_autoreply_failed" ? reply.reason : "",
+      autoReplyResendId: reply?.resendId || "",
     });
   }
 
@@ -599,6 +636,9 @@ async function listLeadCaptures(settings) {
     leads,
     summary: {
       total: leads.length,
+      autoReplySent: leads.filter((lead) => lead.autoReplySentAt).length,
+      autoReplyFailed: leads.filter((lead) => lead.autoReplyFailedAt).length,
+      manualPending: leads.filter((lead) => !lead.autoReplySentAt).length,
     },
     generatedAt: new Date().toISOString(),
   };

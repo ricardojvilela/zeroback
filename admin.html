@@ -656,6 +656,14 @@
             <strong id="liveLeadCaptures">0</strong>
           </article>
           <article class="live-card">
+            <span>Auto email lead</span>
+            <strong id="liveLeadAutoreplies">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Auto email falhou</span>
+            <strong id="liveLeadAutoreplyFailures">0</strong>
+          </article>
+          <article class="live-card">
             <span>Conta sem checkout</span>
             <strong id="liveAccountCheckoutGap">0</strong>
           </article>
@@ -774,7 +782,7 @@
           <div class="panel-head compact">
             <div>
               <h3>Recuperação e prova</h3>
-              <p class="note">Candidatos para contacto manual. Não envia emails automaticamente.</p>
+              <p class="note">Candidatos para contacto manual. Leads que pedem o link recebem resposta automática e saem desta fila.</p>
             </div>
           </div>
           <div class="live-grid">
@@ -787,8 +795,12 @@
               <strong id="recoveryCheckoutNotPaid">0</strong>
             </article>
             <article class="live-card">
-              <span>Leads grátis</span>
+              <span>Leads por contactar</span>
               <strong id="recoveryLeadCaptures">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Auto email lead</span>
+              <strong id="recoveryAutoLeadReplies">0</strong>
             </article>
             <article class="live-card">
               <span>Pedir prova real</span>
@@ -1358,6 +1370,8 @@
         document.querySelector("#liveAccountSignups").textContent = totals.accountSignups || 0;
         document.querySelector("#liveAccountLogins").textContent = totals.accountLogins || 0;
         document.querySelector("#liveLeadCaptures").textContent = totals.leadCaptures || 0;
+        document.querySelector("#liveLeadAutoreplies").textContent = totals.leadAutorepliesSent || 0;
+        document.querySelector("#liveLeadAutoreplyFailures").textContent = totals.leadAutorepliesFailed || 0;
         document.querySelector("#liveBillingPortalOpens").textContent = totals.billingPortalOpens || 0;
         const accountEntrants = (totals.accountSignups || 0) + (totals.accountLogins || 0);
         document.querySelector("#liveAccountCheckoutGap").textContent = Math.max(accountEntrants - (totals.checkoutStarts || 0), 0);
@@ -1458,6 +1472,7 @@
         const leadRows = capturedLeads
           .filter((lead) => lead.email && !proEmails.has(String(lead.email).toLowerCase()))
           .filter((lead) => !userEmails.has(String(lead.email).toLowerCase()))
+          .filter((lead) => !lead.autoReplySentAt)
           .map((lead) => ({
             type: "lead",
             lead,
@@ -1468,19 +1483,21 @@
         const accountNoCheckout = rows.filter((row) => row.segment === "account_no_checkout").length;
         const checkoutNotPaid = rows.filter((row) => row.segment === "checkout_not_paid").length;
         const leadCaptures = rows.filter((row) => row.segment === "lead_capture" || row.segment === "lead_capture_pt").length;
+        const autoLeadReplies = capturedLeads.filter((lead) => lead.autoReplySentAt).length;
         const proofCandidates = rows.filter((row) => row.segment === "proof").length;
 
         document.querySelector("#recoveryAccountNoCheckout").textContent = accountNoCheckout;
         document.querySelector("#recoveryCheckoutNotPaid").textContent = checkoutNotPaid;
         document.querySelector("#recoveryLeadCaptures").textContent = leadCaptures;
+        document.querySelector("#recoveryAutoLeadReplies").textContent = autoLeadReplies;
         document.querySelector("#recoveryProofCandidates").textContent = proofCandidates;
-        recoverySummary.textContent = `${rows.length} contactos manuais potenciais. Use apenas com consentimento ou relação comercial válida.`;
+        recoverySummary.textContent = `${rows.length} contactos manuais potenciais. ${autoLeadReplies} lead(s) ja receberam o link automaticamente. Use contacto manual apenas com consentimento ou relação comercial válida.`;
 
         recoveryRowsBody.innerHTML = rows.length
           ? rows.map(({ user, lead, email, segment }) => {
               const copy = recoveryCopy(segment);
               const reason = lead
-                ? `${copy.reason || "-"} ${lead.count ? `${lead.count} imagem(ns), ${lead.downloadType || "download"}.` : ""}`
+                ? `${copy.reason || "-"} ${lead.count ? `${lead.count} imagem(ns), ${lead.downloadType || "download"}.` : ""}${lead.autoReplyFailedAt ? ` Auto email falhou: ${lead.autoReplyFailureReason || "ver Resend"}.` : ""}`
                 : copy.reason || "-";
               return `
                 <tr>

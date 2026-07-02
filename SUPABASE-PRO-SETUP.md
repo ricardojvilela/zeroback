@@ -105,6 +105,29 @@ Variaveis opcionais na Vercel:
 
 Se as variaveis opcionais nao existirem, o endpoint usa esses valores por defeito.
 
+### 2.2.2 Auto-resposta para leads captados
+
+Quando um utilizador descarrega um resultado gratuito e pede para guardar o link,
+o endpoint `/api/track` pode enviar automaticamente o email "O seu link BatchCutout".
+
+Regras de seguranca:
+
+- exige `lead_capture_submitted` com consentimento;
+- exige origem `post_download`;
+- exige contagem de imagens maior que zero;
+- exige tipo de download `png` ou `zip`;
+- nao reenvia para o mesmo email durante 30 dias;
+- regista `lead_capture_autoreply_sent` ou `lead_capture_autoreply_failed` no Supabase.
+
+Variaveis opcionais na Vercel:
+
+- `LEAD_CAPTURE_AUTOREPLY_ENABLED=false` para desligar a automacao;
+- `LEAD_CAPTURE_REPLY_FROM=BatchCutout <support@batchcutout.com>`;
+- `LEAD_CAPTURE_REPLY_TO=support@batchcutout.com`.
+
+Se as variaveis opcionais nao existirem, usa `SUPPORT_REPLY_FROM`, `SUPPORT_REPLY_TO`
+ou os valores por defeito do dominio BatchCutout.
+
 ### 2.3 Template de confirmação de conta
 
 Em `Authentication > Email Templates`:

@@ -52,6 +52,8 @@ Interpretation:
 - Do not send a second cold outreach batch on the same day.
 - Send only one follow-up per prospect.
 - Stop on any opt-out or negative reply.
+- Leads who explicitly ask to save the tool link after download can receive one automatic link email.
+- Do not manually email a captured lead if `lead_capture_autoreply_sent` already exists.
 - Do not raise ad spend until checkout starts or paid subscriptions appear.
 - Prioritize fixes that reduce the gap between download, Pro click, account creation, and checkout.
 
@@ -59,6 +61,7 @@ Interpretation:
 
 1. Strengthen the post-download upgrade path so users who received a result see a clearer reason to start checkout.
 2. Improve lead capture after successful free test because current lead captures are 0.
+   - Done: captured leads now receive an automatic link email when eligible.
 3. Review Google Ads search terms and negatives before increasing spend.
 4. Prepare 2026-07-06 and 2026-07-07 follow-ups, but send only when due.
 5. Prepare directory launch assets for Product Hunt/Uneed after the conversion path is improved.

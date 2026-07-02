@@ -1,3 +1,5 @@
+import { Resend } from "resend";
+
 const allowedEvents = new Set([
   "tool_page_view",
   "tool_drag_upload_intent",
@@ -34,6 +36,9 @@ const allowedEvents = new Set([
   "account_login_succeeded",
 ]);
 
+const allowedEmailDomains = new Set(["batchcutout.com"]);
+const leadAutoreplyWindowMs = 30 * 24 * 60 * 60 * 1000;
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "https://batchcutout.com",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -53,6 +58,29 @@ function asString(value, maxLength = 500) {
   return String(value).slice(0, maxLength);
 }
 
+function normalizeEmail(value) {
+  const email = String(value || "").trim().toLowerCase();
+  const valid = /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(email);
+  return valid ? email : "";
+}
+
+function emailDomain(value) {
+  return normalizeEmail(value).split("@")[1] || "";
+}
+
+function fromEmail(value) {
+  const match = String(value || "").match(/<([^<>]+)>/);
+  return normalizeEmail(match?.[1] || value);
+}
+
+function htmlEscape(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
 function sanitizeDetail(detail) {
   if (!detail || typeof detail !== "object" || Array.isArray(detail)) return {};
 
@@ -66,6 +94,266 @@ function sanitizeDetail(detail) {
     }
   }
   return output;
+}
+
+function leadMailSettings() {
+  const from = process.env.LEAD_CAPTURE_REPLY_FROM || process.env.SUPPORT_REPLY_FROM || "BatchCutout <support@batchcutout.com>";
+  const replyTo = process.env.LEAD_CAPTURE_REPLY_TO || process.env.SUPPORT_REPLY_TO || "support@batchcutout.com";
+  const fromAddress = fromEmail(from);
+  return {
+    from,
+    replyTo,
+    fromDomain: emailDomain(fromAddress),
+  };
+}
+
+function leadLanguage(detail) {
+  return String(detail.language || "").toLowerCase().startsWith("pt") ? "pt" : "en";
+}
+
+function leadAutoreplyCopy(language) {
+  if (language === "pt") {
+    return {
+      subject: "O seu link BatchCutout",
+      greeting: "Ola,",
+      toolUrl: "https://batchcutout.com/?utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply#tool",
+      pricingUrl: "https://batchcutout.com/pricing/?utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply",
+      intro: "Aqui fica o link para voltar ao BatchCutout e tratar fotos de produto.",
+      proLine: "Se precisar de repetir este fluxo em catálogo, variantes ou marketplace, o Pro desbloqueia:",
+      cta: "Abrir BatchCutout",
+      pricingCta: "Ver planos Pro",
+      optOut: "Se isto não for útil, responda \"remover\" e não enviaremos acompanhamento.",
+      thanks: "Obrigado,\nNexaFlow Labs",
+      bullets: ["100 imagens por lote", "2.000 imagens por mês", "PNG transparente e ZIP"],
+    };
+  }
+
+  return {
+    subject: "Your BatchCutout link",
+    greeting: "Hi,",
+    toolUrl: "https://batchcutout.com/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply#tool",
+    pricingUrl: "https://batchcutout.com/pricing/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply",
+    intro: "Here is the link to come back to BatchCutout and process product photos.",
+    proLine: "If you need to repeat this workflow for catalogs, variants, or marketplace listings, Pro unlocks:",
+    cta: "Open BatchCutout",
+    pricingCta: "See Pro plans",
+    optOut: "If this is not useful, reply \"unsubscribe\" and we will not send product follow-ups.",
+    thanks: "Thanks,\nNexaFlow Labs",
+    bullets: ["100 images per batch", "2,000 images per month", "Transparent PNG and ZIP export"],
+  };
+}
+
+function leadAutoreplyText(copy) {
+  return [
+    copy.greeting,
+    "",
+    copy.intro,
+    copy.toolUrl,
+    "",
+    copy.proLine,
+    "",
+    ...copy.bullets.map((bullet) => `- ${bullet}`),
+    "",
+    copy.pricingCta + ":",
+    copy.pricingUrl,
+    "",
+    copy.optOut,
+    "",
+    copy.thanks,
+  ].join("\n");
+}
+
+function leadAutoreplyHtml(copy) {
+  const bullets = copy.bullets.map((bullet) => `<li>${htmlEscape(bullet)}</li>`).join("");
+  return `<!doctype html>
+<html>
+  <body style="margin:0;background:#f3f7fa;color:#17202a;font-family:Arial,Helvetica,sans-serif;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f3f7fa;padding:24px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:1px solid #dbe3ee;border-radius:8px;overflow:hidden;">
+            <tr><td style="padding:24px 26px;background:#17202a;color:#ffffff;"><strong style="font-size:18px;">BatchCutout</strong><span style="margin-left:10px;color:#9fb4c6;font-size:12px;text-transform:uppercase;">NexaFlow Labs</span></td></tr>
+            <tr>
+              <td style="padding:28px 26px;">
+                <h1 style="margin:0 0 14px;font-size:28px;line-height:1.1;">${htmlEscape(copy.subject)}</h1>
+                <p style="margin:0 0 16px;line-height:1.55;color:#52606d;">${htmlEscape(copy.intro)}</p>
+                <p style="margin:0 0 18px;"><a href="${htmlEscape(copy.toolUrl)}" style="display:inline-block;background:#2646d8;color:#ffffff;text-decoration:none;font-weight:700;border-radius:8px;padding:13px 18px;">${htmlEscape(copy.cta)}</a></p>
+                <p style="margin:0 0 12px;line-height:1.55;color:#52606d;">${htmlEscape(copy.proLine)}</p>
+                <ul style="margin:0 0 22px;padding-left:20px;color:#52606d;line-height:1.55;">${bullets}</ul>
+                <a href="${htmlEscape(copy.pricingUrl)}" style="display:inline-block;background:#14958b;color:#ffffff;text-decoration:none;font-weight:700;border-radius:8px;padding:13px 18px;">${htmlEscape(copy.pricingCta)}</a>
+              </td>
+            </tr>
+            <tr><td style="padding:18px 26px;border-top:1px solid #dbe3ee;color:#697483;font-size:12px;line-height:1.45;">NexaFlow Labs. ${htmlEscape(copy.optOut)}</td></tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+}
+
+async function insertEvent(settings, tableName, row) {
+  const supabaseResponse = await fetch(`${settings.supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}`, {
+    method: "POST",
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+      "Content-Type": "application/json",
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify(row),
+  });
+
+  if (!supabaseResponse.ok) {
+    const errorText = await supabaseResponse.text();
+    const error = new Error(`supabase_insert_failed:${supabaseResponse.status}:${errorText.slice(0, 500)}`);
+    error.status = supabaseResponse.status;
+    error.detail = errorText.slice(0, 500);
+    throw error;
+  }
+}
+
+async function hasRecentLeadAutoreply(settings, tableName, email) {
+  const since = new Date(Date.now() - leadAutoreplyWindowMs).toISOString();
+  const query = new URLSearchParams({
+    select: "id",
+    event_name: "eq.lead_capture_autoreply_sent",
+    event_label: `eq.${email}`,
+    occurred_at: `gte.${since}`,
+    limit: "1",
+  });
+
+  const response = await fetch(`${settings.supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}?${query}`, {
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+    },
+  });
+
+  if (!response.ok) {
+    return true;
+  }
+
+  const rows = await response.json();
+  return Array.isArray(rows) && rows.length > 0;
+}
+
+async function sendLeadAutoreply(settings, tableName, detail, row) {
+  if (eventAutoreplyDisabled()) return { sent: false, skipped: true, reason: "disabled" };
+  if (detail.consent !== true) return { sent: false, skipped: true, reason: "no_consent" };
+  if (detail.source !== "post_download") return { sent: false, skipped: true, reason: "not_post_download" };
+  if ((Number(detail.count || 0) || 0) <= 0) return { sent: false, skipped: true, reason: "missing_download_count" };
+  if (!["png", "zip"].includes(String(detail.downloadType || ""))) {
+    return { sent: false, skipped: true, reason: "unknown_download_type" };
+  }
+
+  const to = normalizeEmail(detail.email);
+  if (!to) return { sent: false, skipped: true, reason: "invalid_email" };
+
+  const mailSettings = leadMailSettings();
+  if (!allowedEmailDomains.has(mailSettings.fromDomain)) {
+    return { sent: false, skipped: true, reason: "from_domain_not_allowed" };
+  }
+
+  const resendApiKey = process.env.RESEND_API_KEY || "";
+  if (!resendApiKey) return { sent: false, skipped: true, reason: "resend_not_configured" };
+
+  const alreadySent = await hasRecentLeadAutoreply(settings, tableName, to);
+  if (alreadySent) return { sent: false, skipped: true, reason: "already_sent_recently" };
+
+  const language = leadLanguage(detail);
+  const copy = leadAutoreplyCopy(language);
+  const payload = {
+    from: mailSettings.from,
+    to,
+    replyTo: mailSettings.replyTo,
+    subject: copy.subject,
+    text: leadAutoreplyText(copy),
+    html: leadAutoreplyHtml(copy),
+    tags: [
+      { name: "source", value: "lead_capture_autoreply" },
+      { name: "product", value: "batchcutout" },
+    ],
+  };
+
+  const resend = new Resend(resendApiKey);
+  let sent;
+  try {
+    sent = await resend.emails.send(payload);
+  } catch (error) {
+    await insertEvent(settings, tableName, {
+      event_name: "lead_capture_autoreply_failed",
+      event_category: "email",
+      event_label: to,
+      page_path: row.page_path,
+      page_location: row.page_location,
+      language,
+      session_id: row.session_id,
+      visitor_id: row.visitor_id,
+      source: "email",
+      campaign: "lead_capture_autoreply",
+      value: 0,
+      detail: {
+        email: to,
+        reason: error instanceof Error ? error.message.slice(0, 300) : "resend_exception",
+      },
+      occurred_at: new Date().toISOString(),
+    });
+    return { sent: false, skipped: false, reason: "resend_exception" };
+  }
+
+  if (sent.error) {
+    await insertEvent(settings, tableName, {
+      event_name: "lead_capture_autoreply_failed",
+      event_category: "email",
+      event_label: to,
+      page_path: row.page_path,
+      page_location: row.page_location,
+      language,
+      session_id: row.session_id,
+      visitor_id: row.visitor_id,
+      source: "email",
+      campaign: "lead_capture_autoreply",
+      value: 0,
+      detail: {
+        email: to,
+        reason: sent.error.message || "resend_error",
+      },
+      occurred_at: new Date().toISOString(),
+    });
+    return { sent: false, skipped: false, reason: "resend_error" };
+  }
+
+  await insertEvent(settings, tableName, {
+    event_name: "lead_capture_autoreply_sent",
+    event_category: "email",
+    event_label: to,
+    page_path: row.page_path,
+    page_location: row.page_location,
+    language,
+    session_id: row.session_id,
+    visitor_id: row.visitor_id,
+    source: "email",
+    campaign: "lead_capture_autoreply",
+    value: 0,
+    detail: {
+      email: to,
+      from: payload.from,
+      reply_to: payload.replyTo,
+      subject: payload.subject,
+      resend_id: sent.data?.id || "",
+      original_source: detail.source || "",
+      original_download_type: detail.downloadType || "",
+      original_count: Number(detail.count || 0) || 0,
+    },
+    occurred_at: new Date().toISOString(),
+  });
+
+  return { sent: true, skipped: false, id: sent.data?.id || "" };
+}
+
+function eventAutoreplyDisabled() {
+  return String(process.env.LEAD_CAPTURE_AUTOREPLY_ENABLED || "true").toLowerCase() === "false";
 }
 
 async function readRequestBody(request) {
@@ -134,29 +422,33 @@ export default async function handler(request, response) {
   };
 
   try {
-    const supabaseResponse = await fetch(`${supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}`, {
-      method: "POST",
-      headers: {
-        apikey: serviceRoleKey,
-        Authorization: `Bearer ${serviceRoleKey}`,
-        "Content-Type": "application/json",
-        Prefer: "return=minimal",
-      },
-      body: JSON.stringify(row),
-    });
+    const settings = { supabaseUrl, serviceRoleKey };
+    await insertEvent(settings, tableName, row);
 
-    if (!supabaseResponse.ok) {
-      const errorText = await supabaseResponse.text();
+    let leadAutoreply = null;
+    if (eventName === "lead_capture_submitted") {
+      try {
+        leadAutoreply = await sendLeadAutoreply(settings, tableName, detail, row);
+      } catch (error) {
+        leadAutoreply = {
+          sent: false,
+          skipped: false,
+          reason: error instanceof Error ? error.message.slice(0, 160) : "lead_autoreply_failed",
+        };
+      }
+    }
+
+    return sendJson(response, 202, { ok: true, stored: true, leadAutoreply });
+  } catch (error) {
+    if (String(error?.message || "").startsWith("supabase_insert_failed")) {
       return sendJson(response, 502, {
         ok: false,
         error: "supabase_insert_failed",
-        status: supabaseResponse.status,
-        detail: errorText.slice(0, 500),
+        status: error.status || 502,
+        detail: error.detail || "",
       });
     }
 
-    return sendJson(response, 202, { ok: true, stored: true });
-  } catch (error) {
     return sendJson(response, 500, {
       ok: false,
       error: "track_failed",

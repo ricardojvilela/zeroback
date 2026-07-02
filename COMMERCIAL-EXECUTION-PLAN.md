@@ -16,6 +16,8 @@ Secondary KPIs:
 - Uploads iniciados
 - Downloads
 - Cliques em planos
+- Leads captados
+- Auto-respostas a leads
 - Checkout sem login
 - Contas criadas
 - Checkouts iniciados
@@ -73,6 +75,7 @@ Success signal:
 - Visitors upload images.
 - Downloads happen.
 - At least some users click Pro plans.
+- Lead captures receive an immediate link email and do not require manual follow-up unless the auto-email fails.
 
 ### Week 2
 

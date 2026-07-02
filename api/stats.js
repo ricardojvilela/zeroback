@@ -43,6 +43,8 @@ function emptyDay(date) {
     accountSignups: 0,
     accountLogins: 0,
     leadCaptures: 0,
+    leadAutorepliesSent: 0,
+    leadAutorepliesFailed: 0,
     billingPortalOpens: 0,
   };
 }
@@ -131,6 +133,8 @@ function emptySourceRow(source) {
     accountSignups: 0,
     accountLogins: 0,
     leadCaptures: 0,
+    leadAutorepliesSent: 0,
+    leadAutorepliesFailed: 0,
     billingPortalOpens: 0,
     events: 0,
   };
@@ -309,6 +313,14 @@ export default async function handler(request, response) {
         case "lead_capture_submitted":
           row.leadCaptures += 1;
           sourceRow.leadCaptures += 1;
+          break;
+        case "lead_capture_autoreply_sent":
+          row.leadAutorepliesSent += 1;
+          sourceRow.leadAutorepliesSent += 1;
+          break;
+        case "lead_capture_autoreply_failed":
+          row.leadAutorepliesFailed += 1;
+          sourceRow.leadAutorepliesFailed += 1;
           break;
         case "billing_portal_opened":
           row.billingPortalOpens += 1;
