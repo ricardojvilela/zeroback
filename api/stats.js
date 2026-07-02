@@ -34,6 +34,9 @@ function emptyDay(date) {
     downloads: 0,
     pngDownloads: 0,
     zipDownloads: 0,
+    postDownloadNextShown: 0,
+    postDownloadFounderClicks: 0,
+    postDownloadSaveLinkClicks: 0,
     proClicks: 0,
     checkoutLoginRequired: 0,
     checkoutStarts: 0,
@@ -125,6 +128,9 @@ function emptySourceRow(source) {
     imagesAccepted: 0,
     downloads: 0,
     zipDownloads: 0,
+    postDownloadNextShown: 0,
+    postDownloadFounderClicks: 0,
+    postDownloadSaveLinkClicks: 0,
     proClicks: 0,
     checkoutLoginRequired: 0,
     checkoutStarts: 0,
@@ -281,6 +287,18 @@ export default async function handler(request, response) {
           row.downloads += 1;
           sourceRow.zipDownloads += 1;
           sourceRow.downloads += 1;
+          break;
+        case "post_download_next_shown":
+          row.postDownloadNextShown += 1;
+          sourceRow.postDownloadNextShown += 1;
+          break;
+        case "post_download_founder_clicked":
+          row.postDownloadFounderClicks += 1;
+          sourceRow.postDownloadFounderClicks += 1;
+          break;
+        case "post_download_save_link_clicked":
+          row.postDownloadSaveLinkClicks += 1;
+          sourceRow.postDownloadSaveLinkClicks += 1;
           break;
         case "tool_pro_clicked":
           row.proClicks += 1;

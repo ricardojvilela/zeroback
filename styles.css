@@ -689,6 +689,64 @@ h2 {
   filter: brightness(0.96);
 }
 
+.post-download-next {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
+  gap: 14px;
+  align-items: center;
+  margin-top: 14px;
+  border: 1px solid rgba(38, 70, 216, 0.22);
+  border-radius: 8px;
+  padding: 16px;
+  background:
+    linear-gradient(135deg, rgba(38, 70, 216, 0.08), rgba(15, 139, 124, 0.12)),
+    #ffffff;
+  box-shadow: 0 12px 28px rgba(26, 39, 57, 0.08);
+}
+
+.post-download-next h2 {
+  max-width: 34rem;
+  color: var(--charcoal);
+  font-size: 1.18rem;
+}
+
+.post-download-next p:not(.section-kicker) {
+  max-width: 42rem;
+  margin: 6px 0 0;
+  color: #52606d;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.post-download-next-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.post-download-next-actions button {
+  width: 100%;
+  min-height: 44px;
+  white-space: normal;
+}
+
+.post-download-next-actions .secondary {
+  border: 1px solid rgba(38, 70, 216, 0.2);
+  background: #ffffff;
+  color: var(--blue-strong);
+}
+
+.post-download-next-actions .secondary:hover:not(:disabled) {
+  background: #eef2ff;
+}
+
+.post-download-next-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #697483;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
 .status-panel {
   margin-top: 18px;
   color: var(--muted);
@@ -2787,6 +2845,7 @@ progress::-moz-progress-bar {
   .seo-link-grid,
   .feedback-options,
   .post-download-options,
+  .post-download-next,
   .lead-capture-form,
   .pro-plan-contrast,
   .pro-form {

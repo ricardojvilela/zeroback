@@ -620,6 +620,18 @@
             <strong id="liveDownloadReady">0</strong>
           </article>
           <article class="live-card">
+            <span>Oferta pós-download</span>
+            <strong id="livePostDownloadNext">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Fundador pós-download</span>
+            <strong id="livePostDownloadFounder">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Guardar link</span>
+            <strong id="livePostDownloadSaveLink">0</strong>
+          </article>
+          <article class="live-card">
             <span>Cliques em planos</span>
             <strong id="liveProClicks">0</strong>
           </article>
@@ -1383,6 +1395,9 @@
         document.querySelector("#liveLimit").textContent = totals.limitAttempts || 0;
         document.querySelector("#liveDownloads").textContent = totals.downloads || 0;
         document.querySelector("#liveDownloadReady").textContent = totals.downloadReadyShown || 0;
+        document.querySelector("#livePostDownloadNext").textContent = totals.postDownloadNextShown || 0;
+        document.querySelector("#livePostDownloadFounder").textContent = totals.postDownloadFounderClicks || 0;
+        document.querySelector("#livePostDownloadSaveLink").textContent = totals.postDownloadSaveLinkClicks || 0;
         document.querySelector("#liveProClicks").textContent = totals.proClicks || 0;
         document.querySelector("#liveCheckoutStarts").textContent = totals.checkoutStarts || 0;
         document.querySelector("#liveCheckoutSessionsCreated").textContent = totals.checkoutSessionsCreated || 0;

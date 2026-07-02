@@ -25,6 +25,9 @@ const inlineProCta = document.querySelector("#inlineProCta");
 const zipProCta = document.querySelector("#zipProCta");
 const progressBar = document.querySelector("#progressBar");
 const countText = document.querySelector("#countText");
+const postDownloadNextPanel = document.querySelector("#postDownloadNextPanel");
+const postDownloadFounderCta = document.querySelector("#postDownloadFounderCta");
+const postDownloadSaveLinkCta = document.querySelector("#postDownloadSaveLinkCta");
 const postDownloadFeedback = document.querySelector("#postDownloadFeedback");
 const postDownloadOptions = document.querySelector("#postDownloadOptions");
 const postDownloadThanks = document.querySelector("#postDownloadThanks");
@@ -90,6 +93,9 @@ const serverEventNames = new Set([
   "tool_processing_completed",
   "tool_download_png",
   "tool_download_zip",
+  "post_download_next_shown",
+  "post_download_founder_clicked",
+  "post_download_save_link_clicked",
   "tool_pro_clicked",
   "pro_prompt_shown",
   "pro_form_started",
@@ -150,6 +156,12 @@ const baseTranslation = {
   postDownloadNeedsQuality: "Precisa de melhor recorte",
   postDownloadLargerBatches: "Preciso de lotes maiores",
   postDownloadThanks: "Obrigado. A sua resposta ajuda-nos a melhorar a ferramenta.",
+  postDownloadNextKicker: "Próximo lote",
+  postDownloadNextTitle: "Resultado descarregado. Quer repetir isto em mais produtos?",
+  postDownloadNextText: "O plano fundador desbloqueia lotes até 100 imagens e 2.000 imagens por mês. Se ainda está a avaliar, guarde o link por email.",
+  postDownloadFounderCta: "Ativar fundador - 15 EUR/mês",
+  postDownloadSaveLinkCta: "Enviar link por email",
+  postDownloadNextNote: "Sem cartão no teste grátis. Pagamento seguro por Stripe quando escolher Pro.",
   leadCaptureKicker: "Guardar contacto",
   leadCaptureTitle: "Quer guardar este fluxo para voltar depois?",
   leadCaptureText: "Deixe o email e enviamos o link da ferramenta e dicas úteis para preparar fotos de produto em lote.",
@@ -300,6 +312,12 @@ const translations = {
     postDownloadNeedsQuality: "Needs better cutout",
     postDownloadLargerBatches: "I need larger batches",
     postDownloadThanks: "Thanks. This helps us improve the tool.",
+    postDownloadNextKicker: "Next batch",
+    postDownloadNextTitle: "Result downloaded. Want to repeat this for more products?",
+    postDownloadNextText: "The founder plan unlocks batches up to 100 images and 2,000 images per month. If you are still evaluating, save the link by email.",
+    postDownloadFounderCta: "Start founder plan - EUR 15/month",
+    postDownloadSaveLinkCta: "Send link by email",
+    postDownloadNextNote: "No card for the free test. Secure Stripe payment when you choose Pro.",
     leadCaptureKicker: "Stay in touch",
     leadCaptureTitle: "Want to save this workflow for later?",
     leadCaptureText: "Leave your email and we will send the tool link plus useful tips for preparing product photos in batches.",
@@ -1642,6 +1660,7 @@ function syncPaidAccessUi() {
   if (paidAccess) {
     proPromptButton?.classList.add("hidden");
     zipProCta?.classList.add("hidden");
+    postDownloadNextPanel?.classList.add("hidden");
     proInterestPanel?.classList.add("hidden");
     leadCapturePanel?.classList.add("hidden");
     if (brandCta) brandCta.textContent = t("brandCtaPro", paidParams);
@@ -2496,6 +2515,7 @@ function clearAll() {
   hasTrackedDownloadReady = false;
   fileInput.value = "";
   setStatus("statusWaiting");
+  postDownloadNextPanel?.classList.add("hidden");
   trackEvent("queue_cleared");
   render();
 }
@@ -2511,7 +2531,8 @@ function showProInterest(reason = "manual") {
   showProPrompt(reason);
 }
 
-function showProPrompt(reason = "post_download") {
+function showProPrompt(reason = "post_download", options = {}) {
+  const shouldScroll = options.scroll !== false;
   if (canUsePaidAccess()) {
     proInterestPanel?.classList.add("hidden");
     return;
@@ -2535,15 +2556,57 @@ function showProPrompt(reason = "post_download") {
     });
   }
 
-  proInterestPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  if (shouldScroll) {
+    proInterestPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+}
+
+function showPostDownloadNext(downloadType, count) {
+  if (!postDownloadNextPanel || canUsePaidAccess()) {
+    postDownloadNextPanel?.classList.add("hidden");
+    return;
+  }
+
+  const wasHidden = postDownloadNextPanel.classList.contains("hidden");
+  postDownloadNextPanel.classList.remove("hidden");
+  postDownloadNextPanel.dataset.downloadType = downloadType;
+  postDownloadNextPanel.dataset.downloadCount = String(count);
+  postDownloadSaveLinkCta?.classList.toggle("hidden", Boolean(currentAccount?.email || getCapturedLeadEmail()));
+
+  if (wasHidden) {
+    trackEvent("post_download_next_shown", {
+      downloadType,
+      count,
+      totalInQueue: items.length,
+      free_limit: maxFilesPerBatch,
+    });
+  }
+
+  postDownloadNextPanel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+function focusPostDownloadLeadCapture() {
+  const downloadType = postDownloadNextPanel?.dataset.downloadType || "unknown";
+  const count = Number(postDownloadNextPanel?.dataset.downloadCount || 0) || 0;
+  localStorage.removeItem(leadCaptureDismissedStorageKey);
+  showLeadCapture(downloadType, count);
+  trackEvent("post_download_save_link_clicked", {
+    downloadType,
+    count,
+    totalInQueue: items.length,
+    free_limit: maxFilesPerBatch,
+  });
+  leadCapturePanel?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  leadCaptureEmail?.focus({ preventScroll: true });
 }
 
 function showPostDownloadFeedback(downloadType, count) {
+  showPostDownloadNext(downloadType, count);
   postDownloadFeedback?.classList.remove("hidden");
   postDownloadFeedback?.setAttribute("data-download-type", downloadType);
   postDownloadFeedback?.setAttribute("data-download-count", String(count));
   showLeadCapture(downloadType, count);
-  showProPrompt(`post_download_${downloadType}`);
+  showProPrompt(`post_download_${downloadType}`, { scroll: false });
 }
 
 function shouldShowLeadCapture() {
@@ -2587,6 +2650,7 @@ async function handleLeadCaptureSubmit(event) {
 
   localStorage.setItem(leadCaptureEmailStorageKey, email);
   localStorage.removeItem(leadCaptureDismissedStorageKey);
+  postDownloadSaveLinkCta?.classList.add("hidden");
   setGoogleUserData(email);
   trackEvent("lead_capture_submitted", {
     email,
@@ -2652,6 +2716,21 @@ brandCta.addEventListener("click", () => {
 });
 inlineProCta.addEventListener("click", () => showProInterest("inline_pro_cta"));
 zipProCta?.addEventListener("click", () => showProInterest("zip_download_context"));
+postDownloadFounderCta?.addEventListener("click", () => {
+  const downloadType = postDownloadNextPanel?.dataset.downloadType || "unknown";
+  const count = Number(postDownloadNextPanel?.dataset.downloadCount || 0) || 0;
+  const detail = {
+    reason: "post_download_next_founder",
+    downloadType,
+    count,
+    totalInQueue: items.length,
+    free_limit: maxFilesPerBatch,
+  };
+  trackEvent("post_download_founder_clicked", detail);
+  trackEvent("tool_pro_clicked", detail);
+  startCheckout("early", postDownloadFounderCta);
+});
+postDownloadSaveLinkCta?.addEventListener("click", focusPostDownloadLeadCapture);
 proInlineForm?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-checkout-plan]");
   if (!button) return;
