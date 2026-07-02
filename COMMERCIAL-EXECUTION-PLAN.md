@@ -230,6 +230,12 @@ Decision rules:
 - Added `Pagamento sem acesso` detection for cases where a customer has an active payment but no Pro access.
 - Confirmed current real renewable MRR after internal cleanup is 0 EUR.
 
+## Executed growth work - founder checkout alignment
+
+- Updated SEO, customer-result, use-case and recovery-email pricing links so they preselect the founder plan and jump directly to the checkout panel.
+- Aligned single-offer English SEO structured data with the current founder entry price of 15 EUR/month.
+- Kept monthly and annual alternatives available on the pricing page.
+
 ## First revenue targets
 
 Target 1:
