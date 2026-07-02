@@ -218,6 +218,14 @@ Decision rules:
   - `LAUNCH-DIRECTORIES-PLAN.md`
 - Added directory source classification for Product Hunt, Uneed, BetaList, Indie Hackers and SaaSHub.
 
+## Executed growth work - revenue hygiene
+
+- Created `REVENUE-MAXIMIZATION-OPERATING-PLAN.md` with the autonomous revenue objective, live baseline and daily decision rules.
+- Cancelled renewal for the remaining internal/test Stripe subscription that was still active at 59 EUR/month.
+- Improved `/admin` subscription classification so Stripe subscriptions can be matched to Supabase accounts by email when Stripe IDs are out of sync.
+- Added `Pagamento sem acesso` detection for cases where a customer has an active payment but no Pro access.
+- Confirmed current real renewable MRR after internal cleanup is 0 EUR.
+
 ## First revenue targets
 
 Target 1:

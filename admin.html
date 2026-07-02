@@ -697,6 +697,10 @@
               <strong id="subscriptionAttention">0</strong>
             </article>
             <article class="live-card">
+              <span>Pagou sem acesso</span>
+              <strong id="subscriptionPaidNoAccess">0</strong>
+            </article>
+            <article class="live-card">
               <span>Fim de período</span>
               <strong id="subscriptionCancelAtPeriodEnd">0</strong>
             </article>
@@ -1120,6 +1124,9 @@
         }
         if (!subscription.linkedToSupabase) {
           return { label: "Sem ligação", tone: "warning", note: "Existe no Stripe mas não está ligada a uma conta BatchCutout." };
+        }
+        if (status === "active" && !(subscription.accessPlan === "pro" && ["active", "manual"].includes(subscription.accessStatus))) {
+          return { label: "Pagamento sem acesso", tone: "danger", note: "Existe pagamento ativo, mas a conta ainda não tem Pro ativo." };
         }
         if (status === "active") {
           return { label: "Cliente pagante", tone: "success", note: "Conta paga recorrente, conta para MRR." };
@@ -1662,6 +1669,7 @@
         document.querySelector("#subscriptionActive").textContent = summary.active || 0;
         document.querySelector("#subscriptionTotal").textContent = summary.total || 0;
         document.querySelector("#subscriptionAttention").textContent = summary.attention || 0;
+        document.querySelector("#subscriptionPaidNoAccess").textContent = businessTypes.paid_no_access || 0;
         document.querySelector("#subscriptionCancelAtPeriodEnd").textContent = summary.cancelAtPeriodEnd || 0;
         document.querySelector("#subscriptionUnlinked").textContent = summary.unlinked || 0;
         document.querySelector("#subscriptionNonRevenueRenewing").textContent = nonRevenueRenewing;
@@ -1691,6 +1699,9 @@
               const usageLabel = subscription.linkedToSupabase
                 ? `${subscription.monthlyUsed || 0} / ${subscription.monthlyLimit || 0} imagens`
                 : "sem utilizador ligado";
+              const linkSourceLabel = subscription.linkSource === "email"
+                ? "Ligada por email; confirmar IDs Stripe"
+                : "";
               const periodText = subscription.currentPeriodEnd
                 ? formatDate(subscription.currentPeriodEnd)
                 : formatDate(subscription.canceledAt);
@@ -1718,6 +1729,7 @@
                   <td>
                     <span class="pill ${subscription.linkedToSupabase ? "success" : "warning"}">${escapeHtml(accessLabel)}</span>
                     <span class="muted-small">${escapeHtml(usageLabel)}</span>
+                    ${linkSourceLabel ? `<span class="muted-small">${escapeHtml(linkSourceLabel)}</span>` : ""}
                   </td>
                   <td>
                     <a class="subscription-link" href="${escapeHtml(subscription.stripeDashboardUrl)}" target="_blank" rel="noreferrer">Subscrição</a>

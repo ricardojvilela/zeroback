@@ -159,6 +159,10 @@ function subscriptionPricing(subscription) {
   };
 }
 
+function hasProAccessProfile(profile = null) {
+  return profile?.plan === "pro" && ["active", "manual"].includes(profile?.planStatus);
+}
+
 function subscriptionBusinessType(subscription, profile = null) {
   const status = String(subscription?.status || "");
   const manualAccess = profile?.plan === "pro" && profile?.planStatus === "manual";
@@ -209,6 +213,15 @@ function subscriptionBusinessType(subscription, profile = null) {
     };
   }
 
+  if (status === "active" && !hasProAccessProfile(profile)) {
+    return {
+      key: "paid_no_access",
+      label: "Pagamento sem acesso",
+      tone: "danger",
+      note: "Existe pagamento ativo, mas a conta BatchCutout nao tem Pro ativo.",
+    };
+  }
+
   if (status === "active") {
     return {
       key: "paid_customer",
@@ -244,6 +257,7 @@ function mapSubscription(subscription, profile = null) {
     customerEmail: customer.email || profile?.email || "",
     profileEmail: profile?.email || "",
     linkedToSupabase: Boolean(profile?.userId),
+    linkSource: profile?.linkSource || "",
     accessPlan: profile?.plan || "",
     accessStatus: profile?.planStatus || "",
     businessType,
@@ -276,6 +290,7 @@ function summarizeSubscriptions(subscriptions) {
     businessTypes: {
       paid_customer: 0,
       manual_pro: 0,
+      paid_no_access: 0,
       canceling: 0,
       canceled: 0,
       payment_issue: 0,
@@ -306,7 +321,8 @@ function summarizeSubscriptions(subscriptions) {
     if (!subscription.linkedToSupabase) summary.unlinked += 1;
     if (
       subscription.cancelAtPeriodEnd ||
-      ["incomplete", "incomplete_expired", "past_due", "unpaid", "paused"].includes(subscription.status)
+      ["incomplete", "incomplete_expired", "past_due", "unpaid", "paused"].includes(subscription.status) ||
+      ["paid_no_access", "unlinked"].includes(typeKey)
     ) {
       summary.attention += 1;
     }
@@ -366,15 +382,27 @@ async function listSubscriptions(settings) {
 
   const profilesBySubscription = new Map();
   const profilesByCustomer = new Map();
+  const profilesByEmail = new Map();
   for (const profile of profiles) {
     if (profile.stripeSubscriptionId) profilesBySubscription.set(profile.stripeSubscriptionId, profile);
     if (profile.stripeCustomerId) profilesByCustomer.set(profile.stripeCustomerId, profile);
+    if (profile.email) profilesByEmail.set(normalizeEmail(profile.email), profile);
   }
 
   const subscriptions = stripeList.data
     .map((subscription) => {
       const customer = getCustomer(subscription);
-      const profile = profilesBySubscription.get(subscription.id) || profilesByCustomer.get(customer.id) || null;
+      const profileBySubscription = profilesBySubscription.get(subscription.id);
+      const profileByCustomer = profilesByCustomer.get(customer.id);
+      const profileByEmail = profilesByEmail.get(normalizeEmail(customer.email));
+      const profile = profileBySubscription || profileByCustomer || profileByEmail || null;
+      if (profile) {
+        profile.linkSource = profileBySubscription
+          ? "stripe_subscription_id"
+          : profileByCustomer
+            ? "stripe_customer_id"
+            : "email";
+      }
       return mapSubscription(subscription, profile);
     })
     .sort((a, b) => {
