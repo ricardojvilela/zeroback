@@ -1,5 +1,27 @@
 {
   "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/shopify",
+      "destination": "/remove-background-for-shopify/",
+      "permanent": true
+    },
+    {
+      "source": "/shopify.html",
+      "destination": "/remove-background-for-shopify/",
+      "permanent": true
+    },
+    {
+      "source": "/etsy",
+      "destination": "/etsy-product-photo-background-remover/",
+      "permanent": true
+    },
+    {
+      "source": "/etsy.html",
+      "destination": "/etsy-product-photo-background-remover/",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
