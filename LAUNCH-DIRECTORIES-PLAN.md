@@ -34,6 +34,8 @@ https://batchcutout.com/customer-results/?utm_source=product_hunt&utm_medium=lau
 
 ## Product Hunt assets
 
+Detailed copy is ready in `DIRECTORY-SUBMISSION-KIT.md`.
+
 Maker comment:
 
 Hi Product Hunt,
