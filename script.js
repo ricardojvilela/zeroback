@@ -78,6 +78,7 @@ const sessionStorageKey = "batchcutout_session_id";
 const paidConversionStorageKey = "batchcutout_paid_conversion_sessions";
 const leadCaptureEmailStorageKey = "batchcutout_lead_capture_email";
 const leadCaptureDismissedStorageKey = "batchcutout_lead_capture_dismissed";
+const pendingCheckoutPlanStorageKey = "batchcutout_pending_checkout_plan";
 const serverEventNames = new Set([
   "tool_page_view",
   "tool_drag_upload_intent",
@@ -211,7 +212,7 @@ const baseTranslation = {
   billingPortalStarting: "A abrir gestão de pagamento...",
   billingCheckoutSuccess: "Pagamento recebido. A ativação Pro pode demorar alguns segundos.",
   billingCheckoutCancelled: "Pagamento cancelado. Pode tentar novamente quando quiser.",
-  billingLoginRequired: "Entre ou crie conta antes de escolher um plano Pro.",
+  billingLoginRequired: "Entre ou crie conta. Depois abrimos automaticamente o plano Pro escolhido.",
   billingCheckoutError: "Não foi possível abrir o pagamento agora.",
   billingPortalError: "Não foi possível abrir a gestão de pagamento agora.",
   accountMagicLinkSent: "Sessão iniciada.",
@@ -355,7 +356,7 @@ const translations = {
     billingPortalStarting: "Opening billing...",
     billingCheckoutSuccess: "Payment received. Pro activation can take a few seconds.",
     billingCheckoutCancelled: "Payment cancelled. You can try again whenever you want.",
-    billingLoginRequired: "Sign in or create an account before choosing a Pro plan.",
+    billingLoginRequired: "Sign in or create an account. Then we automatically open the Pro plan you chose.",
     billingCheckoutError: "We could not open payment right now.",
     billingPortalError: "We could not open billing management right now.",
     accountMagicLinkSent: "Signed in.",
@@ -1812,9 +1813,11 @@ async function handleAccountLogin(event) {
 
     if (error) throw error;
     setGoogleUserData(email);
+    const waitingPlan = checkoutPlanWaitingForAuth();
     trackEvent("account_login_succeeded", {
-      source: requestedCheckoutPlan ? "checkout_plan" : "account_panel",
-      has_requested_checkout: Boolean(requestedCheckoutPlan),
+      source: waitingPlan ? "checkout_plan" : "account_panel",
+      has_requested_checkout: Boolean(waitingPlan),
+      checkout_plan: waitingPlan || "",
     });
     setAccountMessage("accountMagicLinkSent");
   } catch {
@@ -1841,9 +1844,11 @@ async function handleAccountCreate() {
   accountCreate.disabled = true;
   accountCreate.textContent = t("accountCreateSending");
   setAccountMessage();
+  const waitingPlan = checkoutPlanWaitingForAuth();
   trackEvent("account_signup_started", {
-    source: requestedCheckoutPlan ? "checkout_plan" : "account_panel",
-    has_requested_checkout: Boolean(requestedCheckoutPlan),
+    source: waitingPlan ? "checkout_plan" : "account_panel",
+    has_requested_checkout: Boolean(waitingPlan),
+    checkout_plan: waitingPlan || "",
   });
 
   try {
@@ -1858,9 +1863,11 @@ async function handleAccountCreate() {
 
     if (error) throw error;
     setGoogleUserData(email);
+    const waitingPlan = checkoutPlanWaitingForAuth();
     trackEvent("account_signup_succeeded", {
-      source: requestedCheckoutPlan ? "checkout_plan" : "account_panel",
-      has_requested_checkout: Boolean(requestedCheckoutPlan),
+      source: waitingPlan ? "checkout_plan" : "account_panel",
+      has_requested_checkout: Boolean(waitingPlan),
+      checkout_plan: waitingPlan || "",
     });
     setAccountMessage("accountSignupSuccess");
   } catch {
@@ -1874,6 +1881,7 @@ async function handleAccountCreate() {
 async function handleAccountLogout() {
   if (!supabaseClient) return;
   await supabaseClient.auth.signOut();
+  clearPendingCheckoutPlan();
   currentAccount = null;
   updateAccountUi();
   setAccountMessage("accountLoggedOut");
@@ -1891,11 +1899,44 @@ function checkoutPlanLabelKey(plan) {
   return "billingMonthly";
 }
 
+function getPendingCheckoutPlan() {
+  try {
+    const pending = JSON.parse(localStorage.getItem(pendingCheckoutPlanStorageKey) || "{}");
+    const createdAt = Number(pending.createdAt || 0) || 0;
+    if (!checkoutPlans.has(pending.plan) || Date.now() - createdAt > 24 * 60 * 60 * 1000) {
+      localStorage.removeItem(pendingCheckoutPlanStorageKey);
+      return "";
+    }
+    return pending.plan;
+  } catch {
+    localStorage.removeItem(pendingCheckoutPlanStorageKey);
+    return "";
+  }
+}
+
+function setPendingCheckoutPlan(plan) {
+  const selectedPlan = checkoutPlans.has(plan) ? plan : "monthly";
+  localStorage.setItem(pendingCheckoutPlanStorageKey, JSON.stringify({
+    plan: selectedPlan,
+    createdAt: Date.now(),
+  }));
+  return selectedPlan;
+}
+
+function clearPendingCheckoutPlan() {
+  localStorage.removeItem(pendingCheckoutPlanStorageKey);
+}
+
+function checkoutPlanWaitingForAuth() {
+  return checkoutPlans.has(requestedCheckoutPlan || "") ? requestedCheckoutPlan : getPendingCheckoutPlan();
+}
+
 async function startCheckout(plan = "monthly", triggerButton = null) {
   const selectedPlan = checkoutPlans.has(plan) ? plan : "monthly";
   const accessToken = await getCurrentAccessToken();
 
   if (!accessToken) {
+    setPendingCheckoutPlan(selectedPlan);
     trackEvent("pro_checkout_login_required", { plan: selectedPlan });
     setAccountMessage("billingLoginRequired");
     accountPanel?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1938,6 +1979,7 @@ async function startCheckout(plan = "monthly", triggerButton = null) {
     });
     setKnownGoogleUserData();
     trackBeginCheckout(selectedPlan, "app");
+    clearPendingCheckoutPlan();
     window.location.href = data.url;
   } catch {
     setAccountMessage("billingCheckoutError");
@@ -2037,19 +2079,23 @@ async function showCheckoutReturnMessage() {
 }
 
 async function maybeStartRequestedCheckout() {
-  if (hasStartedRequestedCheckout || !checkoutPlans.has(requestedCheckoutPlan || "")) return;
+  const planToStart = checkoutPlanWaitingForAuth();
+  if (hasStartedRequestedCheckout || !checkoutPlans.has(planToStart || "")) return;
   if (!currentAccount) {
     if (!hasTrackedRequestedCheckoutLoginRequired) {
       hasTrackedRequestedCheckoutLoginRequired = true;
-      trackEvent("pro_checkout_login_required", { plan: requestedCheckoutPlan });
+      trackEvent("pro_checkout_login_required", { plan: planToStart });
     }
     setAccountMessage("billingLoginRequired");
     return;
   }
-  if (currentAccount.access?.canUsePro) return;
+  if (currentAccount.access?.canUsePro) {
+    clearPendingCheckoutPlan();
+    return;
+  }
 
   hasStartedRequestedCheckout = true;
-  await startCheckout(requestedCheckoutPlan);
+  await startCheckout(planToStart);
 }
 
 async function reserveMonthlyUsage(count) {
