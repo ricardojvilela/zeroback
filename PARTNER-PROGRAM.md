@@ -21,6 +21,21 @@ BatchCutout is a focused utility for repeat product-photo cutouts:
 
 Do not position it as a replacement for professional editing, photography, or design services. Position it as a batch utility for repetitive cutout work.
 
+## Public partner page
+
+Use this page when approaching partners:
+
+```text
+https://batchcutout.com/partners/?utm_source=partner_outreach&utm_medium=email&utm_campaign=partner_first
+```
+
+The current partner offer is a pilot:
+
+- the partner tests 2 images first;
+- each partner can receive a unique UTM link;
+- private Stripe codes are only created after the partner shows qualified traffic;
+- do not promise commission until attribution and payment flow are stable.
+
 ## Tracking links
 
 Use one UTM link per partner:

@@ -1412,6 +1412,7 @@ progress::-moz-progress-bar {
   background:
     linear-gradient(135deg, rgba(23, 32, 42, 0.05) 0 24%, transparent 24% 100%),
     linear-gradient(180deg, #f8fbfc 0%, #eef4f8 62%, #e8f1f4 100%);
+  overflow-x: hidden;
 }
 
 .landing-shell {
@@ -1523,6 +1524,11 @@ progress::-moz-progress-bar {
   font-size: clamp(3rem, 5.2vw, 4.9rem);
   line-height: 1.01;
   overflow-wrap: break-word;
+}
+
+.landing-copy,
+.landing-visual {
+  min-width: 0;
 }
 
 .landing-copy p {
@@ -2783,6 +2789,27 @@ progress::-moz-progress-bar {
 
   .landing-hero {
     padding: 20px;
+  }
+
+  .landing-copy,
+  .landing-visual,
+  .landing-actions {
+    max-width: 100%;
+  }
+
+  .landing-copy p {
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+
+  .landing-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .landing-button,
+  .landing-secondary {
+    width: 100%;
   }
 
   .landing-copy h1 {
