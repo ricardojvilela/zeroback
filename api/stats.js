@@ -37,6 +37,7 @@ function emptyDay(date) {
     proClicks: 0,
     checkoutLoginRequired: 0,
     checkoutStarts: 0,
+    checkoutSessionsCreated: 0,
     paidSubscriptions: 0,
     revenue: 0,
     accountSignupStarts: 0,
@@ -127,6 +128,7 @@ function emptySourceRow(source) {
     proClicks: 0,
     checkoutLoginRequired: 0,
     checkoutStarts: 0,
+    checkoutSessionsCreated: 0,
     paidSubscriptions: 0,
     revenue: 0,
     accountSignupStarts: 0,
@@ -291,6 +293,10 @@ export default async function handler(request, response) {
         case "pro_checkout_started":
           row.checkoutStarts += 1;
           sourceRow.checkoutStarts += 1;
+          break;
+        case "pro_checkout_session_created":
+          row.checkoutSessionsCreated += 1;
+          sourceRow.checkoutSessionsCreated += 1;
           break;
         case "pro_subscription_paid":
           row.paidSubscriptions += 1;

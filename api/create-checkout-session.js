@@ -41,6 +41,12 @@ const attributionMetadataKeys = [
   "free_limit",
 ];
 
+function checkoutValueForPlan(plan) {
+  if (plan === "annual") return 190;
+  if (plan === "early") return 15;
+  return 19;
+}
+
 function metadataString(value, maxLength = 450) {
   if (value === null || value === undefined) return "";
   return String(value).slice(0, maxLength);
@@ -58,6 +64,44 @@ function sanitizeAttribution(input) {
   }
 
   return attribution;
+}
+
+async function recordCheckoutSessionCreated(settings, { user, profile, session, plan, attribution }) {
+  const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
+  const detail = {
+    ...attribution,
+    stripe_session_id: session.id || "",
+    stripe_customer_id: profile.stripe_customer_id || session.customer || "",
+    supabase_user_id: user.id || "",
+    plan,
+    price_plan: plan,
+  };
+  const row = {
+    event_name: "pro_checkout_session_created",
+    event_category: "commercial_intent",
+    event_label: plan,
+    page_path: metadataString(attribution.page_path, 500),
+    page_location: metadataString(attribution.page_location, 1000),
+    language: metadataString(attribution.language, 20),
+    session_id: metadataString(attribution.session_id, 80),
+    visitor_id: metadataString(attribution.visitor_id, 80),
+    source: metadataString(attribution.utm_source || attribution.source || attribution.last_source || attribution.first_source, 160),
+    campaign: metadataString(attribution.utm_campaign || attribution.campaign || attribution.last_campaign || attribution.first_campaign, 160),
+    value: checkoutValueForPlan(plan),
+    detail,
+    occurred_at: new Date().toISOString(),
+  };
+
+  await fetch(`${settings.supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}`, {
+    method: "POST",
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+      "Content-Type": "application/json",
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify(row),
+  });
 }
 
 export default async function handler(request, response) {
@@ -136,6 +180,12 @@ export default async function handler(request, response) {
         address: "auto",
       },
     });
+
+    try {
+      await recordCheckoutSessionCreated(settings, { user, profile, session, plan, attribution });
+    } catch {
+      // Checkout must not fail because analytics storage failed.
+    }
 
     return sendJson(response, 200, {
       ok: true,

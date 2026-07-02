@@ -21,6 +21,7 @@ Secondary KPIs:
 - Checkout sem login
 - Contas criadas
 - Checkouts iniciados
+- Sessões Stripe criadas
 - Subscricoes pagas
 - Receita atribuida por origem
 - Portal aberto
