@@ -38,6 +38,7 @@ function emptyDay(date) {
     postDownloadFounderClicks: 0,
     postDownloadSaveLinkClicks: 0,
     proClicks: 0,
+    pricingCtaClicks: 0,
     checkoutLoginRequired: 0,
     checkoutStarts: 0,
     checkoutSessionsCreated: 0,
@@ -132,6 +133,7 @@ function emptySourceRow(source) {
     postDownloadFounderClicks: 0,
     postDownloadSaveLinkClicks: 0,
     proClicks: 0,
+    pricingCtaClicks: 0,
     checkoutLoginRequired: 0,
     checkoutStarts: 0,
     checkoutSessionsCreated: 0,
@@ -313,6 +315,10 @@ export default async function handler(request, response) {
         case "tool_pro_clicked":
           row.proClicks += 1;
           sourceRow.proClicks += 1;
+          break;
+        case "pro_cta_clicked":
+          row.pricingCtaClicks += 1;
+          sourceRow.pricingCtaClicks += 1;
           break;
         case "pro_checkout_login_required":
           row.checkoutLoginRequired += 1;

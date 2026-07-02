@@ -636,6 +636,10 @@
             <strong id="liveProClicks">0</strong>
           </article>
           <article class="live-card">
+            <span>CTA pricing</span>
+            <strong id="livePricingCtaClicks">0</strong>
+          </article>
+          <article class="live-card">
             <span>Checkouts iniciados</span>
             <strong id="liveCheckoutStarts">0</strong>
           </article>
@@ -977,6 +981,7 @@
                   <th>Downloads</th>
                   <th>ZIP</th>
                   <th>Cliques planos</th>
+                  <th>CTA pricing</th>
                   <th>Sem login</th>
                   <th>Registos</th>
                   <th>Contas</th>
@@ -990,7 +995,7 @@
               </thead>
               <tbody id="sourceRowsBody">
                 <tr>
-                  <td class="empty" colspan="17">A carregar origens.</td>
+                  <td class="empty" colspan="18">A carregar origens.</td>
                 </tr>
               </tbody>
             </table>
@@ -1009,6 +1014,7 @@
                 <th>Resultado pronto</th>
                 <th>Downloads</th>
                 <th>Cliques planos</th>
+                <th>CTA pricing</th>
                 <th>Sem login</th>
                 <th>Registos</th>
                 <th>Contas</th>
@@ -1022,7 +1028,7 @@
             </thead>
             <tbody id="liveRowsBody">
               <tr>
-                <td class="empty" colspan="18">A carregar atividade.</td>
+                <td class="empty" colspan="19">A carregar atividade.</td>
               </tr>
             </tbody>
           </table>
@@ -1399,6 +1405,7 @@
         document.querySelector("#livePostDownloadFounder").textContent = totals.postDownloadFounderClicks || 0;
         document.querySelector("#livePostDownloadSaveLink").textContent = totals.postDownloadSaveLinkClicks || 0;
         document.querySelector("#liveProClicks").textContent = totals.proClicks || 0;
+        document.querySelector("#livePricingCtaClicks").textContent = totals.pricingCtaClicks || 0;
         document.querySelector("#liveCheckoutStarts").textContent = totals.checkoutStarts || 0;
         document.querySelector("#liveCheckoutSessionsCreated").textContent = totals.checkoutSessionsCreated || 0;
         document.querySelector("#livePaidSubscriptions").textContent = totals.paidSubscriptions || 0;
@@ -1427,6 +1434,7 @@
                   <td>${row.downloadReadyShown || 0}</td>
                   <td>${row.downloads}</td>
                   <td>${row.proClicks}</td>
+                  <td>${row.pricingCtaClicks || 0}</td>
                   <td>${row.checkoutLoginRequired || 0}</td>
                   <td>${row.accountSignupStarts || 0}</td>
                   <td>${row.accountSignups || 0}</td>
@@ -1439,7 +1447,7 @@
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="18">Ainda não existem eventos reais no período.</td></tr>`;
+          : `<tr><td class="empty" colspan="19">Ainda não existem eventos reais no período.</td></tr>`;
 
         sourceRowsBody.innerHTML = data.sourceBreakdown?.length
           ? data.sourceBreakdown.map((row) => `
@@ -1452,6 +1460,7 @@
                 <td>${row.downloads || 0}</td>
                 <td>${row.zipDownloads || 0}</td>
                 <td>${row.proClicks || 0}</td>
+                <td>${row.pricingCtaClicks || 0}</td>
                 <td>${row.checkoutLoginRequired || 0}</td>
                 <td>${row.accountSignupStarts || 0}</td>
                 <td>${row.accountSignups || 0}</td>
@@ -1463,7 +1472,7 @@
                 <td>${row.billingPortalOpens || 0}</td>
               </tr>
             `).join("")
-          : `<tr><td class="empty" colspan="17">Ainda não existem origens identificadas.</td></tr>`;
+          : `<tr><td class="empty" colspan="18">Ainda não existem origens identificadas.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "";
         liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Última atualização: ${generatedAt}`;
@@ -2161,7 +2170,7 @@
             localStorage.removeItem(adminTokenExpiryStorageKey);
             document.body.classList.add("locked");
           }
-          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="18">Não foi possível carregar atividade.</td></tr>`;
+          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="19">Não foi possível carregar atividade.</td></tr>`;
           proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar contas.</td></tr>`;
           recoveryRowsBody.innerHTML = `<tr><td class="empty" colspan="4">Não foi possível carregar oportunidades comerciais.</td></tr>`;
           outreachProspectsBody.innerHTML = `<tr><td class="empty" colspan="8">Não foi possível carregar prospects.</td></tr>`;
