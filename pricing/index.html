@@ -97,6 +97,46 @@
         ]
       }
     </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Tenho de criar conta antes de pagar?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sim. A conta permite ligar a subscrição Stripe ao acesso Pro e ativar os limites pagos automaticamente."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "O Pro fica ativo logo depois do pagamento?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sim. Depois do pagamento por Stripe Checkout, o BatchCutout sincroniza a subscrição e ativa o acesso Pro na conta."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Posso cancelar quando quiser?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sim. O plano não tem fidelização. Pode gerir ou cancelar a subscrição no portal de faturação."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Posso testar antes de pagar?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Sim. Pode testar 2 imagens grátis, sem cartão, antes de escolher um plano Pro."
+            }
+          }
+        ]
+      }
+    </script>
     <link rel="stylesheet" href="../styles.css?v=20260629-account-contrast" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
@@ -241,6 +281,31 @@
           <strong data-i18n="stepThreeTitle">3. Exporte ficheiros limpos</strong>
           <p data-i18n="stepThreeText">Descarregue PNGs transparentes ou um ZIP mais fácil de entregar, carregar ou arquivar.</p>
         </article>
+      </section>
+
+      <section class="pricing-faq" aria-labelledby="pricing-faq-title">
+        <div>
+          <p class="section-kicker" data-i18n="faqKicker">Antes de pagar</p>
+          <h2 id="pricing-faq-title" data-i18n="faqTitle">Dúvidas que normalmente travam a compra</h2>
+        </div>
+        <div class="pricing-faq-list">
+          <article>
+            <h3 data-i18n="faqAccountQuestion">Tenho de criar conta antes de pagar?</h3>
+            <p data-i18n="faqAccountAnswer">Sim. A conta permite ligar a subscrição Stripe ao acesso Pro e ativar os limites pagos automaticamente.</p>
+          </article>
+          <article>
+            <h3 data-i18n="faqActivationQuestion">O Pro fica ativo logo depois do pagamento?</h3>
+            <p data-i18n="faqActivationAnswer">Sim. Depois do pagamento por Stripe Checkout, o BatchCutout sincroniza a subscrição e ativa o acesso Pro na conta.</p>
+          </article>
+          <article>
+            <h3 data-i18n="faqCancelQuestion">Posso cancelar quando quiser?</h3>
+            <p data-i18n="faqCancelAnswer">Sim. O plano não tem fidelização. Pode gerir ou cancelar a subscrição no portal de faturação.</p>
+          </article>
+          <article>
+            <h3 data-i18n="faqTestQuestion">Posso testar antes de pagar?</h3>
+            <p data-i18n="faqTestAnswer">Sim. Pode testar 2 imagens grátis, sem cartão, antes de escolher um plano Pro.</p>
+          </article>
+        </div>
       </section>
 
       <section class="pricing-form-panel" id="pro-plans" aria-labelledby="plans-title">
@@ -392,6 +457,16 @@
           stepTwoText: "O Pro é pensado para vendedores que preparam dezenas ou centenas de imagens para produtos e variantes.",
           stepThreeTitle: "3. Exporte ficheiros limpos",
           stepThreeText: "Descarregue PNGs transparentes ou um ZIP mais fácil de entregar, carregar ou arquivar.",
+          faqKicker: "Antes de pagar",
+          faqTitle: "Dúvidas que normalmente travam a compra",
+          faqAccountQuestion: "Tenho de criar conta antes de pagar?",
+          faqAccountAnswer: "Sim. A conta permite ligar a subscrição Stripe ao acesso Pro e ativar os limites pagos automaticamente.",
+          faqActivationQuestion: "O Pro fica ativo logo depois do pagamento?",
+          faqActivationAnswer: "Sim. Depois do pagamento por Stripe Checkout, o BatchCutout sincroniza a subscrição e ativa o acesso Pro na conta.",
+          faqCancelQuestion: "Posso cancelar quando quiser?",
+          faqCancelAnswer: "Sim. O plano não tem fidelização. Pode gerir ou cancelar a subscrição no portal de faturação.",
+          faqTestQuestion: "Posso testar antes de pagar?",
+          faqTestAnswer: "Sim. Pode testar 2 imagens grátis, sem cartão, antes de escolher um plano Pro.",
           formKicker: "Planos Pro",
           formTitle: "Escolha o plano para começar",
           formLead: "O pagamento é feito por Stripe Checkout. Depois de pagar, a conta passa automaticamente para Pro.",
@@ -503,6 +578,16 @@
           stepTwoText: "Pro is built for sellers preparing dozens or hundreds of images for products and variants.",
           stepThreeTitle: "3. Export clean files",
           stepThreeText: "Download transparent PNGs or a ZIP that is easier to hand over, upload, or archive.",
+          faqKicker: "Before paying",
+          faqTitle: "Questions that usually block purchase",
+          faqAccountQuestion: "Do I need to create an account before paying?",
+          faqAccountAnswer: "Yes. The account links the Stripe subscription to Pro access and activates the paid limits automatically.",
+          faqActivationQuestion: "Does Pro activate right after payment?",
+          faqActivationAnswer: "Yes. After Stripe Checkout payment, BatchCutout syncs the subscription and activates Pro access on the account.",
+          faqCancelQuestion: "Can I cancel anytime?",
+          faqCancelAnswer: "Yes. There is no long-term lock-in. You can manage or cancel the subscription in the billing portal.",
+          faqTestQuestion: "Can I test before paying?",
+          faqTestAnswer: "Yes. You can test 2 images free, with no card, before choosing a Pro plan.",
           formKicker: "Pro plans",
           formTitle: "Choose a plan to start",
           formLead: "Payment runs through Stripe Checkout. After payment, your account automatically becomes Pro.",

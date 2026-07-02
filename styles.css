@@ -2285,6 +2285,53 @@ progress::-moz-progress-bar {
   color: var(--charcoal);
 }
 
+.pricing-faq {
+  display: grid;
+  grid-template-columns: minmax(0, 0.65fr) minmax(0, 1.35fr);
+  gap: 18px;
+  align-items: start;
+  margin-top: 22px;
+  border: 1px solid rgba(23, 32, 42, 0.12);
+  border-radius: 8px;
+  padding: 24px;
+  background: #ffffff;
+  box-shadow: 0 14px 34px rgba(26, 39, 57, 0.07);
+}
+
+.pricing-faq h2 {
+  max-width: 14ch;
+  color: var(--charcoal);
+  font-size: 1.8rem;
+  line-height: 1.04;
+}
+
+.pricing-faq-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.pricing-faq article {
+  border: 1px solid rgba(202, 213, 226, 0.82);
+  border-radius: 8px;
+  padding: 16px;
+  background: rgba(248, 250, 252, 0.82);
+}
+
+.pricing-faq h3 {
+  margin-bottom: 8px;
+  color: var(--charcoal);
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.pricing-faq p {
+  margin: 0;
+  color: #52606d;
+  font-size: 0.92rem;
+  line-height: 1.48;
+}
+
 .pricing-form-panel {
   display: grid;
   grid-template-columns: minmax(0, 0.8fr) minmax(360px, 1fr);
@@ -2834,6 +2881,7 @@ progress::-moz-progress-bar {
   .pricing-proof,
   .pricing-reassurance,
   .pricing-value-case,
+  .pricing-faq,
   .pricing-form-panel,
   .use-case-grid {
     grid-template-columns: 1fr;
@@ -3032,6 +3080,19 @@ progress::-moz-progress-bar {
   }
 
   .pricing-value-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pricing-faq {
+    padding: 20px;
+  }
+
+  .pricing-faq h2 {
+    max-width: 100%;
+    font-size: 1.5rem;
+  }
+
+  .pricing-faq-list {
     grid-template-columns: 1fr;
   }
 
