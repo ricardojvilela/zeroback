@@ -2136,6 +2136,83 @@ progress::-moz-progress-bar {
   line-height: 1.35;
 }
 
+.pricing-value-case {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(420px, 1.08fr);
+  gap: 18px;
+  align-items: stretch;
+  margin: 0 0 22px;
+  border: 1px solid rgba(23, 32, 42, 0.12);
+  border-radius: 8px;
+  padding: 24px;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(234, 247, 244, 0.72)),
+    #ffffff;
+  box-shadow: 0 14px 34px rgba(26, 39, 57, 0.07);
+}
+
+.pricing-value-copy {
+  display: grid;
+  align-content: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.pricing-value-copy h2 {
+  max-width: 17ch;
+  color: var(--charcoal);
+  font-size: 2rem;
+  line-height: 1.04;
+}
+
+.pricing-value-copy p:not(.section-kicker),
+.pricing-value-grid p {
+  color: #52606d;
+  line-height: 1.5;
+}
+
+.pricing-value-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.pricing-value-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.pricing-value-grid article {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-height: 168px;
+  border: 1px solid rgba(202, 213, 226, 0.82);
+  border-radius: 8px;
+  padding: 16px;
+  background: #ffffff;
+}
+
+.pricing-value-grid span {
+  color: var(--accent-strong);
+  font-size: 0.78rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.pricing-value-grid strong {
+  color: var(--charcoal);
+  font-size: 1.35rem;
+  line-height: 1.05;
+}
+
+.pricing-value-grid p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
 .pricing-card {
   border: 0;
   border-radius: 0;
@@ -2756,6 +2833,7 @@ progress::-moz-progress-bar {
   .pricing-hero,
   .pricing-proof,
   .pricing-reassurance,
+  .pricing-value-case,
   .pricing-form-panel,
   .use-case-grid {
     grid-template-columns: 1fr;
@@ -2942,6 +3020,19 @@ progress::-moz-progress-bar {
 
   .pricing-form-panel {
     padding: 20px;
+  }
+
+  .pricing-value-case {
+    padding: 20px;
+  }
+
+  .pricing-value-copy h2 {
+    max-width: 100%;
+    font-size: 1.72rem;
+  }
+
+  .pricing-value-grid {
+    grid-template-columns: 1fr;
   }
 
   .landing-metrics span {
