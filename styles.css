@@ -360,6 +360,18 @@ h2 {
   background: rgba(81, 215, 198, 0.2);
 }
 
+.billing-actions button[data-checkout-plan="early"] {
+  border-color: rgba(81, 215, 198, 0.68);
+  background: #ffffff;
+  color: var(--charcoal);
+  box-shadow: 0 12px 28px rgba(81, 215, 198, 0.16);
+}
+
+.billing-actions button[data-checkout-plan="early"]:hover:not(:disabled) {
+  background: #e9fffb;
+  color: var(--charcoal);
+}
+
 .trust-copy {
   margin: 24px 0 0;
   color: rgba(255, 255, 255, 0.72);
@@ -966,6 +978,23 @@ h2 {
 
 .pro-checkout-actions {
   grid-template-columns: 1fr;
+}
+
+.pro-form.pro-checkout-actions button {
+  white-space: normal;
+  line-height: 1.2;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.pro-checkout-actions button[data-checkout-plan="early"] {
+  border: 1px solid rgba(15, 139, 124, 0.35);
+  background: linear-gradient(135deg, var(--accent), var(--blue));
+  box-shadow: 0 12px 30px rgba(15, 139, 124, 0.2);
+}
+
+.pro-checkout-actions button[data-checkout-plan="early"]:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--accent-strong), var(--blue-strong));
 }
 
 .pro-form button {
@@ -2264,7 +2293,20 @@ progress::-moz-progress-bar {
   width: 100%;
   justify-content: center;
   min-height: 48px;
+  padding-top: 8px;
+  padding-bottom: 8px;
   text-align: center;
+}
+
+.pricing-plan-actions button[data-pricing-checkout-plan="early"] {
+  border-color: rgba(15, 139, 124, 0.35);
+  background: linear-gradient(135deg, var(--accent), var(--blue));
+  color: #ffffff;
+  box-shadow: 0 12px 30px rgba(15, 139, 124, 0.18);
+}
+
+.pricing-plan-actions button[data-pricing-checkout-plan="early"]:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--accent-strong), var(--blue-strong));
 }
 
 .pricing-form input,
@@ -2818,11 +2860,25 @@ progress::-moz-progress-bar {
   }
 
   .pricing-copy {
-    padding: 26px;
+    min-width: 0;
+    max-width: 100%;
+    padding: 24px 20px;
   }
 
   .pricing-copy h1 {
-    font-size: 2.55rem;
+    max-width: 100%;
+    font-size: clamp(2.25rem, 10vw, 2.55rem);
+    line-height: 1.02;
+    overflow-wrap: break-word;
+  }
+
+  .pricing-copy p,
+  .pricing-free-test-note,
+  .pricing-free-test-note a,
+  .pro-metrics span {
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .pricing-form-panel {
