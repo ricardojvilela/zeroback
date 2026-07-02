@@ -7,14 +7,14 @@ Updated: 2026-07-01
 Horizontal website/email version:
 
 - Local: `assets/video/batchcutout-demo-horizontal.mp4`
-- Public: `https://batchcutout.com/assets/video/batchcutout-demo-horizontal.mp4`
+- Public: `https://batchcutout.com/assets/video/batchcutout-demo-horizontal.mp4?v=20260702-no-sweep`
 - Poster: `assets/video/batchcutout-demo-horizontal-poster.png`
 - Format: 1920 x 1080, about 22 seconds, no audio.
 
 Vertical social version:
 
 - Local: `assets/video/batchcutout-demo-vertical.mp4`
-- Public: `https://batchcutout.com/assets/video/batchcutout-demo-vertical.mp4`
+- Public: `https://batchcutout.com/assets/video/batchcutout-demo-vertical.mp4?v=20260702-no-sweep`
 - Poster: `assets/video/batchcutout-demo-vertical-poster.png`
 - Format: 1080 x 1920, about 22 seconds, no audio.
 
@@ -53,4 +53,3 @@ Teste grátis: 2 imagens, sem cartão.
 Pro: 100 imagens por lote e 2.000 por mês.
 
 https://batchcutout.com/
-

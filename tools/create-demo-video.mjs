@@ -200,22 +200,6 @@ function pageHtml() {
         ctx.fillRect(x, y, w, h);
         drawContain(image, x, y, w, h, zoom);
 
-        const sweep = ease((progress - 0.28) / 0.44);
-        if (sweep > 0 && sweep < 1) {
-          const sweepX = x + w * sweep;
-          const gradient = ctx.createLinearGradient(sweepX - 170, 0, sweepX + 170, 0);
-          gradient.addColorStop(0, "rgba(255, 255, 255, 0)");
-          gradient.addColorStop(0.5, "rgba(18, 91, 220, 0.18)");
-          gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
-          ctx.fillStyle = gradient;
-          ctx.fillRect(sweepX - 170, y, 340, h);
-          ctx.strokeStyle = "#125bdc";
-          ctx.lineWidth = vertical ? 5 : 6;
-          ctx.beginPath();
-          ctx.moveTo(sweepX, y + 24);
-          ctx.lineTo(sweepX, y + h - 24);
-          ctx.stroke();
-        }
         ctx.restore();
 
         strokeRound(x, y, w, h, radius, "rgba(23, 26, 32, 0.14)", 2);
