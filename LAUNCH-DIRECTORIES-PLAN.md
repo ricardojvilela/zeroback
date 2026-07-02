@@ -57,7 +57,7 @@ Before submitting:
 
 - Confirm homepage and pricing work on mobile.
 - Confirm `https://batchcutout.com/customer-results/` is live.
-- Prepare one 1200x630 social image from the current before/after asset.
+- Social image ready: `assets/social-preview.png` (1200x630).
 - Prepare one short screen recording of upload -> remove background -> ZIP export.
 - Make sure support email is monitored on launch day.
 

@@ -1,0 +1,36 @@
+# BatchCutout
+
+BatchCutout is a browser-based bulk background remover for ecommerce product photos.
+It is a NexaFlow Labs product.
+
+Primary site:
+https://batchcutout.com/
+
+Pricing:
+https://batchcutout.com/pricing/
+
+Contact:
+support@batchcutout.com
+
+Core positioning:
+- Remove backgrounds from product photos in batches.
+- Export transparent PNG files individually or as one organized ZIP.
+- Built for Shopify, WooCommerce, Etsy, eBay, Amazon sellers and small ecommerce teams.
+- Images are processed in the user's browser and are not uploaded to BatchCutout servers.
+- Free plan: test with 2 images per batch.
+- Pro: up to 100 images per batch and 2,000 images per month.
+- Current paid plans: founder plan EUR 15/month, monthly Pro EUR 19/month, annual Pro EUR 190/year.
+
+Useful pages:
+- https://batchcutout.com/product-photo-background-remover/
+- https://batchcutout.com/bulk-background-remover/
+- https://batchcutout.com/remove-background-for-shopify/
+- https://batchcutout.com/woocommerce-product-background-remover/
+- https://batchcutout.com/etsy-product-photo-background-remover/
+- https://batchcutout.com/ebay-product-background-remover/
+- https://batchcutout.com/amazon-product-background-remover/
+- https://batchcutout.com/customer-results/
+- https://batchcutout.com/partners/
+
+Preferred short description:
+BatchCutout removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP for ecommerce workflows.
