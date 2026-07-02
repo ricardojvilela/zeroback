@@ -235,6 +235,7 @@ Decision rules:
 - Updated SEO, customer-result, use-case and recovery-email pricing links so they preselect the founder plan and jump directly to the checkout panel.
 - Aligned single-offer English SEO structured data with the current founder entry price of 15 EUR/month.
 - Kept monthly and annual alternatives available on the pricing page.
+- Added `/en/` as an English ecommerce resource hub and linked it from the homepage so English SEO pages are no longer isolated behind the sitemap only.
 
 ## First revenue targets
 
