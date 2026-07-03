@@ -1226,6 +1226,26 @@
         return detail;
       }
 
+      function preservePricingCampaignParams() {
+        const keys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "gbraid", "wbraid"];
+        if (!keys.some((key) => pricingPageParams.has(key))) return;
+
+        document.querySelectorAll("a[href]").forEach((link) => {
+          const url = new URL(link.getAttribute("href"), window.location.origin);
+          if (url.origin !== window.location.origin) return;
+
+          let changed = false;
+          keys.forEach((key) => {
+            if (pricingPageParams.has(key) && !url.searchParams.has(key)) {
+              url.searchParams.set(key, pricingPageParams.get(key));
+              changed = true;
+            }
+          });
+
+          if (changed) link.setAttribute("href", `${url.pathname}${url.search}${url.hash}`);
+        });
+      }
+
       function trackPricingCheckoutEvent(name, detail = {}) {
         const eventParams = {
           event_category: "commercial_intent",
@@ -1618,6 +1638,7 @@
         startPricingCheckout(selectedPricingPlan);
       });
 
+      preservePricingCampaignParams();
       initPricingCheckout();
     </script>
   </body>
