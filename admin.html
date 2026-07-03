@@ -656,6 +656,14 @@
             <strong id="liveCheckoutSessionsCreated">0</strong>
           </article>
           <article class="live-card">
+            <span>Email checkout</span>
+            <strong id="liveCheckoutLinkEmails">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Email checkout falhou</span>
+            <strong id="liveCheckoutLinkEmailFailures">0</strong>
+          </article>
+          <article class="live-card">
             <span>Subscrições pagas</span>
             <strong id="livePaidSubscriptions">0</strong>
           </article>
@@ -1440,6 +1448,8 @@
         document.querySelector("#livePricingCtaClicks").textContent = totals.pricingCtaClicks || 0;
         document.querySelector("#liveCheckoutStarts").textContent = totals.checkoutStarts || 0;
         document.querySelector("#liveCheckoutSessionsCreated").textContent = totals.checkoutSessionsCreated || 0;
+        document.querySelector("#liveCheckoutLinkEmails").textContent = totals.checkoutLinkEmailsSent || 0;
+        document.querySelector("#liveCheckoutLinkEmailFailures").textContent = totals.checkoutLinkEmailFailures || 0;
         document.querySelector("#livePaidSubscriptions").textContent = totals.paidSubscriptions || 0;
         document.querySelector("#liveRevenue").textContent = formatCurrency(totals.revenue || 0);
         document.querySelector("#liveCheckoutLoginRequired").textContent = totals.checkoutLoginRequired || 0;

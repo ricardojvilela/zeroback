@@ -13,6 +13,7 @@ import {
   getStripeClient,
   getStripePriceId,
 } from "./_stripe.js";
+import { Resend } from "resend";
 
 const attributionMetadataKeys = [
   "utm_source",
@@ -40,6 +41,8 @@ const attributionMetadataKeys = [
   "limit_variant",
   "free_limit",
 ];
+const allowedCheckoutEmailDomains = new Set(["batchcutout.com"]);
+const checkoutLinkEmailWindowMs = 60 * 60 * 1000;
 
 function checkoutValueForPlan(plan) {
   if (plan === "annual") return 190;
@@ -50,6 +53,29 @@ function checkoutValueForPlan(plan) {
 function metadataString(value, maxLength = 450) {
   if (value === null || value === undefined) return "";
   return String(value).slice(0, maxLength);
+}
+
+function normalizeEmail(value) {
+  const email = String(value || "").trim().toLowerCase();
+  const valid = /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(email);
+  return valid ? email : "";
+}
+
+function emailDomain(value) {
+  return normalizeEmail(value).split("@")[1] || "";
+}
+
+function fromEmail(value) {
+  const match = String(value || "").match(/<([^<>]+)>/);
+  return normalizeEmail(match?.[1] || value);
+}
+
+function htmlEscape(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 function sanitizeAttribution(input) {
@@ -66,8 +92,144 @@ function sanitizeAttribution(input) {
   return attribution;
 }
 
-async function recordCheckoutSessionCreated(settings, { user, profile, session, plan, attribution }) {
+function checkoutEmailEnabled() {
+  return String(process.env.CHECKOUT_LINK_EMAIL_ENABLED || "true").toLowerCase() !== "false";
+}
+
+function checkoutMailSettings() {
+  const from = process.env.CHECKOUT_LINK_EMAIL_FROM || process.env.SUPPORT_REPLY_FROM || "BatchCutout <support@batchcutout.com>";
+  const replyTo = process.env.CHECKOUT_LINK_EMAIL_REPLY_TO || process.env.SUPPORT_REPLY_TO || "support@batchcutout.com";
+  const fromAddress = fromEmail(from);
+  return {
+    from,
+    replyTo,
+    fromDomain: emailDomain(fromAddress),
+  };
+}
+
+function checkoutLanguage(attribution) {
+  return String(attribution.language || "").toLowerCase().startsWith("pt") ? "pt" : "en";
+}
+
+function checkoutPlanText(plan, language) {
+  if (language === "pt") {
+    if (plan === "annual") return "Pro anual - 190 EUR/ano";
+    if (plan === "early") return "Plano fundador - 15 EUR/mes";
+    return "Pro mensal - 19 EUR/mes";
+  }
+  if (plan === "annual") return "Annual Pro - EUR 190/year";
+  if (plan === "early") return "Founder plan - EUR 15/month";
+  return "Monthly Pro - EUR 19/month";
+}
+
+function checkoutLinkCopy({ language, plan, sessionUrl }) {
+  const planText = checkoutPlanText(plan, language);
+  if (language === "pt") {
+    return {
+      subject: "Link seguro para concluir o BatchCutout Pro",
+      title: "Concluir BatchCutout Pro",
+      intro: "Criou uma sessao de pagamento para BatchCutout Pro. Se a aba do Stripe fechar, pode continuar por este link seguro:",
+      cta: "Concluir pagamento",
+      planLine: `Plano: ${planText}`,
+      note: "Se ja concluiu o pagamento, pode ignorar este email.",
+      support: "Se tiver alguma dificuldade, responda a este email.",
+      thanks: "Obrigado,\nNexaFlow Labs",
+      sessionUrl,
+    };
+  }
+  return {
+    subject: "Your secure BatchCutout Pro checkout link",
+    title: "Complete BatchCutout Pro",
+    intro: "You created a BatchCutout Pro payment session. If the Stripe tab closes, you can continue with this secure link:",
+    cta: "Complete payment",
+    planLine: `Plan: ${planText}`,
+    note: "If you already completed payment, you can ignore this email.",
+    support: "If anything gets in the way, reply to this email.",
+    thanks: "Thanks,\nNexaFlow Labs",
+    sessionUrl,
+  };
+}
+
+function checkoutLinkEmailText(copy) {
+  return [
+    copy.intro,
+    copy.sessionUrl,
+    "",
+    copy.planLine,
+    "",
+    copy.note,
+    copy.support,
+    "",
+    copy.thanks,
+  ].join("\n");
+}
+
+function checkoutLinkEmailHtml(copy) {
+  return `<!doctype html>
+<html>
+  <body style="margin:0;background:#f3f7fa;color:#17202a;font-family:Arial,Helvetica,sans-serif;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f3f7fa;padding:24px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:1px solid #dbe3ee;border-radius:8px;overflow:hidden;">
+            <tr><td style="padding:24px 26px;background:#17202a;color:#ffffff;"><strong style="font-size:18px;">BatchCutout</strong><span style="margin-left:10px;color:#9fb4c6;font-size:12px;text-transform:uppercase;">NexaFlow Labs</span></td></tr>
+            <tr>
+              <td style="padding:28px 26px;">
+                <h1 style="margin:0 0 14px;font-size:28px;line-height:1.1;">${htmlEscape(copy.title)}</h1>
+                <p style="margin:0 0 16px;line-height:1.55;color:#52606d;">${htmlEscape(copy.intro)}</p>
+                <p style="margin:0 0 10px;color:#17202a;font-weight:700;">${htmlEscape(copy.planLine)}</p>
+                <p style="margin:0 0 20px;"><a href="${htmlEscape(copy.sessionUrl)}" style="display:inline-block;background:#14958b;color:#ffffff;text-decoration:none;font-weight:700;border-radius:8px;padding:13px 18px;">${htmlEscape(copy.cta)}</a></p>
+                <p style="margin:0 0 8px;line-height:1.55;color:#52606d;">${htmlEscape(copy.note)}</p>
+                <p style="margin:0;line-height:1.55;color:#52606d;">${htmlEscape(copy.support)}</p>
+              </td>
+            </tr>
+            <tr><td style="padding:18px 26px;border-top:1px solid #dbe3ee;color:#697483;font-size:12px;line-height:1.45;">NexaFlow Labs</td></tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+}
+
+async function insertCheckoutEvent(settings, row) {
   const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
+  await fetch(`${settings.supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}`, {
+    method: "POST",
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+      "Content-Type": "application/json",
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify(row),
+  });
+}
+
+async function hasRecentCheckoutLinkEmail(settings, email) {
+  const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
+  const since = new Date(Date.now() - checkoutLinkEmailWindowMs).toISOString();
+  const query = new URLSearchParams({
+    select: "id",
+    event_name: "eq.checkout_link_email_sent",
+    event_label: `eq.${email}`,
+    occurred_at: `gte.${since}`,
+    limit: "1",
+  });
+
+  const response = await fetch(`${settings.supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}?${query}`, {
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+    },
+  });
+
+  if (!response.ok) return true;
+  const rows = await response.json();
+  return Array.isArray(rows) && rows.length > 0;
+}
+
+async function recordCheckoutSessionCreated(settings, { user, profile, session, plan, attribution }) {
   const detail = {
     ...attribution,
     stripe_session_id: session.id || "",
@@ -92,16 +254,108 @@ async function recordCheckoutSessionCreated(settings, { user, profile, session, 
     occurred_at: new Date().toISOString(),
   };
 
-  await fetch(`${settings.supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}`, {
-    method: "POST",
-    headers: {
-      apikey: settings.serviceRoleKey,
-      Authorization: `Bearer ${settings.serviceRoleKey}`,
-      "Content-Type": "application/json",
-      Prefer: "return=minimal",
-    },
-    body: JSON.stringify(row),
+  await insertCheckoutEvent(settings, row);
+}
+
+async function recordCheckoutLinkEmail(settings, { eventName, user, profile, session, plan, attribution, to, reason = "", resendId = "" }) {
+  const detail = {
+    ...attribution,
+    email: to,
+    reason,
+    resend_id: resendId,
+    stripe_session_id: session.id || "",
+    stripe_customer_id: profile.stripe_customer_id || session.customer || "",
+    supabase_user_id: user.id || "",
+    plan,
+    price_plan: plan,
+  };
+
+  await insertCheckoutEvent(settings, {
+    event_name: eventName,
+    event_category: "email",
+    event_label: to,
+    page_path: metadataString(attribution.page_path, 500),
+    page_location: metadataString(attribution.page_location, 1000),
+    language: metadataString(attribution.language, 20),
+    session_id: metadataString(attribution.session_id, 80),
+    visitor_id: metadataString(attribution.visitor_id, 80),
+    source: "email",
+    campaign: "checkout_link_email",
+    value: 0,
+    detail,
+    occurred_at: new Date().toISOString(),
   });
+}
+
+async function sendCheckoutLinkEmail(settings, { user, profile, session, plan, attribution }) {
+  if (!checkoutEmailEnabled()) return { sent: false, skipped: true, reason: "disabled" };
+  if (!session.url) return { sent: false, skipped: true, reason: "missing_session_url" };
+
+  const to = normalizeEmail(user.email);
+  if (!to) return { sent: false, skipped: true, reason: "missing_user_email" };
+
+  const mailSettings = checkoutMailSettings();
+  if (!allowedCheckoutEmailDomains.has(mailSettings.fromDomain)) {
+    return { sent: false, skipped: true, reason: "from_domain_not_allowed" };
+  }
+
+  const resendApiKey = process.env.RESEND_API_KEY || "";
+  if (!resendApiKey) return { sent: false, skipped: true, reason: "resend_not_configured" };
+
+  const alreadySent = await hasRecentCheckoutLinkEmail(settings, to);
+  if (alreadySent) return { sent: false, skipped: true, reason: "already_sent_recently" };
+
+  const language = checkoutLanguage(attribution);
+  const copy = checkoutLinkCopy({ language, plan, sessionUrl: session.url });
+  const payload = {
+    from: mailSettings.from,
+    to,
+    replyTo: mailSettings.replyTo,
+    subject: copy.subject,
+    text: checkoutLinkEmailText(copy),
+    html: checkoutLinkEmailHtml(copy),
+    tags: [
+      { name: "source", value: "checkout_link_email" },
+      { name: "product", value: "batchcutout" },
+    ],
+  };
+
+  const resend = new Resend(resendApiKey);
+  let sent;
+  try {
+    sent = await resend.emails.send(payload);
+  } catch (error) {
+    const reason = error instanceof Error ? error.message.slice(0, 300) : "resend_exception";
+    await recordCheckoutLinkEmail(settings, { eventName: "checkout_link_email_failed", user, profile, session, plan, attribution, to, reason });
+    return { sent: false, skipped: false, reason: "resend_exception" };
+  }
+
+  if (sent.error) {
+    await recordCheckoutLinkEmail(settings, {
+      eventName: "checkout_link_email_failed",
+      user,
+      profile,
+      session,
+      plan,
+      attribution,
+      to,
+      reason: sent.error.message || "resend_error",
+    });
+    return { sent: false, skipped: false, reason: "resend_error" };
+  }
+
+  await recordCheckoutLinkEmail(settings, {
+    eventName: "checkout_link_email_sent",
+    user,
+    profile,
+    session,
+    plan,
+    attribution,
+    to,
+    resendId: sent.data?.id || "",
+  });
+
+  return { sent: true, skipped: false, id: sent.data?.id || "" };
 }
 
 export default async function handler(request, response) {
@@ -185,6 +439,11 @@ export default async function handler(request, response) {
       await recordCheckoutSessionCreated(settings, { user, profile, session, plan, attribution });
     } catch {
       // Checkout must not fail because analytics storage failed.
+    }
+    try {
+      await sendCheckoutLinkEmail(settings, { user, profile, session, plan, attribution });
+    } catch {
+      // Checkout must not fail because email recovery failed.
     }
 
     return sendJson(response, 200, {
