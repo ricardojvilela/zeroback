@@ -2511,6 +2511,12 @@ progress::-moz-progress-bar {
   text-align: center;
 }
 
+.pricing-plan-actions button.is-selected {
+  outline: 3px solid rgba(15, 139, 124, 0.24);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 1px rgba(15, 139, 124, 0.28), 0 12px 30px rgba(15, 139, 124, 0.14);
+}
+
 .pricing-plan-actions button[data-pricing-checkout-plan="early"] {
   border-color: rgba(15, 139, 124, 0.35);
   background: linear-gradient(135deg, var(--accent), var(--blue));

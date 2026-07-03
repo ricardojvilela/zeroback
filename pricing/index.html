@@ -1079,10 +1079,19 @@
         });
       }
 
+      function updateSelectedPricingPlanUi() {
+        for (const button of pricingCheckoutActions?.querySelectorAll("[data-pricing-checkout-plan]") || []) {
+          const isSelected = button.dataset.pricingCheckoutPlan === selectedPricingPlan;
+          button.classList.toggle("is-selected", isSelected);
+          button.setAttribute("aria-pressed", String(isSelected));
+        }
+      }
+
       function updatePricingAccountUi() {
         const ready = Boolean(pricingAccount?.email);
         const hasPro = Boolean(pricingAccount?.access?.canUsePro);
         const batchLimit = pricingAccount?.access?.batchLimit || 100;
+        updateSelectedPricingPlanUi();
         pricingAccountBadge.textContent = hasPro
           ? pricingText("checkoutBadgePro")
           : ready
@@ -1138,6 +1147,7 @@
       async function startPricingCheckout(plan = selectedPricingPlan) {
         const selectedPlan = pricingCheckoutPlans.has(plan) ? plan : "monthly";
         selectedPricingPlan = selectedPlan;
+        updateSelectedPricingPlanUi();
         if (pricingAccount?.access?.canUsePro) {
           updatePricingAccountUi();
           return;
@@ -1272,6 +1282,7 @@
       }
 
       async function initPricingCheckout() {
+        updateSelectedPricingPlanUi();
         try {
           const response = await fetch("/api/auth-config");
           const data = await response.json().catch(() => ({}));
