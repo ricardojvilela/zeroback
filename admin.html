@@ -407,7 +407,7 @@
 
       table {
         width: 100%;
-        min-width: 1400px;
+        min-width: 1520px;
         border-collapse: collapse;
         background: #fff;
       }
@@ -630,6 +630,14 @@
           <article class="live-card">
             <span>Guardar link</span>
             <strong id="livePostDownloadSaveLink">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Prova visual</span>
+            <strong id="liveProofPageViews">0</strong>
+          </article>
+          <article class="live-card">
+            <span>CTA prova</span>
+            <strong id="liveProofCtaClicks">0</strong>
           </article>
           <article class="live-card">
             <span>Cliques em planos</span>
@@ -992,6 +1000,8 @@
                   <th>Imagens</th>
                   <th>Downloads</th>
                   <th>ZIP</th>
+                  <th>Prova</th>
+                  <th>CTA prova</th>
                   <th>Cliques planos</th>
                   <th>CTA pricing</th>
                   <th>Sem login</th>
@@ -1010,7 +1020,7 @@
               </thead>
               <tbody id="sourceRowsBody">
                 <tr>
-                  <td class="empty" colspan="21">A carregar origens.</td>
+                  <td class="empty" colspan="23">A carregar origens.</td>
                 </tr>
               </tbody>
             </table>
@@ -1028,6 +1038,8 @@
                 <th>Limite</th>
                 <th>Resultado pronto</th>
                 <th>Downloads</th>
+                <th>Prova</th>
+                <th>CTA prova</th>
                 <th>Cliques planos</th>
                 <th>CTA pricing</th>
                 <th>Sem login</th>
@@ -1046,7 +1058,7 @@
             </thead>
             <tbody id="liveRowsBody">
               <tr>
-                <td class="empty" colspan="22">A carregar atividade.</td>
+                <td class="empty" colspan="24">A carregar atividade.</td>
               </tr>
             </tbody>
           </table>
@@ -1422,6 +1434,8 @@
         document.querySelector("#livePostDownloadNext").textContent = totals.postDownloadNextShown || 0;
         document.querySelector("#livePostDownloadFounder").textContent = totals.postDownloadFounderClicks || 0;
         document.querySelector("#livePostDownloadSaveLink").textContent = totals.postDownloadSaveLinkClicks || 0;
+        document.querySelector("#liveProofPageViews").textContent = totals.proofPageViews || 0;
+        document.querySelector("#liveProofCtaClicks").textContent = totals.proofCtaClicks || 0;
         document.querySelector("#liveProClicks").textContent = totals.proClicks || 0;
         document.querySelector("#livePricingCtaClicks").textContent = totals.pricingCtaClicks || 0;
         document.querySelector("#liveCheckoutStarts").textContent = totals.checkoutStarts || 0;
@@ -1454,6 +1468,8 @@
                   <td>${row.limitAttempts}</td>
                   <td>${row.downloadReadyShown || 0}</td>
                   <td>${row.downloads}</td>
+                  <td>${row.proofPageViews || 0}</td>
+                  <td>${row.proofCtaClicks || 0}</td>
                   <td>${row.proClicks}</td>
                   <td>${row.pricingCtaClicks || 0}</td>
                   <td>${row.checkoutLoginRequired || 0}</td>
@@ -1471,7 +1487,7 @@
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="22">Ainda não existem eventos reais no período.</td></tr>`;
+          : `<tr><td class="empty" colspan="24">Ainda não existem eventos reais no período.</td></tr>`;
 
         sourceRowsBody.innerHTML = data.sourceBreakdown?.length
           ? data.sourceBreakdown.map((row) => `
@@ -1483,6 +1499,8 @@
                 <td>${row.imagesAccepted || 0}</td>
                 <td>${row.downloads || 0}</td>
                 <td>${row.zipDownloads || 0}</td>
+                <td>${row.proofPageViews || 0}</td>
+                <td>${row.proofCtaClicks || 0}</td>
                 <td>${row.proClicks || 0}</td>
                 <td>${row.pricingCtaClicks || 0}</td>
                 <td>${row.checkoutLoginRequired || 0}</td>
@@ -1499,7 +1517,7 @@
                 <td>${row.billingPortalOpens || 0}</td>
               </tr>
             `).join("")
-          : `<tr><td class="empty" colspan="21">Ainda não existem origens identificadas.</td></tr>`;
+          : `<tr><td class="empty" colspan="23">Ainda não existem origens identificadas.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "";
         liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Última atualização: ${generatedAt}`;

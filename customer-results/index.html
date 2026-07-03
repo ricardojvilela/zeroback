@@ -61,7 +61,7 @@
           <span>BatchCutout</span>
         </a>
         <span class="landing-parent-brand">NexaFlow Labs</span>
-        <a href="/?utm_source=customer_results&utm_medium=nav&utm_campaign=proof_page#tool">Abrir ferramenta</a>
+        <a href="/?utm_source=customer_results&utm_medium=nav&utm_campaign=proof_page#tool" data-proof-cta="tool_nav">Abrir ferramenta</a>
       </nav>
 
       <section class="landing-hero">
@@ -73,8 +73,8 @@
             transparentes e ZIPs organizados para lojas online, marketplaces e catálogos.
           </p>
           <div class="landing-actions">
-            <a class="landing-button" href="/?utm_source=customer_results&utm_medium=hero&utm_campaign=proof_page#tool">Testar 2 imagens grátis</a>
-            <a class="landing-secondary" href="/pricing/?utm_source=customer_results&utm_medium=hero&utm_campaign=proof_page&checkout_plan=early#pricing-account-title">Ver planos Pro</a>
+            <a class="landing-button" href="/?utm_source=customer_results&utm_medium=hero&utm_campaign=proof_page#tool" data-proof-cta="tool_hero">Testar 2 imagens grátis</a>
+            <a class="landing-secondary" href="/pricing/?utm_source=customer_results&utm_medium=hero&utm_campaign=proof_page&checkout_plan=early#pricing-account-title" data-proof-cta="pricing_hero">Ver planos Pro</a>
           </div>
         </div>
         <figure class="landing-visual">
@@ -96,8 +96,8 @@
             <li>Use Pro quando precisar de 100 imagens por lote.</li>
           </ul>
           <div class="landing-actions">
-            <a class="landing-button" href="/?utm_source=customer_results&utm_medium=proof&utm_campaign=static_results#tool">Testar com fotos reais</a>
-            <a class="landing-secondary" href="/pricing/?checkout_plan=early&utm_source=customer_results&utm_medium=proof&utm_campaign=static_results#pricing-account-title">Plano fundador</a>
+            <a class="landing-button" href="/?utm_source=customer_results&utm_medium=proof&utm_campaign=static_results#tool" data-proof-cta="tool_static_proof">Testar com fotos reais</a>
+            <a class="landing-secondary" href="/pricing/?checkout_plan=early&utm_source=customer_results&utm_medium=proof&utm_campaign=static_results#pricing-account-title" data-proof-cta="pricing_static_proof">Plano fundador</a>
           </div>
         </div>
         <figure class="landing-result-visual">
@@ -138,8 +138,83 @@
             com nome da loja ou de forma anónima.
           </p>
         </div>
-        <a class="landing-button" href="mailto:support@batchcutout.com?subject=Exemplo%20BatchCutout">Enviar exemplo autorizado</a>
+        <a class="landing-button" href="mailto:support@batchcutout.com?subject=Exemplo%20BatchCutout" data-proof-cta="mailto_proof">Enviar exemplo autorizado</a>
       </section>
     </main>
+    <script>
+      const proofVisitorStorageKey = "batchcutout_visitor_id";
+      const proofSessionStorageKey = "batchcutout_session_id";
+      const proofParams = new URLSearchParams(window.location.search);
+
+      function getProofStableId(storage, key) {
+        try {
+          const existing = storage.getItem(key);
+          if (existing) return existing;
+          const next = crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+          storage.setItem(key, next);
+          return next;
+        } catch {
+          return "";
+        }
+      }
+
+      function proofAttribution(extra = {}) {
+        const detail = {
+          event_category: "commercial_intent",
+          source: "customer_results",
+          page_path: window.location.pathname,
+          page_location: window.location.href.split("#")[0],
+          language: document.documentElement.lang || "pt-PT",
+          ...extra,
+        };
+        for (const key of ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "gbraid", "wbraid"]) {
+          const value = proofParams.get(key);
+          if (value) detail[key] = value;
+        }
+        return detail;
+      }
+
+      function trackProofEvent(name, detail = {}) {
+        const eventDetail = proofAttribution(detail);
+        window.gtag?.("event", name, eventDetail);
+
+        const payload = JSON.stringify({
+          name,
+          detail: eventDetail,
+          visitorId: getProofStableId(localStorage, proofVisitorStorageKey),
+          sessionId: getProofStableId(sessionStorage, proofSessionStorageKey),
+        });
+
+        try {
+          if (navigator.sendBeacon) {
+            const sent = navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" }));
+            if (sent) return;
+          }
+        } catch {
+          // Measurement must not block the page.
+        }
+
+        fetch("/api/track", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload,
+          keepalive: true,
+        }).catch(() => {});
+      }
+
+      document.querySelectorAll("[data-proof-cta]").forEach((link) => {
+        link.addEventListener("click", () => {
+          const href = link.getAttribute("href") || "";
+          trackProofEvent("proof_cta_clicked", {
+            event_label: link.dataset.proofCta || "proof_cta",
+            target: href.includes("/pricing/") ? "pricing" : href.startsWith("mailto:") ? "email" : "tool",
+          });
+        });
+      });
+
+      trackProofEvent("proof_page_view", {
+        event_label: "customer_results",
+      });
+    </script>
   </body>
 </html>

@@ -37,6 +37,8 @@ function emptyDay(date) {
     postDownloadNextShown: 0,
     postDownloadFounderClicks: 0,
     postDownloadSaveLinkClicks: 0,
+    proofPageViews: 0,
+    proofCtaClicks: 0,
     proClicks: 0,
     pricingCtaClicks: 0,
     checkoutLoginRequired: 0,
@@ -83,6 +85,8 @@ function classifySource(event, detail) {
     "landing",
     "use-cases",
     "admin",
+    "customer_results",
+    "partners_page",
   ]);
   const cleanSource = (value) => {
     const cleaned = asCleanText(value, 200);
@@ -135,6 +139,8 @@ function emptySourceRow(source) {
     postDownloadNextShown: 0,
     postDownloadFounderClicks: 0,
     postDownloadSaveLinkClicks: 0,
+    proofPageViews: 0,
+    proofCtaClicks: 0,
     proClicks: 0,
     pricingCtaClicks: 0,
     checkoutLoginRequired: 0,
@@ -273,6 +279,20 @@ export default async function handler(request, response) {
       if (event.visitor_id) visitorsByDay.get(date).add(event.visitor_id);
 
       switch (event.event_name) {
+        case "proof_page_view":
+          row.pageViews += 1;
+          row.proofPageViews += 1;
+          sourceRow.pageViews += 1;
+          sourceRow.proofPageViews += 1;
+          break;
+        case "proof_cta_clicked":
+          row.proofCtaClicks += 1;
+          sourceRow.proofCtaClicks += 1;
+          if (detail.target === "pricing") {
+            row.pricingCtaClicks += 1;
+            sourceRow.pricingCtaClicks += 1;
+          }
+          break;
         case "pro_page_view":
         case "tool_page_view":
           row.pageViews += 1;

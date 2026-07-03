@@ -91,3 +91,4 @@ Interpretation:
 - Partner referral link/message copy actions are now stored in the internal funnel, so partner-page intent is measurable beyond Google events.
 - Legacy `/shopify/` and `/etsy/` trailing-slash URLs now redirect to the current SEO pages, avoiding duplicate outdated landing pages.
 - The `/customer-results/` outreach proof page now uses static before/after proof and ecommerce steps instead of leading with the weaker demo video.
+- The `/customer-results/` proof page now records internal page-view and CTA-click events, making proof-page outreach measurable in the admin funnel.
