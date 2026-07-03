@@ -138,11 +138,16 @@ function checkoutLinkCopy({ language, plan, sessionUrl }) {
     return {
       subject: "Link seguro para concluir o BatchCutout Pro",
       title: "Concluir BatchCutout Pro",
-      intro: "Criou uma sessao de pagamento para BatchCutout Pro. Se a aba do Stripe fechar, pode continuar por este link seguro:",
+      intro: "Abriu o pagamento do BatchCutout Pro. Se a aba do Stripe fechar ou quiser continuar noutro dispositivo, use este link seguro:",
       cta: "Concluir pagamento",
       planLine: `Plano: ${planText}`,
-      note: "Se ja concluiu o pagamento, pode ignorar este email.",
-      support: "Se tiver alguma dificuldade, responda a este email.",
+      benefits: [
+        "Ate 100 imagens por lote",
+        "Ate 2.000 imagens por mes",
+        "PNG transparente e ZIP organizado para produto",
+      ],
+      note: "O botao retoma a mesma sessao segura do Stripe. Se ja concluiu o pagamento, pode ignorar este email.",
+      support: "Se alguma coisa bloquear a ativacao, responda a este email.",
       thanks: "Obrigado,\nNexaFlow Labs",
       sessionUrl,
     };
@@ -150,11 +155,16 @@ function checkoutLinkCopy({ language, plan, sessionUrl }) {
   return {
     subject: "Your secure BatchCutout Pro checkout link",
     title: "Complete BatchCutout Pro",
-    intro: "You created a BatchCutout Pro payment session. If the Stripe tab closes, you can continue with this secure link:",
+    intro: "You opened BatchCutout Pro checkout. If the Stripe tab closes or you want to continue on another device, use this secure link:",
     cta: "Complete payment",
     planLine: `Plan: ${planText}`,
-    note: "If you already completed payment, you can ignore this email.",
-    support: "If anything gets in the way, reply to this email.",
+    benefits: [
+      "Up to 100 images per batch",
+      "Up to 2,000 images per month",
+      "Transparent PNG and organized ZIP export for product work",
+    ],
+    note: "The button resumes the same secure Stripe session. If you already completed payment, you can ignore this email.",
+    support: "If anything blocks activation, reply to this email.",
     thanks: "Thanks,\nNexaFlow Labs",
     sessionUrl,
   };
@@ -167,11 +177,21 @@ function checkoutLinkEmailText(copy) {
     "",
     copy.planLine,
     "",
+    ...(copy.benefits || []).map((benefit) => `- ${benefit}`),
+    "",
     copy.note,
     copy.support,
     "",
     copy.thanks,
   ].join("\n");
+}
+
+function checkoutBenefitsHtml(benefits = []) {
+  if (!benefits.length) return "";
+  const items = benefits
+    .map((benefit) => `<li>${htmlEscape(benefit)}</li>`)
+    .join("");
+  return `<ul style="margin:0 0 20px;padding-left:20px;color:#52606d;line-height:1.55;">${items}</ul>`;
 }
 
 function checkoutLinkEmailHtml(copy) {
@@ -188,6 +208,7 @@ function checkoutLinkEmailHtml(copy) {
                 <h1 style="margin:0 0 14px;font-size:28px;line-height:1.1;">${htmlEscape(copy.title)}</h1>
                 <p style="margin:0 0 16px;line-height:1.55;color:#52606d;">${htmlEscape(copy.intro)}</p>
                 <p style="margin:0 0 10px;color:#17202a;font-weight:700;">${htmlEscape(copy.planLine)}</p>
+                ${checkoutBenefitsHtml(copy.benefits)}
                 <p style="margin:0 0 20px;"><a href="${htmlEscape(copy.sessionUrl)}" style="display:inline-block;background:#14958b;color:#ffffff;text-decoration:none;font-weight:700;border-radius:8px;padding:13px 18px;">${htmlEscape(copy.cta)}</a></p>
                 <p style="margin:0 0 8px;line-height:1.55;color:#52606d;">${htmlEscape(copy.note)}</p>
                 <p style="margin:0;line-height:1.55;color:#52606d;">${htmlEscape(copy.support)}</p>
