@@ -1235,7 +1235,7 @@
           account_no_checkout: {
             label: "Conta sem checkout",
             subject: "Finish setting up BatchCutout Pro",
-            body: `Hi,\n\nYou created a BatchCutout account but did not choose a Pro plan yet.\n\nIf you are preparing product photos in batches, Pro unlocks:\n\n- Up to 100 images per batch\n- Up to 2,000 images per month\n- ZIP export for product workflows\n\nChoose the current plan here:\nhttps://batchcutout.com/pricing/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=account_no_checkout\n\nThanks,\nNexaFlow Labs`,
+            body: `Hi,\n\nYou created a BatchCutout account but did not choose a Pro plan yet.\n\nIf you are preparing product photos in batches, Pro unlocks:\n\n- Up to 100 images per batch\n- Up to 2,000 images per month\n- ZIP export for product workflows\n\nChoose the current founder plan here:\nhttps://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=account_no_checkout#pricing-account-title\n\nThanks,\nNexaFlow Labs`,
             reason: "Conta gratuita criada há mais de 2 horas sem cliente Stripe.",
           },
           checkout_not_paid: {
@@ -1253,13 +1253,13 @@
           lead_capture: {
             label: "Lead grátis",
             subject: "Your BatchCutout link",
-            body: `Hi,\n\nYou asked to receive BatchCutout updates after testing the tool.\n\nHere is the link to come back and process product photos:\nhttps://batchcutout.com/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#tool\n\nIf you need larger batches, the founder plan includes:\n\n- 100 images per batch\n- 2,000 images per month\n- Transparent PNG and ZIP export\n\nPlans:\nhttps://batchcutout.com/pricing/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup\n\nIf this is not useful, reply "unsubscribe" and we will not send product follow-ups.\n\nThanks,\nNexaFlow Labs`,
+            body: `Hi,\n\nYou asked to receive BatchCutout updates after testing the tool.\n\nHere is the link to come back and process product photos:\nhttps://batchcutout.com/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#tool\n\nIf you need larger batches, the founder plan includes:\n\n- 100 images per batch\n- 2,000 images per month\n- Transparent PNG and ZIP export\n\nFounder plan:\nhttps://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#pricing-account-title\n\nIf this is not useful, reply "unsubscribe" and we will not send product follow-ups.\n\nThanks,\nNexaFlow Labs`,
             reason: "Email deixado voluntariamente após testar/descarregar.",
           },
           lead_capture_pt: {
             label: "Lead grátis PT",
             subject: "O seu link BatchCutout",
-            body: `Ola,\n\nPediu para receber novidades do BatchCutout depois de testar a ferramenta.\n\nAqui fica o link para voltar e tratar fotos de produto:\nhttps://batchcutout.com/?utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#tool\n\nSe precisar de lotes maiores, o plano fundador inclui:\n\n- 100 imagens por lote\n- 2.000 imagens por mes\n- PNG transparente e exportacao ZIP\n\nPlanos:\nhttps://batchcutout.com/pricing/?utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup\n\nSe nao quiser receber emails de acompanhamento, responda com "remover".\n\nObrigado,\nNexaFlow Labs`,
+            body: `Ola,\n\nPediu para receber novidades do BatchCutout depois de testar a ferramenta.\n\nAqui fica o link para voltar e tratar fotos de produto:\nhttps://batchcutout.com/?utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#tool\n\nSe precisar de lotes maiores, o plano fundador inclui:\n\n- 100 imagens por lote\n- 2.000 imagens por mes\n- PNG transparente e exportacao ZIP\n\nPlano fundador:\nhttps://batchcutout.com/pricing/?checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#pricing-account-title\n\nSe nao quiser receber emails de acompanhamento, responda com "remover".\n\nObrigado,\nNexaFlow Labs`,
             reason: "Email deixado voluntariamente após testar/descarregar.",
           },
         };
@@ -1350,7 +1350,7 @@
         if (key === "email_partner") {
           return {
             subject: "Batch background removal for ecommerce photo workflows",
-            body: `Hi,\n\n${outreachIntro(prospect)}\n\nBatchCutout is a simple batch background remover for product photo workflows. It is not a full design suite; it is focused on repeat cutouts, transparent PNGs, and ZIP export.${demoBlock}\n\nYou can also test 2 images free here, no card needed:\nhttps://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach#tool\n\nFounder plan:\nhttps://batchcutout.com/pricing/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach\n\nIf this is not relevant, reply "no thanks" and I will not contact you again.\n\nThanks,\nRicardo\nNexaFlow Labs`,
+            body: `Hi,\n\n${outreachIntro(prospect)}\n\nBatchCutout is a simple batch background remover for product photo workflows. It is not a full design suite; it is focused on repeat cutouts, transparent PNGs, and ZIP export.${demoBlock}\n\nYou can also test 2 images free here, no card needed:\nhttps://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach#tool\n\nFounder plan:\nhttps://batchcutout.com/pricing/?checkout_plan=early&utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach#pricing-account-title\n\nIf this is not relevant, reply "no thanks" and I will not contact you again.\n\nThanks,\nRicardo\nNexaFlow Labs`,
           };
         }
         return {

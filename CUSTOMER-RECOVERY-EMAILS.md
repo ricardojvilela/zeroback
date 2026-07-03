@@ -71,8 +71,8 @@ If you are preparing product photos in batches, Pro unlocks:
 - Up to 2,000 images per month
 - ZIP export for product workflows
 
-Choose the current plan here:
-https://batchcutout.com/pricing/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=account_no_checkout
+Choose the current founder plan here:
+https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=account_no_checkout#pricing-account-title
 
 Thanks,
 NexaFlow Labs
@@ -99,7 +99,7 @@ If anything blocked you, reply to this email and we will help. The current Pro o
 - Monthly, founder, and annual billing options
 
 Continue checkout:
-https://batchcutout.com/pricing/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=checkout_not_paid
+https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=checkout_not_paid#pricing-account-title
 
 Thanks,
 NexaFlow Labs
@@ -126,7 +126,7 @@ Pro includes:
 - Transparent PNG and ZIP export
 
 See plans:
-https://batchcutout.com/pricing/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=download_no_pro
+https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=download_no_pro#pricing-account-title
 
 Thanks,
 NexaFlow Labs
@@ -177,8 +177,8 @@ If you need larger batches, the founder plan includes:
 - 2,000 images per month
 - Transparent PNG and ZIP export
 
-Plans:
-https://batchcutout.com/pricing/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup
+Founder plan:
+https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#pricing-account-title
 
 If this is not useful, reply "unsubscribe" and we will not send product follow-ups.
 
@@ -201,8 +201,8 @@ Se esta a preparar fotos de produto em lote, o Pro desbloqueia:
 - Ate 2.000 imagens por mes
 - Exportacao ZIP para fluxos de ecommerce
 
-Escolha o plano atual aqui:
-https://batchcutout.com/pricing/?utm_source=email&utm_medium=recovery&utm_campaign=account_no_checkout
+Escolha o plano fundador aqui:
+https://batchcutout.com/pricing/?checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=account_no_checkout#pricing-account-title
 
 Obrigado,
 NexaFlow Labs
@@ -227,7 +227,7 @@ Se alguma coisa bloqueou o processo, responda a este email e ajudamos. O plano P
 - PNG transparente e ZIP para fluxos de ecommerce
 
 Continuar:
-https://batchcutout.com/pricing/?utm_source=email&utm_medium=recovery&utm_campaign=checkout_not_paid
+https://batchcutout.com/pricing/?checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=checkout_not_paid#pricing-account-title
 
 Obrigado,
 NexaFlow Labs
@@ -252,7 +252,7 @@ O Pro inclui:
 - Exportacao em PNG transparente e ZIP
 
 Ver planos:
-https://batchcutout.com/pricing/?utm_source=email&utm_medium=recovery&utm_campaign=download_no_pro
+https://batchcutout.com/pricing/?checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=download_no_pro#pricing-account-title
 
 Obrigado,
 NexaFlow Labs
@@ -299,8 +299,8 @@ Se precisar de lotes maiores, o plano fundador inclui:
 - 2.000 imagens por mes
 - PNG transparente e exportacao ZIP
 
-Planos:
-https://batchcutout.com/pricing/?utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup
+Plano fundador:
+https://batchcutout.com/pricing/?checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#pricing-account-title
 
 Se nao quiser receber emails de acompanhamento, responda com "remover".
 

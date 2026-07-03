@@ -54,7 +54,7 @@ Indie Hackers:
 https://batchcutout.com/?utm_source=indie_hackers&utm_medium=community&utm_campaign=directory_launch#tool
 
 Pricing:
-https://batchcutout.com/pricing/?utm_source=directory&utm_medium=profile&utm_campaign=directory_launch
+https://batchcutout.com/pricing/?checkout_plan=early&utm_source=directory&utm_medium=profile&utm_campaign=directory_launch#pricing-account-title
 
 Partner page:
 https://batchcutout.com/partners/?utm_source=directory&utm_medium=profile&utm_campaign=directory_launch

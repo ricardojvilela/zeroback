@@ -37,7 +37,7 @@ Founder offer:
 
 Link:
 
-https://batchcutout.com/pricing/?utm_source=manual_outreach&utm_medium=email&utm_campaign=founder_first_customers
+https://batchcutout.com/pricing/?checkout_plan=early&utm_source=manual_outreach&utm_medium=email&utm_campaign=founder_first_customers#pricing-account-title
 
 ## Email template - direct store owner
 
@@ -81,7 +81,7 @@ We built BatchCutout as a simple batch background remover for product photo work
 It may be useful when you need to process many simple product shots before final editing or client delivery.
 
 Founder plan:
-https://batchcutout.com/pricing/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach
+https://batchcutout.com/pricing/?checkout_plan=early&utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach#pricing-account-title
 
 You can test 2 images free here, no card needed:
 https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach#tool

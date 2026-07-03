@@ -87,3 +87,4 @@ Interpretation:
 - The main tool account panel now also treats account creation as the primary action and reuses captured email locally, aligning the post-download Pro path with the pricing checkout path.
 - Account signup/login failures are now tracked and surfaced in the admin funnel, making authentication friction visible before the checkout-start step.
 - The partner page now gives partners a ready-to-copy tracked referral link and client message, reducing the need to request a manual link before sharing BatchCutout.
+- Lead autoreplies, recovery templates, outreach docs and directory profile links now point to the founder plan selected in the pricing checkout, reducing clicks from warm intent to payment.
