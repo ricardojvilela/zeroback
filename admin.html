@@ -1388,8 +1388,8 @@
         return "";
       }
 
-      function recoveryPlanUrl(plan = "monthly") {
-        const checkoutPlan = ["early", "monthly", "annual"].includes(plan) ? plan : "monthly";
+      function recoveryPlanUrl(plan = "early") {
+        const checkoutPlan = ["early", "monthly", "annual"].includes(plan) ? plan : "early";
         return `https://batchcutout.com/pricing/?lang=en&checkout_plan=${checkoutPlan}&utm_source=email&utm_medium=recovery&utm_campaign=checkout_not_paid#pricing-account-title`;
       }
 
@@ -1415,14 +1415,14 @@
           },
           lead_capture: {
             label: "Lead grátis",
-            subject: "Your BatchCutout link",
-            body: `Hi,\n\nYou asked to receive BatchCutout updates after testing the tool.\n\nHere is the link to come back and process product photos:\nhttps://batchcutout.com/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#tool\n\nIf you need larger batches, the founder plan includes:\n\n- 100 images per batch\n- 2,000 images per month\n- Transparent PNG and ZIP export\n\nFounder plan:\nhttps://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#pricing-account-title\n\nIf this is not useful, reply "unsubscribe" and we will not send product follow-ups.\n\nThanks,\nNexaFlow Labs`,
+            subject: "Your BatchCutout link and checklist",
+            body: `Hi,\n\nYou asked to receive the BatchCutout link after testing the tool.\n\nHere is the link to come back and process product photos:\nhttps://batchcutout.com/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#tool\n\nQuick checklist for your next batch:\n\n- Use photos where the full product is visible and not cropped at the edges\n- Avoid very strong shadows or backgrounds with colors too close to the product\n- Download PNG for one image or ZIP for multiple products\n\nIf you need larger batches, the founder plan includes:\n\n- 100 images per batch\n- 2,000 images per month\n- Transparent PNG and ZIP export\n\nFounder plan:\nhttps://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#pricing-account-title\n\nIf this is not useful, reply "unsubscribe" and we will not send product follow-ups.\n\nThanks,\nNexaFlow Labs`,
             reason: "Email deixado voluntariamente após testar/descarregar.",
           },
           lead_capture_pt: {
             label: "Lead grátis PT",
-            subject: "O seu link BatchCutout",
-            body: `Ola,\n\nPediu para receber novidades do BatchCutout depois de testar a ferramenta.\n\nAqui fica o link para voltar e tratar fotos de produto:\nhttps://batchcutout.com/?utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#tool\n\nSe precisar de lotes maiores, o plano fundador inclui:\n\n- 100 imagens por lote\n- 2.000 imagens por mes\n- PNG transparente e exportacao ZIP\n\nPlano fundador:\nhttps://batchcutout.com/pricing/?checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#pricing-account-title\n\nSe nao quiser receber emails de acompanhamento, responda com "remover".\n\nObrigado,\nNexaFlow Labs`,
+            subject: "O seu link e checklist BatchCutout",
+            body: `Ola,\n\nPediu para receber o link do BatchCutout depois de testar a ferramenta.\n\nAqui fica o link para voltar e tratar fotos de produto:\nhttps://batchcutout.com/?utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#tool\n\nChecklist rapido para o proximo lote:\n\n- Use fotos em que o produto aparece inteiro e sem cortes nas margens\n- Evite sombras muito fortes ou fundos com cores iguais ao produto\n- Descarregue PNG para uma imagem ou ZIP para varios produtos\n\nSe precisar de lotes maiores, o plano fundador inclui:\n\n- 100 imagens por lote\n- 2.000 imagens por mes\n- PNG transparente e exportacao ZIP\n\nPlano fundador:\nhttps://batchcutout.com/pricing/?checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#pricing-account-title\n\nSe nao quiser receber emails de acompanhamento, responda com "remover".\n\nObrigado,\nNexaFlow Labs`,
             reason: "Email deixado voluntariamente após testar/descarregar.",
           },
         };
