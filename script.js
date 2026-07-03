@@ -246,7 +246,10 @@ const baseTranslation = {
   accountMonthlyLimitReached: "A sua conta Pro atingiu o limite mensal de {monthlyLimit} imagens.",
   volumeContactCta: "Falar sobre volume maior",
   volumeContactEmailSubject: "BatchCutout - preciso de mais volume",
-  volumeContactEmailBody: "Olá,\n\nA minha conta Pro atingiu o limite mensal e preciso de avaliar mais volume.\n\nEmail da conta: {email}\nLimite mensal atual: {monthlyLimit} imagens\nImagens restantes: {monthlyRemaining}\n\nFonte: {source}\n\nObrigado.",
+  volumeContactEmailBody: "Olá,\n\nPreciso de avaliar mais volume para a minha conta BatchCutout Pro.\n\nMotivo: {reason}\nEmail da conta: {email}\nLimite por lote atual: {batchLimit} imagens\nLimite mensal atual: {monthlyLimit} imagens\nImagens restantes este mês: {monthlyRemaining}\n\nFonte: {source}\n\nObrigado.",
+  volumeReasonMonthly: "limite mensal atingido",
+  volumeReasonBatch: "limite por lote atingido",
+  volumeReasonGeneral: "pedido de mais volume",
   statusTooManyFilesPro: "O seu acesso atual permite até {limit} imagens por lote.",
 };
 
@@ -401,7 +404,10 @@ const translations = {
     accountMonthlyLimitReached: "Your Pro account reached the monthly limit of {monthlyLimit} images.",
     volumeContactCta: "Talk about higher volume",
     volumeContactEmailSubject: "BatchCutout - I need more volume",
-    volumeContactEmailBody: "Hi,\n\nMy Pro account reached the monthly limit and I need to evaluate more volume.\n\nAccount email: {email}\nCurrent monthly limit: {monthlyLimit} images\nImages remaining: {monthlyRemaining}\n\nSource: {source}\n\nThanks.",
+    volumeContactEmailBody: "Hi,\n\nI need to evaluate more volume for my BatchCutout Pro account.\n\nReason: {reason}\nAccount email: {email}\nCurrent batch limit: {batchLimit} images\nCurrent monthly limit: {monthlyLimit} images\nImages remaining this month: {monthlyRemaining}\n\nSource: {source}\n\nThanks.",
+    volumeReasonMonthly: "monthly limit reached",
+    volumeReasonBatch: "batch limit reached",
+    volumeReasonGeneral: "higher volume request",
     statusTooManyFilesPro: "Your current access allows up to {limit} images per batch.",
     downloadReadyHint: "Result ready. To repeat this workflow with more products, Pro unlocks 100 images per batch.",
     zipProCta: "Process up to 100 images per batch - from EUR 15/month",
@@ -1630,25 +1636,39 @@ function setStatus(key, progress = 0, params = {}) {
   statusText.textContent = t(key, params);
   progressBar.value = progress;
   proPromptButton.classList.toggle("hidden", canUsePaidAccess() || key !== "statusTooManyFiles");
-  statusVolumeContact?.classList.toggle("hidden", key !== "accountMonthlyLimitReached");
-  updateStatusVolumeContactLink(params);
+  statusVolumeContact?.classList.toggle("hidden", !isHighVolumeStatus(key));
+  updateStatusVolumeContactLink({ ...params, statusKey: key });
 }
 
 function refreshStatusText() {
   const key = statusText.dataset.statusKey || "statusWaiting";
   const params = JSON.parse(statusText.dataset.statusParams || "{}");
   statusText.textContent = t(key, params);
-  statusVolumeContact?.classList.toggle("hidden", key !== "accountMonthlyLimitReached");
-  updateStatusVolumeContactLink(params);
+  statusVolumeContact?.classList.toggle("hidden", !isHighVolumeStatus(key));
+  updateStatusVolumeContactLink({ ...params, statusKey: key });
+}
+
+function isHighVolumeStatus(key) {
+  return key === "accountMonthlyLimitReached" || key === "statusTooManyFilesPro";
+}
+
+function highVolumeReasonKey(statusKey) {
+  if (statusKey === "accountMonthlyLimitReached") return "volumeReasonMonthly";
+  if (statusKey === "statusTooManyFilesPro") return "volumeReasonBatch";
+  return "volumeReasonGeneral";
 }
 
 function highVolumeContactParams(params = {}) {
   const access = currentAccount?.access || {};
+  const statusKey = params.statusKey || statusText.dataset.statusKey || "";
   return {
     email: currentAccount?.email || "",
+    reason: t(highVolumeReasonKey(statusKey)),
+    batchLimit: params.limit || access.batchLimit || defaultProBatchLimit,
     monthlyLimit: params.monthlyLimit || access.monthlyLimit || defaultProMonthlyLimit,
     monthlyRemaining: access.monthlyRemaining ?? 0,
     source: window.location.href,
+    statusKey,
   };
 }
 
@@ -2387,6 +2407,7 @@ function addFiles(fileList) {
   if (!acceptedFiles.length) {
     setStatus(imageFiles.length ? overLimitStatusKey : "statusNoSupportedFiles", 0, {
       accepted: 0,
+      limit: maxFilesPerBatch,
       total: items.length + imageFiles.length,
     });
     render();
@@ -2421,6 +2442,7 @@ function addFiles(fileList) {
   setStatus(rejectedByLimit ? overLimitStatusKey : "statusLoaded", 0, {
     accepted: acceptedFiles.length,
     count: acceptedFiles.length,
+    limit: maxFilesPerBatch,
     total: imageFiles.length,
   });
   if (rejectedByLimit) {
@@ -2865,8 +2887,10 @@ proPromptButton.addEventListener("click", () => showProInterest("status_limit_ct
 statusVolumeContact?.addEventListener("click", () => {
   const params = highVolumeContactParams(JSON.parse(statusText.dataset.statusParams || "{}"));
   trackEvent("high_volume_contact_clicked", {
-    source: "tool_monthly_limit",
+    source: params.statusKey === "statusTooManyFilesPro" ? "tool_batch_limit" : "tool_monthly_limit",
     event_label: "tool_high_volume",
+    reason: params.reason,
+    batch_limit: params.batchLimit,
     monthly_limit: params.monthlyLimit,
     monthly_remaining: params.monthlyRemaining,
     has_account: Boolean(params.email),

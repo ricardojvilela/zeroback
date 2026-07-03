@@ -93,4 +93,4 @@ Interpretation:
 - The `/customer-results/` outreach proof page now uses static before/after proof and ecommerce steps instead of leading with the weaker demo video.
 - The `/customer-results/` proof page now records internal page-view and CTA-click events, making proof-page outreach measurable in the admin funnel.
 - The pricing page now captures high-volume prospects above 2,000 images/month and exposes those contacts in the admin funnel.
-- Pro users who hit the monthly image limit now see a direct high-volume contact action, while the admin funnel records both the limit event and the contact click.
+- Pro users who hit the monthly image limit or batch limit now see a direct high-volume contact action, while the admin funnel records limit events and contact clicks.
