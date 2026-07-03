@@ -33,7 +33,7 @@ Best-fit niches:
 - Stop immediately on any negative reply or opt-out.
 - Keep daily direct email batches small while the domain is still building reputation.
 - Use `BatchCutout <support@batchcutout.com>` and reply-to `support@batchcutout.com`.
-- When using the demo variant, link to `/customer-results/`; do not attach video files to cold outreach emails.
+- When using the proof variant, link to `/customer-results/`; do not attach video files to cold outreach emails.
 
 ## Status workflow
 
@@ -57,9 +57,9 @@ Best-fit niches:
 
 ## Outreach variants
 
-- `outreach_variant=demo_video`: use the short demo page before asking the prospect to test the 2 free images.
-- Demo email links must use `/customer-results/?utm_source=manual_outreach&utm_medium=email&utm_campaign=[niche]_demo`.
-- Keep the normal tool link after the demo link so the prospect can self-test immediately.
+- `outreach_variant=demo_video`: historical CSV value; use the visual proof page before asking the prospect to test the 2 free images.
+- Proof email links must use `/customer-results/?utm_source=manual_outreach&utm_medium=email&utm_campaign=[niche]_demo`.
+- Keep the normal tool link after the proof link so the prospect can self-test immediately.
 
 ## First email structure
 
@@ -74,7 +74,7 @@ I found [store] and noticed your [niche] photos could benefit from a faster way 
 
 We built BatchCutout for small ecommerce teams that need to remove backgrounds from product photos in batches, export transparent PNGs, and download everything as one ZIP.
 
-I made a 22-second demo so you can see the flow before testing it:
+I put together a visual proof page so you can see the result before testing it:
 https://batchcutout.com/customer-results/?utm_source=manual_outreach&utm_medium=email&utm_campaign=[niche]_demo
 
 You can test 2 images free here, no account or card needed:
@@ -95,7 +95,7 @@ Batch background removal for ecommerce photo workflows
 
 Use this for product photographers, ecommerce assistants and small agencies. The message should position BatchCutout as a utility for repeat cutouts before final editing or client delivery, not as a replacement for their service.
 
-The partner email must link to the demo first:
+The partner email must link to the visual proof page first:
 
 https://batchcutout.com/customer-results/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach_demo
 

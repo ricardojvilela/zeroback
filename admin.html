@@ -1351,7 +1351,7 @@
         const demoUrl = `https://batchcutout.com/customer-results/?utm_source=manual_outreach&utm_medium=email&utm_campaign=${campaign}_demo`;
         const usesDemo = prospect.outreach_variant === "demo_video";
         const demoBlock = usesDemo
-          ? `\n\nI made a 22-second demo so you can see the flow before testing it:\n${demoUrl}`
+          ? `\n\nI put together a visual proof page so you can see the result before testing it:\n${demoUrl}`
           : "";
         if (key === "email_partner") {
           return {
@@ -1368,7 +1368,7 @@
       function outreachContactFormCopy(prospect) {
         const campaign = outreachCampaign(prospect);
         const demoLine = prospect.outreach_variant === "demo_video"
-          ? ` I made a 22-second demo here: https://batchcutout.com/customer-results/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${campaign}_demo`
+          ? ` I put together a visual proof page here: https://batchcutout.com/customer-results/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${campaign}_demo`
           : "";
         return `Hi, ${outreachIntro(prospect)} BatchCutout removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP.${demoLine} You can also test 2 images free, no account or card needed: https://batchcutout.com/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${campaign}#tool Founder plan is 15 EUR/month for 100 images per batch and 2,000/month. - Ricardo, NexaFlow Labs`;
       }

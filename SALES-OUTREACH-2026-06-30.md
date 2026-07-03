@@ -193,18 +193,18 @@ Daily queue update on 2026-07-01:
 - No new emails were sent automatically in this update.
 - Use `SALES-PROSPECTION-DAILY-QUEUE.md` for the daily cap and priority order.
 
-Demo outreach preparation on 2026-07-02:
+Visual proof outreach preparation on 2026-07-02:
 
 - Added `outreach_variant` to the prospect CSV.
-- Marked the 13 ready direct-email prospects with `outreach_variant=demo_video`.
+- Marked the 13 ready direct-email prospects with `outreach_variant=demo_video` as the historical CSV value for the proof-page variant.
 - Updated `/admin` email and contact-form copy to link to `/customer-results/` before the free 2-image test.
-- Demo outreach links use UTM campaigns ending in `_demo` so they can be compared with normal outreach.
+- Proof outreach links use UTM campaigns ending in `_demo` so they can be compared with normal outreach.
 - No emails were sent automatically in this update.
 
-Demo outreach send on 2026-07-02:
+Visual proof outreach send on 2026-07-02:
 
 - Sent 13 direct emails through `support@batchcutout.com`.
-- All 13 used the demo-first variant with `/customer-results/` before the free 2-image test link.
+- All 13 used the proof-first variant with `/customer-results/` before the free 2-image test link.
 - All 13 sends succeeded through Resend and their send IDs are recorded in `sales-outreach-prospects-2026-06-30.csv`.
 - The CSV rows were updated to `status=sent_2026-07-02`, `next_action=follow_up_if_no_reply`, and `follow_up_date=2026-07-08`.
 - Do not send another direct outreach batch on 2026-07-02; monitor replies first.

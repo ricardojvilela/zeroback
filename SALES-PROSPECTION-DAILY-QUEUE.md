@@ -6,14 +6,14 @@ Updated: 2026-07-02
 
 - Total prospects: 93.
 - Ready for domain email: 0.
-- Ready with demo email variant: 0.
+- Ready with proof-page email variant: 0.
 - Already contacted: 69.
 - Blocked or not usable: 24.
 - Follow-ups due next: 2026-07-06, 2026-07-07 and 2026-07-08.
 
 ## Today's rule
 
-The domain sent 13 demo-variant direct emails on 2026-07-02. Do not send more direct outreach today. Next action is monitoring replies and preparing the 2026-07-06, 2026-07-07 and 2026-07-08 follow-ups.
+The domain sent 13 proof-page direct emails on 2026-07-02. Do not send more direct outreach today. Next action is monitoring replies and preparing the 2026-07-06, 2026-07-07 and 2026-07-08 follow-ups.
 
 Recommended cap while the domain is still warming:
 
@@ -22,9 +22,9 @@ Recommended cap while the domain is still warming:
 - Stop immediately on any negative reply or opt-out.
 - Do not use personal email.
 
-## Demo batch sent on 2026-07-02
+## Proof-page batch sent on 2026-07-02
 
-These were sent through `support@batchcutout.com` with the `/customer-results/` demo link before the free 2-image test:
+These were sent through `support@batchcutout.com` with the `/customer-results/` visual proof link before the free 2-image test:
 
 1. West Glow Studio - candles - `hello@westglowstudio.com`
 2. TIA by Tia Hayek - jewelry - `info@tiahayek.com`
@@ -51,7 +51,7 @@ These were sent through `support@batchcutout.com` with the `/customer-results/` 
    - `next_action`: `follow_up_if_no_reply`
    - `follow_up_date`: 3 to 4 business days later
    - `send_id`: Resend ID from the panel
-   - keep `outreach_variant`: `demo_video`
+   - keep `outreach_variant`: `demo_video` as the historical CSV value for the proof-page variant
 6. If a prospect replies negatively, set `status` to `blocked_opt_out` and `next_action` to `do_not_contact`.
 7. If a prospect replies positively, handle manually and ask for proof only after they are satisfied.
 
@@ -59,4 +59,4 @@ These were sent through `support@batchcutout.com` with the `/customer-results/` 
 
 - Previous 2026-06-30 batch: follow-up from 2026-07-06 if no reply.
 - Previous 2026-07-01 batch: follow-up from 2026-07-07 if no reply.
-- Demo 2026-07-02 batch: follow-up from 2026-07-08 if no reply.
+- Proof-page 2026-07-02 batch: follow-up from 2026-07-08 if no reply.
