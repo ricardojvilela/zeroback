@@ -2358,6 +2358,103 @@ progress::-moz-progress-bar {
   font-size: 0.9rem;
 }
 
+.pricing-savings-calculator {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(320px, 0.85fr) minmax(280px, 0.75fr);
+  gap: 18px;
+  align-items: stretch;
+  margin: 0 0 22px;
+  border: 1px solid rgba(20, 149, 139, 0.22);
+  border-radius: 8px;
+  padding: 24px;
+  background: #ffffff;
+  box-shadow: 0 14px 34px rgba(26, 39, 57, 0.06);
+}
+
+.pricing-calculator-copy,
+.pricing-calculator-controls,
+.pricing-calculator-result {
+  min-width: 0;
+}
+
+.pricing-calculator-copy {
+  display: grid;
+  align-content: center;
+  gap: 10px;
+}
+
+.pricing-calculator-copy h2 {
+  color: var(--charcoal);
+  font-size: 1.62rem;
+  line-height: 1.08;
+}
+
+.pricing-calculator-copy p:not(.section-kicker) {
+  color: #52606d;
+  line-height: 1.5;
+}
+
+.pricing-calculator-controls {
+  display: grid;
+  gap: 10px;
+}
+
+.pricing-calculator-controls label {
+  display: grid;
+  gap: 7px;
+  color: var(--charcoal);
+  font-size: 0.84rem;
+  font-weight: 850;
+}
+
+.pricing-calculator-controls input {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid rgba(202, 213, 226, 0.95);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #f8fbfd;
+  color: var(--charcoal);
+  font: inherit;
+}
+
+.pricing-calculator-controls input:focus {
+  border-color: rgba(20, 149, 139, 0.82);
+  outline: 3px solid rgba(20, 149, 139, 0.16);
+}
+
+.pricing-calculator-result {
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  border-left: 1px solid rgba(202, 213, 226, 0.9);
+  padding-left: 18px;
+}
+
+.pricing-calculator-result span {
+  color: var(--accent-strong);
+  font-size: 0.78rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.pricing-calculator-result strong {
+  color: var(--charcoal);
+  font-size: 2.35rem;
+  line-height: 1;
+}
+
+.pricing-calculator-result p {
+  margin: 0;
+  color: #52606d;
+  line-height: 1.45;
+}
+
+.pricing-calculator-result .landing-button {
+  justify-self: start;
+  margin-top: 4px;
+}
+
 .pricing-card {
   border: 0;
   border-radius: 0;
@@ -3241,6 +3338,25 @@ progress::-moz-progress-bar {
 
   .pricing-value-case {
     padding: 20px;
+  }
+
+  .pricing-savings-calculator {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .pricing-calculator-copy h2 {
+    font-size: 1.45rem;
+  }
+
+  .pricing-calculator-result {
+    border-left: 0;
+    border-top: 1px solid rgba(202, 213, 226, 0.9);
+    padding: 16px 0 0;
+  }
+
+  .pricing-calculator-result strong {
+    font-size: 2rem;
   }
 
   .pricing-value-copy h2 {

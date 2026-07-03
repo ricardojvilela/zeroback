@@ -250,6 +250,34 @@
         </div>
       </section>
 
+      <section class="pricing-savings-calculator" aria-labelledby="pricing-calculator-title">
+        <div class="pricing-calculator-copy">
+          <p class="section-kicker" data-i18n="calculatorKicker">Calculadora de retorno</p>
+          <h2 id="pricing-calculator-title" data-i18n="calculatorTitle">Veja quanto tempo o Pro pode transformar em margem</h2>
+          <p data-i18n="calculatorLead">Ajuste o volume mensal, os minutos poupados por imagem e o valor da hora para estimar o ganho mensal antes de comprar.</p>
+        </div>
+        <div class="pricing-calculator-controls" id="pricingSavingsCalculator" role="group" aria-label="Calculadora de retorno" data-i18n-aria="calculatorKicker">
+          <label>
+            <span data-i18n="calculatorImagesLabel">Imagens por mês</span>
+            <input id="pricingCalcImages" type="number" min="10" max="2000" step="10" value="120" inputmode="numeric" />
+          </label>
+          <label>
+            <span data-i18n="calculatorMinutesLabel">Minutos poupados por imagem</span>
+            <input id="pricingCalcMinutes" type="number" min="0.5" max="20" step="0.5" value="2" inputmode="decimal" />
+          </label>
+          <label>
+            <span data-i18n="calculatorRateLabel">Valor da hora</span>
+            <input id="pricingCalcRate" type="number" min="5" max="100" step="5" value="20" inputmode="decimal" />
+          </label>
+        </div>
+        <div class="pricing-calculator-result" aria-live="polite">
+          <span data-i18n="calculatorResultLabel">Estimativa mensal</span>
+          <strong id="pricingCalcValue">80 EUR</strong>
+          <p id="pricingCalcDetail">4 h poupadas/mês. Depois do plano fundador: 65 EUR.</p>
+          <a class="landing-button" href="/pricing/?checkout_plan=early&utm_source=pricing&utm_medium=calculator&utm_campaign=founder_roi#pricing-account-title" data-i18n="calculatorCta">Usar plano fundador</a>
+        </div>
+      </section>
+
       <section class="pricing-proof" aria-label="Quem precisa do BatchCutout Pro" data-i18n-aria="whoLabel">
         <article>
           <span>01</span>
@@ -434,6 +462,15 @@
           valueCardThreeVolume: "2.000 imagens/mês",
           valueCardThreePrice: "0,0075 EUR/imagem",
           valueCardThreeText: "No limite do plano fundador, cada imagem custa menos de um cêntimo antes de impostos.",
+          calculatorKicker: "Calculadora de retorno",
+          calculatorTitle: "Veja quanto tempo o Pro pode transformar em margem",
+          calculatorLead: "Ajuste o volume mensal, os minutos poupados por imagem e o valor da hora para estimar o ganho mensal antes de comprar.",
+          calculatorImagesLabel: "Imagens por mês",
+          calculatorMinutesLabel: "Minutos poupados por imagem",
+          calculatorRateLabel: "Valor da hora",
+          calculatorResultLabel: "Estimativa mensal",
+          calculatorDetail: "{hours} poupadas/mês. Depois do plano fundador: {net}.",
+          calculatorCta: "Usar plano fundador",
           heroImageAlt: "Exemplo antes e depois de uma foto de produto",
           planKicker: "Plano recomendado",
           planTitle: "15 EUR/mês para começar em volume",
@@ -558,6 +595,15 @@
           valueCardThreeVolume: "2,000 images/month",
           valueCardThreePrice: "EUR 0.0075/image",
           valueCardThreeText: "At the founder plan limit, each image costs less than one cent before taxes.",
+          calculatorKicker: "Return calculator",
+          calculatorTitle: "See how much time Pro can turn into margin",
+          calculatorLead: "Adjust monthly volume, minutes saved per image, and hourly value to estimate monthly gain before buying.",
+          calculatorImagesLabel: "Images per month",
+          calculatorMinutesLabel: "Minutes saved per image",
+          calculatorRateLabel: "Hourly value",
+          calculatorResultLabel: "Monthly estimate",
+          calculatorDetail: "{hours} saved/month. After the founder plan: {net}.",
+          calculatorCta: "Use founder plan",
           heroImageAlt: "Before and after example of a product photo",
           planKicker: "Recommended plan",
           planTitle: "EUR 15/month to start at volume",
@@ -648,6 +694,12 @@
       const languageSelect = document.querySelector("#pricingLanguage");
       const pricingSubmitButton = pricingForm.querySelector("[data-pricing-fallback-submit]");
       const pricingPageParams = new URLSearchParams(window.location.search);
+      const pricingCalculator = document.querySelector("#pricingSavingsCalculator");
+      const pricingCalcImages = document.querySelector("#pricingCalcImages");
+      const pricingCalcMinutes = document.querySelector("#pricingCalcMinutes");
+      const pricingCalcRate = document.querySelector("#pricingCalcRate");
+      const pricingCalcValue = document.querySelector("#pricingCalcValue");
+      const pricingCalcDetail = document.querySelector("#pricingCalcDetail");
       const debugMode = pricingPageParams.get("debug") === "1";
       const debugEventsStorageKey = "batchcutout_debug_events";
       const visitorStorageKey = "batchcutout_visitor_id";
@@ -791,6 +843,46 @@
         return browserLanguage.startsWith("pt") ? "pt" : "en";
       }
 
+      function clampNumber(value, min, max, fallback) {
+        const number = Number(value);
+        if (!Number.isFinite(number)) return fallback;
+        return Math.min(Math.max(number, min), max);
+      }
+
+      function pricingCurrency(value, language) {
+        const locale = language === "pt" ? "pt-PT" : "en";
+        return new Intl.NumberFormat(locale, {
+          style: "currency",
+          currency: "EUR",
+          maximumFractionDigits: 0,
+        }).format(value);
+      }
+
+      function pricingHours(value, language) {
+        const locale = language === "pt" ? "pt-PT" : "en";
+        const formatted = new Intl.NumberFormat(locale, {
+          maximumFractionDigits: value < 10 ? 1 : 0,
+        }).format(value);
+        return language === "pt" ? `${formatted} h` : `${formatted}h`;
+      }
+
+      function updatePricingSavingsCalculator() {
+        if (!pricingCalculator || !pricingCalcValue || !pricingCalcDetail) return;
+        const language = languageSelect.value === "pt" ? "pt" : "en";
+        const dictionary = pricingTranslations[language] || pricingTranslations.en;
+        const images = clampNumber(pricingCalcImages?.value, 10, 2000, 120);
+        const minutes = clampNumber(pricingCalcMinutes?.value, 0.5, 20, 2);
+        const hourlyRate = clampNumber(pricingCalcRate?.value, 5, 100, 20);
+        const savedHours = (images * minutes) / 60;
+        const monthlyValue = savedHours * hourlyRate;
+        const netValue = Math.max(monthlyValue - 15, 0);
+
+        pricingCalcValue.textContent = pricingCurrency(monthlyValue, language);
+        pricingCalcDetail.textContent = dictionary.calculatorDetail
+          .replace("{hours}", pricingHours(savedHours, language))
+          .replace("{net}", pricingCurrency(netValue, language));
+      }
+
       function applyPricingLanguage(language) {
         const nextLanguage = pricingTranslations[language] ? language : "en";
         const dictionary = pricingTranslations[nextLanguage];
@@ -816,6 +908,7 @@
         languageSelect.value = nextLanguage;
         pricingForm.querySelector('[name="language"]').value = nextLanguage;
         localStorage.setItem("language", nextLanguage);
+        updatePricingSavingsCalculator();
       }
 
       const initialLanguage = detectPricingLanguage();
@@ -829,6 +922,10 @@
       languageSelect.addEventListener("change", (event) => {
         applyPricingLanguage(event.target.value);
         trackPricingEvent("pricing_language_changed", { language: event.target.value });
+      });
+
+      pricingCalculator?.addEventListener("input", () => {
+        updatePricingSavingsCalculator();
       });
 
       for (const cta of document.querySelectorAll(".landing-button, .landing-secondary, .landing-nav a:not(.landing-logo)")) {
