@@ -1,6 +1,6 @@
 # BatchCutout - directory submission kit
 
-Updated: 2026-07-02
+Updated: 2026-07-03
 
 Use this kit for Product Hunt, Uneed, BetaList, SaaSHub, Indie Hackers and AI/ecommerce tool directories.
 
@@ -24,6 +24,9 @@ The free plan lets users test 2 images without a card. Pro unlocks 100 images pe
 
 Images are processed in the user's browser and are not uploaded to BatchCutout servers.
 
+Current offer:
+Test 2 images free with no card. Founder plan starts at EUR 15/month for 100 images per batch and 2,000 images per month.
+
 Company:
 NexaFlow Labs
 
@@ -35,6 +38,9 @@ Ecommerce tools
 
 Secondary categories:
 Productivity, AI image tools, product photography, marketplace seller tools.
+
+Best keywords:
+bulk background remover, product photo background remover, ecommerce product photos, transparent PNG, Shopify product photos, marketplace images, batch image editing, browser-based image tool.
 
 ## Links with UTM
 
@@ -69,6 +75,61 @@ assets/product-before-after-v5.png
 
 Logo:
 favicon.svg
+
+## Ready fields by platform
+
+### Product Hunt
+
+Product name:
+BatchCutout
+
+Tagline:
+Bulk background remover for ecommerce product photos.
+
+First comment:
+Use the Product Hunt maker comment below.
+
+Primary link:
+https://batchcutout.com/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch#tool
+
+Pricing link:
+https://batchcutout.com/pricing/?checkout_plan=early&utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch#pricing-account-title
+
+### Uneed
+
+Title:
+BatchCutout
+
+Short pitch:
+Remove backgrounds from product photos in batches. Export transparent PNGs or one organized ZIP for ecommerce listings.
+
+Problem solved:
+Small ecommerce teams often repeat the same background-removal task across catalog, variant and marketplace photos. BatchCutout makes that workflow direct: upload, remove background, review, export.
+
+Link:
+https://batchcutout.com/?utm_source=uneed&utm_medium=directory&utm_campaign=directory_launch#tool
+
+### BetaList
+
+Startup description:
+BatchCutout is a browser-based bulk background remover for ecommerce product photos. It helps Shopify, WooCommerce, Etsy, eBay and Amazon sellers process repeated product-photo batches and export transparent PNGs or one ZIP.
+
+Market:
+Ecommerce sellers, catalog teams, product photographers, marketplace sellers and small agencies.
+
+Link:
+https://batchcutout.com/?utm_source=betalist&utm_medium=directory&utm_campaign=directory_launch#tool
+
+### SaaSHub
+
+One-line description:
+BatchCutout removes product-photo backgrounds in batches and exports transparent PNGs or ZIP files.
+
+Alternative positioning:
+A focused alternative to generic background remover tools when the job is repeated ecommerce product batches.
+
+Link:
+https://batchcutout.com/?utm_source=saashub&utm_medium=directory&utm_campaign=directory_launch#tool
 
 ## Product Hunt maker comment
 
@@ -105,6 +166,20 @@ I am looking for feedback from sellers, VAs, product photographers and small age
 
 Link:
 https://batchcutout.com/?utm_source=indie_hackers&utm_medium=community&utm_campaign=directory_launch#tool
+
+## Reply snippets
+
+If someone asks whether images are uploaded:
+No. BatchCutout processes images in the browser. Product photos are not uploaded to BatchCutout servers.
+
+If someone asks why not use a full design suite:
+BatchCutout is intentionally narrower. It is for repeated ecommerce cutouts: upload a batch, remove backgrounds, export PNGs or one ZIP.
+
+If someone asks about pricing:
+You can test 2 images free with no card. The founder plan is EUR 15/month and unlocks 100 images per batch plus 2,000 images per month.
+
+If someone asks who it is for:
+The best fit is Shopify, WooCommerce, Etsy, eBay and Amazon sellers, plus assistants or small agencies preparing repeated product batches.
 
 ## Short directory variants
 

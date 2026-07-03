@@ -221,6 +221,7 @@ Decision rules:
   - `PARTNER-PROGRAM.md`
   - `LAUNCH-DIRECTORIES-PLAN.md`
 - Added directory source classification for Product Hunt, Uneed, BetaList, Indie Hackers and SaaSHub.
+- Expanded `DIRECTORY-SUBMISSION-KIT.md` with ready-to-submit fields for Product Hunt, Uneed, BetaList and SaaSHub, plus reply snippets for privacy, pricing and target audience questions.
 
 ## Executed growth work - revenue hygiene
 
