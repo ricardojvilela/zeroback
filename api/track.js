@@ -16,6 +16,7 @@ const allowedEvents = new Set([
   "post_download_next_shown",
   "post_download_founder_clicked",
   "post_download_save_link_clicked",
+  "post_download_feedback_selected",
   "tool_pro_clicked",
   "monthly_limit_reached",
   "pro_prompt_shown",

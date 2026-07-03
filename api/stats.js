@@ -39,6 +39,8 @@ function emptyDay(date) {
     postDownloadNextShown: 0,
     postDownloadFounderClicks: 0,
     postDownloadSaveLinkClicks: 0,
+    postDownloadFeedbacks: 0,
+    postDownloadLargerBatchFeedbacks: 0,
     proofPageViews: 0,
     proofCtaClicks: 0,
     proClicks: 0,
@@ -159,6 +161,8 @@ function emptySourceRow(source) {
     postDownloadNextShown: 0,
     postDownloadFounderClicks: 0,
     postDownloadSaveLinkClicks: 0,
+    postDownloadFeedbacks: 0,
+    postDownloadLargerBatchFeedbacks: 0,
     proofPageViews: 0,
     proofCtaClicks: 0,
     proClicks: 0,
@@ -456,6 +460,14 @@ export default async function handler(request, response) {
         case "post_download_save_link_clicked":
           row.postDownloadSaveLinkClicks += 1;
           sourceRow.postDownloadSaveLinkClicks += 1;
+          break;
+        case "post_download_feedback_selected":
+          row.postDownloadFeedbacks += 1;
+          sourceRow.postDownloadFeedbacks += 1;
+          if (detail.answer === "larger_batches") {
+            row.postDownloadLargerBatchFeedbacks += 1;
+            sourceRow.postDownloadLargerBatchFeedbacks += 1;
+          }
           break;
         case "tool_pro_clicked":
           row.proClicks += 1;
