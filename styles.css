@@ -2031,6 +2031,55 @@ progress::-moz-progress-bar {
   line-height: 1.45;
 }
 
+.partner-share-panel {
+  align-items: start;
+}
+
+.partner-share-box {
+  display: grid;
+  gap: 10px;
+}
+
+.partner-share-box label {
+  color: var(--charcoal);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.partner-copy-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.partner-share-box input,
+.partner-share-box textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: #ffffff;
+  color: var(--charcoal);
+  font: inherit;
+  line-height: 1.45;
+}
+
+.partner-share-box textarea {
+  resize: vertical;
+}
+
+.partner-share-box button {
+  min-height: 46px;
+}
+
+.partner-copy-status {
+  min-height: 1.3em;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
 .pricing-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(330px, 0.92fr);
@@ -3082,6 +3131,10 @@ progress::-moz-progress-bar {
   .landing-actions {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .partner-copy-row {
+    grid-template-columns: 1fr;
   }
 
   .landing-button,

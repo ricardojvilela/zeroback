@@ -139,6 +139,33 @@
         </div>
       </section>
 
+      <section class="landing-panel partner-share-panel" aria-labelledby="partner-share-title">
+        <div>
+          <p class="section-kicker">Link pronto a partilhar</p>
+          <h2 id="partner-share-title">Envie clientes para o teste gratuito hoje</h2>
+          <p>
+            Este link já identifica a origem como parceiro. Use-o em emails, propostas, páginas de recursos
+            ou mensagens diretas para clientes que tratam fotos de produto.
+          </p>
+        </div>
+        <div class="partner-share-box">
+          <label for="partnerReferralLink">Link rastreável</label>
+          <div class="partner-copy-row">
+            <input
+              id="partnerReferralLink"
+              type="text"
+              readonly
+              value="https://batchcutout.com/?utm_source=partner_referral&utm_medium=partner&utm_campaign=partner_test#tool"
+            />
+            <button type="button" data-copy-target="partnerReferralLink">Copiar link</button>
+          </div>
+          <label for="partnerClientMessage">Mensagem curta para cliente</label>
+          <textarea id="partnerClientMessage" readonly rows="6">Pode testar o BatchCutout com 2 imagens grátis, sem conta nem cartão. É útil quando precisa de remover fundos de fotos de produto em lote e descarregar PNGs transparentes ou um ZIP: https://batchcutout.com/?utm_source=partner_referral&utm_medium=partner&utm_campaign=partner_test#tool</textarea>
+          <button class="landing-secondary" type="button" data-copy-target="partnerClientMessage">Copiar mensagem</button>
+          <p class="partner-copy-status" id="partnerCopyStatus" aria-live="polite"></p>
+        </div>
+      </section>
+
       <section class="landing-panel">
         <div>
           <p class="section-kicker">Link recomendado</p>
@@ -154,5 +181,42 @@
         </div>
       </section>
     </main>
+    <script>
+      const partnerCopyStatus = document.querySelector("#partnerCopyStatus");
+
+      async function copyPartnerText(text) {
+        if (navigator.clipboard?.writeText) {
+          await navigator.clipboard.writeText(text);
+          return true;
+        }
+        return false;
+      }
+
+      document.querySelectorAll("[data-copy-target]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          const target = document.querySelector(`#${button.dataset.copyTarget}`);
+          if (!target) return;
+          const originalText = button.textContent;
+          try {
+            target.select?.();
+            const copied = await copyPartnerText(target.value) || document.execCommand?.("copy");
+            if (!copied) throw new Error("copy_failed");
+            button.textContent = "Copiado";
+            if (partnerCopyStatus) partnerCopyStatus.textContent = "Pronto para partilhar.";
+            window.gtag?.("event", "partner_referral_copy", {
+              event_category: "commercial_intent",
+              event_label: button.dataset.copyTarget,
+              source: "partners_page",
+            });
+          } catch {
+            if (partnerCopyStatus) partnerCopyStatus.textContent = "Selecione e copie manualmente.";
+          } finally {
+            setTimeout(() => {
+              button.textContent = originalText;
+            }, 1800);
+          }
+        });
+      });
+    </script>
   </body>
 </html>
