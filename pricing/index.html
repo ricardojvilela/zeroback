@@ -556,10 +556,11 @@
           checkoutLoginError: "Não foi possível entrar. Confirme a password ou crie conta se ainda não tiver.",
           checkoutSignupError: "Não foi possível criar a conta. Se este email já existir, use Entrar e continuar.",
           checkoutError: "Não foi possível abrir o pagamento agora.",
-          checkoutCancelled: "Pagamento cancelado. O plano continua selecionado; pode retomar o Stripe Checkout quando quiser.",
+          checkoutCancelled: "Pagamento cancelado. O plano continua selecionado; clique em Retomar pagamento para abrir o Stripe Checkout novamente.",
           checkoutContinueError: "Não foi possível recuperar esse checkout. Escolha o plano para abrir uma nova sessão segura.",
           checkoutNote: "Se já tiver sessão iniciada, o pagamento abre logo. Se ainda não tiver conta, escolha o plano e crie conta em seguida.",
           checkoutNotePro: "A subscrição já está ativa nesta conta. Pode gerir o pagamento no painel principal.",
+          checkoutResumeCta: "Retomar pagamento",
           earlyPlanCta: "Plano fundador - 15 EUR/mês (melhor entrada)",
           monthlyPlanCta: "Pro mensal - 19 EUR/mês",
           annualPlanCta: "Pro anual - 190 EUR/ano",
@@ -700,10 +701,11 @@
           checkoutLoginError: "We could not sign you in. Check the password or create an account if you do not have one yet.",
           checkoutSignupError: "We could not create the account. If this email already exists, use Sign in and continue.",
           checkoutError: "We could not open payment right now.",
-          checkoutCancelled: "Payment was cancelled. The plan is still selected; you can reopen Stripe Checkout whenever you want.",
+          checkoutCancelled: "Payment was cancelled. The plan is still selected; click Resume payment to open Stripe Checkout again.",
           checkoutContinueError: "We could not recover that checkout. Choose the plan to open a new secure session.",
           checkoutNote: "If you are already signed in, payment opens immediately. If not, choose the plan and create your account next.",
           checkoutNotePro: "The subscription is already active on this account. You can manage payment from the main tool page.",
+          checkoutResumeCta: "Resume payment",
           earlyPlanCta: "Founder plan - EUR 15/month (best start)",
           monthlyPlanCta: "Pro monthly - EUR 19/month",
           annualPlanCta: "Pro annual - EUR 190/year",
@@ -1297,6 +1299,9 @@
           const isSelected = button.dataset.pricingCheckoutPlan === selectedPricingPlan;
           button.classList.toggle("is-selected", isSelected);
           button.setAttribute("aria-pressed", String(isSelected));
+          const buttonPlan = button.dataset.pricingCheckoutPlan;
+          const buttonLabel = pricingPlanLabel(buttonPlan);
+          button.textContent = isSelected && pricingReturnStatusKey() === "checkoutCancelled" ? pricingText("checkoutResumeCta") : buttonLabel;
         }
       }
 
