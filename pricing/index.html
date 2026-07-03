@@ -533,6 +533,8 @@
           checkoutLoginError: "Não foi possível entrar. Confirme a password ou crie conta se ainda não tiver.",
           checkoutSignupError: "Não foi possível criar a conta. Se este email já existir, use Entrar e continuar.",
           checkoutError: "Não foi possível abrir o pagamento agora.",
+          checkoutCancelled: "Pagamento cancelado. O plano continua selecionado; pode retomar o Stripe Checkout quando quiser.",
+          checkoutContinueError: "Não foi possível recuperar esse checkout. Escolha o plano para abrir uma nova sessão segura.",
           checkoutNote: "Se já tiver sessão iniciada, o pagamento abre logo. Se ainda não tiver conta, escolha o plano e crie conta em seguida.",
           checkoutNotePro: "A subscrição já está ativa nesta conta. Pode gerir o pagamento no painel principal.",
           earlyPlanCta: "Plano fundador - 15 EUR/mês (melhor entrada)",
@@ -666,6 +668,8 @@
           checkoutLoginError: "We could not sign you in. Check the password or create an account if you do not have one yet.",
           checkoutSignupError: "We could not create the account. If this email already exists, use Sign in and continue.",
           checkoutError: "We could not open payment right now.",
+          checkoutCancelled: "Payment was cancelled. The plan is still selected; you can reopen Stripe Checkout whenever you want.",
+          checkoutContinueError: "We could not recover that checkout. Choose the plan to open a new secure session.",
           checkoutNote: "If you are already signed in, payment opens immediately. If not, choose the plan and create your account next.",
           checkoutNotePro: "The subscription is already active on this account. You can manage payment from the main tool page.",
           earlyPlanCta: "Founder plan - EUR 15/month (best start)",
@@ -1068,6 +1072,7 @@
         ? pricingPageParams.get("checkout_plan")
         : "monthly";
       let hasStartedPricingCheckout = false;
+      let hasTrackedPricingReturnStatus = false;
 
       function pricingDictionary() {
         return pricingTranslations[languageSelect?.value || "pt"] || pricingTranslations.en;
@@ -1232,6 +1237,30 @@
         }
       }
 
+      function pricingReturnStatusKey() {
+        const checkoutStatus = pricingPageParams.get("checkout");
+        if (checkoutStatus === "cancelled") return "checkoutCancelled";
+        if (checkoutStatus === "continue_error") return "checkoutContinueError";
+        return "";
+      }
+
+      function applyPricingReturnStatus() {
+        const statusKey = pricingReturnStatusKey();
+        if (!statusKey) return false;
+        setPricingStatus(statusKey);
+        if (!hasTrackedPricingReturnStatus) {
+          hasTrackedPricingReturnStatus = true;
+          trackPricingCheckoutEvent(
+            statusKey === "checkoutCancelled" ? "pro_checkout_cancelled_return" : "checkout_continue_error_shown",
+            {
+              plan: selectedPricingPlan,
+              source: "pricing_page",
+            },
+          );
+        }
+        return true;
+      }
+
       function updatePricingAccountUi() {
         const ready = Boolean(pricingAccount?.email);
         const hasPro = Boolean(pricingAccount?.access?.canUsePro);
@@ -1256,6 +1285,8 @@
           setPricingStatus("checkoutStatusPro", false, { batchLimit });
           return;
         }
+
+        if (applyPricingReturnStatus()) return;
 
         if (ready) {
           setPricingStatus("checkoutStatusReady");
@@ -1475,13 +1506,15 @@
             return;
           }
           await refreshPricingAccount();
-          if (!hasStartedPricingCheckout && pricingCheckoutPlans.has(pricingPageParams.get("checkout_plan"))) {
+          if (!hasStartedPricingCheckout && !pricingReturnStatusKey() && pricingCheckoutPlans.has(pricingPageParams.get("checkout_plan"))) {
             hasStartedPricingCheckout = true;
             await startPricingCheckout(selectedPricingPlan);
           }
         });
 
-        if (pricingCheckoutPlans.has(pricingPageParams.get("checkout_plan"))) {
+        if (pricingReturnStatusKey() && !pricingAccount?.access?.canUsePro) {
+          applyPricingReturnStatus();
+        } else if (pricingCheckoutPlans.has(pricingPageParams.get("checkout_plan"))) {
           if (pricingAccount) {
             if (pricingAccount.access?.canUsePro) {
               updatePricingAccountUi();

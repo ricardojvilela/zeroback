@@ -523,7 +523,7 @@ export default async function handler(request, response) {
       line_items: [{ price: priceId, quantity: 1 }],
       allow_promotion_codes: true,
       success_url: `${siteUrl}/?checkout=success&session_id={CHECKOUT_SESSION_ID}#accountTitle`,
-      cancel_url: `${siteUrl}/pricing/?checkout=cancelled`,
+      cancel_url: `${siteUrl}/pricing/?checkout=cancelled&checkout_plan=${encodeURIComponent(plan)}#pricing-account-title`,
       subscription_data: {
         metadata,
       },

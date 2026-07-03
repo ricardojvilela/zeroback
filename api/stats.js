@@ -43,6 +43,8 @@ function emptyDay(date) {
     pricingCtaClicks: 0,
     checkoutLoginRequired: 0,
     checkoutStarts: 0,
+    checkoutCancelledReturns: 0,
+    checkoutContinueErrors: 0,
     checkoutSessionsCreated: 0,
     checkoutLinkEmailsSent: 0,
     checkoutLinkEmailClicks: 0,
@@ -148,6 +150,8 @@ function emptySourceRow(source) {
     pricingCtaClicks: 0,
     checkoutLoginRequired: 0,
     checkoutStarts: 0,
+    checkoutCancelledReturns: 0,
+    checkoutContinueErrors: 0,
     checkoutSessionsCreated: 0,
     checkoutLinkEmailsSent: 0,
     checkoutLinkEmailClicks: 0,
@@ -359,6 +363,14 @@ export default async function handler(request, response) {
         case "pro_checkout_started":
           row.checkoutStarts += 1;
           sourceRow.checkoutStarts += 1;
+          break;
+        case "pro_checkout_cancelled_return":
+          row.checkoutCancelledReturns += 1;
+          sourceRow.checkoutCancelledReturns += 1;
+          break;
+        case "checkout_continue_error_shown":
+          row.checkoutContinueErrors += 1;
+          sourceRow.checkoutContinueErrors += 1;
           break;
         case "pro_checkout_session_created":
           row.checkoutSessionsCreated += 1;

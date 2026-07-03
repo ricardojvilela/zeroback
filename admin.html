@@ -652,6 +652,14 @@
             <strong id="liveCheckoutStarts">0</strong>
           </article>
           <article class="live-card">
+            <span>Checkout cancelado</span>
+            <strong id="liveCheckoutCancelledReturns">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Link checkout falhou</span>
+            <strong id="liveCheckoutContinueErrors">0</strong>
+          </article>
+          <article class="live-card">
             <span>Sessões Stripe</span>
             <strong id="liveCheckoutSessionsCreated">0</strong>
           </article>
@@ -1451,6 +1459,8 @@
         document.querySelector("#liveProClicks").textContent = totals.proClicks || 0;
         document.querySelector("#livePricingCtaClicks").textContent = totals.pricingCtaClicks || 0;
         document.querySelector("#liveCheckoutStarts").textContent = totals.checkoutStarts || 0;
+        document.querySelector("#liveCheckoutCancelledReturns").textContent = totals.checkoutCancelledReturns || 0;
+        document.querySelector("#liveCheckoutContinueErrors").textContent = totals.checkoutContinueErrors || 0;
         document.querySelector("#liveCheckoutSessionsCreated").textContent = totals.checkoutSessionsCreated || 0;
         document.querySelector("#liveCheckoutLinkEmails").textContent = totals.checkoutLinkEmailsSent || 0;
         document.querySelector("#liveCheckoutLinkEmailClicks").textContent = totals.checkoutLinkEmailClicks || 0;
