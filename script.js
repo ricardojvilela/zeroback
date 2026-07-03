@@ -67,6 +67,7 @@ const requestedCheckoutPlan = pageParams.get("checkout_plan");
 const checkoutStatus = pageParams.get("checkout");
 const checkoutSessionId = pageParams.get("session_id");
 const checkoutPlans = new Set(["monthly", "annual", "early"]);
+const defaultCheckoutPlan = "early";
 let maxFilesPerBatch = [2, 3, 5, 10, 20].includes(requestedLimit)
   ? requestedLimit
   : defaultMaxFilesPerBatch;
@@ -2086,7 +2087,7 @@ function getPendingCheckoutPlan() {
 }
 
 function setPendingCheckoutPlan(plan) {
-  const selectedPlan = checkoutPlans.has(plan) ? plan : "monthly";
+  const selectedPlan = checkoutPlans.has(plan) ? plan : defaultCheckoutPlan;
   localStorage.setItem(pendingCheckoutPlanStorageKey, JSON.stringify({
     plan: selectedPlan,
     createdAt: Date.now(),
@@ -2102,8 +2103,8 @@ function checkoutPlanWaitingForAuth() {
   return checkoutPlans.has(requestedCheckoutPlan || "") ? requestedCheckoutPlan : getPendingCheckoutPlan();
 }
 
-async function startCheckout(plan = "monthly", triggerButton = null) {
-  const selectedPlan = checkoutPlans.has(plan) ? plan : "monthly";
+async function startCheckout(plan = defaultCheckoutPlan, triggerButton = null) {
+  const selectedPlan = checkoutPlans.has(plan) ? plan : defaultCheckoutPlan;
   const accessToken = await getCurrentAccessToken();
 
   if (!accessToken) {

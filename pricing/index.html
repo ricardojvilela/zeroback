@@ -1106,6 +1106,7 @@
 
       const pricingPageParams = new URLSearchParams(window.location.search);
       const pricingCheckoutPlans = new Set(["early", "monthly", "annual"]);
+      const defaultPricingPlan = "early";
       const pricingAuthForm = document.querySelector("#pricingAccountForm");
       const pricingEmail = document.querySelector("#pricingAccountEmail");
       const pricingPassword = document.querySelector("#pricingAccountPassword");
@@ -1126,7 +1127,7 @@
       let pricingAccount = null;
       let selectedPricingPlan = pricingCheckoutPlans.has(pricingPageParams.get("checkout_plan"))
         ? pricingPageParams.get("checkout_plan")
-        : "monthly";
+        : defaultPricingPlan;
       let hasStartedPricingCheckout = false;
       let hasTrackedPricingReturnStatus = false;
 
@@ -1415,7 +1416,7 @@
       }
 
       async function startPricingCheckout(plan = selectedPricingPlan) {
-        const selectedPlan = pricingCheckoutPlans.has(plan) ? plan : "monthly";
+        const selectedPlan = pricingCheckoutPlans.has(plan) ? plan : defaultPricingPlan;
         selectedPricingPlan = selectedPlan;
         updateSelectedPricingPlanUi();
         if (pricingAccount?.access?.canUsePro) {
