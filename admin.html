@@ -636,6 +636,10 @@
             <strong id="livePostDownloadFounder">0</strong>
           </article>
           <article class="live-card">
+            <span>Taxa pós-download</span>
+            <strong id="livePostDownloadFounderRate">0%</strong>
+          </article>
+          <article class="live-card">
             <span>Guardar link</span>
             <strong id="livePostDownloadSaveLink">0</strong>
           </article>
@@ -662,6 +666,10 @@
           <article class="live-card">
             <span>CTA pricing</span>
             <strong id="livePricingCtaClicks">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Pricing para Stripe</span>
+            <strong id="livePricingStripeRate">0%</strong>
           </article>
           <article class="live-card">
             <span>Volume alto</span>
@@ -706,6 +714,10 @@
           <article class="live-card">
             <span>Subscrições pagas</span>
             <strong id="livePaidSubscriptions">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Stripe para pago</span>
+            <strong id="liveStripePaidRate">0%</strong>
           </article>
           <article class="live-card">
             <span>Receita atribuída</span>
@@ -758,6 +770,10 @@
           <article class="live-card">
             <span>Auto email lead</span>
             <strong id="liveLeadAutoreplies">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Lead para email</span>
+            <strong id="liveLeadAutoreplyRate">0%</strong>
           </article>
           <article class="live-card">
             <span>Auto email falhou</span>
@@ -1268,6 +1284,12 @@
         return `${Math.round((Number(value || 0) || 0) * 100)}%`;
       }
 
+      function conversionRate(numerator, denominator) {
+        const total = Number(denominator || 0) || 0;
+        if (total <= 0) return 0;
+        return (Number(numerator || 0) || 0) / total;
+      }
+
       function formatDate(value) {
         if (!value) return "-";
         const date = new Date(value);
@@ -1558,6 +1580,10 @@
         document.querySelector("#liveSeoLandingCtaClicks").textContent = totals.seoLandingCtaClicks || 0;
         document.querySelector("#livePostDownloadNext").textContent = totals.postDownloadNextShown || 0;
         document.querySelector("#livePostDownloadFounder").textContent = totals.postDownloadFounderClicks || 0;
+        document.querySelector("#livePostDownloadFounderRate").textContent = formatPercent(conversionRate(
+          totals.postDownloadFounderClicks,
+          totals.postDownloadNextShown,
+        ));
         document.querySelector("#livePostDownloadSaveLink").textContent = totals.postDownloadSaveLinkClicks || 0;
         document.querySelector("#livePostDownloadFeedbacks").textContent = totals.postDownloadFeedbacks || 0;
         document.querySelector("#livePostDownloadLargerBatch").textContent = totals.postDownloadLargerBatchFeedbacks || 0;
@@ -1565,6 +1591,10 @@
         document.querySelector("#liveProofCtaClicks").textContent = totals.proofCtaClicks || 0;
         document.querySelector("#liveProClicks").textContent = totals.proClicks || 0;
         document.querySelector("#livePricingCtaClicks").textContent = totals.pricingCtaClicks || 0;
+        document.querySelector("#livePricingStripeRate").textContent = formatPercent(conversionRate(
+          totals.checkoutSessionsCreated,
+          totals.pricingCtaClicks,
+        ));
         document.querySelector("#liveHighVolumeContacts").textContent = totals.highVolumeContacts || 0;
         document.querySelector("#liveMonthlyLimitReached").textContent = totals.monthlyLimitReached || 0;
         document.querySelector("#liveCheckoutStarts").textContent = totals.checkoutStarts || 0;
@@ -1576,6 +1606,10 @@
         document.querySelector("#liveCheckoutLinkEmailClicks").textContent = totals.checkoutLinkEmailClicks || 0;
         document.querySelector("#liveCheckoutLinkEmailFailures").textContent = totals.checkoutLinkEmailFailures || 0;
         document.querySelector("#livePaidSubscriptions").textContent = totals.paidSubscriptions || 0;
+        document.querySelector("#liveStripePaidRate").textContent = formatPercent(conversionRate(
+          totals.paidSubscriptions,
+          totals.checkoutSessionsCreated,
+        ));
         document.querySelector("#liveRevenue").textContent = formatCurrency(totals.revenue || 0);
         document.querySelector("#livePaymentFailures").textContent = totals.paymentFailures || 0;
         document.querySelector("#livePaymentFailureValue").textContent = formatCurrency(totals.paymentFailureValue || 0);
@@ -1589,6 +1623,10 @@
         document.querySelector("#liveAccountLoginFailures").textContent = totals.accountLoginFailures || 0;
         document.querySelector("#liveLeadCaptures").textContent = totals.leadCaptures || 0;
         document.querySelector("#liveLeadAutoreplies").textContent = totals.leadAutorepliesSent || 0;
+        document.querySelector("#liveLeadAutoreplyRate").textContent = formatPercent(conversionRate(
+          totals.leadAutorepliesSent,
+          totals.leadCaptures,
+        ));
         document.querySelector("#liveLeadAutoreplyFailures").textContent = totals.leadAutorepliesFailed || 0;
         document.querySelector("#liveProWelcomeEmails").textContent = totals.proWelcomeEmailsSent || 0;
         document.querySelector("#liveProWelcomeEmailFailures").textContent = totals.proWelcomeEmailsFailed || 0;
