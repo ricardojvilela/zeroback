@@ -128,6 +128,10 @@ function checkoutPlanText(plan, language) {
   return "Monthly Pro - EUR 19/month";
 }
 
+function checkoutContinueUrl(session) {
+  return `${getSiteUrl()}/api/continue-checkout-session?session_id=${encodeURIComponent(session.id || "")}`;
+}
+
 function checkoutLinkCopy({ language, plan, sessionUrl }) {
   const planText = checkoutPlanText(plan, language);
   if (language === "pt") {
@@ -312,7 +316,7 @@ async function sendCheckoutLinkEmail(settings, { user, profile, session, plan, a
   if (alreadySent) return { sent: false, skipped: true, reason: "already_sent_recently" };
 
   const language = checkoutLanguage(attribution);
-  const copy = checkoutLinkCopy({ language, plan, sessionUrl: session.url });
+  const copy = checkoutLinkCopy({ language, plan, sessionUrl: checkoutContinueUrl(session) });
   const payload = {
     from: mailSettings.from,
     to,
