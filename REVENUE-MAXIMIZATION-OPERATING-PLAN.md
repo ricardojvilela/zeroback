@@ -1,6 +1,6 @@
 # BatchCutout - revenue maximization operating plan
 
-Updated: 2026-07-02
+Updated: 2026-07-03
 
 ## Objective
 
@@ -17,15 +17,20 @@ Ask Ricardo only when an action needs account approval, spend changes, legal/bus
 
 ## Current baseline
 
-Live 14-day funnel snapshot on 2026-07-02:
+Live 14-day funnel snapshot on 2026-07-03:
 
-- Visitors: 179.
-- Uploads started: 194.
-- Downloads: 129.
-- Pro clicks: 8.
+- Visitors: 171.
+- Uploads started: 152.
+- Processing completed: 121.
+- Downloads: 96.
+- Pro clicks: 6.
+- Pricing CTA clicks: 2.
+- Account signup starts: 1.
 - Checkout starts: 0.
+- Stripe checkout sessions created: 0.
 - Paid subscriptions from live funnel: 0.
 - Lead captures: 0.
+- Main source: Google Ads generated 110 visitors, 138 uploads and 86 downloads, but 0 checkout starts.
 - Manual/direct outreach sent: 69 prospects.
 - Demo outreach batch sent on 2026-07-02: 13 prospects.
 - Current real renewable MRR after internal cleanup: 0 EUR.
@@ -33,7 +38,7 @@ Live 14-day funnel snapshot on 2026-07-02:
 Interpretation:
 
 - Google Ads is producing product usage, not just empty visits.
-- The main conversion gap is downloads/Pro clicks not becoming checkout starts.
+- The main conversion gap is downloads not becoming plan clicks, account creation or checkout starts.
 - Warm recovery is currently limited because lead capture is still 0.
 - Outreach is active but must be paced to protect domain reputation.
 
@@ -80,6 +85,7 @@ Interpretation:
 - Pro CTAs across SEO landing pages now send high-intent users directly to `/pricing/` with the selected checkout plan instead of jumping to the homepage account panel.
 - The admin funnel now separates tool Pro clicks from pricing-page CTA clicks, making the gap between pricing interest and checkout starts easier to diagnose.
 - The post-download panel now shows an inline email field immediately after a successful download, reducing friction in the lead capture step and reusing the existing automatic follow-up email.
+- The result-ready CTA now sends high-intent free users directly toward the founder checkout flow instead of opening another explanatory Pro block.
 - Pricing checkout buttons now visibly highlight the selected plan from URL parameters or user clicks, reducing ambiguity before account creation/payment.
 - The pricing checkout panel now repeats the selected plan beside the account form and labels the account buttons as continuation actions, making the account step feel connected to payment.
 - Checkout session creation failures are now stored as `pro_checkout_session_failed` and surfaced in `/admin`, making Stripe/customer/price configuration problems visible instead of blending into account-to-checkout drop-off.

@@ -198,8 +198,8 @@ const baseTranslation = {
   proInlineSuccessTitle: "Pagamento seguro",
   proInlineSuccessDetail: "Depois do pagamento, o acesso Pro é ativado automaticamente na conta.",
   proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
-  downloadReadyHint: "Resultado pronto. Para repetir este fluxo com mais produtos, o Pro desbloqueia 100 imagens por lote.",
-  zipProCta: "Processar até 100 imagens por lote - desde 15 EUR/mês",
+  downloadReadyHint: "Resultado pronto. Se quiser repetir isto com mais produtos, o plano fundador desbloqueia 100 imagens por lote.",
+  zipProCta: "Criar conta e ativar fundador - 15 EUR/mês",
   benefitsLabel: "Vantagens do serviço",
   benefitPng: "PNG transparente",
   benefitZip: "ZIP pronto para loja",
@@ -409,8 +409,8 @@ const translations = {
     volumeReasonBatch: "batch limit reached",
     volumeReasonGeneral: "higher volume request",
     statusTooManyFilesPro: "Your current access allows up to {limit} images per batch.",
-    downloadReadyHint: "Result ready. To repeat this workflow with more products, Pro unlocks 100 images per batch.",
-    zipProCta: "Process up to 100 images per batch - from EUR 15/month",
+    downloadReadyHint: "Result ready. If you want to repeat this with more products, the founder plan unlocks 100 images per batch.",
+    zipProCta: "Create account and start founder plan - EUR 15/month",
     eyebrow: "Bulk background removal",
     title: "BatchCutout",
     lead: "Free plan: remove the background from up to {limit} images now. Download transparent PNGs or a store-ready ZIP.",
@@ -1028,8 +1028,8 @@ const proTranslations = {
     proInlineNote: "Pagamento seguro por Stripe Checkout.",
     proInlineSuccess: "A abrir pagamento Pro.",
     proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
-    downloadReadyHint: "Resultado pronto. Para repetir este fluxo com mais produtos, o Pro desbloqueia 100 imagens por lote.",
-    zipProCta: "Processar até 100 imagens por lote - desde 15 EUR/mês",
+    downloadReadyHint: "Resultado pronto. Se quiser repetir isto com mais produtos, o plano fundador desbloqueia 100 imagens por lote.",
+    zipProCta: "Criar conta e ativar fundador - 15 EUR/mês",
     emptyTitle: "Os seus PNGs transparentes aparecem aqui",
     emptyState: "Depois pode descarregar uma imagem ou exportar tudo em ZIP.",
     demoLabel: "Exemplo antes e depois",
@@ -1084,8 +1084,8 @@ const proTranslations = {
     proInlineNote: "Secure payment through Stripe Checkout.",
     proInlineSuccess: "Opening Pro payment.",
     proInlineError: "We could not submit automatically. Opening an email draft instead.",
-    downloadReadyHint: "Result ready. To repeat this workflow with more products, Pro unlocks 100 images per batch.",
-    zipProCta: "Process up to 100 images per batch - from EUR 15/month",
+    downloadReadyHint: "Result ready. If you want to repeat this with more products, the founder plan unlocks 100 images per batch.",
+    zipProCta: "Create account and start founder plan - EUR 15/month",
     emptyTitle: "Your transparent PNGs appear here",
     emptyState: "Then download one image or export everything as a ZIP.",
     demoLabel: "Before and after example",
@@ -2902,7 +2902,19 @@ brandCta.addEventListener("click", () => {
   trackEvent("brand_cta_clicked");
 });
 inlineProCta.addEventListener("click", () => showProInterest("inline_pro_cta"));
-zipProCta?.addEventListener("click", () => showProInterest("zip_download_context"));
+zipProCta?.addEventListener("click", () => {
+  const readyCount = items.filter((item) => item.outputBlob).length;
+  const detail = {
+    reason: "download_ready_founder",
+    downloadType: readyCount > 1 ? "zip_available" : "png_available",
+    count: readyCount,
+    totalInQueue: items.length,
+    free_limit: maxFilesPerBatch,
+  };
+  trackEvent("post_download_founder_clicked", detail);
+  trackEvent("tool_pro_clicked", detail);
+  startCheckout("early", zipProCta);
+});
 postDownloadFounderCta?.addEventListener("click", () => {
   const downloadType = postDownloadNextPanel?.dataset.downloadType || "unknown";
   const count = Number(postDownloadNextPanel?.dataset.downloadCount || 0) || 0;
