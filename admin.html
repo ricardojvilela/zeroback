@@ -407,7 +407,7 @@
 
       table {
         width: 100%;
-        min-width: 1180px;
+        min-width: 1320px;
         border-collapse: collapse;
         background: #fff;
       }
@@ -664,12 +664,20 @@
             <strong id="liveAccountSignupStarts">0</strong>
           </article>
           <article class="live-card">
+            <span>Registos falharam</span>
+            <strong id="liveAccountSignupFailures">0</strong>
+          </article>
+          <article class="live-card">
             <span>Contas criadas</span>
             <strong id="liveAccountSignups">0</strong>
           </article>
           <article class="live-card">
             <span>Logins</span>
             <strong id="liveAccountLogins">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Logins falharam</span>
+            <strong id="liveAccountLoginFailures">0</strong>
           </article>
           <article class="live-card">
             <span>Leads capturados</span>
@@ -984,8 +992,10 @@
                   <th>CTA pricing</th>
                   <th>Sem login</th>
                   <th>Registos</th>
+                  <th>Registos falhados</th>
                   <th>Contas</th>
                   <th>Logins</th>
+                  <th>Logins falhados</th>
                   <th>Leads</th>
                   <th>Checkouts</th>
                   <th>Pagas</th>
@@ -995,7 +1005,7 @@
               </thead>
               <tbody id="sourceRowsBody">
                 <tr>
-                  <td class="empty" colspan="18">A carregar origens.</td>
+                  <td class="empty" colspan="20">A carregar origens.</td>
                 </tr>
               </tbody>
             </table>
@@ -1017,8 +1027,10 @@
                 <th>CTA pricing</th>
                 <th>Sem login</th>
                 <th>Registos</th>
+                <th>Registos falhados</th>
                 <th>Contas</th>
                 <th>Logins</th>
+                <th>Logins falhados</th>
                 <th>Leads</th>
                 <th>Checkouts</th>
                 <th>Pagas</th>
@@ -1028,7 +1040,7 @@
             </thead>
             <tbody id="liveRowsBody">
               <tr>
-                <td class="empty" colspan="19">A carregar atividade.</td>
+                <td class="empty" colspan="21">A carregar atividade.</td>
               </tr>
             </tbody>
           </table>
@@ -1412,8 +1424,10 @@
         document.querySelector("#liveRevenue").textContent = formatCurrency(totals.revenue || 0);
         document.querySelector("#liveCheckoutLoginRequired").textContent = totals.checkoutLoginRequired || 0;
         document.querySelector("#liveAccountSignupStarts").textContent = totals.accountSignupStarts || 0;
+        document.querySelector("#liveAccountSignupFailures").textContent = totals.accountSignupFailures || 0;
         document.querySelector("#liveAccountSignups").textContent = totals.accountSignups || 0;
         document.querySelector("#liveAccountLogins").textContent = totals.accountLogins || 0;
+        document.querySelector("#liveAccountLoginFailures").textContent = totals.accountLoginFailures || 0;
         document.querySelector("#liveLeadCaptures").textContent = totals.leadCaptures || 0;
         document.querySelector("#liveLeadAutoreplies").textContent = totals.leadAutorepliesSent || 0;
         document.querySelector("#liveLeadAutoreplyFailures").textContent = totals.leadAutorepliesFailed || 0;
@@ -1437,8 +1451,10 @@
                   <td>${row.pricingCtaClicks || 0}</td>
                   <td>${row.checkoutLoginRequired || 0}</td>
                   <td>${row.accountSignupStarts || 0}</td>
+                  <td>${row.accountSignupFailures || 0}</td>
                   <td>${row.accountSignups || 0}</td>
                   <td>${row.accountLogins || 0}</td>
+                  <td>${row.accountLoginFailures || 0}</td>
                   <td>${row.leadCaptures || 0}</td>
                   <td>${row.checkoutStarts || 0}</td>
                   <td>${row.paidSubscriptions || 0}</td>
@@ -1447,7 +1463,7 @@
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="19">Ainda não existem eventos reais no período.</td></tr>`;
+          : `<tr><td class="empty" colspan="21">Ainda não existem eventos reais no período.</td></tr>`;
 
         sourceRowsBody.innerHTML = data.sourceBreakdown?.length
           ? data.sourceBreakdown.map((row) => `
@@ -1463,8 +1479,10 @@
                 <td>${row.pricingCtaClicks || 0}</td>
                 <td>${row.checkoutLoginRequired || 0}</td>
                 <td>${row.accountSignupStarts || 0}</td>
+                <td>${row.accountSignupFailures || 0}</td>
                 <td>${row.accountSignups || 0}</td>
                 <td>${row.accountLogins || 0}</td>
+                <td>${row.accountLoginFailures || 0}</td>
                 <td>${row.leadCaptures || 0}</td>
                 <td>${row.checkoutStarts || 0}</td>
                 <td>${row.paidSubscriptions || 0}</td>
@@ -1472,7 +1490,7 @@
                 <td>${row.billingPortalOpens || 0}</td>
               </tr>
             `).join("")
-          : `<tr><td class="empty" colspan="18">Ainda não existem origens identificadas.</td></tr>`;
+          : `<tr><td class="empty" colspan="20">Ainda não existem origens identificadas.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "";
         liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Última atualização: ${generatedAt}`;

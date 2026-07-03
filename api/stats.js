@@ -45,8 +45,10 @@ function emptyDay(date) {
     paidSubscriptions: 0,
     revenue: 0,
     accountSignupStarts: 0,
+    accountSignupFailures: 0,
     accountSignups: 0,
     accountLogins: 0,
+    accountLoginFailures: 0,
     leadCaptures: 0,
     leadAutorepliesSent: 0,
     leadAutorepliesFailed: 0,
@@ -140,8 +142,10 @@ function emptySourceRow(source) {
     paidSubscriptions: 0,
     revenue: 0,
     accountSignupStarts: 0,
+    accountSignupFailures: 0,
     accountSignups: 0,
     accountLogins: 0,
+    accountLoginFailures: 0,
     leadCaptures: 0,
     leadAutorepliesSent: 0,
     leadAutorepliesFailed: 0,
@@ -342,6 +346,10 @@ export default async function handler(request, response) {
           row.accountSignupStarts += 1;
           sourceRow.accountSignupStarts += 1;
           break;
+        case "account_signup_failed":
+          row.accountSignupFailures += 1;
+          sourceRow.accountSignupFailures += 1;
+          break;
         case "account_signup_succeeded":
           row.accountSignups += 1;
           sourceRow.accountSignups += 1;
@@ -349,6 +357,10 @@ export default async function handler(request, response) {
         case "account_login_succeeded":
           row.accountLogins += 1;
           sourceRow.accountLogins += 1;
+          break;
+        case "account_login_failed":
+          row.accountLoginFailures += 1;
+          sourceRow.accountLoginFailures += 1;
           break;
         case "lead_capture_submitted":
           row.leadCaptures += 1;

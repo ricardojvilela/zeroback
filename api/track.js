@@ -36,7 +36,9 @@ const allowedEvents = new Set([
   "billing_portal_opened",
   "account_signup_started",
   "account_signup_succeeded",
+  "account_signup_failed",
   "account_login_succeeded",
+  "account_login_failed",
 ]);
 
 const allowedEmailDomains = new Set(["batchcutout.com"]);

@@ -113,7 +113,9 @@ const serverEventNames = new Set([
   "billing_portal_opened",
   "account_signup_started",
   "account_signup_succeeded",
+  "account_signup_failed",
   "account_login_succeeded",
+  "account_login_failed",
 ]);
 let debugList;
 let supabaseClient = null;
@@ -1130,7 +1132,9 @@ const analyticsEvents = {
   billing_portal_opened: { category: "account", label: "billing_portal_opened" },
   account_signup_started: { category: "account", label: "signup_started" },
   account_signup_succeeded: { category: "account", label: "signup_succeeded" },
+  account_signup_failed: { category: "account", label: "signup_failed" },
   account_login_succeeded: { category: "account", label: "login_succeeded" },
+  account_login_failed: { category: "account", label: "login_failed" },
   photos_selected: { category: "upload", label: "photos_selected" },
   upload_rejected: { category: "upload", label: "upload_rejected" },
   upload: { category: "funnel", label: "upload", step: 1 },
@@ -1401,6 +1405,14 @@ function prefillAccountEmail() {
   if (!accountEmail || accountEmail.value.trim()) return;
   const capturedEmail = getCapturedLeadEmail();
   if (isValidEmail(capturedEmail)) accountEmail.value = capturedEmail;
+}
+
+function authFailureReason(error) {
+  return String(error?.code || error?.message || "auth_failed")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_")
+    .slice(0, 120);
 }
 
 function setKnownGoogleUserData() {
@@ -1862,7 +1874,14 @@ async function handleAccountLogin(event) {
       checkout_plan: waitingPlan || "",
     });
     setAccountMessage("accountMagicLinkSent");
-  } catch {
+  } catch (error) {
+    const waitingPlan = checkoutPlanWaitingForAuth();
+    trackEvent("account_login_failed", {
+      source: waitingPlan ? "checkout_plan" : "account_panel",
+      has_requested_checkout: Boolean(waitingPlan),
+      checkout_plan: waitingPlan || "",
+      reason: authFailureReason(error),
+    });
     setAccountMessage("accountAuthError");
   } finally {
     accountSubmit.disabled = false;
@@ -1918,7 +1937,13 @@ async function handleAccountCreate(event) {
       await maybeStartRequestedCheckout();
     }
     setAccountMessage("accountSignupSuccess");
-  } catch {
+  } catch (error) {
+    trackEvent("account_signup_failed", {
+      source: waitingPlan ? "checkout_plan" : "account_panel",
+      has_requested_checkout: Boolean(waitingPlan),
+      checkout_plan: waitingPlan || "",
+      reason: authFailureReason(error),
+    });
     setAccountMessage("accountSignupError");
   } finally {
     accountCreate.disabled = false;

@@ -1011,6 +1011,14 @@
         }
       }
 
+      function pricingAuthFailureReason(error) {
+        return String(error?.code || error?.message || "auth_failed")
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, "_")
+          .slice(0, 120);
+      }
+
       function getPricingStableId(storage, key) {
         try {
           const existing = storage.getItem(key);
@@ -1265,7 +1273,13 @@
           await refreshPricingAccount();
           hasStartedPricingCheckout = true;
           await startPricingCheckout(selectedPricingPlan);
-        } catch {
+        } catch (error) {
+          trackPricingCheckoutEvent("account_login_failed", {
+            source: "pricing_page",
+            has_requested_checkout: true,
+            plan: selectedPricingPlan,
+            reason: pricingAuthFailureReason(error),
+          });
           setPricingStatus("checkoutAuthError");
         } finally {
           pricingLoginButton.disabled = false;
@@ -1314,7 +1328,13 @@
           } else {
             setPricingStatus("checkoutCreatedCheckEmail");
           }
-        } catch {
+        } catch (error) {
+          trackPricingCheckoutEvent("account_signup_failed", {
+            source: "pricing_page",
+            has_requested_checkout: true,
+            plan: selectedPricingPlan,
+            reason: pricingAuthFailureReason(error),
+          });
           setPricingStatus("checkoutAuthError");
         } finally {
           pricingCreateButton.disabled = false;
