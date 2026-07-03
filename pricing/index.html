@@ -330,6 +330,7 @@
           <p id="pricingAccountStatus" class="pricing-auth-status" data-i18n="checkoutStatusGuest">
             Use o seu email para criar conta ou entrar. Depois abrimos o Stripe Checkout automaticamente.
           </p>
+          <p class="pricing-selected-plan" id="pricingSelectedPlan" aria-live="polite"></p>
           <form class="pricing-auth-form" id="pricingAccountForm" novalidate>
             <input
               id="pricingAccountEmail"
@@ -482,10 +483,11 @@
           checkoutStatusReady: "Conta validada. Escolha o plano para abrir o pagamento seguro.",
           checkoutStatusPro: "Esta conta já tem Pro ativo. Volte à ferramenta para processar até {batchLimit} imagens por lote.",
           checkoutStatusChoosePlan: "Plano selecionado. Entre ou crie conta para abrir o pagamento.",
+          selectedPlanPrefix: "Plano selecionado",
           checkoutEmailPlaceholder: "O seu email",
           checkoutPasswordPlaceholder: "A sua password",
-          checkoutLogin: "Entrar",
-          checkoutCreate: "Criar conta",
+          checkoutLogin: "Entrar e continuar",
+          checkoutCreate: "Criar conta e continuar",
           checkoutLoggingIn: "A entrar...",
           checkoutCreating: "A criar conta...",
           checkoutOpening: "A abrir Stripe...",
@@ -603,10 +605,11 @@
           checkoutStatusReady: "Account verified. Choose a plan to open secure payment.",
           checkoutStatusPro: "This account already has Pro active. Return to the tool to process up to {batchLimit} images per batch.",
           checkoutStatusChoosePlan: "Plan selected. Sign in or create an account to open payment.",
+          selectedPlanPrefix: "Selected plan",
           checkoutEmailPlaceholder: "Your email",
           checkoutPasswordPlaceholder: "Your password",
-          checkoutLogin: "Sign in",
-          checkoutCreate: "Create account",
+          checkoutLogin: "Sign in and continue",
+          checkoutCreate: "Create account and continue",
           checkoutLoggingIn: "Signing in...",
           checkoutCreating: "Creating account...",
           checkoutOpening: "Opening Stripe...",
@@ -950,6 +953,7 @@
       const pricingCreateButton = document.querySelector("#pricingCreateButton");
       const pricingAccountStatus = document.querySelector("#pricingAccountStatus");
       const pricingAccountBadge = document.querySelector("#pricingAccountBadge");
+      const pricingSelectedPlan = document.querySelector("#pricingSelectedPlan");
       const pricingCheckoutActions = document.querySelector("#pricingCheckoutActions");
       const pricingHeroActions = document.querySelector(".pricing-copy .landing-actions");
       const pricingFreeTestNote = document.querySelector(".pricing-free-test-note");
@@ -1080,6 +1084,11 @@
       }
 
       function updateSelectedPricingPlanUi() {
+        const selectedLabel = pricingPlanLabel(selectedPricingPlan);
+        if (pricingSelectedPlan) {
+          pricingSelectedPlan.textContent = `${pricingText("selectedPlanPrefix")}: ${selectedLabel}`;
+        }
+
         for (const button of pricingCheckoutActions?.querySelectorAll("[data-pricing-checkout-plan]") || []) {
           const isSelected = button.dataset.pricingCheckoutPlan === selectedPricingPlan;
           button.classList.toggle("is-selected", isSelected);
