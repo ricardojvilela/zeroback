@@ -206,7 +206,7 @@ const baseTranslation = {
   accountBadgeGuest: "Sem sessão",
   accountBadgeFree: "Grátis",
   accountBadgePro: "Pro",
-  accountStatusGuest: "Entre com email e password para ativar ou gerir o seu acesso Pro.",
+  accountStatusGuest: "Crie conta para ativar Pro ou entre para gerir o seu acesso.",
   accountStatusLoading: "A verificar a sua conta...",
   accountStatusFree: "Conta gratuita. O Pro ativa até 100 imagens por lote e 2.000 imagens por mês.",
   accountStatusPro: "Conta Pro ativa. Até {batchLimit} imagens por lote e {monthlyRemaining} de {monthlyLimit} disponíveis este mês.",
@@ -215,7 +215,7 @@ const baseTranslation = {
   accountPasswordPlaceholder: "A sua password",
   accountSubmit: "Entrar",
   accountSubmitSending: "A entrar...",
-  accountCreate: "Criar conta",
+  accountCreate: "Criar conta e continuar",
   accountCreateSending: "A criar conta...",
   accountRefresh: "Atualizar conta",
   accountLogout: "Sair",
@@ -227,14 +227,14 @@ const baseTranslation = {
   billingPortalStarting: "A abrir gestão de pagamento...",
   billingCheckoutSuccess: "Pagamento recebido. A ativação Pro pode demorar alguns segundos.",
   billingCheckoutCancelled: "Pagamento cancelado. Pode tentar novamente quando quiser.",
-  billingLoginRequired: "Entre ou crie conta. Depois abrimos automaticamente o plano Pro escolhido.",
+  billingLoginRequired: "Crie conta ou entre. Depois abrimos automaticamente o plano Pro escolhido.",
   billingCheckoutError: "Não foi possível abrir o pagamento agora.",
   billingPortalError: "Não foi possível abrir a gestão de pagamento agora.",
   accountMagicLinkSent: "Sessão iniciada.",
   accountSignupSuccess: "Conta criada. Se a confirmação de email estiver ativa, verifique a sua caixa de entrada antes de entrar.",
   accountLoggedOut: "Sessão terminada.",
   accountAuthError: "Não foi possível iniciar sessão agora.",
-  accountSignupError: "Não foi possível criar a conta agora.",
+  accountSignupError: "Não foi possível criar a conta agora. Se já tiver conta, use Entrar.",
   accountReserveError: "A sua conta não permite este lote neste momento.",
   accountMonthlyLimitReached: "A sua conta Pro atingiu o limite mensal de {monthlyLimit} imagens.",
   statusTooManyFilesPro: "O seu acesso atual permite até {limit} imagens por lote.",
@@ -356,7 +356,7 @@ const translations = {
     accountBadgeGuest: "No session",
     accountBadgeFree: "Free",
     accountBadgePro: "Pro",
-    accountStatusGuest: "Sign in with email and password to activate or manage your Pro access.",
+    accountStatusGuest: "Create an account to activate Pro, or sign in to manage your access.",
     accountStatusLoading: "Checking your account...",
     accountStatusFree: "Free account. Pro unlocks up to 100 images per batch and 2,000 images per month.",
     accountStatusPro: "Pro account active. Up to {batchLimit} images per batch and {monthlyRemaining} of {monthlyLimit} available this month.",
@@ -365,7 +365,7 @@ const translations = {
     accountPasswordPlaceholder: "Your password",
     accountSubmit: "Sign in",
     accountSubmitSending: "Signing in...",
-    accountCreate: "Create account",
+    accountCreate: "Create account and continue",
     accountCreateSending: "Creating account...",
     accountRefresh: "Refresh account",
     accountLogout: "Sign out",
@@ -377,14 +377,14 @@ const translations = {
     billingPortalStarting: "Opening billing...",
     billingCheckoutSuccess: "Payment received. Pro activation can take a few seconds.",
     billingCheckoutCancelled: "Payment cancelled. You can try again whenever you want.",
-    billingLoginRequired: "Sign in or create an account. Then we automatically open the Pro plan you chose.",
+    billingLoginRequired: "Create an account or sign in. Then we automatically open the Pro plan you chose.",
     billingCheckoutError: "We could not open payment right now.",
     billingPortalError: "We could not open billing management right now.",
     accountMagicLinkSent: "Signed in.",
     accountSignupSuccess: "Account created. If email confirmation is enabled, check your inbox before signing in.",
     accountLoggedOut: "Signed out.",
     accountAuthError: "We could not sign you in right now.",
-    accountSignupError: "We could not create the account right now.",
+    accountSignupError: "We could not create the account right now. If you already have one, use Sign in.",
     accountReserveError: "Your account does not allow this batch right now.",
     accountMonthlyLimitReached: "Your Pro account reached the monthly limit of {monthlyLimit} images.",
     statusTooManyFilesPro: "Your current access allows up to {limit} images per batch.",
@@ -1386,6 +1386,23 @@ function getCapturedLeadEmail() {
   return normalizeEmail(localStorage.getItem(leadCaptureEmailStorageKey) || "");
 }
 
+function rememberAccountEmail(value = "") {
+  const email = normalizeEmail(value);
+  if (!isValidEmail(email)) return "";
+  try {
+    localStorage.setItem(leadCaptureEmailStorageKey, email);
+  } catch {
+    // Local storage only reduces repeated typing; checkout must work without it.
+  }
+  return email;
+}
+
+function prefillAccountEmail() {
+  if (!accountEmail || accountEmail.value.trim()) return;
+  const capturedEmail = getCapturedLeadEmail();
+  if (isValidEmail(capturedEmail)) accountEmail.value = capturedEmail;
+}
+
 function setKnownGoogleUserData() {
   const knownEmail = currentAccount?.email || getCapturedLeadEmail();
   setGoogleUserData(knownEmail);
@@ -1690,6 +1707,7 @@ function updateAccountUi() {
   if (!authConfig?.configured) {
     accountBadge.textContent = t("accountBadgeGuest");
     accountStatus.textContent = t("accountStatusConfigMissing");
+    prefillAccountEmail();
     accountForm?.classList.remove("hidden");
     accountActions?.classList.add("hidden");
     billingActions?.classList.add("hidden");
@@ -1702,6 +1720,7 @@ function updateAccountUi() {
   if (!currentAccount) {
     accountBadge.textContent = t("accountBadgeGuest");
     accountStatus.textContent = t("accountStatusGuest");
+    prefillAccountEmail();
     accountForm?.classList.remove("hidden");
     accountActions?.classList.add("hidden");
     billingActions?.classList.add("hidden");
@@ -1816,12 +1835,13 @@ async function handleAccountLogin(event) {
     return;
   }
 
-  const email = accountEmail.value.trim();
+  const email = normalizeEmail(accountEmail.value);
   const password = accountPassword.value;
-  if (!email || !password) {
+  if (!accountEmail.checkValidity() || !accountPassword.checkValidity()) {
     accountForm?.reportValidity();
     return;
   }
+  rememberAccountEmail(email);
 
   accountSubmit.disabled = true;
   accountSubmit.textContent = t("accountSubmitSending");
@@ -1850,18 +1870,20 @@ async function handleAccountLogin(event) {
   }
 }
 
-async function handleAccountCreate() {
+async function handleAccountCreate(event) {
+  event?.preventDefault();
   if (!supabaseClient || !accountEmail || !accountPassword || !accountCreate) {
     setAccountMessage("accountStatusConfigMissing");
     return;
   }
 
-  const email = accountEmail.value.trim();
+  const email = normalizeEmail(accountEmail.value);
   const password = accountPassword.value;
-  if (!email || !password) {
+  if (!accountEmail.checkValidity() || !accountPassword.checkValidity()) {
     accountForm?.reportValidity();
     return;
   }
+  rememberAccountEmail(email);
 
   accountCreate.disabled = true;
   accountCreate.textContent = t("accountCreateSending");
@@ -1875,7 +1897,7 @@ async function handleAccountCreate() {
 
   try {
     const redirectTo = `${window.location.origin}${window.location.pathname}${window.location.search}`;
-    const { error } = await supabaseClient.auth.signUp({
+    const { data, error } = await supabaseClient.auth.signUp({
       email,
       password,
       options: {
@@ -1891,6 +1913,10 @@ async function handleAccountCreate() {
       has_requested_checkout: Boolean(waitingPlan),
       checkout_plan: waitingPlan || "",
     });
+    if (data?.session) {
+      await refreshAccount();
+      await maybeStartRequestedCheckout();
+    }
     setAccountMessage("accountSignupSuccess");
   } catch {
     setAccountMessage("accountSignupError");
@@ -2641,6 +2667,7 @@ function hideLeadCapture() {
 
 function recordLeadCapture(email, { downloadType = "unknown", count = 0, source = "post_download" } = {}) {
   localStorage.setItem(leadCaptureEmailStorageKey, email);
+  if (accountEmail && !accountEmail.value.trim()) accountEmail.value = email;
   localStorage.removeItem(leadCaptureDismissedStorageKey);
   postDownloadSaveLinkCta?.classList.add("hidden");
   postDownloadEmailForm?.classList.add("hidden");
@@ -2782,8 +2809,8 @@ proInlineForm?.addEventListener("click", (event) => {
   if (!button) return;
   startCheckout(button.dataset.checkoutPlan, button);
 });
-accountForm?.addEventListener("submit", handleAccountLogin);
-accountCreate?.addEventListener("click", handleAccountCreate);
+accountForm?.addEventListener("submit", handleAccountCreate);
+accountSubmit?.addEventListener("click", handleAccountLogin);
 accountRefresh?.addEventListener("click", refreshAccount);
 accountLogout?.addEventListener("click", handleAccountLogout);
 billingActions?.addEventListener("click", (event) => {
