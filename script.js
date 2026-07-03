@@ -209,9 +209,11 @@ const baseTranslation = {
   cookieDecline: "Continuar sem medição",
   accountKicker: "Acesso Pro",
   accountBadgeGuest: "Sem sessão",
+  accountBadgeCheckout: "Plano escolhido",
   accountBadgeFree: "Grátis",
   accountBadgePro: "Pro",
   accountStatusGuest: "Crie conta para ativar Pro ou entre para gerir o seu acesso.",
+  accountStatusCheckoutPending: "Plano escolhido: {plan}. Crie conta ou entre e abrimos o pagamento automaticamente.",
   accountStatusLoading: "A verificar a sua conta...",
   accountStatusFree: "Conta gratuita. O Pro ativa até 100 imagens por lote e 2.000 imagens por mês.",
   accountStatusPro: "Conta Pro ativa. Até {batchLimit} imagens por lote e {monthlyRemaining} de {monthlyLimit} disponíveis este mês.",
@@ -219,8 +221,10 @@ const baseTranslation = {
   accountEmailPlaceholder: "O seu email",
   accountPasswordPlaceholder: "A sua password",
   accountSubmit: "Entrar",
+  accountSubmitCheckout: "Entrar e continuar",
   accountSubmitSending: "A entrar...",
   accountCreate: "Criar conta e continuar",
+  accountCreateCheckout: "Criar conta e continuar para pagamento",
   accountCreateSending: "A criar conta...",
   accountRefresh: "Atualizar conta",
   accountLogout: "Sair",
@@ -367,9 +371,11 @@ const translations = {
     proInlineError: "We could not submit automatically. Opening an email draft instead.",
     accountKicker: "Pro access",
     accountBadgeGuest: "No session",
+    accountBadgeCheckout: "Plan selected",
     accountBadgeFree: "Free",
     accountBadgePro: "Pro",
     accountStatusGuest: "Create an account to activate Pro, or sign in to manage your access.",
+    accountStatusCheckoutPending: "Selected plan: {plan}. Create an account or sign in and we will open payment automatically.",
     accountStatusLoading: "Checking your account...",
     accountStatusFree: "Free account. Pro unlocks up to 100 images per batch and 2,000 images per month.",
     accountStatusPro: "Pro account active. Up to {batchLimit} images per batch and {monthlyRemaining} of {monthlyLimit} available this month.",
@@ -377,8 +383,10 @@ const translations = {
     accountEmailPlaceholder: "Your email",
     accountPasswordPlaceholder: "Your password",
     accountSubmit: "Sign in",
+    accountSubmitCheckout: "Sign in and continue",
     accountSubmitSending: "Signing in...",
     accountCreate: "Create account and continue",
+    accountCreateCheckout: "Create account and continue to payment",
     accountCreateSending: "Creating account...",
     accountRefresh: "Refresh account",
     accountLogout: "Sign out",
@@ -1707,6 +1715,25 @@ function setAccountMessage(key = "", params = {}) {
   accountMessage.textContent = key ? t(key, params) : "";
 }
 
+function checkoutPlanDisplayName(plan) {
+  if (!checkoutPlans.has(plan || "")) return "";
+  return t(checkoutPlanLabelKey(plan));
+}
+
+function syncAccountAuthButtons() {
+  const waitingPlan = checkoutPlanWaitingForAuth();
+  const createKey = waitingPlan ? "accountCreateCheckout" : "accountCreate";
+  const submitKey = waitingPlan ? "accountSubmitCheckout" : "accountSubmit";
+
+  if (accountCreate && !accountCreate.disabled) {
+    accountCreate.textContent = t(createKey);
+  }
+
+  if (accountSubmit && !accountSubmit.disabled) {
+    accountSubmit.textContent = t(submitKey);
+  }
+}
+
 function getRequestedBatchLimit() {
   if (![2, 3, 5, 10, 20].includes(requestedLimit)) return defaultMaxFilesPerBatch;
   return requestedLimit;
@@ -1776,24 +1803,34 @@ function updateAccountUi() {
   if (!authConfig?.configured) {
     accountBadge.textContent = t("accountBadgeGuest");
     accountStatus.textContent = t("accountStatusConfigMissing");
+    accountPanel.classList.remove("has-pending-checkout");
     prefillAccountEmail();
     accountForm?.classList.remove("hidden");
     accountActions?.classList.add("hidden");
     billingActions?.classList.add("hidden");
     billingPortal?.classList.add("hidden");
+    if (accountCreate) accountCreate.textContent = t("accountCreate");
+    if (accountSubmit) accountSubmit.textContent = t("accountSubmit");
     syncPaidAccessUi();
     updateControls();
     return;
   }
 
   if (!currentAccount) {
-    accountBadge.textContent = t("accountBadgeGuest");
-    accountStatus.textContent = t("accountStatusGuest");
+    const waitingPlan = checkoutPlanWaitingForAuth();
+    const waitingPlanName = checkoutPlanDisplayName(waitingPlan);
+
+    accountPanel.classList.toggle("has-pending-checkout", Boolean(waitingPlanName));
+    accountBadge.textContent = waitingPlanName ? t("accountBadgeCheckout") : t("accountBadgeGuest");
+    accountStatus.textContent = waitingPlanName
+      ? t("accountStatusCheckoutPending", { plan: waitingPlanName })
+      : t("accountStatusGuest");
     prefillAccountEmail();
     accountForm?.classList.remove("hidden");
     accountActions?.classList.add("hidden");
     billingActions?.classList.add("hidden");
     billingPortal?.classList.add("hidden");
+    syncAccountAuthButtons();
     syncPaidAccessUi();
     updateControls();
     return;
@@ -1813,6 +1850,7 @@ function updateAccountUi() {
 
   accountBadge.textContent = t(badgeKey);
   accountStatus.textContent = email ? `${email} - ${statusTextValue}` : statusTextValue;
+  accountPanel.classList.remove("has-pending-checkout");
   accountForm?.classList.add("hidden");
   accountActions?.classList.remove("hidden");
   billingActions?.classList.toggle("hidden", Boolean(access.canUsePro));
@@ -1942,7 +1980,7 @@ async function handleAccountLogin(event) {
     setAccountMessage("accountAuthError");
   } finally {
     accountSubmit.disabled = false;
-    accountSubmit.textContent = t("accountSubmit");
+    syncAccountAuthButtons();
   }
 }
 
@@ -2006,7 +2044,7 @@ async function handleAccountCreate(event) {
     setAccountMessage("accountSignupError");
   } finally {
     accountCreate.disabled = false;
-    accountCreate.textContent = t("accountCreate");
+    syncAccountAuthButtons();
   }
 }
 
@@ -2070,6 +2108,7 @@ async function startCheckout(plan = "monthly", triggerButton = null) {
   if (!accessToken) {
     setPendingCheckoutPlan(selectedPlan);
     trackEvent("pro_checkout_login_required", { plan: selectedPlan });
+    updateAccountUi();
     setAccountMessage("billingLoginRequired");
     accountPanel?.scrollIntoView({ behavior: "smooth", block: "start" });
     return;
