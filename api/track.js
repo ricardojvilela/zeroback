@@ -53,6 +53,7 @@ const allowedEvents = new Set([
 ]);
 
 const allowedEmailDomains = new Set(["batchcutout.com"]);
+const leadAutoreplySources = new Set(["post_download", "post_download_inline"]);
 const leadAutoreplyWindowMs = 30 * 24 * 60 * 60 * 1000;
 
 const corsHeaders = {
@@ -257,7 +258,7 @@ async function hasRecentLeadAutoreply(settings, tableName, email) {
 async function sendLeadAutoreply(settings, tableName, detail, row) {
   if (eventAutoreplyDisabled()) return { sent: false, skipped: true, reason: "disabled" };
   if (detail.consent !== true) return { sent: false, skipped: true, reason: "no_consent" };
-  if (detail.source !== "post_download") return { sent: false, skipped: true, reason: "not_post_download" };
+  if (!leadAutoreplySources.has(String(detail.source || ""))) return { sent: false, skipped: true, reason: "not_post_download" };
   if ((Number(detail.count || 0) || 0) <= 0) return { sent: false, skipped: true, reason: "missing_download_count" };
   if (!["png", "zip"].includes(String(detail.downloadType || ""))) {
     return { sent: false, skipped: true, reason: "unknown_download_type" };
