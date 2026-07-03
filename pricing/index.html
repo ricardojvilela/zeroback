@@ -324,7 +324,7 @@
         <section class="pricing-checkout-panel" aria-labelledby="pricing-account-title">
           <div class="pricing-checkout-head">
             <p class="section-kicker" data-i18n="checkoutKicker">Checkout direto</p>
-            <h3 id="pricing-account-title" data-i18n="checkoutTitle">Entre e escolha o plano</h3>
+            <h3 id="pricing-account-title" data-i18n="checkoutTitle">Crie conta e escolha o plano</h3>
             <span class="pricing-account-badge" id="pricingAccountBadge" data-i18n="checkoutBadgeGuest">Sem sessão</span>
           </div>
           <p id="pricingAccountStatus" class="pricing-auth-status" data-i18n="checkoutStatusGuest">
@@ -343,15 +343,15 @@
             <input
               id="pricingAccountPassword"
               type="password"
-              autocomplete="current-password"
+              autocomplete="new-password"
               required
               minlength="6"
               placeholder="A sua password"
               data-i18n-placeholder="checkoutPasswordPlaceholder"
             />
             <div class="pricing-auth-actions">
-              <button type="submit" class="landing-secondary" id="pricingLoginButton" data-i18n="checkoutLogin">Entrar</button>
-              <button type="button" class="landing-secondary" id="pricingCreateButton" data-i18n="checkoutCreate">Criar conta</button>
+              <button type="submit" class="landing-button" id="pricingCreateButton" data-i18n="checkoutCreate">Criar conta e continuar</button>
+              <button type="button" class="landing-secondary" id="pricingLoginButton" data-i18n="checkoutLogin">Entrar e continuar</button>
             </div>
           </form>
           <div class="pricing-plan-actions" id="pricingCheckoutActions">
@@ -475,14 +475,14 @@
           formPointReply: "Mensal: 19 EUR/mês.",
           formPointPriority: "Anual: 190 EUR/ano.",
           checkoutKicker: "Checkout direto",
-          checkoutTitle: "Entre e escolha o plano",
+          checkoutTitle: "Crie conta e escolha o plano",
           checkoutBadgeGuest: "Sem sessão",
           checkoutBadgeReady: "Conta pronta",
           checkoutBadgePro: "Pro ativo",
-          checkoutStatusGuest: "Use o seu email para criar conta ou entrar. Depois abrimos o Stripe Checkout automaticamente.",
+          checkoutStatusGuest: "Use o seu email para criar conta. Se já tiver conta, entre e abrimos o Stripe Checkout automaticamente.",
           checkoutStatusReady: "Conta validada. Escolha o plano para abrir o pagamento seguro.",
           checkoutStatusPro: "Esta conta já tem Pro ativo. Volte à ferramenta para processar até {batchLimit} imagens por lote.",
-          checkoutStatusChoosePlan: "Plano selecionado. Entre ou crie conta para abrir o pagamento.",
+          checkoutStatusChoosePlan: "Plano selecionado. Crie conta para abrir o pagamento ou entre se já tiver conta.",
           selectedPlanPrefix: "Plano selecionado",
           checkoutEmailPlaceholder: "O seu email",
           checkoutPasswordPlaceholder: "A sua password",
@@ -597,14 +597,14 @@
           formPointReply: "Monthly: EUR 19/month.",
           formPointPriority: "Annual: EUR 190/year.",
           checkoutKicker: "Direct checkout",
-          checkoutTitle: "Sign in and choose a plan",
+          checkoutTitle: "Create an account and choose a plan",
           checkoutBadgeGuest: "No session",
           checkoutBadgeReady: "Account ready",
           checkoutBadgePro: "Pro active",
-          checkoutStatusGuest: "Use your email to create an account or sign in. Then we open Stripe Checkout automatically.",
+          checkoutStatusGuest: "Use your email to create an account. If you already have one, sign in and we open Stripe Checkout automatically.",
           checkoutStatusReady: "Account verified. Choose a plan to open secure payment.",
           checkoutStatusPro: "This account already has Pro active. Return to the tool to process up to {batchLimit} images per batch.",
-          checkoutStatusChoosePlan: "Plan selected. Sign in or create an account to open payment.",
+          checkoutStatusChoosePlan: "Plan selected. Create an account to open payment, or sign in if you already have one.",
           selectedPlanPrefix: "Selected plan",
           checkoutEmailPlaceholder: "Your email",
           checkoutPasswordPlaceholder: "Your password",
@@ -1244,7 +1244,8 @@
         }
       }
 
-      async function handlePricingCreateAccount() {
+      async function handlePricingCreateAccount(event) {
+        event?.preventDefault();
         if (!pricingSupabase) {
           setPricingStatus("checkoutAuthError");
           return;
@@ -1341,8 +1342,8 @@
         }
       }
 
-      pricingAuthForm?.addEventListener("submit", handlePricingLogin);
-      pricingCreateButton?.addEventListener("click", handlePricingCreateAccount);
+      pricingAuthForm?.addEventListener("submit", handlePricingCreateAccount);
+      pricingLoginButton?.addEventListener("click", handlePricingLogin);
       languageSelect?.addEventListener("change", updatePricingAccountUi);
       pricingCheckoutActions?.addEventListener("click", (event) => {
         const button = event.target.closest("[data-pricing-checkout-plan]");
