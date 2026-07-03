@@ -1,5 +1,6 @@
 import { getSupabaseSettings } from "./_pro.js";
 import { getStripeClient, updateProfileFromSubscription } from "./_stripe.js";
+import { Resend } from "resend";
 
 const attributionKeys = [
   "utm_source",
@@ -35,6 +36,29 @@ function webhookJson(status, data) {
 function asText(value, maxLength = 1000) {
   if (value === null || value === undefined) return "";
   return String(value).slice(0, maxLength);
+}
+
+function normalizeEmail(value) {
+  const email = String(value || "").trim().toLowerCase();
+  const valid = /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(email);
+  return valid ? email : "";
+}
+
+function fromEmail(value) {
+  const match = String(value || "").match(/<([^<>]+)>/);
+  return normalizeEmail(match?.[1] || value);
+}
+
+function emailDomain(value) {
+  return normalizeEmail(value).split("@")[1] || "";
+}
+
+function htmlEscape(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 function firstSubscriptionPrice(subscription) {
@@ -86,6 +110,46 @@ async function paidEventAlreadyStored(settings, tableName, sessionId) {
   return rows.length > 0;
 }
 
+async function eventAlreadyStored(settings, tableName, eventName, eventLabel) {
+  if (!eventName || !eventLabel) return false;
+
+  const query = new URLSearchParams({
+    event_name: `eq.${eventName}`,
+    event_label: `eq.${eventLabel}`,
+    select: "id",
+    limit: "1",
+  });
+
+  const response = await fetch(`${settings.supabaseUrl}/rest/v1/${tableName}?${query}`, {
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+    },
+  });
+
+  if (!response.ok) return false;
+  const rows = await response.json().catch(() => []);
+  return rows.length > 0;
+}
+
+async function insertWebhookEvent(settings, tableName, row) {
+  const response = await fetch(`${settings.supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}`, {
+    method: "POST",
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+      "Content-Type": "application/json",
+      Prefer: "return=minimal",
+    },
+    body: JSON.stringify(row),
+  });
+
+  if (!response.ok) {
+    const detailText = await response.text();
+    throw new Error(`webhook_event_insert_failed:${response.status}:${detailText.slice(0, 300)}`);
+  }
+}
+
 async function storePaidSubscriptionEvent(settings, event, session, subscription) {
   const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
   const sessionId = asText(session?.id, 120);
@@ -130,20 +194,195 @@ async function storePaidSubscriptionEvent(settings, event, session, subscription
     occurred_at: new Date(Number(event?.created || Date.now() / 1000) * 1000).toISOString(),
   };
 
-  const response = await fetch(`${settings.supabaseUrl}/rest/v1/${tableName}`, {
-    method: "POST",
-    headers: {
-      apikey: settings.serviceRoleKey,
-      Authorization: `Bearer ${settings.serviceRoleKey}`,
-      "Content-Type": "application/json",
-      Prefer: "return=minimal",
-    },
-    body: JSON.stringify(row),
-  });
+  await insertWebhookEvent(settings, tableName, row);
+}
 
-  if (!response.ok) {
-    const detailText = await response.text();
-    throw new Error(`paid_event_insert_failed:${response.status}:${detailText.slice(0, 300)}`);
+function proWelcomeCopy(language = "en") {
+  if (String(language || "").toLowerCase().startsWith("pt")) {
+    return {
+      subject: "O seu BatchCutout Pro está ativo",
+      heading: "BatchCutout Pro está ativo",
+      intro: "O seu acesso Pro já está disponível.",
+      usage: "Pode processar até 100 imagens por lote e até 2.000 imagens por mês.",
+      next: "Comece com um lote real de produto para confirmar o fluxo de PNG transparente e ZIP.",
+      toolCta: "Abrir BatchCutout",
+      pricingCta: "Gerir plano",
+      tips: ["Arraste um lote de fotos de produto.", "Remova fundos e descarregue PNGs transparentes.", "Use ZIP quando quiser entregar ou arquivar o lote completo."],
+      footer: "NexaFlow Labs. Pode gerir o pagamento no painel da conta BatchCutout.",
+      toolUrl: "https://batchcutout.com/?utm_source=email&utm_medium=onboarding&utm_campaign=pro_welcome#tool",
+      pricingUrl: "https://batchcutout.com/pricing/?utm_source=email&utm_medium=onboarding&utm_campaign=pro_welcome#pricing-account-title",
+    };
+  }
+
+  return {
+    subject: "Your BatchCutout Pro is active",
+    heading: "BatchCutout Pro is active",
+    intro: "Your Pro access is now available.",
+    usage: "You can process up to 100 images per batch and up to 2,000 images per month.",
+    next: "Start with a real product batch to confirm your transparent PNG and ZIP workflow.",
+    toolCta: "Open BatchCutout",
+    pricingCta: "Manage plan",
+    tips: ["Drag in a batch of product photos.", "Remove backgrounds and download transparent PNGs.", "Use ZIP when you want to deliver or archive the full batch."],
+    footer: "NexaFlow Labs. You can manage billing from your BatchCutout account panel.",
+    toolUrl: "https://batchcutout.com/?lang=en&utm_source=email&utm_medium=onboarding&utm_campaign=pro_welcome#tool",
+    pricingUrl: "https://batchcutout.com/pricing/?lang=en&utm_source=email&utm_medium=onboarding&utm_campaign=pro_welcome#pricing-account-title",
+  };
+}
+
+function proWelcomeText(copy) {
+  return [
+    copy.heading,
+    "",
+    copy.intro,
+    copy.usage,
+    "",
+    copy.next,
+    "",
+    ...copy.tips.map((tip) => `- ${tip}`),
+    "",
+    `${copy.toolCta}:`,
+    copy.toolUrl,
+    "",
+    `${copy.pricingCta}:`,
+    copy.pricingUrl,
+    "",
+    copy.footer,
+  ].join("\n");
+}
+
+function proWelcomeHtml(copy) {
+  const tips = copy.tips.map((tip) => `<li>${htmlEscape(tip)}</li>`).join("");
+  return `<!doctype html>
+<html>
+  <body style="margin:0;background:#f3f7fa;color:#17202a;font-family:Arial,Helvetica,sans-serif;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f3f7fa;padding:24px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:620px;background:#ffffff;border:1px solid #dbe3ee;border-radius:8px;overflow:hidden;">
+            <tr><td style="padding:24px 26px;background:#17202a;color:#ffffff;"><strong style="font-size:18px;">BatchCutout</strong><span style="margin-left:10px;color:#9fb4c6;font-size:12px;text-transform:uppercase;">NexaFlow Labs</span></td></tr>
+            <tr>
+              <td style="padding:28px 26px;">
+                <h1 style="margin:0 0 14px;font-size:28px;line-height:1.1;">${htmlEscape(copy.heading)}</h1>
+                <p style="margin:0 0 16px;line-height:1.55;color:#52606d;">${htmlEscape(copy.intro)}</p>
+                <p style="margin:0 0 18px;line-height:1.55;color:#52606d;">${htmlEscape(copy.usage)}</p>
+                <p style="margin:0 0 18px;line-height:1.55;color:#52606d;">${htmlEscape(copy.next)}</p>
+                <ul style="margin:0 0 22px;padding-left:20px;color:#52606d;line-height:1.55;">${tips}</ul>
+                <p style="margin:0 0 12px;"><a href="${htmlEscape(copy.toolUrl)}" style="display:inline-block;background:#2646d8;color:#ffffff;text-decoration:none;font-weight:700;border-radius:8px;padding:13px 18px;">${htmlEscape(copy.toolCta)}</a></p>
+                <a href="${htmlEscape(copy.pricingUrl)}" style="display:inline-block;background:#eef8f5;color:#0f766e;text-decoration:none;font-weight:700;border-radius:8px;padding:12px 16px;">${htmlEscape(copy.pricingCta)}</a>
+              </td>
+            </tr>
+            <tr><td style="padding:18px 26px;border-top:1px solid #dbe3ee;color:#697483;font-size:12px;line-height:1.45;">${htmlEscape(copy.footer)}</td></tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+}
+
+async function recordProWelcomeEvent(settings, tableName, eventName, session, detail = {}) {
+  const sessionId = asText(session?.id, 120);
+  await insertWebhookEvent(settings, tableName, {
+    event_name: eventName,
+    event_category: "email",
+    event_label: sessionId,
+    page_path: "",
+    page_location: "",
+    language: asText(detail.language, 20),
+    session_id: asText(detail.session_id, 80),
+    visitor_id: asText(detail.visitor_id, 80),
+    source: "email",
+    campaign: "pro_welcome",
+    free_limit: null,
+    value: 0,
+    detail,
+    occurred_at: new Date().toISOString(),
+  });
+}
+
+async function sendProWelcomeEmail(settings, event, session, subscription, profile = null) {
+  const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
+  const sessionId = asText(session?.id, 120);
+  if (!sessionId) return { sent: false, skipped: true, reason: "missing_session_id" };
+  if (await eventAlreadyStored(settings, tableName, "pro_welcome_email_sent", sessionId)) {
+    return { sent: false, skipped: true, reason: "already_sent" };
+  }
+
+  const metadata = {
+    ...(session?.metadata || {}),
+    ...(subscription?.metadata || {}),
+  };
+  const to = normalizeEmail(session?.customer_details?.email || session?.customer_email || profile?.email || "");
+  const baseDetail = {
+    stripe_event_id: asText(event?.id, 120),
+    stripe_session_id: sessionId,
+    stripe_subscription_id: asText(subscription?.id, 120),
+    plan: asText(metadata.batchcutout_price_plan || "monthly", 80),
+    email: to,
+    language: asText(metadata.language || profile?.language || "", 20),
+    session_id: asText(metadata.session_id, 80),
+    visitor_id: asText(metadata.visitor_id, 80),
+  };
+
+  if (!to) {
+    await recordProWelcomeEvent(settings, tableName, "pro_welcome_email_failed", session, {
+      ...baseDetail,
+      reason: "missing_customer_email",
+    });
+    return { sent: false, skipped: false, reason: "missing_customer_email" };
+  }
+
+  const resendApiKey = process.env.RESEND_API_KEY || "";
+  if (!resendApiKey) {
+    await recordProWelcomeEvent(settings, tableName, "pro_welcome_email_failed", session, {
+      ...baseDetail,
+      reason: "resend_not_configured",
+    });
+    return { sent: false, skipped: false, reason: "resend_not_configured" };
+  }
+
+  const from = process.env.PRO_WELCOME_FROM || process.env.SUPPORT_REPLY_FROM || "BatchCutout <support@batchcutout.com>";
+  const replyTo = process.env.PRO_WELCOME_REPLY_TO || process.env.SUPPORT_REPLY_TO || "support@batchcutout.com";
+  const fromAddress = fromEmail(from);
+  const copy = proWelcomeCopy(baseDetail.language);
+  const resend = new Resend(resendApiKey);
+  const payload = {
+    from,
+    to,
+    replyTo,
+    subject: copy.subject,
+    text: proWelcomeText(copy),
+    html: proWelcomeHtml(copy),
+    tags: [
+      { name: "product", value: "batchcutout" },
+      { name: "type", value: "pro_welcome" },
+    ],
+  };
+
+  try {
+    const sent = await resend.emails.send(payload);
+    if (sent.error) {
+      await recordProWelcomeEvent(settings, tableName, "pro_welcome_email_failed", session, {
+        ...baseDetail,
+        fromDomain: emailDomain(fromAddress),
+        reason: sent.error.message || "resend_error",
+      });
+      return { sent: false, skipped: false, reason: "resend_error" };
+    }
+
+    await recordProWelcomeEvent(settings, tableName, "pro_welcome_email_sent", session, {
+      ...baseDetail,
+      fromDomain: emailDomain(fromAddress),
+      resend_id: sent.data?.id || "",
+    });
+    return { sent: true, skipped: false };
+  } catch (error) {
+    await recordProWelcomeEvent(settings, tableName, "pro_welcome_email_failed", session, {
+      ...baseDetail,
+      fromDomain: emailDomain(fromAddress),
+      reason: error instanceof Error ? error.message.slice(0, 300) : "resend_exception",
+    });
+    return { sent: false, skipped: false, reason: "resend_exception" };
   }
 }
 
@@ -171,11 +410,16 @@ async function handleStripeEvent(event) {
       const session = event.data.object;
       const subscription = await getSubscriptionFromCheckout(stripe, session);
       if (subscription) {
-        await updateProfileFromSubscription(settings, subscription, session.client_reference_id);
+        const profile = await updateProfileFromSubscription(settings, subscription, session.client_reference_id);
         try {
           await storePaidSubscriptionEvent(settings, event, session, subscription);
         } catch (error) {
           console.error("BatchCutout paid subscription event failed", error);
+        }
+        try {
+          await sendProWelcomeEmail(settings, event, session, subscription, profile);
+        } catch (error) {
+          console.error("BatchCutout pro welcome email failed", error);
         }
       }
     }

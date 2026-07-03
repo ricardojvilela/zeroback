@@ -736,6 +736,14 @@
             <strong id="liveLeadAutoreplyFailures">0</strong>
           </article>
           <article class="live-card">
+            <span>Welcome Pro</span>
+            <strong id="liveProWelcomeEmails">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Welcome Pro falhou</span>
+            <strong id="liveProWelcomeEmailFailures">0</strong>
+          </article>
+          <article class="live-card">
             <span>Cópias parceiro</span>
             <strong id="livePartnerReferralCopies">0</strong>
           </article>
@@ -1500,6 +1508,8 @@
         document.querySelector("#liveLeadCaptures").textContent = totals.leadCaptures || 0;
         document.querySelector("#liveLeadAutoreplies").textContent = totals.leadAutorepliesSent || 0;
         document.querySelector("#liveLeadAutoreplyFailures").textContent = totals.leadAutorepliesFailed || 0;
+        document.querySelector("#liveProWelcomeEmails").textContent = totals.proWelcomeEmailsSent || 0;
+        document.querySelector("#liveProWelcomeEmailFailures").textContent = totals.proWelcomeEmailsFailed || 0;
         document.querySelector("#livePartnerReferralCopies").textContent = totals.partnerReferralCopies || 0;
         document.querySelector("#liveBillingPortalOpens").textContent = totals.billingPortalOpens || 0;
         const accountEntrants = (totals.accountSignups || 0) + (totals.accountLogins || 0);
