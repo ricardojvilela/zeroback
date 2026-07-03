@@ -89,6 +89,29 @@
     };
   }
 
+  function preserveCampaignParams() {
+    const sourceParams = new URLSearchParams(window.location.search);
+    const preservedParams = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "gbraid", "wbraid"];
+    if (!preservedParams.some((key) => sourceParams.has(key))) return;
+
+    document.querySelectorAll("a[href]").forEach((link) => {
+      const url = new URL(link.getAttribute("href"), window.location.origin);
+      if (url.origin !== window.location.origin) return;
+
+      let changed = false;
+      preservedParams.forEach((key) => {
+        if (sourceParams.has(key) && !url.searchParams.has(key)) {
+          url.searchParams.set(key, sourceParams.get(key));
+          changed = true;
+        }
+      });
+
+      if (changed) {
+        link.setAttribute("href", `${url.pathname}${url.search}${url.hash}`);
+      }
+    });
+  }
+
   function markPageViewOnce() {
     try {
       const key = `${trackedFlag}:${window.location.pathname}`;
@@ -99,6 +122,8 @@
       return true;
     }
   }
+
+  preserveCampaignParams();
 
   if (markPageViewOnce()) {
     send("seo_landing_view", { landing_type: "seo" });
