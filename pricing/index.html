@@ -278,6 +278,20 @@
         </div>
       </section>
 
+      <section class="pricing-volume-lead" aria-labelledby="pricing-volume-title">
+        <div>
+          <p class="section-kicker" data-i18n="volumeLeadKicker">Volume acima do Pro</p>
+          <h2 id="pricing-volume-title" data-i18n="volumeLeadTitle">Precisa de tratar mais de 2.000 imagens por mês?</h2>
+          <p data-i18n="volumeLeadText">Se tiver catálogo grande, agência ou equipa com produção recorrente, fale connosco para avaliar um fluxo de volume sem perder ZIP, PNG transparente e organização por lote.</p>
+        </div>
+        <a
+          class="landing-secondary"
+          id="pricingVolumeContact"
+          href="mailto:support@batchcutout.com?subject=BatchCutout%20-%20volume%20acima%20de%202000%20imagens&body=Ol%C3%A1%2C%0A%0APreciso%20de%20processar%20mais%20de%202.000%20imagens%20por%20m%C3%AAs%20no%20BatchCutout.%0A%0AVolume%20estimado%20por%20m%C3%AAs%3A%20%0ATipo%20de%20loja%2Fneg%C3%B3cio%3A%20%0AFluxo%20atual%3A%20%0A%0AObrigado."
+          data-i18n="volumeLeadCta"
+        >Falar sobre volume maior</a>
+      </section>
+
       <section class="pricing-proof" aria-label="Quem precisa do BatchCutout Pro" data-i18n-aria="whoLabel">
         <article>
           <span>01</span>
@@ -471,6 +485,12 @@
           calculatorResultLabel: "Estimativa mensal",
           calculatorDetail: "{hours} poupadas/mês. Depois do plano fundador: {net}.",
           calculatorCta: "Usar plano fundador",
+          volumeLeadKicker: "Volume acima do Pro",
+          volumeLeadTitle: "Precisa de tratar mais de 2.000 imagens por mês?",
+          volumeLeadText: "Se tiver catálogo grande, agência ou equipa com produção recorrente, fale connosco para avaliar um fluxo de volume sem perder ZIP, PNG transparente e organização por lote.",
+          volumeLeadCta: "Falar sobre volume maior",
+          volumeLeadEmailSubject: "BatchCutout - volume acima de 2000 imagens",
+          volumeLeadEmailBody: "Olá,\n\nPreciso de processar mais de 2.000 imagens por mês no BatchCutout.\n\nVolume estimado por mês:\nTipo de loja/negócio:\nFluxo atual:\n\nObrigado.",
           heroImageAlt: "Exemplo antes e depois de uma foto de produto",
           planKicker: "Plano recomendado",
           planTitle: "15 EUR/mês para começar em volume",
@@ -606,6 +626,12 @@
           calculatorResultLabel: "Monthly estimate",
           calculatorDetail: "{hours} saved/month. After the founder plan: {net}.",
           calculatorCta: "Use founder plan",
+          volumeLeadKicker: "Above Pro volume",
+          volumeLeadTitle: "Need to process more than 2,000 images per month?",
+          volumeLeadText: "If you run a large catalog, agency, or recurring production team, contact us to evaluate a volume workflow without losing ZIP export, transparent PNGs, and batch organization.",
+          volumeLeadCta: "Talk about higher volume",
+          volumeLeadEmailSubject: "BatchCutout - volume above 2000 images",
+          volumeLeadEmailBody: "Hi,\n\nI need to process more than 2,000 images per month with BatchCutout.\n\nEstimated monthly volume:\nStore/business type:\nCurrent workflow:\n\nThanks.",
           heroImageAlt: "Before and after example of a product photo",
           planKicker: "Recommended plan",
           planTitle: "EUR 15/month to start at volume",
@@ -704,6 +730,7 @@
       const pricingCalcRate = document.querySelector("#pricingCalcRate");
       const pricingCalcValue = document.querySelector("#pricingCalcValue");
       const pricingCalcDetail = document.querySelector("#pricingCalcDetail");
+      const pricingVolumeContact = document.querySelector("#pricingVolumeContact");
       const debugMode = pricingPageParams.get("debug") === "1";
       const debugEventsStorageKey = "batchcutout_debug_events";
       const visitorStorageKey = "batchcutout_visitor_id";
@@ -711,6 +738,7 @@
       const serverEventNames = new Set([
         "pro_page_view",
         "pro_cta_clicked",
+        "high_volume_contact_clicked",
         "pro_form_started",
         "pro_volume_selected",
         "pro_submit_attempt",
@@ -887,6 +915,15 @@
           .replace("{net}", pricingCurrency(netValue, language));
       }
 
+      function updatePricingVolumeContactLink() {
+        if (!pricingVolumeContact) return;
+        const language = languageSelect.value === "pt" ? "pt" : "en";
+        const dictionary = pricingTranslations[language] || pricingTranslations.en;
+        const subject = encodeURIComponent(dictionary.volumeLeadEmailSubject);
+        const body = encodeURIComponent(`${dictionary.volumeLeadEmailBody}\nSource: ${window.location.href}`);
+        pricingVolumeContact.href = `mailto:support@batchcutout.com?subject=${subject}&body=${body}`;
+      }
+
       function applyPricingLanguage(language) {
         const nextLanguage = pricingTranslations[language] ? language : "en";
         const dictionary = pricingTranslations[nextLanguage];
@@ -913,6 +950,7 @@
         pricingForm.querySelector('[name="language"]').value = nextLanguage;
         localStorage.setItem("language", nextLanguage);
         updatePricingSavingsCalculator();
+        updatePricingVolumeContactLink();
       }
 
       const initialLanguage = detectPricingLanguage();
@@ -932,8 +970,17 @@
         updatePricingSavingsCalculator();
       });
 
+      pricingVolumeContact?.addEventListener("click", () => {
+        trackPricingEvent("high_volume_contact_clicked", {
+          source: "pricing_page",
+          event_label: "pricing_high_volume",
+          value: 0,
+        });
+      });
+
       for (const cta of document.querySelectorAll(".landing-button, .landing-secondary, .landing-nav a:not(.landing-logo)")) {
         cta.addEventListener("click", () => {
+          if (cta === pricingVolumeContact) return;
           trackPricingEvent("pro_cta_clicked", {
             label: cta.textContent.trim(),
             href: cta.getAttribute("href") || "",

@@ -41,6 +41,7 @@ function emptyDay(date) {
     proofCtaClicks: 0,
     proClicks: 0,
     pricingCtaClicks: 0,
+    highVolumeContacts: 0,
     checkoutLoginRequired: 0,
     checkoutStarts: 0,
     checkoutCancelledReturns: 0,
@@ -148,6 +149,7 @@ function emptySourceRow(source) {
     proofCtaClicks: 0,
     proClicks: 0,
     pricingCtaClicks: 0,
+    highVolumeContacts: 0,
     checkoutLoginRequired: 0,
     checkoutStarts: 0,
     checkoutCancelledReturns: 0,
@@ -355,6 +357,10 @@ export default async function handler(request, response) {
         case "pro_cta_clicked":
           row.pricingCtaClicks += 1;
           sourceRow.pricingCtaClicks += 1;
+          break;
+        case "high_volume_contact_clicked":
+          row.highVolumeContacts += 1;
+          sourceRow.highVolumeContacts += 1;
           break;
         case "pro_checkout_login_required":
           row.checkoutLoginRequired += 1;

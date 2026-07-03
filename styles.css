@@ -2455,6 +2455,36 @@ progress::-moz-progress-bar {
   margin-top: 4px;
 }
 
+.pricing-volume-lead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  margin: 0 0 22px;
+  border: 1px solid rgba(38, 70, 216, 0.18);
+  border-radius: 8px;
+  padding: 22px 24px;
+  background: linear-gradient(135deg, rgba(248, 251, 253, 0.98), rgba(236, 242, 255, 0.72));
+}
+
+.pricing-volume-lead h2 {
+  margin: 0 0 8px;
+  color: var(--charcoal);
+  font-size: 1.48rem;
+  line-height: 1.12;
+}
+
+.pricing-volume-lead p:not(.section-kicker) {
+  max-width: 72ch;
+  color: #52606d;
+  line-height: 1.5;
+}
+
+.pricing-volume-lead .landing-secondary {
+  justify-self: end;
+  white-space: nowrap;
+}
+
 .pricing-card {
   border: 0;
   border-radius: 0;
@@ -3357,6 +3387,20 @@ progress::-moz-progress-bar {
 
   .pricing-calculator-result strong {
     font-size: 2rem;
+  }
+
+  .pricing-volume-lead {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .pricing-volume-lead h2 {
+    font-size: 1.34rem;
+  }
+
+  .pricing-volume-lead .landing-secondary {
+    justify-self: stretch;
+    white-space: normal;
   }
 
   .pricing-value-copy h2 {

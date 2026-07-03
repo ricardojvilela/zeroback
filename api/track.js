@@ -21,6 +21,7 @@ const allowedEvents = new Set([
   "pro_email_submitted",
   "pro_page_view",
   "pro_cta_clicked",
+  "high_volume_contact_clicked",
   "pro_form_started",
   "pro_volume_selected",
   "pro_submit_attempt",

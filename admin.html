@@ -648,6 +648,10 @@
             <strong id="livePricingCtaClicks">0</strong>
           </article>
           <article class="live-card">
+            <span>Volume alto</span>
+            <strong id="liveHighVolumeContacts">0</strong>
+          </article>
+          <article class="live-card">
             <span>Checkouts iniciados</span>
             <strong id="liveCheckoutStarts">0</strong>
           </article>
@@ -1458,6 +1462,7 @@
         document.querySelector("#liveProofCtaClicks").textContent = totals.proofCtaClicks || 0;
         document.querySelector("#liveProClicks").textContent = totals.proClicks || 0;
         document.querySelector("#livePricingCtaClicks").textContent = totals.pricingCtaClicks || 0;
+        document.querySelector("#liveHighVolumeContacts").textContent = totals.highVolumeContacts || 0;
         document.querySelector("#liveCheckoutStarts").textContent = totals.checkoutStarts || 0;
         document.querySelector("#liveCheckoutCancelledReturns").textContent = totals.checkoutCancelledReturns || 0;
         document.querySelector("#liveCheckoutContinueErrors").textContent = totals.checkoutContinueErrors || 0;
