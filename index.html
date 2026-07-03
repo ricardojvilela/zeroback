@@ -349,7 +349,20 @@
           </div>
           <div class="post-download-next-actions">
             <button type="button" id="postDownloadFounderCta" data-i18n="postDownloadFounderCta">Ativar fundador - 15 EUR/mês</button>
-            <button class="secondary" type="button" id="postDownloadSaveLinkCta" data-i18n="postDownloadSaveLinkCta">Enviar link por email</button>
+            <form class="post-download-email-form" id="postDownloadEmailForm" novalidate>
+              <input
+                id="postDownloadEmail"
+                type="email"
+                autocomplete="email"
+                required
+                aria-label="O seu email"
+                data-i18n-aria="leadCapturePlaceholder"
+                placeholder="O seu email"
+                data-i18n-placeholder="leadCapturePlaceholder"
+              />
+              <button class="secondary" type="submit" data-i18n="postDownloadSaveLinkCta">Enviar link</button>
+            </form>
+            <p class="post-download-email-message" id="postDownloadEmailMessage" aria-live="polite"></p>
           </div>
           <p class="post-download-next-note" data-i18n="postDownloadNextNote">Sem cartão no teste grátis. Pagamento seguro por Stripe quando escolher Pro.</p>
         </section>

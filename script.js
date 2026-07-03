@@ -28,6 +28,9 @@ const countText = document.querySelector("#countText");
 const postDownloadNextPanel = document.querySelector("#postDownloadNextPanel");
 const postDownloadFounderCta = document.querySelector("#postDownloadFounderCta");
 const postDownloadSaveLinkCta = document.querySelector("#postDownloadSaveLinkCta");
+const postDownloadEmailForm = document.querySelector("#postDownloadEmailForm");
+const postDownloadEmail = document.querySelector("#postDownloadEmail");
+const postDownloadEmailMessage = document.querySelector("#postDownloadEmailMessage");
 const postDownloadFeedback = document.querySelector("#postDownloadFeedback");
 const postDownloadOptions = document.querySelector("#postDownloadOptions");
 const postDownloadThanks = document.querySelector("#postDownloadThanks");
@@ -2571,7 +2574,10 @@ function showPostDownloadNext(downloadType, count) {
   postDownloadNextPanel.classList.remove("hidden");
   postDownloadNextPanel.dataset.downloadType = downloadType;
   postDownloadNextPanel.dataset.downloadCount = String(count);
-  postDownloadSaveLinkCta?.classList.toggle("hidden", Boolean(currentAccount?.email || getCapturedLeadEmail()));
+  const hasLeadContact = Boolean(currentAccount?.email || getCapturedLeadEmail());
+  postDownloadSaveLinkCta?.classList.toggle("hidden", hasLeadContact);
+  postDownloadEmailForm?.classList.toggle("hidden", hasLeadContact);
+  if (postDownloadEmailMessage) postDownloadEmailMessage.textContent = "";
 
   if (wasHidden) {
     trackEvent("post_download_next_shown", {
@@ -2605,7 +2611,7 @@ function showPostDownloadFeedback(downloadType, count) {
   postDownloadFeedback?.classList.remove("hidden");
   postDownloadFeedback?.setAttribute("data-download-type", downloadType);
   postDownloadFeedback?.setAttribute("data-download-count", String(count));
-  showLeadCapture(downloadType, count);
+  if (!postDownloadEmailForm) showLeadCapture(downloadType, count);
   showProPrompt(`post_download_${downloadType}`, { scroll: false });
 }
 
@@ -2633,6 +2639,27 @@ function hideLeadCapture() {
   leadCapturePanel?.classList.add("hidden");
 }
 
+function recordLeadCapture(email, { downloadType = "unknown", count = 0, source = "post_download" } = {}) {
+  localStorage.setItem(leadCaptureEmailStorageKey, email);
+  localStorage.removeItem(leadCaptureDismissedStorageKey);
+  postDownloadSaveLinkCta?.classList.add("hidden");
+  postDownloadEmailForm?.classList.add("hidden");
+  setGoogleUserData(email);
+  trackEvent("lead_capture_submitted", {
+    email,
+    consent: true,
+    downloadType,
+    count,
+    source,
+  });
+}
+
+function disableFormControls(form) {
+  form?.querySelectorAll("input, button").forEach((element) => {
+    element.disabled = true;
+  });
+}
+
 async function handleLeadCaptureSubmit(event) {
   event.preventDefault();
   if (!leadCaptureEmail || !leadCaptureForm) return;
@@ -2648,22 +2675,40 @@ async function handleLeadCaptureSubmit(event) {
     return;
   }
 
-  localStorage.setItem(leadCaptureEmailStorageKey, email);
-  localStorage.removeItem(leadCaptureDismissedStorageKey);
-  postDownloadSaveLinkCta?.classList.add("hidden");
-  setGoogleUserData(email);
-  trackEvent("lead_capture_submitted", {
-    email,
-    consent: true,
+  recordLeadCapture(email, {
     downloadType,
     count,
     source: "post_download",
   });
 
   if (leadCaptureMessage) leadCaptureMessage.textContent = t("leadCaptureSuccess");
-  leadCaptureForm.querySelectorAll("input, button").forEach((element) => {
-    element.disabled = true;
+  disableFormControls(leadCaptureForm);
+}
+
+function handlePostDownloadEmailSubmit(event) {
+  event.preventDefault();
+  if (!postDownloadEmail || !postDownloadEmailForm) return;
+
+  const email = normalizeEmail(postDownloadEmail.value);
+  const downloadType = postDownloadNextPanel?.dataset.downloadType || "unknown";
+  const count = Number(postDownloadNextPanel?.dataset.downloadCount || 0) || 0;
+
+  if (!isValidEmail(email)) {
+    if (postDownloadEmailMessage) postDownloadEmailMessage.textContent = t("leadCaptureInvalid");
+    trackEvent("lead_capture_invalid", { downloadType, count, source: "post_download_inline" });
+    postDownloadEmail.focus();
+    return;
+  }
+
+  recordLeadCapture(email, {
+    downloadType,
+    count,
+    source: "post_download_inline",
   });
+
+  hideLeadCapture();
+  if (postDownloadEmailMessage) postDownloadEmailMessage.textContent = t("leadCaptureSuccess");
+  disableFormControls(postDownloadEmailForm);
 }
 
 function dismissLeadCapture() {
@@ -2731,6 +2776,7 @@ postDownloadFounderCta?.addEventListener("click", () => {
   startCheckout("early", postDownloadFounderCta);
 });
 postDownloadSaveLinkCta?.addEventListener("click", focusPostDownloadLeadCapture);
+postDownloadEmailForm?.addEventListener("submit", handlePostDownloadEmailSubmit);
 proInlineForm?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-checkout-plan]");
   if (!button) return;
