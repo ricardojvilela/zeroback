@@ -129,7 +129,7 @@ function checkoutPlanText(plan, language) {
 }
 
 function checkoutContinueUrl(session) {
-  return `${getSiteUrl()}/api/continue-checkout-session?session_id=${encodeURIComponent(session.id || "")}`;
+  return `${getSiteUrl()}/api/create-checkout-session?continue_session=${encodeURIComponent(session.id || "")}`;
 }
 
 function checkoutLinkCopy({ language, plan, sessionUrl }) {
@@ -214,6 +214,85 @@ async function insertCheckoutEvent(settings, row) {
     },
     body: JSON.stringify(row),
   });
+}
+
+function redirect(response, location) {
+  response.writeHead(302, { Location: location });
+  response.end();
+}
+
+function checkoutSessionPlan(session) {
+  const metadata = session?.metadata || {};
+  const plan = String(metadata.batchcutout_price_plan || metadata.price_plan || "monthly").toLowerCase();
+  return ["early", "monthly", "annual"].includes(plan) ? plan : "monthly";
+}
+
+async function recordCheckoutLinkClick(settings, session) {
+  if (!settings.supabaseUrl || !settings.serviceRoleKey) return;
+
+  const metadata = session?.metadata || {};
+  const plan = checkoutSessionPlan(session);
+  await insertCheckoutEvent(settings, {
+    event_name: "checkout_link_email_clicked",
+    event_category: "email_click",
+    event_label: metadataString(session.id, 160),
+    page_path: "/api/create-checkout-session",
+    page_location: `${getSiteUrl()}/api/create-checkout-session`,
+    language: metadataString(metadata.language, 20),
+    session_id: metadataString(metadata.session_id, 80),
+    visitor_id: metadataString(metadata.visitor_id, 80),
+    source: "email",
+    campaign: "checkout_link_email",
+    value: checkoutValueForPlan(plan),
+    detail: {
+      stripe_session_id: session.id || "",
+      stripe_customer_id: typeof session.customer === "string" ? session.customer : session.customer?.id || "",
+      supabase_user_id: session.client_reference_id || metadata.supabase_user_id || "",
+      plan,
+      price_plan: plan,
+      checkout_status: metadataString(session.status, 80),
+      payment_status: metadataString(session.payment_status, 80),
+      source: "email",
+      campaign: "checkout_link_email",
+    },
+    occurred_at: new Date().toISOString(),
+  });
+}
+
+async function continueCheckoutSession(request, response) {
+  const siteUrl = getSiteUrl();
+  const pricingUrl = `${siteUrl}/pricing/?checkout=continue_error#pricing-account-title`;
+  const sessionId = metadataString(request.query?.continue_session || request.query?.session_id || "", 200);
+
+  if (!/^cs_(test|live)_[a-zA-Z0-9]+$/.test(sessionId)) {
+    return redirect(response, pricingUrl);
+  }
+
+  const stripe = getStripeClient();
+  if (!stripe) {
+    return redirect(response, pricingUrl);
+  }
+
+  try {
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    try {
+      await recordCheckoutLinkClick(getSupabaseSettings(), session);
+    } catch {
+      // A click should still reach Stripe if internal analytics fail.
+    }
+
+    if (session.status === "complete") {
+      return redirect(response, `${siteUrl}/?checkout=success&session_id=${encodeURIComponent(session.id)}#accountTitle`);
+    }
+
+    if (session.url) {
+      return redirect(response, session.url);
+    }
+
+    return redirect(response, pricingUrl);
+  } catch {
+    return redirect(response, pricingUrl);
+  }
 }
 
 async function hasRecentCheckoutLinkEmail(settings, email) {
@@ -377,6 +456,10 @@ function checkoutEmailTimeout() {
 export default async function handler(request, response) {
   if (request.method === "OPTIONS") {
     return sendJson(response, 200, { ok: true });
+  }
+
+  if (request.method === "GET") {
+    return continueCheckoutSession(request, response);
   }
 
   if (request.method !== "POST") {
