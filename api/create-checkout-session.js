@@ -43,6 +43,7 @@ const attributionMetadataKeys = [
 ];
 const allowedCheckoutEmailDomains = new Set(["batchcutout.com"]);
 const checkoutLinkEmailWindowMs = 60 * 60 * 1000;
+const checkoutLinkEmailDefaultTimeoutMs = 1500;
 
 function checkoutValueForPlan(plan) {
   if (plan === "annual") return 190;
@@ -94,6 +95,11 @@ function sanitizeAttribution(input) {
 
 function checkoutEmailEnabled() {
   return String(process.env.CHECKOUT_LINK_EMAIL_ENABLED || "true").toLowerCase() !== "false";
+}
+
+function checkoutEmailTimeoutMs() {
+  const configured = Number(process.env.CHECKOUT_LINK_EMAIL_TIMEOUT_MS || 0) || 0;
+  return Math.min(Math.max(configured || checkoutLinkEmailDefaultTimeoutMs, 500), 5000);
 }
 
 function checkoutMailSettings() {
@@ -358,6 +364,12 @@ async function sendCheckoutLinkEmail(settings, { user, profile, session, plan, a
   return { sent: true, skipped: false, id: sent.data?.id || "" };
 }
 
+function checkoutEmailTimeout() {
+  return new Promise((resolve) => {
+    setTimeout(() => resolve({ sent: false, skipped: true, reason: "timeout" }), checkoutEmailTimeoutMs());
+  });
+}
+
 export default async function handler(request, response) {
   if (request.method === "OPTIONS") {
     return sendJson(response, 200, { ok: true });
@@ -441,7 +453,10 @@ export default async function handler(request, response) {
       // Checkout must not fail because analytics storage failed.
     }
     try {
-      await sendCheckoutLinkEmail(settings, { user, profile, session, plan, attribution });
+      await Promise.race([
+        sendCheckoutLinkEmail(settings, { user, profile, session, plan, attribution }),
+        checkoutEmailTimeout(),
+      ]);
     } catch {
       // Checkout must not fail because email recovery failed.
     }
