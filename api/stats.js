@@ -225,7 +225,9 @@ function isInternalValidationEvent(event) {
     detail.event_category === "validation" ||
     detail.source === "codex_validation" ||
     event.source === "codex_validation" ||
-    event.visitor_id === "codex-validation-visitor"
+    event.visitor_id === "codex-validation-visitor" ||
+    event.visitor_id === "validation-probe" ||
+    String(event.session_id || "").startsWith("validation-")
   );
 }
 
