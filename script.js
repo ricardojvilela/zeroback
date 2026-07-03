@@ -234,9 +234,11 @@ const baseTranslation = {
   billingPortalError: "Não foi possível abrir a gestão de pagamento agora.",
   accountMagicLinkSent: "Sessão iniciada.",
   accountSignupSuccess: "Conta criada. Se a confirmação de email estiver ativa, verifique a sua caixa de entrada antes de entrar.",
+  accountSignupReady: "Conta criada. A abrir o pagamento Pro escolhido...",
+  accountSignupReadyNoPlan: "Conta criada. Escolha o plano Pro quando quiser ativar os limites pagos.",
   accountLoggedOut: "Sessão terminada.",
-  accountAuthError: "Não foi possível iniciar sessão agora.",
-  accountSignupError: "Não foi possível criar a conta agora. Se já tiver conta, use Entrar.",
+  accountAuthError: "Não foi possível entrar. Confirme a password ou crie conta se ainda não tiver.",
+  accountSignupError: "Não foi possível criar a conta. Se este email já existir, use Entrar.",
   accountReserveError: "A sua conta não permite este lote neste momento.",
   accountMonthlyLimitReached: "A sua conta Pro atingiu o limite mensal de {monthlyLimit} imagens.",
   statusTooManyFilesPro: "O seu acesso atual permite até {limit} imagens por lote.",
@@ -384,9 +386,11 @@ const translations = {
     billingPortalError: "We could not open billing management right now.",
     accountMagicLinkSent: "Signed in.",
     accountSignupSuccess: "Account created. If email confirmation is enabled, check your inbox before signing in.",
+    accountSignupReady: "Account created. Opening the Pro payment you chose...",
+    accountSignupReadyNoPlan: "Account created. Choose a Pro plan whenever you want to activate paid limits.",
     accountLoggedOut: "Signed out.",
-    accountAuthError: "We could not sign you in right now.",
-    accountSignupError: "We could not create the account right now. If you already have one, use Sign in.",
+    accountAuthError: "We could not sign you in. Check the password or create an account if you do not have one yet.",
+    accountSignupError: "We could not create the account. If this email already exists, use Sign in.",
     accountReserveError: "Your account does not allow this batch right now.",
     accountMonthlyLimitReached: "Your Pro account reached the monthly limit of {monthlyLimit} images.",
     statusTooManyFilesPro: "Your current access allows up to {limit} images per batch.",
@@ -1934,9 +1938,11 @@ async function handleAccountCreate(event) {
     });
     if (data?.session) {
       await refreshAccount();
+      setAccountMessage(waitingPlan ? "accountSignupReady" : "accountSignupReadyNoPlan");
       await maybeStartRequestedCheckout();
+    } else {
+      setAccountMessage("accountSignupSuccess");
     }
-    setAccountMessage("accountSignupSuccess");
   } catch (error) {
     trackEvent("account_signup_failed", {
       source: waitingPlan ? "checkout_plan" : "account_panel",

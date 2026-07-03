@@ -493,6 +493,8 @@
           checkoutOpening: "A abrir Stripe...",
           checkoutCreatedCheckEmail: "Conta criada. Se a confirmação por email estiver ativa, verifique a sua caixa de entrada antes de continuar.",
           checkoutAuthError: "Não foi possível validar a conta agora.",
+          checkoutLoginError: "Não foi possível entrar. Confirme a password ou crie conta se ainda não tiver.",
+          checkoutSignupError: "Não foi possível criar a conta. Se este email já existir, use Entrar e continuar.",
           checkoutError: "Não foi possível abrir o pagamento agora.",
           checkoutNote: "Se já tiver sessão iniciada, o pagamento abre logo. Se ainda não tiver conta, escolha o plano e crie conta em seguida.",
           checkoutNotePro: "A subscrição já está ativa nesta conta. Pode gerir o pagamento no painel principal.",
@@ -615,6 +617,8 @@
           checkoutOpening: "Opening Stripe...",
           checkoutCreatedCheckEmail: "Account created. If email confirmation is active, check your inbox before continuing.",
           checkoutAuthError: "We could not verify the account right now.",
+          checkoutLoginError: "We could not sign you in. Check the password or create an account if you do not have one yet.",
+          checkoutSignupError: "We could not create the account. If this email already exists, use Sign in and continue.",
           checkoutError: "We could not open payment right now.",
           checkoutNote: "If you are already signed in, payment opens immediately. If not, choose the plan and create your account next.",
           checkoutNotePro: "The subscription is already active on this account. You can manage payment from the main tool page.",
@@ -1280,7 +1284,7 @@
             plan: selectedPricingPlan,
             reason: pricingAuthFailureReason(error),
           });
-          setPricingStatus("checkoutAuthError");
+          setPricingStatus("checkoutLoginError");
         } finally {
           pricingLoginButton.disabled = false;
           pricingLoginButton.textContent = pricingText("checkoutLogin");
@@ -1335,7 +1339,7 @@
             plan: selectedPricingPlan,
             reason: pricingAuthFailureReason(error),
           });
-          setPricingStatus("checkoutAuthError");
+          setPricingStatus("checkoutSignupError");
         } finally {
           pricingCreateButton.disabled = false;
           pricingCreateButton.textContent = pricingText("checkoutCreate");
