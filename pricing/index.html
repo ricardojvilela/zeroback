@@ -960,6 +960,7 @@
       const pricingCheckoutNote = document.querySelector(".pricing-checkout-note");
       const pricingVisitorStorageKey = "batchcutout_visitor_id";
       const pricingSessionStorageKey = "batchcutout_session_id";
+      const pricingLeadEmailStorageKey = "batchcutout_lead_capture_email";
       let pricingSupabase = null;
       let pricingAccount = null;
       let selectedPricingPlan = pricingCheckoutPlans.has(pricingPageParams.get("checkout_plan"))
@@ -982,6 +983,32 @@
       function setPricingStatus(keyOrText, isRaw = false, params = {}) {
         if (!pricingAccountStatus) return;
         pricingAccountStatus.textContent = isRaw ? keyOrText : pricingText(keyOrText, params);
+      }
+
+      function normalizePricingEmail(value = "") {
+        const email = String(value).trim().toLowerCase();
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? email : "";
+      }
+
+      function rememberPricingEmail(value = "") {
+        const email = normalizePricingEmail(value);
+        if (!email) return "";
+        try {
+          localStorage.setItem(pricingLeadEmailStorageKey, email);
+        } catch {
+          // Local storage improves checkout continuity but is not required.
+        }
+        return email;
+      }
+
+      function prefillPricingEmail() {
+        if (!pricingEmail || pricingEmail.value.trim()) return;
+        try {
+          const capturedEmail = normalizePricingEmail(localStorage.getItem(pricingLeadEmailStorageKey) || "");
+          if (capturedEmail) pricingEmail.value = capturedEmail;
+        } catch {
+          // Missing storage access should not block checkout.
+        }
       }
 
       function getPricingStableId(storage, key) {
@@ -1215,16 +1242,18 @@
           setPricingStatus("checkoutAuthError");
           return;
         }
-        if (!pricingEmail.value.trim() || !pricingPassword.value) {
+        const email = String(pricingEmail.value || "").trim().toLowerCase();
+        if (!pricingEmail.checkValidity() || !pricingPassword.checkValidity()) {
           pricingAuthForm.reportValidity();
           return;
         }
+        rememberPricingEmail(email);
 
         pricingLoginButton.disabled = true;
         pricingLoginButton.textContent = pricingText("checkoutLoggingIn");
         try {
           const { error } = await pricingSupabase.auth.signInWithPassword({
-            email: pricingEmail.value.trim(),
+            email,
             password: pricingPassword.value,
           });
           if (error) throw error;
@@ -1250,10 +1279,12 @@
           setPricingStatus("checkoutAuthError");
           return;
         }
-        if (!pricingEmail.value.trim() || !pricingPassword.value) {
+        const email = String(pricingEmail.value || "").trim().toLowerCase();
+        if (!pricingEmail.checkValidity() || !pricingPassword.checkValidity()) {
           pricingAuthForm.reportValidity();
           return;
         }
+        rememberPricingEmail(email);
 
         pricingCreateButton.disabled = true;
         pricingCreateButton.textContent = pricingText("checkoutCreating");
@@ -1266,7 +1297,7 @@
         try {
           const redirectTo = `${window.location.origin}${window.location.pathname}${window.location.search}`;
           const { data, error } = await pricingSupabase.auth.signUp({
-            email: pricingEmail.value.trim(),
+            email,
             password: pricingPassword.value,
             options: { emailRedirectTo: redirectTo },
           });
@@ -1292,6 +1323,7 @@
       }
 
       async function initPricingCheckout() {
+        prefillPricingEmail();
         updateSelectedPricingPlanUi();
         try {
           const response = await fetch("/api/auth-config");
