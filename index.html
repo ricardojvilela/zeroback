@@ -345,8 +345,13 @@
             <h2 id="post-download-next-title" data-i18n="postDownloadNextTitle">Resultado descarregado. Quer repetir isto em mais produtos?</h2>
             <p data-i18n="postDownloadNextText">
               Se o resultado ficou bom, transforme este teste em produção: plano fundador por 15 EUR/mês,
-              lotes até 100 imagens e 2.000 imagens por mês. Se ainda está a avaliar, guarde o link por email.
+              lotes até 100 imagens e 2.000 imagens por mês. Se ainda está a avaliar, receba o link e um checklist curto por email.
             </p>
+            <ul class="post-download-checklist">
+              <li data-i18n="postDownloadChecklistLink">Link direto para voltar à ferramenta</li>
+              <li data-i18n="postDownloadChecklistPrep">Checklist para fotos com melhor recorte</li>
+              <li data-i18n="postDownloadChecklistPlan">Resumo do plano fundador se precisar de volume</li>
+            </ul>
           </div>
           <div class="post-download-next-actions">
             <button type="button" id="postDownloadFounderCta" data-i18n="postDownloadFounderCta">Criar conta e ativar fundador - 15 EUR/mês</button>
@@ -361,7 +366,7 @@
                 placeholder="O seu email"
                 data-i18n-placeholder="leadCapturePlaceholder"
               />
-              <button class="secondary" type="submit" data-i18n="postDownloadSaveLinkCta">Enviar link</button>
+              <button class="secondary" type="submit" data-i18n="postDownloadSaveLinkCta">Receber link e checklist</button>
             </form>
             <p class="post-download-email-message" id="postDownloadEmailMessage" aria-live="polite"></p>
           </div>
@@ -405,10 +410,10 @@
 
         <section class="lead-capture hidden" id="leadCapturePanel" aria-labelledby="lead-capture-title">
           <div>
-            <p class="section-kicker" data-i18n="leadCaptureKicker">Guardar contacto</p>
+            <p class="section-kicker" data-i18n="leadCaptureKicker">Link e checklist</p>
             <h2 id="lead-capture-title" data-i18n="leadCaptureTitle">Quer guardar este fluxo para voltar depois?</h2>
             <p data-i18n="leadCaptureText">
-              Deixe o email e enviamos o link da ferramenta e dicas úteis para preparar fotos de produto em lote.
+              Deixe o email e enviamos o link da ferramenta, um checklist curto para preparar fotos de produto e a opção Pro se precisar de volume.
             </p>
           </div>
           <form class="lead-capture-form" id="leadCaptureForm" novalidate>
@@ -420,7 +425,7 @@
               placeholder="O seu email"
               data-i18n-placeholder="leadCapturePlaceholder"
             />
-            <button type="submit" data-i18n="leadCaptureSubmit">Guardar link</button>
+            <button type="submit" data-i18n="leadCaptureSubmit">Receber link e checklist</button>
             <button class="ghost-button" id="leadCaptureDismiss" type="button" data-i18n="leadCaptureDismiss">Agora não</button>
           </form>
           <p class="lead-capture-note" data-i18n="leadCaptureNote">

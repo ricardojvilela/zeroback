@@ -161,15 +161,21 @@ NexaFlow Labs
 Timing: 2 to 24 hours after `lead_capture_submitted`, only when the user voluntarily submitted email.
 
 Subject:
-Your BatchCutout link
+Your BatchCutout link and checklist
 
 Email:
 Hi,
 
-You asked to receive BatchCutout updates after testing the tool.
+You asked to receive the BatchCutout link after testing the tool.
 
 Here is the link to come back and process product photos:
 https://batchcutout.com/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#tool
+
+Quick checklist for your next batch:
+
+- Use photos where the full product is visible and not cropped at the edges
+- Avoid very strong shadows or backgrounds with colors too close to the product
+- Download PNG for one image or ZIP for multiple products
 
 If you need larger batches, the founder plan includes:
 
@@ -283,15 +289,21 @@ NexaFlow Labs
 ## PT variant - free test lead captured
 
 Subject:
-O seu link BatchCutout
+O seu link e checklist BatchCutout
 
 Email:
 Ola,
 
-Pediu para receber novidades do BatchCutout depois de testar a ferramenta.
+Pediu para receber o link do BatchCutout depois de testar a ferramenta.
 
 Aqui fica o link para voltar e tratar fotos de produto:
 https://batchcutout.com/?utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#tool
+
+Checklist rapido para o proximo lote:
+
+- Use fotos em que o produto aparece inteiro e sem cortes nas margens
+- Evite sombras muito fortes ou fundos com cores iguais ao produto
+- Descarregue PNG para uma imagem ou ZIP para varios produtos
 
 Se precisar de lotes maiores, o plano fundador inclui:
 

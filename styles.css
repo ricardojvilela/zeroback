@@ -729,6 +729,33 @@ h2 {
   line-height: 1.45;
 }
 
+.post-download-checklist {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  color: #334155;
+  font-size: 0.86rem;
+  font-weight: 850;
+}
+
+.post-download-checklist li {
+  position: relative;
+  padding-left: 18px;
+}
+
+.post-download-checklist li::before {
+  position: absolute;
+  top: 0.45em;
+  left: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  content: "";
+}
+
 .post-download-next-actions {
   display: grid;
   gap: 10px;

@@ -107,8 +107,8 @@ Se as variaveis opcionais nao existirem, o endpoint usa esses valores por defeit
 
 ### 2.2.2 Auto-resposta para leads captados
 
-Quando um utilizador descarrega um resultado gratuito e pede para guardar o link,
-o endpoint `/api/track` pode enviar automaticamente o email "O seu link BatchCutout".
+Quando um utilizador descarrega um resultado gratuito e pede para guardar o link/checklist,
+o endpoint `/api/track` pode enviar automaticamente o email "O seu link e checklist BatchCutout".
 
 Regras de seguranca:
 

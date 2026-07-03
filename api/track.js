@@ -132,31 +132,43 @@ function leadLanguage(detail) {
 function leadAutoreplyCopy(language) {
   if (language === "pt") {
     return {
-      subject: "O seu link BatchCutout",
+      subject: "O seu link e checklist BatchCutout",
       greeting: "Ola,",
       toolUrl: "https://batchcutout.com/?utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply#tool",
       pricingUrl: "https://batchcutout.com/pricing/?checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply#pricing-account-title",
       intro: "Aqui fica o link para voltar ao BatchCutout e tratar fotos de produto.",
+      checklistLine: "Checklist rapido para preparar o proximo lote:",
       proLine: "Se precisar de repetir este fluxo em catálogo, variantes ou marketplace, o Pro desbloqueia:",
       cta: "Abrir BatchCutout",
       pricingCta: "Ver planos Pro",
       optOut: "Se isto não for útil, responda \"remover\" e não enviaremos acompanhamento.",
       thanks: "Obrigado,\nNexaFlow Labs",
+      checklistBullets: [
+        "Use fotos em que o produto aparece inteiro e sem cortes nas margens.",
+        "Evite sombras muito fortes ou fundos com cores iguais ao produto.",
+        "Depois do recorte, descarregue PNG para uma imagem ou ZIP para vários produtos.",
+      ],
       bullets: ["100 imagens por lote", "2.000 imagens por mês", "PNG transparente e ZIP"],
     };
   }
 
   return {
-    subject: "Your BatchCutout link",
+    subject: "Your BatchCutout link and checklist",
     greeting: "Hi,",
     toolUrl: "https://batchcutout.com/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply#tool",
     pricingUrl: "https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply#pricing-account-title",
     intro: "Here is the link to come back to BatchCutout and process product photos.",
+    checklistLine: "Quick checklist for your next batch:",
     proLine: "If you need to repeat this workflow for catalogs, variants, or marketplace listings, Pro unlocks:",
     cta: "Open BatchCutout",
     pricingCta: "See Pro plans",
     optOut: "If this is not useful, reply \"unsubscribe\" and we will not send product follow-ups.",
     thanks: "Thanks,\nNexaFlow Labs",
+    checklistBullets: [
+      "Use photos where the full product is visible and not cropped at the edges.",
+      "Avoid very strong shadows or backgrounds with colors too close to the product.",
+      "After cutout, download PNG for one image or ZIP for multiple products.",
+    ],
     bullets: ["100 images per batch", "2,000 images per month", "Transparent PNG and ZIP export"],
   };
 }
@@ -167,6 +179,10 @@ function leadAutoreplyText(copy) {
     "",
     copy.intro,
     copy.toolUrl,
+    "",
+    copy.checklistLine,
+    "",
+    ...copy.checklistBullets.map((bullet) => `- ${bullet}`),
     "",
     copy.proLine,
     "",
@@ -183,6 +199,7 @@ function leadAutoreplyText(copy) {
 
 function leadAutoreplyHtml(copy) {
   const bullets = copy.bullets.map((bullet) => `<li>${htmlEscape(bullet)}</li>`).join("");
+  const checklistBullets = copy.checklistBullets.map((bullet) => `<li>${htmlEscape(bullet)}</li>`).join("");
   return `<!doctype html>
 <html>
   <body style="margin:0;background:#f3f7fa;color:#17202a;font-family:Arial,Helvetica,sans-serif;">
@@ -196,6 +213,8 @@ function leadAutoreplyHtml(copy) {
                 <h1 style="margin:0 0 14px;font-size:28px;line-height:1.1;">${htmlEscape(copy.subject)}</h1>
                 <p style="margin:0 0 16px;line-height:1.55;color:#52606d;">${htmlEscape(copy.intro)}</p>
                 <p style="margin:0 0 18px;"><a href="${htmlEscape(copy.toolUrl)}" style="display:inline-block;background:#2646d8;color:#ffffff;text-decoration:none;font-weight:700;border-radius:8px;padding:13px 18px;">${htmlEscape(copy.cta)}</a></p>
+                <p style="margin:0 0 12px;line-height:1.55;color:#52606d;">${htmlEscape(copy.checklistLine)}</p>
+                <ul style="margin:0 0 22px;padding-left:20px;color:#52606d;line-height:1.55;">${checklistBullets}</ul>
                 <p style="margin:0 0 12px;line-height:1.55;color:#52606d;">${htmlEscape(copy.proLine)}</p>
                 <ul style="margin:0 0 22px;padding-left:20px;color:#52606d;line-height:1.55;">${bullets}</ul>
                 <a href="${htmlEscape(copy.pricingUrl)}" style="display:inline-block;background:#14958b;color:#ffffff;text-decoration:none;font-weight:700;border-radius:8px;padding:13px 18px;">${htmlEscape(copy.pricingCta)}</a>
