@@ -222,17 +222,6 @@
         <a class="landing-button" href="/?utm_source=seo&utm_medium=landing&utm_campaign=etsy_background_remover#tool" data-preserve-utm>Limpar fotos Etsy</a>
       </section>
     </main>
-    <script>
-      const sourceParams = new URLSearchParams(window.location.search);
-      const preservedParams = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "gbraid", "wbraid"];
-      document.querySelectorAll("[data-preserve-utm]").forEach(function (link) {
-        const url = new URL(link.getAttribute("href"), window.location.origin);
-        preservedParams.forEach(function (key) {
-          if (sourceParams.has(key)) url.searchParams.set(key, sourceParams.get(key));
-        });
-        link.setAttribute("href", url.pathname + url.search + url.hash);
-      });
-    </script>
     <script src="/landing-track.js?v=20260703-attribution"></script>
   </body>
 </html>
