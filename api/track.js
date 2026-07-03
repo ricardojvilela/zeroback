@@ -45,6 +45,8 @@ const allowedEvents = new Set([
   "account_signup_failed",
   "account_login_succeeded",
   "account_login_failed",
+  "partner_page_view",
+  "partner_cta_clicked",
   "partner_referral_copy",
   "proof_page_view",
   "proof_cta_clicked",

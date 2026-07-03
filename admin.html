@@ -764,6 +764,14 @@
             <strong id="liveProWelcomeEmailFailures">0</strong>
           </article>
           <article class="live-card">
+            <span>Página parceiros</span>
+            <strong id="livePartnerPageViews">0</strong>
+          </article>
+          <article class="live-card">
+            <span>CTA parceiros</span>
+            <strong id="livePartnerCtaClicks">0</strong>
+          </article>
+          <article class="live-card">
             <span>Cópias parceiro</span>
             <strong id="livePartnerReferralCopies">0</strong>
           </article>
@@ -1077,6 +1085,8 @@
                   <th>Logins</th>
                   <th>Logins falhados</th>
                   <th>Leads</th>
+                  <th>Pág. parceiros</th>
+                  <th>CTA parceiros</th>
                   <th>Parceiros</th>
                   <th>Checkouts</th>
                   <th>Pagas</th>
@@ -1086,7 +1096,7 @@
               </thead>
               <tbody id="sourceRowsBody">
                 <tr>
-                  <td class="empty" colspan="25">A carregar origens.</td>
+                  <td class="empty" colspan="27">A carregar origens.</td>
                 </tr>
               </tbody>
             </table>
@@ -1117,6 +1127,8 @@
                 <th>Logins</th>
                 <th>Logins falhados</th>
                 <th>Leads</th>
+                <th>Pág. parceiros</th>
+                <th>CTA parceiros</th>
                 <th>Parceiros</th>
                 <th>Checkouts</th>
                 <th>Pagas</th>
@@ -1535,6 +1547,8 @@
         document.querySelector("#liveLeadAutoreplyFailures").textContent = totals.leadAutorepliesFailed || 0;
         document.querySelector("#liveProWelcomeEmails").textContent = totals.proWelcomeEmailsSent || 0;
         document.querySelector("#liveProWelcomeEmailFailures").textContent = totals.proWelcomeEmailsFailed || 0;
+        document.querySelector("#livePartnerPageViews").textContent = totals.partnerPageViews || 0;
+        document.querySelector("#livePartnerCtaClicks").textContent = totals.partnerCtaClicks || 0;
         document.querySelector("#livePartnerReferralCopies").textContent = totals.partnerReferralCopies || 0;
         document.querySelector("#liveBillingPortalOpens").textContent = totals.billingPortalOpens || 0;
         const accountEntrants = (totals.accountSignups || 0) + (totals.accountLogins || 0);
@@ -1565,6 +1579,8 @@
                   <td>${row.accountLogins || 0}</td>
                   <td>${row.accountLoginFailures || 0}</td>
                   <td>${row.leadCaptures || 0}</td>
+                  <td>${row.partnerPageViews || 0}</td>
+                  <td>${row.partnerCtaClicks || 0}</td>
                   <td>${row.partnerReferralCopies || 0}</td>
                   <td>${row.checkoutStarts || 0}</td>
                   <td>${row.paidSubscriptions || 0}</td>
@@ -1573,7 +1589,7 @@
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="26">Ainda não existem eventos reais no período.</td></tr>`;
+          : `<tr><td class="empty" colspan="28">Ainda não existem eventos reais no período.</td></tr>`;
 
         sourceRowsBody.innerHTML = data.sourceBreakdown?.length
           ? data.sourceBreakdown.map((row) => `
@@ -1598,6 +1614,8 @@
                 <td>${row.accountLogins || 0}</td>
                 <td>${row.accountLoginFailures || 0}</td>
                 <td>${row.leadCaptures || 0}</td>
+                <td>${row.partnerPageViews || 0}</td>
+                <td>${row.partnerCtaClicks || 0}</td>
                 <td>${row.partnerReferralCopies || 0}</td>
                 <td>${row.checkoutStarts || 0}</td>
                 <td>${row.paidSubscriptions || 0}</td>
@@ -1605,7 +1623,7 @@
                 <td>${row.billingPortalOpens || 0}</td>
               </tr>
             `).join("")
-          : `<tr><td class="empty" colspan="25">Ainda não existem origens identificadas.</td></tr>`;
+          : `<tr><td class="empty" colspan="27">Ainda não existem origens identificadas.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "";
         liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Última atualização: ${generatedAt}`;

@@ -185,6 +185,7 @@
       const partnerCopyStatus = document.querySelector("#partnerCopyStatus");
       const partnerVisitorStorageKey = "batchcutout_visitor_id";
       const partnerSessionStorageKey = "batchcutout_session_id";
+      const partnerTrackedFlag = "batchcutout_partner_page_view";
 
       async function copyPartnerText(text) {
         if (navigator.clipboard?.writeText) {
@@ -206,19 +207,40 @@
         }
       }
 
-      function trackPartnerCopy(targetId) {
+      function partnerTargetFor(link) {
+        const href = link.getAttribute("href") || "";
+        if (href.startsWith("mailto:")) return "email";
+        const url = new URL(link.href, window.location.origin);
+        if (url.pathname.startsWith("/pricing")) return "pricing";
+        if (url.hash === "#tool" || url.href.includes("#tool")) return "tool";
+        return url.origin === window.location.origin ? "internal" : "external";
+      }
+
+      function shouldTrackPartnerPageView() {
+        try {
+          const key = `${partnerTrackedFlag}:${window.location.pathname}`;
+          if (sessionStorage.getItem(key)) return false;
+          sessionStorage.setItem(key, "1");
+          return true;
+        } catch {
+          return true;
+        }
+      }
+
+      function trackPartnerEvent(name, extra = {}) {
         const detail = {
           event_category: "commercial_intent",
-          event_label: targetId,
+          event_label: extra.event_label || name,
           source: "partners_page",
           page_path: window.location.pathname,
           page_location: window.location.href.split("#")[0],
           language: document.documentElement.lang || "pt-PT",
+          ...extra,
         };
-        window.gtag?.("event", "partner_referral_copy", detail);
+        window.gtag?.("event", name, detail);
 
         const payload = JSON.stringify({
-          name: "partner_referral_copy",
+          name,
           detail,
           visitorId: getPartnerStableId(localStorage, partnerVisitorStorageKey),
           sessionId: getPartnerStableId(sessionStorage, partnerSessionStorageKey),
@@ -240,6 +262,25 @@
           keepalive: true,
         }).catch(() => {});
       }
+
+      function trackPartnerCopy(targetId) {
+        trackPartnerEvent("partner_referral_copy", { event_label: targetId });
+      }
+
+      if (shouldTrackPartnerPageView()) {
+        trackPartnerEvent("partner_page_view", { event_label: "partners" });
+      }
+
+      document.querySelectorAll(".landing-button, .landing-secondary, .landing-nav a:not(.landing-logo)").forEach((link) => {
+        link.addEventListener("click", () => {
+          if (!link.href) return;
+          trackPartnerEvent("partner_cta_clicked", {
+            event_label: link.textContent.replace(/\s+/g, " ").trim().slice(0, 120),
+            target: partnerTargetFor(link),
+            cta_href: link.href,
+          });
+        });
+      });
 
       document.querySelectorAll("[data-copy-target]").forEach((button) => {
         button.addEventListener("click", async () => {

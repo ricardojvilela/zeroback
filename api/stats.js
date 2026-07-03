@@ -70,6 +70,8 @@ function emptyDay(date) {
     leadAutorepliesFailed: 0,
     proWelcomeEmailsSent: 0,
     proWelcomeEmailsFailed: 0,
+    partnerPageViews: 0,
+    partnerCtaClicks: 0,
     partnerReferralCopies: 0,
     billingPortalOpens: 0,
   };
@@ -188,6 +190,8 @@ function emptySourceRow(source) {
     leadAutorepliesFailed: 0,
     proWelcomeEmailsSent: 0,
     proWelcomeEmailsFailed: 0,
+    partnerPageViews: 0,
+    partnerCtaClicks: 0,
     partnerReferralCopies: 0,
     billingPortalOpens: 0,
     events: 0,
@@ -498,6 +502,16 @@ export default async function handler(request, response) {
         case "pro_welcome_email_failed":
           row.proWelcomeEmailsFailed += 1;
           sourceRow.proWelcomeEmailsFailed += 1;
+          break;
+        case "partner_page_view":
+          row.pageViews += 1;
+          row.partnerPageViews += 1;
+          sourceRow.pageViews += 1;
+          sourceRow.partnerPageViews += 1;
+          break;
+        case "partner_cta_clicked":
+          row.partnerCtaClicks += 1;
+          sourceRow.partnerCtaClicks += 1;
           break;
         case "partner_referral_copy":
           row.partnerReferralCopies += 1;
