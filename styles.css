@@ -784,16 +784,34 @@ h2 {
   font-size: 0.92rem;
 }
 
-.status-pro-button {
+.status-pro-button,
+.status-volume-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 36px;
   padding: 0 12px;
   background: var(--charcoal);
+  border: 0;
+  border-radius: 8px;
+  color: #ffffff;
   font-size: 0.84rem;
+  font-weight: 900;
+  text-decoration: none;
   white-space: nowrap;
 }
 
-.status-pro-button:hover:not(:disabled) {
+.status-pro-button:hover:not(:disabled),
+.status-volume-button:hover {
   background: #0c1117;
+}
+
+.status-volume-button {
+  background: var(--blue);
+}
+
+.status-volume-button:hover {
+  background: var(--blue-strong);
 }
 
 .feedback-panel {
@@ -3281,6 +3299,8 @@ progress::-moz-progress-bar {
   }
 
   .ghost-button,
+  .status-pro-button,
+  .status-volume-button,
   progress {
     width: 100%;
   }

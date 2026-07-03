@@ -21,6 +21,7 @@ const imageGrid = document.querySelector("#imageGrid");
 const emptyState = document.querySelector("#emptyState");
 const statusText = document.querySelector("#statusText");
 const proPromptButton = document.querySelector("#proPromptButton");
+const statusVolumeContact = document.querySelector("#statusVolumeContact");
 const inlineProCta = document.querySelector("#inlineProCta");
 const zipProCta = document.querySelector("#zipProCta");
 const progressBar = document.querySelector("#progressBar");
@@ -100,6 +101,8 @@ const serverEventNames = new Set([
   "post_download_founder_clicked",
   "post_download_save_link_clicked",
   "tool_pro_clicked",
+  "monthly_limit_reached",
+  "high_volume_contact_clicked",
   "pro_prompt_shown",
   "pro_form_started",
   "pro_submit_attempt",
@@ -241,6 +244,9 @@ const baseTranslation = {
   accountSignupError: "Não foi possível criar a conta. Se este email já existir, use Entrar.",
   accountReserveError: "A sua conta não permite este lote neste momento.",
   accountMonthlyLimitReached: "A sua conta Pro atingiu o limite mensal de {monthlyLimit} imagens.",
+  volumeContactCta: "Falar sobre volume maior",
+  volumeContactEmailSubject: "BatchCutout - preciso de mais volume",
+  volumeContactEmailBody: "Olá,\n\nA minha conta Pro atingiu o limite mensal e preciso de avaliar mais volume.\n\nEmail da conta: {email}\nLimite mensal atual: {monthlyLimit} imagens\nImagens restantes: {monthlyRemaining}\n\nFonte: {source}\n\nObrigado.",
   statusTooManyFilesPro: "O seu acesso atual permite até {limit} imagens por lote.",
 };
 
@@ -393,6 +399,9 @@ const translations = {
     accountSignupError: "We could not create the account. If this email already exists, use Sign in.",
     accountReserveError: "Your account does not allow this batch right now.",
     accountMonthlyLimitReached: "Your Pro account reached the monthly limit of {monthlyLimit} images.",
+    volumeContactCta: "Talk about higher volume",
+    volumeContactEmailSubject: "BatchCutout - I need more volume",
+    volumeContactEmailBody: "Hi,\n\nMy Pro account reached the monthly limit and I need to evaluate more volume.\n\nAccount email: {email}\nCurrent monthly limit: {monthlyLimit} images\nImages remaining: {monthlyRemaining}\n\nSource: {source}\n\nThanks.",
     statusTooManyFilesPro: "Your current access allows up to {limit} images per batch.",
     downloadReadyHint: "Result ready. To repeat this workflow with more products, Pro unlocks 100 images per batch.",
     zipProCta: "Process up to 100 images per batch - from EUR 15/month",
@@ -1129,6 +1138,8 @@ const analyticsEvents = {
   pro_checkout_login_required: { category: "commercial_intent", label: "checkout_login_required", step: 10 },
   pro_checkout_started: { category: "commercial_intent", label: "checkout_started", step: 11 },
   pro_purchase_conversion_sent: { category: "revenue", label: "purchase_conversion", step: 12 },
+  monthly_limit_reached: { category: "commercial_intent", label: "monthly_limit_reached", step: 13 },
+  high_volume_contact_clicked: { category: "commercial_intent", label: "high_volume_contact_clicked", step: 14 },
   lead_capture_shown: { category: "lead", label: "lead_capture_shown", step: 7 },
   lead_capture_submitted: { category: "lead", label: "lead_capture_submitted", step: 8 },
   lead_capture_dismissed: { category: "lead", label: "lead_capture_dismissed", step: 8 },
@@ -1619,12 +1630,34 @@ function setStatus(key, progress = 0, params = {}) {
   statusText.textContent = t(key, params);
   progressBar.value = progress;
   proPromptButton.classList.toggle("hidden", canUsePaidAccess() || key !== "statusTooManyFiles");
+  statusVolumeContact?.classList.toggle("hidden", key !== "accountMonthlyLimitReached");
+  updateStatusVolumeContactLink(params);
 }
 
 function refreshStatusText() {
   const key = statusText.dataset.statusKey || "statusWaiting";
   const params = JSON.parse(statusText.dataset.statusParams || "{}");
   statusText.textContent = t(key, params);
+  statusVolumeContact?.classList.toggle("hidden", key !== "accountMonthlyLimitReached");
+  updateStatusVolumeContactLink(params);
+}
+
+function highVolumeContactParams(params = {}) {
+  const access = currentAccount?.access || {};
+  return {
+    email: currentAccount?.email || "",
+    monthlyLimit: params.monthlyLimit || access.monthlyLimit || defaultProMonthlyLimit,
+    monthlyRemaining: access.monthlyRemaining ?? 0,
+    source: window.location.href,
+  };
+}
+
+function updateStatusVolumeContactLink(params = {}) {
+  if (!statusVolumeContact) return;
+  const contactParams = highVolumeContactParams(params);
+  const subject = encodeURIComponent(t("volumeContactEmailSubject"));
+  const body = encodeURIComponent(t("volumeContactEmailBody", contactParams));
+  statusVolumeContact.href = `mailto:support@batchcutout.com?subject=${subject}&body=${body}`;
 }
 
 function applyLanguage() {
@@ -2435,6 +2468,15 @@ async function processImages() {
     const reservation = await reserveMonthlyUsage(pendingCount);
     if (!reservation.ok) {
       const monthlyLimit = currentAccount?.access?.monthlyLimit || defaultProMonthlyLimit;
+      if (reservation.error === "monthly_limit_reached") {
+        trackEvent("monthly_limit_reached", {
+          source: "tool_monthly_limit",
+          monthly_limit: monthlyLimit,
+          monthly_remaining: currentAccount?.access?.monthlyRemaining ?? 0,
+          pending: pendingCount,
+          account_email: currentAccount?.email || "",
+        });
+      }
       setStatus(
         reservation.error === "monthly_limit_reached" ? "accountMonthlyLimitReached" : "accountReserveError",
         0,
@@ -2758,6 +2800,14 @@ function handlePostDownloadEmailSubmit(event) {
     return;
   }
 
+  trackEvent("post_download_save_link_clicked", {
+    downloadType,
+    count,
+    source: "post_download_inline",
+    totalInQueue: items.length,
+    free_limit: maxFilesPerBatch,
+  });
+
   recordLeadCapture(email, {
     downloadType,
     count,
@@ -2812,6 +2862,16 @@ pngButton.addEventListener("click", downloadSinglePng);
 zipButton.addEventListener("click", downloadZip);
 clearButton.addEventListener("click", clearAll);
 proPromptButton.addEventListener("click", () => showProInterest("status_limit_cta"));
+statusVolumeContact?.addEventListener("click", () => {
+  const params = highVolumeContactParams(JSON.parse(statusText.dataset.statusParams || "{}"));
+  trackEvent("high_volume_contact_clicked", {
+    source: "tool_monthly_limit",
+    event_label: "tool_high_volume",
+    monthly_limit: params.monthlyLimit,
+    monthly_remaining: params.monthlyRemaining,
+    has_account: Boolean(params.email),
+  });
+});
 brandCta.addEventListener("click", () => {
   dropzone.scrollIntoView({ behavior: "smooth", block: "center" });
   fileInput.focus({ preventScroll: true });
