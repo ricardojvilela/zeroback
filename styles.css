@@ -2687,6 +2687,12 @@ progress::-moz-progress-bar {
   background: rgba(255, 255, 255, 0.92);
 }
 
+.pricing-checkout-panel.has-selected-plan {
+  border-color: rgba(15, 139, 124, 0.28);
+  background: #f7fffd;
+  box-shadow: 0 20px 46px rgba(15, 139, 124, 0.12);
+}
+
 .pricing-checkout-head {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -2720,6 +2726,12 @@ progress::-moz-progress-bar {
 
 .pricing-account-badge.is-ready {
   border-color: rgba(15, 139, 124, 0.28);
+  background: rgba(15, 139, 124, 0.1);
+  color: var(--accent-strong);
+}
+
+.pricing-account-badge.is-selected {
+  border-color: rgba(15, 139, 124, 0.32);
   background: rgba(15, 139, 124, 0.1);
   color: var(--accent-strong);
 }

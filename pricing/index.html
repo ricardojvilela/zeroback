@@ -534,9 +534,11 @@
           checkoutKicker: "Checkout direto",
           checkoutTitle: "Crie conta e escolha o plano",
           checkoutBadgeGuest: "Sem sessão",
+          checkoutBadgeSelected: "Plano escolhido",
           checkoutBadgeReady: "Conta pronta",
           checkoutBadgePro: "Pro ativo",
           checkoutStatusGuest: "Use o seu email para criar conta. Se já tiver conta, entre e abrimos o Stripe Checkout automaticamente.",
+          checkoutStatusSelected: "Plano escolhido: {plan}. Crie conta ou entre e abrimos o Stripe Checkout automaticamente.",
           checkoutStatusReady: "Conta validada. Escolha o plano para abrir o pagamento seguro.",
           checkoutStatusPro: "Esta conta já tem Pro ativo. Volte à ferramenta para processar até {batchLimit} imagens por lote.",
           checkoutStatusChoosePlan: "Plano selecionado. Crie conta para abrir o pagamento ou entre se já tiver conta.",
@@ -545,6 +547,7 @@
           checkoutPasswordPlaceholder: "A sua password",
           checkoutLogin: "Entrar e continuar",
           checkoutCreate: "Criar conta e continuar",
+          checkoutCreatePayment: "Criar conta e continuar para pagamento",
           checkoutLoggingIn: "A entrar...",
           checkoutCreating: "A criar conta...",
           checkoutOpening: "A abrir Stripe...",
@@ -675,9 +678,11 @@
           checkoutKicker: "Direct checkout",
           checkoutTitle: "Create an account and choose a plan",
           checkoutBadgeGuest: "No session",
+          checkoutBadgeSelected: "Plan selected",
           checkoutBadgeReady: "Account ready",
           checkoutBadgePro: "Pro active",
           checkoutStatusGuest: "Use your email to create an account. If you already have one, sign in and we open Stripe Checkout automatically.",
+          checkoutStatusSelected: "Selected plan: {plan}. Create an account or sign in and we will open Stripe Checkout automatically.",
           checkoutStatusReady: "Account verified. Choose a plan to open secure payment.",
           checkoutStatusPro: "This account already has Pro active. Return to the tool to process up to {batchLimit} images per batch.",
           checkoutStatusChoosePlan: "Plan selected. Create an account to open payment, or sign in if you already have one.",
@@ -686,6 +691,7 @@
           checkoutPasswordPlaceholder: "Your password",
           checkoutLogin: "Sign in and continue",
           checkoutCreate: "Create account and continue",
+          checkoutCreatePayment: "Create account and continue to payment",
           checkoutLoggingIn: "Signing in...",
           checkoutCreating: "Creating account...",
           checkoutOpening: "Opening Stripe...",
@@ -1103,6 +1109,7 @@
       const pricingPassword = document.querySelector("#pricingAccountPassword");
       const pricingLoginButton = document.querySelector("#pricingLoginButton");
       const pricingCreateButton = document.querySelector("#pricingCreateButton");
+      const pricingCheckoutPanel = document.querySelector(".pricing-checkout-panel");
       const pricingAccountStatus = document.querySelector("#pricingAccountStatus");
       const pricingAccountBadge = document.querySelector("#pricingAccountBadge");
       const pricingSelectedPlan = document.querySelector("#pricingSelectedPlan");
@@ -1136,6 +1143,15 @@
       function setPricingStatus(keyOrText, isRaw = false, params = {}) {
         if (!pricingAccountStatus) return;
         pricingAccountStatus.textContent = isRaw ? keyOrText : pricingText(keyOrText, params);
+      }
+
+      function syncPricingAuthButtons() {
+        if (pricingCreateButton && !pricingCreateButton.disabled) {
+          pricingCreateButton.textContent = pricingText("checkoutCreatePayment");
+        }
+        if (pricingLoginButton && !pricingLoginButton.disabled) {
+          pricingLoginButton.textContent = pricingText("checkoutLogin");
+        }
       }
 
       function normalizePricingEmail(value = "") {
@@ -1312,18 +1328,22 @@
         const ready = Boolean(pricingAccount?.email);
         const hasPro = Boolean(pricingAccount?.access?.canUsePro);
         const batchLimit = pricingAccount?.access?.batchLimit || 100;
+        const selectedLabel = pricingPlanLabel(selectedPricingPlan);
         updateSelectedPricingPlanUi();
         pricingAccountBadge.textContent = hasPro
           ? pricingText("checkoutBadgePro")
           : ready
             ? pricingText("checkoutBadgeReady")
-            : pricingText("checkoutBadgeGuest");
+            : pricingText("checkoutBadgeSelected");
         pricingAccountBadge.classList.toggle("is-ready", ready);
+        pricingAccountBadge.classList.toggle("is-selected", !ready && !hasPro);
+        pricingCheckoutPanel?.classList.toggle("has-selected-plan", !ready && !hasPro);
         document.body.classList.toggle("pricing-pro-active", hasPro);
         pricingAuthForm?.classList.toggle("hidden", hasPro);
         pricingCheckoutActions?.classList.toggle("hidden", hasPro);
         pricingHeroActions?.classList.toggle("hidden", hasPro);
         pricingFreeTestNote?.classList.toggle("hidden", hasPro);
+        syncPricingAuthButtons();
         if (pricingCheckoutNote) {
           pricingCheckoutNote.textContent = pricingText(hasPro ? "checkoutNotePro" : "checkoutNote");
         }
@@ -1337,6 +1357,8 @@
 
         if (ready) {
           setPricingStatus("checkoutStatusReady");
+        } else {
+          setPricingStatus("checkoutStatusSelected", false, { plan: selectedLabel });
         }
       }
 
@@ -1379,7 +1401,8 @@
         const accessToken = await currentPricingAccessToken();
         if (!accessToken) {
           trackPricingCheckoutEvent("pro_checkout_login_required", { plan: selectedPlan, source: "pricing_page" });
-          setPricingStatus("checkoutStatusChoosePlan");
+          setPricingStatus("checkoutStatusSelected", false, { plan: pricingPlanLabel(selectedPlan) });
+          updatePricingAccountUi();
           pricingEmail?.focus();
           return;
         }
@@ -1462,7 +1485,7 @@
           setPricingStatus("checkoutLoginError");
         } finally {
           pricingLoginButton.disabled = false;
-          pricingLoginButton.textContent = pricingText("checkoutLogin");
+          syncPricingAuthButtons();
         }
       }
 
@@ -1517,7 +1540,7 @@
           setPricingStatus("checkoutSignupError");
         } finally {
           pricingCreateButton.disabled = false;
-          pricingCreateButton.textContent = pricingText("checkoutCreate");
+          syncPricingAuthButtons();
         }
       }
 
@@ -1570,7 +1593,7 @@
               await startPricingCheckout(selectedPricingPlan);
             }
           } else {
-            setPricingStatus("checkoutStatusChoosePlan");
+            setPricingStatus("checkoutStatusSelected", false, { plan: pricingPlanLabel(selectedPricingPlan) });
           }
         }
       }
