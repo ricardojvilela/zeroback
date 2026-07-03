@@ -118,3 +118,4 @@ Interpretation:
 - Public SEO/proof/use-case pages now include a consistent social preview image, improving link presentation in directories, communities and manual outreach.
 - The sitemap now includes `lastmod` dates for all public URLs, helping search crawlers notice the updated commercial pages.
 - Manual recovery templates in `/admin` now match the link-plus-checklist lead capture and default recovery checkout links to the founder plan.
+- Five new qualified ecommerce/product-photo prospects were added to the outreach CSV as ready proof-page candidates, staged for a small domain-safe batch after support replies are checked.

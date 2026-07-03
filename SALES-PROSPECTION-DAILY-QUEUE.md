@@ -1,19 +1,19 @@
 # BatchCutout - daily prospecting queue
 
-Updated: 2026-07-02
+Updated: 2026-07-03
 
 ## Current pipeline
 
-- Total prospects: 93.
-- Ready for domain email: 0.
-- Ready with proof-page email variant: 0.
+- Total prospects: 98.
+- Ready for domain email: 5.
+- Ready with proof-page email variant: 5.
 - Already contacted: 69.
 - Blocked or not usable: 24.
 - Follow-ups due next: 2026-07-06, 2026-07-07 and 2026-07-08.
 
 ## Today's rule
 
-The domain sent 13 proof-page direct emails on 2026-07-02. Do not send more direct outreach today. Next action is monitoring replies and preparing the 2026-07-06, 2026-07-07 and 2026-07-08 follow-ups.
+Five new qualified prospects were added on 2026-07-03 as `ready` with the proof-page variant. Before sending, check `support@batchcutout.com` replies in `/admin`; if there are no negative signals or unresolved replies, send at most these 5 new prospects as the next small warm-up batch.
 
 Recommended cap while the domain is still warming:
 
@@ -39,6 +39,14 @@ These were sent through `support@batchcutout.com` with the `/customer-results/` 
 11. Off Grid Soap Company - bath and body - `offgridsoapcompany@gmail.com`
 12. Nairi Handmade Jewelry - jewelry - `nairihandmadejewelry@gmail.com`
 13. Bee Creative PDX - jewelry - `beecreativepdx@gmail.com`
+
+## Ready proof-page prospects added on 2026-07-03
+
+1. HAMA Pottery - handmade ceramics - `hamapottery@gmail.com`
+2. Pots Jubilee - handmade ceramics - `hels8bells@gmail.com`
+3. Atelier Boa Hora - handmade ceramics - `atelierboahora@gmail.com`
+4. Cat Socrates - gifts and home decor - `hello.catsocrates@gmail.com`
+5. Rustic Metalz - custom gifts and home decor - `rusticmetalz@gmail.com`
 
 ## Daily operating routine
 
