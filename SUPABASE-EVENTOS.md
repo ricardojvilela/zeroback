@@ -99,6 +99,9 @@ Receita:
 - `event_label` guarda o `checkout.session.id`, para reduzir duplicacao em replays do webhook.
 - `value` guarda o valor pago em euros.
 - `detail` guarda IDs Stripe, plano, moeda e atribuicao UTM.
+- `pro_checkout_session_failed`
+- Criado pela API de checkout quando a criacao da sessao Stripe falha depois de haver utilizador autenticado.
+- Ajuda a diagnosticar cliques/contas que nao chegam a abrir Stripe por erro de configuracao, API, customer ou preço.
 - `pro_payment_failed`
 - Criado pelo webhook Stripe quando uma fatura de subscricao falha o pagamento.
 - `event_label` guarda o `invoice.id`; `value` guarda o valor em risco em euros.

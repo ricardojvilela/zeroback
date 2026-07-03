@@ -50,6 +50,7 @@ function emptyDay(date) {
     checkoutCancelledReturns: 0,
     checkoutContinueErrors: 0,
     checkoutSessionsCreated: 0,
+    checkoutSessionFailures: 0,
     checkoutLinkEmailsSent: 0,
     checkoutLinkEmailClicks: 0,
     checkoutLinkEmailFailures: 0,
@@ -167,6 +168,7 @@ function emptySourceRow(source) {
     checkoutCancelledReturns: 0,
     checkoutContinueErrors: 0,
     checkoutSessionsCreated: 0,
+    checkoutSessionFailures: 0,
     checkoutLinkEmailsSent: 0,
     checkoutLinkEmailClicks: 0,
     checkoutLinkEmailFailures: 0,
@@ -420,6 +422,10 @@ export default async function handler(request, response) {
         case "pro_checkout_session_created":
           row.checkoutSessionsCreated += 1;
           sourceRow.checkoutSessionsCreated += 1;
+          break;
+        case "pro_checkout_session_failed":
+          row.checkoutSessionFailures += 1;
+          sourceRow.checkoutSessionFailures += 1;
           break;
         case "checkout_link_email_sent":
           row.checkoutLinkEmailsSent += 1;

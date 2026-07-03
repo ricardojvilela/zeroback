@@ -346,6 +346,37 @@ async function recordCheckoutSessionCreated(settings, { user, profile, session, 
   await insertCheckoutEvent(settings, row);
 }
 
+async function recordCheckoutSessionFailed(settings, { user = null, profile = null, plan = "unknown", attribution = {}, reason = "", stage = "checkout_session" }) {
+  if (!settings.supabaseUrl || !settings.serviceRoleKey) return;
+
+  const detail = {
+    ...attribution,
+    stripe_customer_id: profile?.stripe_customer_id || "",
+    supabase_user_id: user?.id || "",
+    email: normalizeEmail(user?.email || profile?.email || ""),
+    plan,
+    price_plan: plan,
+    reason: metadataString(reason, 300),
+    stage,
+  };
+
+  await insertCheckoutEvent(settings, {
+    event_name: "pro_checkout_session_failed",
+    event_category: "commercial_intent",
+    event_label: metadataString(plan || stage, 120),
+    page_path: metadataString(attribution.page_path, 500),
+    page_location: metadataString(attribution.page_location, 1000),
+    language: metadataString(attribution.language, 20),
+    session_id: metadataString(attribution.session_id, 80),
+    visitor_id: metadataString(attribution.visitor_id, 80),
+    source: metadataString(attribution.utm_source || attribution.source || attribution.last_source || attribution.first_source, 160),
+    campaign: metadataString(attribution.utm_campaign || attribution.campaign || attribution.last_campaign || attribution.first_campaign, 160),
+    value: 0,
+    detail,
+    occurred_at: new Date().toISOString(),
+  });
+}
+
 async function recordCheckoutLinkEmail(settings, { eventName, user, profile, session, plan, attribution, to, reason = "", resendId = "" }) {
   const detail = {
     ...attribution,
@@ -481,20 +512,38 @@ export default async function handler(request, response) {
     return sendJson(response, 401, { ok: false, error: "missing_access_token" });
   }
 
+  let user = null;
+  let profile = null;
+  let plan = "monthly";
+  let attribution = {};
+
   try {
-    const user = await getSupabaseUser(settings, accessToken);
+    user = await getSupabaseUser(settings, accessToken);
     if (!user?.id) {
       return sendJson(response, 401, { ok: false, error: "invalid_access_token" });
     }
 
     const body = await readRequestBody(request);
-    const { plan, priceId } = getStripePriceId(body?.plan);
-    const attribution = sanitizeAttribution(body?.attribution);
+    const selectedPrice = getStripePriceId(body?.plan);
+    plan = selectedPrice.plan;
+    const priceId = selectedPrice.priceId;
+    attribution = sanitizeAttribution(body?.attribution);
     if (!priceId) {
+      try {
+        await recordCheckoutSessionFailed(settings, {
+          user,
+          plan,
+          attribution,
+          reason: "stripe_price_not_configured",
+          stage: "price_lookup",
+        });
+      } catch {
+        // Checkout response should still report the configuration failure.
+      }
       return sendJson(response, 503, { ok: false, error: "stripe_price_not_configured", plan });
     }
 
-    let profile = await loadOrCreateProfile(settings, user);
+    profile = await loadOrCreateProfile(settings, user);
     let customerId = profile.stripe_customer_id;
 
     if (!customerId) {
@@ -556,6 +605,17 @@ export default async function handler(request, response) {
       customerId: profile.stripe_customer_id || customerId,
     });
   } catch (error) {
+    try {
+      await recordCheckoutSessionFailed(settings, {
+        user,
+        profile,
+        plan,
+        attribution,
+        reason: error instanceof Error ? error.message : "unknown_error",
+      });
+    } catch {
+      // Preserve the checkout error response even if analytics storage fails.
+    }
     return sendJson(response, 500, {
       ok: false,
       error: "checkout_session_failed",
