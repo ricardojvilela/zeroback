@@ -55,6 +55,10 @@ function emptyDay(date) {
     checkoutLinkEmailFailures: 0,
     paidSubscriptions: 0,
     revenue: 0,
+    paymentFailures: 0,
+    paymentFailureValue: 0,
+    subscriptionCancelScheduled: 0,
+    subscriptionCanceled: 0,
     accountSignupStarts: 0,
     accountSignupFailures: 0,
     accountSignups: 0,
@@ -168,6 +172,10 @@ function emptySourceRow(source) {
     checkoutLinkEmailFailures: 0,
     paidSubscriptions: 0,
     revenue: 0,
+    paymentFailures: 0,
+    paymentFailureValue: 0,
+    subscriptionCancelScheduled: 0,
+    subscriptionCanceled: 0,
     accountSignupStarts: 0,
     accountSignupFailures: 0,
     accountSignups: 0,
@@ -430,6 +438,20 @@ export default async function handler(request, response) {
           sourceRow.paidSubscriptions += 1;
           row.revenue += Number(event.value || 0) || 0;
           sourceRow.revenue += Number(event.value || 0) || 0;
+          break;
+        case "pro_payment_failed":
+          row.paymentFailures += 1;
+          sourceRow.paymentFailures += 1;
+          row.paymentFailureValue += Number(event.value || 0) || 0;
+          sourceRow.paymentFailureValue += Number(event.value || 0) || 0;
+          break;
+        case "pro_subscription_cancel_scheduled":
+          row.subscriptionCancelScheduled += 1;
+          sourceRow.subscriptionCancelScheduled += 1;
+          break;
+        case "pro_subscription_canceled":
+          row.subscriptionCanceled += 1;
+          sourceRow.subscriptionCanceled += 1;
           break;
         case "account_signup_started":
           row.accountSignupStarts += 1;

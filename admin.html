@@ -700,6 +700,22 @@
             <strong id="liveRevenue">0 EUR</strong>
           </article>
           <article class="live-card">
+            <span>Pagamentos falhados</span>
+            <strong id="livePaymentFailures">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Valor falhado</span>
+            <strong id="livePaymentFailureValue">0 EUR</strong>
+          </article>
+          <article class="live-card">
+            <span>Cancel. agendados</span>
+            <strong id="liveSubscriptionCancelScheduled">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Canceladas</span>
+            <strong id="liveSubscriptionCanceledEvents">0</strong>
+          </article>
+          <article class="live-card">
             <span>Checkout sem login</span>
             <strong id="liveCheckoutLoginRequired">0</strong>
           </article>
@@ -1499,6 +1515,10 @@
         document.querySelector("#liveCheckoutLinkEmailFailures").textContent = totals.checkoutLinkEmailFailures || 0;
         document.querySelector("#livePaidSubscriptions").textContent = totals.paidSubscriptions || 0;
         document.querySelector("#liveRevenue").textContent = formatCurrency(totals.revenue || 0);
+        document.querySelector("#livePaymentFailures").textContent = totals.paymentFailures || 0;
+        document.querySelector("#livePaymentFailureValue").textContent = formatCurrency(totals.paymentFailureValue || 0);
+        document.querySelector("#liveSubscriptionCancelScheduled").textContent = totals.subscriptionCancelScheduled || 0;
+        document.querySelector("#liveSubscriptionCanceledEvents").textContent = totals.subscriptionCanceled || 0;
         document.querySelector("#liveCheckoutLoginRequired").textContent = totals.checkoutLoginRequired || 0;
         document.querySelector("#liveAccountSignupStarts").textContent = totals.accountSignupStarts || 0;
         document.querySelector("#liveAccountSignupFailures").textContent = totals.accountSignupFailures || 0;

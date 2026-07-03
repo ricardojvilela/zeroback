@@ -99,6 +99,15 @@ Receita:
 - `event_label` guarda o `checkout.session.id`, para reduzir duplicacao em replays do webhook.
 - `value` guarda o valor pago em euros.
 - `detail` guarda IDs Stripe, plano, moeda e atribuicao UTM.
+- `pro_payment_failed`
+- Criado pelo webhook Stripe quando uma fatura de subscricao falha o pagamento.
+- `event_label` guarda o `invoice.id`; `value` guarda o valor em risco em euros.
+- `pro_subscription_cancel_scheduled`
+- Criado pelo webhook Stripe quando uma subscricao ativa fica marcada para cancelar no fim do periodo.
+- `event_label` guarda o `subscription.id`, para evitar duplicacao de eventos repetidos.
+- `pro_subscription_canceled`
+- Criado pelo webhook Stripe quando uma subscricao termina/cancela efetivamente.
+- `event_label` guarda o `subscription.id`.
 - `pro_purchase_conversion_sent`
 - Criado pelo browser depois de `/api/sync-checkout-session` confirmar uma sessao Stripe paga no regresso do checkout.
 - Serve para auditar o envio da conversao paga para Google Ads/GA4 e alimentar o sinal `paid_customer`.

@@ -73,6 +73,31 @@ function subscriptionAmountCents(subscription) {
   }, 0);
 }
 
+function stripeObjectId(value) {
+  if (!value) return "";
+  if (typeof value === "string") return asText(value, 120);
+  return asText(value.id, 120);
+}
+
+function stripeCustomerId(value) {
+  return stripeObjectId(value);
+}
+
+function stripeCustomerEmail(value) {
+  if (!value) return "";
+  if (typeof value === "string") return "";
+  return normalizeEmail(value.email || "");
+}
+
+function invoiceSubscriptionId(invoice) {
+  return stripeObjectId(
+    invoice?.subscription ||
+      invoice?.parent?.subscription_details?.subscription ||
+      invoice?.lines?.data?.[0]?.subscription ||
+      "",
+  );
+}
+
 function checkoutAmountCents(session, subscription) {
   const sessionAmount = Number(session?.amount_total || 0) || 0;
   return sessionAmount || subscriptionAmountCents(subscription);
@@ -300,6 +325,85 @@ async function recordProWelcomeEvent(settings, tableName, eventName, session, de
   });
 }
 
+async function recordRevenueRiskEvent(settings, event, eventName, eventLabel, detail = {}, value = 0) {
+  const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
+  const label = asText(eventLabel, 120);
+  if (!label) return { stored: false, skipped: true, reason: "missing_event_label" };
+  if (await eventAlreadyStored(settings, tableName, eventName, label)) {
+    return { stored: false, skipped: true, reason: "already_stored" };
+  }
+
+  await insertWebhookEvent(settings, tableName, {
+    event_name: eventName,
+    event_category: "revenue",
+    event_label: label,
+    page_path: "",
+    page_location: "",
+    language: asText(detail.language, 20),
+    session_id: asText(detail.session_id, 80),
+    visitor_id: asText(detail.visitor_id, 80),
+    source: "stripe",
+    campaign: "subscription_lifecycle",
+    free_limit: null,
+    value: Number(value || 0) || 0,
+    detail,
+    occurred_at: new Date(Number(event?.created || Date.now() / 1000) * 1000).toISOString(),
+  });
+
+  return { stored: true, skipped: false };
+}
+
+async function recordInvoicePaymentFailure(settings, event) {
+  const invoice = event.data.object;
+  const amountCents = Number(invoice?.amount_remaining || invoice?.amount_due || 0) || 0;
+  const currency = asText(invoice?.currency || "eur", 20);
+  const detail = {
+    stripe_event_id: asText(event?.id, 120),
+    stripe_invoice_id: asText(invoice?.id, 120),
+    stripe_subscription_id: invoiceSubscriptionId(invoice),
+    stripe_customer_id: stripeCustomerId(invoice?.customer),
+    customer_email: normalizeEmail(invoice?.customer_email || stripeCustomerEmail(invoice?.customer) || ""),
+    amount_cents: amountCents,
+    currency: currency.toUpperCase(),
+    attempt_count: Number(invoice?.attempt_count || 0) || 0,
+    next_payment_attempt: invoice?.next_payment_attempt ? new Date(Number(invoice.next_payment_attempt) * 1000).toISOString() : "",
+    hosted_invoice_url: asText(invoice?.hosted_invoice_url, 500),
+  };
+
+  return recordRevenueRiskEvent(settings, event, "pro_payment_failed", detail.stripe_invoice_id || event?.id, detail, amountCents / 100);
+}
+
+async function recordSubscriptionRiskEvent(settings, event, subscription) {
+  const subscriptionId = asText(subscription?.id, 120);
+  const status = asText(subscription?.status, 80);
+  const metadata = subscription?.metadata || {};
+  const detail = {
+    stripe_event_id: asText(event?.id, 120),
+    stripe_subscription_id: subscriptionId,
+    stripe_customer_id: stripeCustomerId(subscription?.customer),
+    customer_email: stripeCustomerEmail(subscription?.customer),
+    plan: asText(metadata.batchcutout_price_plan || "", 80),
+    status,
+    cancel_at_period_end: Boolean(subscription?.cancel_at_period_end),
+    current_period_end: subscription?.current_period_end ? new Date(Number(subscription.current_period_end) * 1000).toISOString() : "",
+    canceled_at: subscription?.canceled_at ? new Date(Number(subscription.canceled_at) * 1000).toISOString() : "",
+    ended_at: subscription?.ended_at ? new Date(Number(subscription.ended_at) * 1000).toISOString() : "",
+    language: asText(metadata.language, 20),
+    session_id: asText(metadata.session_id, 80),
+    visitor_id: asText(metadata.visitor_id, 80),
+  };
+
+  if (event.type === "customer.subscription.deleted" || status === "canceled") {
+    return recordRevenueRiskEvent(settings, event, "pro_subscription_canceled", subscriptionId, detail, 0);
+  }
+
+  if (subscription?.cancel_at_period_end) {
+    return recordRevenueRiskEvent(settings, event, "pro_subscription_cancel_scheduled", subscriptionId, detail, 0);
+  }
+
+  return { stored: false, skipped: true, reason: "not_revenue_risk" };
+}
+
 async function sendProWelcomeEmail(settings, event, session, subscription, profile = null) {
   const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
   const sessionId = asText(session?.id, 120);
@@ -429,7 +533,21 @@ async function handleStripeEvent(event) {
       event.type === "customer.subscription.updated" ||
       event.type === "customer.subscription.deleted"
     ) {
-      await updateProfileFromSubscription(settings, event.data.object);
+      const subscription = event.data.object;
+      await updateProfileFromSubscription(settings, subscription);
+      try {
+        await recordSubscriptionRiskEvent(settings, event, subscription);
+      } catch (error) {
+        console.error("BatchCutout subscription risk event failed", error);
+      }
+    }
+
+    if (event.type === "invoice.payment_failed") {
+      try {
+        await recordInvoicePaymentFailure(settings, event);
+      } catch (error) {
+        console.error("BatchCutout payment failure event failed", error);
+      }
     }
 
     return webhookJson(200, { ok: true, received: true });
