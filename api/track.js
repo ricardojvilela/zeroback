@@ -39,6 +39,7 @@ const allowedEvents = new Set([
   "account_signup_failed",
   "account_login_succeeded",
   "account_login_failed",
+  "partner_referral_copy",
 ]);
 
 const allowedEmailDomains = new Set(["batchcutout.com"]);

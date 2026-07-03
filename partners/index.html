@@ -183,6 +183,8 @@
     </main>
     <script>
       const partnerCopyStatus = document.querySelector("#partnerCopyStatus");
+      const partnerVisitorStorageKey = "batchcutout_visitor_id";
+      const partnerSessionStorageKey = "batchcutout_session_id";
 
       async function copyPartnerText(text) {
         if (navigator.clipboard?.writeText) {
@@ -190,6 +192,53 @@
           return true;
         }
         return false;
+      }
+
+      function getPartnerStableId(storage, key) {
+        try {
+          const existing = storage.getItem(key);
+          if (existing) return existing;
+          const next = crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+          storage.setItem(key, next);
+          return next;
+        } catch {
+          return "";
+        }
+      }
+
+      function trackPartnerCopy(targetId) {
+        const detail = {
+          event_category: "commercial_intent",
+          event_label: targetId,
+          source: "partners_page",
+          page_path: window.location.pathname,
+          page_location: window.location.href.split("#")[0],
+          language: document.documentElement.lang || "pt-PT",
+        };
+        window.gtag?.("event", "partner_referral_copy", detail);
+
+        const payload = JSON.stringify({
+          name: "partner_referral_copy",
+          detail,
+          visitorId: getPartnerStableId(localStorage, partnerVisitorStorageKey),
+          sessionId: getPartnerStableId(sessionStorage, partnerSessionStorageKey),
+        });
+
+        try {
+          if (navigator.sendBeacon) {
+            const sent = navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" }));
+            if (sent) return;
+          }
+        } catch {
+          // Ignore measurement transport errors.
+        }
+
+        fetch("/api/track", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload,
+          keepalive: true,
+        }).catch(() => {});
       }
 
       document.querySelectorAll("[data-copy-target]").forEach((button) => {
@@ -203,11 +252,7 @@
             if (!copied) throw new Error("copy_failed");
             button.textContent = "Copiado";
             if (partnerCopyStatus) partnerCopyStatus.textContent = "Pronto para partilhar.";
-            window.gtag?.("event", "partner_referral_copy", {
-              event_category: "commercial_intent",
-              event_label: button.dataset.copyTarget,
-              source: "partners_page",
-            });
+            trackPartnerCopy(button.dataset.copyTarget);
           } catch {
             if (partnerCopyStatus) partnerCopyStatus.textContent = "Selecione e copie manualmente.";
           } finally {

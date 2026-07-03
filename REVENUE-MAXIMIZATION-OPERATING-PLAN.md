@@ -88,3 +88,4 @@ Interpretation:
 - Account signup/login failures are now tracked and surfaced in the admin funnel, making authentication friction visible before the checkout-start step.
 - The partner page now gives partners a ready-to-copy tracked referral link and client message, reducing the need to request a manual link before sharing BatchCutout.
 - Lead autoreplies, recovery templates, outreach docs and directory profile links now point to the founder plan selected in the pricing checkout, reducing clicks from warm intent to payment.
+- Partner referral link/message copy actions are now stored in the internal funnel, so partner-page intent is measurable beyond Google events.

@@ -407,7 +407,7 @@
 
       table {
         width: 100%;
-        min-width: 1320px;
+        min-width: 1400px;
         border-collapse: collapse;
         background: #fff;
       }
@@ -690,6 +690,10 @@
           <article class="live-card">
             <span>Auto email falhou</span>
             <strong id="liveLeadAutoreplyFailures">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Cópias parceiro</span>
+            <strong id="livePartnerReferralCopies">0</strong>
           </article>
           <article class="live-card">
             <span>Conta sem checkout</span>
@@ -997,6 +1001,7 @@
                   <th>Logins</th>
                   <th>Logins falhados</th>
                   <th>Leads</th>
+                  <th>Parceiros</th>
                   <th>Checkouts</th>
                   <th>Pagas</th>
                   <th>Receita</th>
@@ -1005,7 +1010,7 @@
               </thead>
               <tbody id="sourceRowsBody">
                 <tr>
-                  <td class="empty" colspan="20">A carregar origens.</td>
+                  <td class="empty" colspan="21">A carregar origens.</td>
                 </tr>
               </tbody>
             </table>
@@ -1032,6 +1037,7 @@
                 <th>Logins</th>
                 <th>Logins falhados</th>
                 <th>Leads</th>
+                <th>Parceiros</th>
                 <th>Checkouts</th>
                 <th>Pagas</th>
                 <th>Receita</th>
@@ -1040,7 +1046,7 @@
             </thead>
             <tbody id="liveRowsBody">
               <tr>
-                <td class="empty" colspan="21">A carregar atividade.</td>
+                <td class="empty" colspan="22">A carregar atividade.</td>
               </tr>
             </tbody>
           </table>
@@ -1431,6 +1437,7 @@
         document.querySelector("#liveLeadCaptures").textContent = totals.leadCaptures || 0;
         document.querySelector("#liveLeadAutoreplies").textContent = totals.leadAutorepliesSent || 0;
         document.querySelector("#liveLeadAutoreplyFailures").textContent = totals.leadAutorepliesFailed || 0;
+        document.querySelector("#livePartnerReferralCopies").textContent = totals.partnerReferralCopies || 0;
         document.querySelector("#liveBillingPortalOpens").textContent = totals.billingPortalOpens || 0;
         const accountEntrants = (totals.accountSignups || 0) + (totals.accountLogins || 0);
         document.querySelector("#liveAccountCheckoutGap").textContent = Math.max(accountEntrants - (totals.checkoutStarts || 0), 0);
@@ -1456,6 +1463,7 @@
                   <td>${row.accountLogins || 0}</td>
                   <td>${row.accountLoginFailures || 0}</td>
                   <td>${row.leadCaptures || 0}</td>
+                  <td>${row.partnerReferralCopies || 0}</td>
                   <td>${row.checkoutStarts || 0}</td>
                   <td>${row.paidSubscriptions || 0}</td>
                   <td>${formatCurrency(row.revenue || 0)}</td>
@@ -1463,7 +1471,7 @@
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="21">Ainda não existem eventos reais no período.</td></tr>`;
+          : `<tr><td class="empty" colspan="22">Ainda não existem eventos reais no período.</td></tr>`;
 
         sourceRowsBody.innerHTML = data.sourceBreakdown?.length
           ? data.sourceBreakdown.map((row) => `
@@ -1484,13 +1492,14 @@
                 <td>${row.accountLogins || 0}</td>
                 <td>${row.accountLoginFailures || 0}</td>
                 <td>${row.leadCaptures || 0}</td>
+                <td>${row.partnerReferralCopies || 0}</td>
                 <td>${row.checkoutStarts || 0}</td>
                 <td>${row.paidSubscriptions || 0}</td>
                 <td>${formatCurrency(row.revenue || 0)}</td>
                 <td>${row.billingPortalOpens || 0}</td>
               </tr>
             `).join("")
-          : `<tr><td class="empty" colspan="20">Ainda não existem origens identificadas.</td></tr>`;
+          : `<tr><td class="empty" colspan="21">Ainda não existem origens identificadas.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "";
         liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Última atualização: ${generatedAt}`;
