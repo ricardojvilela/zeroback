@@ -198,6 +198,39 @@ function emptySourceRow(source) {
   };
 }
 
+function landingPageFromEvent(event, detail) {
+  const directPath = asCleanText(detail.page_path || event.page_path, 500);
+  if (directPath) return directPath;
+
+  const location = asCleanText(detail.page_location || event.page_location, 1000);
+  if (!location) return "";
+
+  try {
+    const url = new URL(location);
+    return `${url.pathname}${url.search}`.slice(0, 500);
+  } catch {
+    return "";
+  }
+}
+
+function emptyLandingPageRow(pagePath) {
+  return {
+    pagePath,
+    pageTitle: "",
+    visitors: 0,
+    views: 0,
+    ctaClicks: 0,
+    toolClicks: 0,
+    pricingClicks: 0,
+    internalClicks: 0,
+    externalClicks: 0,
+    checkoutPlanClicks: 0,
+    intentClicks: 0,
+    ctaRate: 0,
+    pricingRate: 0,
+  };
+}
+
 function verifyAdminToken(request) {
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (!adminPassword) return false;
@@ -256,7 +289,7 @@ export default async function handler(request, response) {
   const since = new Date(Date.now() - (days - 1) * 24 * 60 * 60 * 1000);
   since.setHours(0, 0, 0, 0);
   const query = new URLSearchParams({
-    select: "event_name,visitor_id,value,detail,source,campaign,occurred_at",
+    select: "event_name,visitor_id,value,detail,source,campaign,page_path,page_location,occurred_at",
     occurred_at: `gte.${since.toISOString()}`,
     order: "occurred_at.asc",
   });
@@ -295,6 +328,8 @@ export default async function handler(request, response) {
     const visitorsByDay = new Map();
     const bySource = new Map();
     const visitorsBySource = new Map();
+    const byLandingPage = new Map();
+    const visitorsByLandingPage = new Map();
 
     for (const event of events) {
       const date = toIsoDate(event.occurred_at);
@@ -315,6 +350,35 @@ export default async function handler(request, response) {
       if (event.visitor_id) visitorsBySource.get(sourceName).add(event.visitor_id);
 
       if (event.visitor_id) visitorsByDay.get(date).add(event.visitor_id);
+
+      if (event.event_name === "seo_landing_view" || event.event_name === "seo_landing_cta_clicked") {
+        const landingPath = landingPageFromEvent(event, detail);
+        if (landingPath) {
+          if (!byLandingPage.has(landingPath)) byLandingPage.set(landingPath, emptyLandingPageRow(landingPath));
+          if (!visitorsByLandingPage.has(landingPath)) visitorsByLandingPage.set(landingPath, new Set());
+
+          const landingRow = byLandingPage.get(landingPath);
+          const title = asCleanText(detail.page_title, 160);
+          if (title && !landingRow.pageTitle) landingRow.pageTitle = title;
+          if (event.visitor_id) visitorsByLandingPage.get(landingPath).add(event.visitor_id);
+
+          if (event.event_name === "seo_landing_view") {
+            landingRow.views += 1;
+          } else {
+            landingRow.ctaClicks += 1;
+            if (detail.target === "tool") {
+              landingRow.toolClicks += 1;
+            } else if (detail.target === "pricing") {
+              landingRow.pricingClicks += 1;
+              if (detail.checkout_plan) landingRow.checkoutPlanClicks += 1;
+            } else if (detail.target === "external") {
+              landingRow.externalClicks += 1;
+            } else {
+              landingRow.internalClicks += 1;
+            }
+          }
+        }
+      }
 
       switch (event.event_name) {
         case "seo_landing_view":
@@ -534,6 +598,13 @@ export default async function handler(request, response) {
     for (const [source, visitors] of visitorsBySource) {
       bySource.get(source).visitors = visitors.size;
     }
+    for (const [pagePath, visitors] of visitorsByLandingPage) {
+      const landingRow = byLandingPage.get(pagePath);
+      landingRow.visitors = visitors.size;
+      landingRow.intentClicks = landingRow.toolClicks + landingRow.pricingClicks;
+      landingRow.ctaRate = landingRow.views ? landingRow.ctaClicks / landingRow.views : 0;
+      landingRow.pricingRate = landingRow.views ? landingRow.pricingClicks / landingRow.views : 0;
+    }
 
     const rows = Array.from(byDay.values()).sort((a, b) => a.date.localeCompare(b.date));
     const totals = rows.reduce((acc, row) => {
@@ -553,6 +624,16 @@ export default async function handler(request, response) {
         b.events - a.events
       )
       .slice(0, 20);
+    const landingBreakdown = Array.from(byLandingPage.values())
+      .sort((a, b) =>
+        b.pricingClicks - a.pricingClicks ||
+        b.toolClicks - a.toolClicks ||
+        b.ctaClicks - a.ctaClicks ||
+        b.views - a.views ||
+        b.visitors - a.visitors ||
+        a.pagePath.localeCompare(b.pagePath)
+      )
+      .slice(0, 20);
 
     return sendJson(response, 200, {
       ok: true,
@@ -561,6 +642,7 @@ export default async function handler(request, response) {
       rows,
       totals,
       sourceBreakdown,
+      landingBreakdown,
       generatedAt: new Date().toISOString(),
     });
   } catch (error) {

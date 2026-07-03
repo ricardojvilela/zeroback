@@ -71,11 +71,22 @@
     }).catch(() => {});
   }
 
-  function targetFor(link) {
+  function targetDetail(link) {
     const url = new URL(link.href, window.location.origin);
-    if (url.pathname.startsWith("/pricing")) return "pricing";
-    if (url.hash === "#tool" || url.href.includes("#tool")) return "tool";
-    return url.origin === window.location.origin ? "internal" : "external";
+    const params = new URLSearchParams(url.search);
+    let target = url.origin === window.location.origin ? "internal" : "external";
+    if (url.pathname.startsWith("/pricing")) target = "pricing";
+    if (url.hash === "#tool" || url.href.includes("#tool")) target = "tool";
+
+    return {
+      target,
+      target_path: url.pathname,
+      target_hash: url.hash,
+      target_source: params.get("utm_source") || "",
+      target_medium: params.get("utm_medium") || "",
+      target_campaign: params.get("utm_campaign") || "",
+      checkout_plan: params.get("checkout_plan") || "",
+    };
   }
 
   function markPageViewOnce() {
@@ -98,7 +109,7 @@
     if (!link || !link.href) return;
     send("seo_landing_cta_clicked", {
       landing_type: "seo",
-      target: targetFor(link),
+      ...targetDetail(link),
       cta_text: link.textContent.replace(/\s+/g, " ").trim().slice(0, 120),
       cta_href: link.href,
     });

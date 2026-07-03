@@ -1102,6 +1102,36 @@
             </table>
           </div>
         </section>
+        <section class="source-live-block" aria-label="Páginas SEO com intenção">
+          <div class="panel-head compact">
+            <div>
+              <h3>Páginas SEO</h3>
+              <p class="note">Páginas ordenadas por cliques para pricing, teste da ferramenta e outros CTAs.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Página</th>
+                  <th>Visitantes</th>
+                  <th>Views</th>
+                  <th>CTA</th>
+                  <th>Teste</th>
+                  <th>Pricing</th>
+                  <th>Plano</th>
+                  <th>Taxa CTA</th>
+                  <th>Taxa pricing</th>
+                </tr>
+              </thead>
+              <tbody id="landingRowsBody">
+                <tr>
+                  <td class="empty" colspan="9">A carregar páginas SEO.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
         <div class="table-wrap">
           <table>
             <thead>
@@ -1138,7 +1168,7 @@
             </thead>
             <tbody id="liveRowsBody">
               <tr>
-                <td class="empty" colspan="26">A carregar atividade.</td>
+                <td class="empty" colspan="28">A carregar atividade.</td>
               </tr>
             </tbody>
           </table>
@@ -1154,6 +1184,7 @@
       const authError = document.querySelector("#authError");
       const liveRowsBody = document.querySelector("#liveRowsBody");
       const sourceRowsBody = document.querySelector("#sourceRowsBody");
+      const landingRowsBody = document.querySelector("#landingRowsBody");
       const proUsersRowsBody = document.querySelector("#proUsersRowsBody");
       const recoveryRowsBody = document.querySelector("#recoveryRowsBody");
       const recoverySummary = document.querySelector("#recoverySummary");
@@ -1223,6 +1254,10 @@
         } catch {
           return `${(Number(amount || 0) || 0).toFixed(2)} ${normalizedCurrency}`;
         }
+      }
+
+      function formatPercent(value) {
+        return `${Math.round((Number(value || 0) || 0) * 100)}%`;
       }
 
       function formatDate(value) {
@@ -1624,6 +1659,25 @@
               </tr>
             `).join("")
           : `<tr><td class="empty" colspan="27">Ainda não existem origens identificadas.</td></tr>`;
+
+        landingRowsBody.innerHTML = data.landingBreakdown?.length
+          ? data.landingBreakdown.map((row) => `
+              <tr>
+                <td>
+                  <strong>${escapeHtml(row.pagePath || "-")}</strong>
+                  ${row.pageTitle ? `<br><span class="note">${escapeHtml(row.pageTitle)}</span>` : ""}
+                </td>
+                <td>${row.visitors || 0}</td>
+                <td>${row.views || 0}</td>
+                <td>${row.ctaClicks || 0}</td>
+                <td>${row.toolClicks || 0}</td>
+                <td>${row.pricingClicks || 0}</td>
+                <td>${row.checkoutPlanClicks || 0}</td>
+                <td>${formatPercent(row.ctaRate)}</td>
+                <td>${formatPercent(row.pricingRate)}</td>
+              </tr>
+            `).join("")
+          : `<tr><td class="empty" colspan="9">Ainda não existem páginas SEO com eventos no período.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "";
         liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Última atualização: ${generatedAt}`;
@@ -2321,7 +2375,9 @@
             localStorage.removeItem(adminTokenExpiryStorageKey);
             document.body.classList.add("locked");
           }
-          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="19">Não foi possível carregar atividade.</td></tr>`;
+          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="28">Não foi possível carregar atividade.</td></tr>`;
+          sourceRowsBody.innerHTML = `<tr><td class="empty" colspan="27">Não foi possível carregar origens.</td></tr>`;
+          landingRowsBody.innerHTML = `<tr><td class="empty" colspan="9">Não foi possível carregar páginas SEO.</td></tr>`;
           proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar contas.</td></tr>`;
           recoveryRowsBody.innerHTML = `<tr><td class="empty" colspan="4">Não foi possível carregar oportunidades comerciais.</td></tr>`;
           outreachProspectsBody.innerHTML = `<tr><td class="empty" colspan="8">Não foi possível carregar prospects.</td></tr>`;
