@@ -2,6 +2,8 @@ import { Resend } from "resend";
 
 const allowedEvents = new Set([
   "tool_page_view",
+  "seo_landing_view",
+  "seo_landing_cta_clicked",
   "tool_drag_upload_intent",
   "tool_upload_started",
   "tool_upload_added",

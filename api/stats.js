@@ -26,6 +26,8 @@ function emptyDay(date) {
     date,
     visitors: 0,
     pageViews: 0,
+    seoLandingViews: 0,
+    seoLandingCtaClicks: 0,
     uploadsStarted: 0,
     imagesAccepted: 0,
     limitAttempts: 0,
@@ -139,6 +141,8 @@ function emptySourceRow(source) {
     source,
     visitors: 0,
     pageViews: 0,
+    seoLandingViews: 0,
+    seoLandingCtaClicks: 0,
     uploadsStarted: 0,
     imagesAccepted: 0,
     downloads: 0,
@@ -293,6 +297,23 @@ export default async function handler(request, response) {
       if (event.visitor_id) visitorsByDay.get(date).add(event.visitor_id);
 
       switch (event.event_name) {
+        case "seo_landing_view":
+          row.pageViews += 1;
+          row.seoLandingViews += 1;
+          sourceRow.pageViews += 1;
+          sourceRow.seoLandingViews += 1;
+          break;
+        case "seo_landing_cta_clicked":
+          row.seoLandingCtaClicks += 1;
+          sourceRow.seoLandingCtaClicks += 1;
+          if (detail.target === "pricing") {
+            row.pricingCtaClicks += 1;
+            sourceRow.pricingCtaClicks += 1;
+          } else if (detail.target === "tool") {
+            row.proClicks += 1;
+            sourceRow.proClicks += 1;
+          }
+          break;
         case "proof_page_view":
           row.pageViews += 1;
           row.proofPageViews += 1;

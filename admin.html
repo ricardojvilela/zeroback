@@ -620,6 +620,14 @@
             <strong id="liveDownloadReady">0</strong>
           </article>
           <article class="live-card">
+            <span>Landing SEO</span>
+            <strong id="liveSeoLandingViews">0</strong>
+          </article>
+          <article class="live-card">
+            <span>CTA SEO</span>
+            <strong id="liveSeoLandingCtaClicks">0</strong>
+          </article>
+          <article class="live-card">
             <span>Oferta pós-download</span>
             <strong id="livePostDownloadNext">0</strong>
           </article>
@@ -1024,6 +1032,8 @@
                   <th>Origem</th>
                   <th>Visitantes</th>
                   <th>Page views</th>
+                  <th>Landing SEO</th>
+                  <th>CTA SEO</th>
                   <th>Uploads</th>
                   <th>Imagens</th>
                   <th>Downloads</th>
@@ -1048,7 +1058,7 @@
               </thead>
               <tbody id="sourceRowsBody">
                 <tr>
-                  <td class="empty" colspan="23">A carregar origens.</td>
+                  <td class="empty" colspan="25">A carregar origens.</td>
                 </tr>
               </tbody>
             </table>
@@ -1061,6 +1071,8 @@
                 <th>Data</th>
                 <th>Visitantes</th>
                 <th>Page views</th>
+                <th>Landing SEO</th>
+                <th>CTA SEO</th>
                 <th>Uploads</th>
                 <th>Imagens</th>
                 <th>Limite</th>
@@ -1086,7 +1098,7 @@
             </thead>
             <tbody id="liveRowsBody">
               <tr>
-                <td class="empty" colspan="24">A carregar atividade.</td>
+                <td class="empty" colspan="26">A carregar atividade.</td>
               </tr>
             </tbody>
           </table>
@@ -1459,6 +1471,8 @@
         document.querySelector("#liveLimit").textContent = totals.limitAttempts || 0;
         document.querySelector("#liveDownloads").textContent = totals.downloads || 0;
         document.querySelector("#liveDownloadReady").textContent = totals.downloadReadyShown || 0;
+        document.querySelector("#liveSeoLandingViews").textContent = totals.seoLandingViews || 0;
+        document.querySelector("#liveSeoLandingCtaClicks").textContent = totals.seoLandingCtaClicks || 0;
         document.querySelector("#livePostDownloadNext").textContent = totals.postDownloadNextShown || 0;
         document.querySelector("#livePostDownloadFounder").textContent = totals.postDownloadFounderClicks || 0;
         document.querySelector("#livePostDownloadSaveLink").textContent = totals.postDownloadSaveLinkClicks || 0;
@@ -1498,6 +1512,8 @@
                   <td>${row.date}</td>
                   <td>${row.visitors}</td>
                   <td>${row.pageViews}</td>
+                  <td>${row.seoLandingViews || 0}</td>
+                  <td>${row.seoLandingCtaClicks || 0}</td>
                   <td>${row.uploadsStarted}</td>
                   <td>${row.imagesAccepted}</td>
                   <td>${row.limitAttempts}</td>
@@ -1522,7 +1538,7 @@
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="24">Ainda não existem eventos reais no período.</td></tr>`;
+          : `<tr><td class="empty" colspan="26">Ainda não existem eventos reais no período.</td></tr>`;
 
         sourceRowsBody.innerHTML = data.sourceBreakdown?.length
           ? data.sourceBreakdown.map((row) => `
@@ -1530,6 +1546,8 @@
                 <td>${escapeHtml(sourceLabel(row.source))}</td>
                 <td>${row.visitors || 0}</td>
                 <td>${row.pageViews || 0}</td>
+                <td>${row.seoLandingViews || 0}</td>
+                <td>${row.seoLandingCtaClicks || 0}</td>
                 <td>${row.uploadsStarted || 0}</td>
                 <td>${row.imagesAccepted || 0}</td>
                 <td>${row.downloads || 0}</td>
@@ -1552,7 +1570,7 @@
                 <td>${row.billingPortalOpens || 0}</td>
               </tr>
             `).join("")
-          : `<tr><td class="empty" colspan="23">Ainda não existem origens identificadas.</td></tr>`;
+          : `<tr><td class="empty" colspan="25">Ainda não existem origens identificadas.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "";
         liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Última atualização: ${generatedAt}`;
