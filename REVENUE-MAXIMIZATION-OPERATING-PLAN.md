@@ -129,3 +129,4 @@ Interpretation:
 - Prepared paused Google Ads import files for a Spanish product-photo/bulk background removal search campaign, ready for review without changing live spend.
 - Added Spanish recovery/onboarding email copy for lead autoreplies, checkout-continuation links, Pro welcome emails and manual lead follow-up templates.
 - Removed outdated "request Pro access" wording from localized batch-limit messages so all supported languages now point users toward choosing Pro directly.
+- Added English and Spanish legal/support pages and made pricing legal links switch by selected language, reducing checkout trust friction for non-Portuguese buyers.

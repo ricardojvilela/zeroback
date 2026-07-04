@@ -12,6 +12,14 @@ https://batchcutout.com/pricing/
 Contact:
 support@batchcutout.com
 
+Legal pages:
+- https://batchcutout.com/termos.html
+- https://batchcutout.com/en/terms.html
+- https://batchcutout.com/es/terminos.html
+- https://batchcutout.com/privacidade.html
+- https://batchcutout.com/en/privacy.html
+- https://batchcutout.com/es/privacidad.html
+
 Core positioning:
 - Remove backgrounds from product photos in batches.
 - Export transparent PNG files individually or as one organized ZIP.
