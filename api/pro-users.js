@@ -159,6 +159,27 @@ function subscriptionPricing(subscription) {
   };
 }
 
+function subscriptionAttribution(subscription) {
+  const customer = typeof subscription.customer === "object" && subscription.customer ? subscription.customer : {};
+  const metadata = {
+    ...(customer.metadata || {}),
+    ...(subscription.metadata || {}),
+  };
+  const source = cleanText(metadata.utm_source || metadata.source || metadata.last_source || metadata.first_source, 120);
+  const medium = cleanText(metadata.utm_medium || metadata.medium, 120);
+  const campaign = cleanText(metadata.utm_campaign || metadata.campaign || metadata.last_campaign || metadata.first_campaign, 160);
+  const content = cleanText(metadata.utm_content || metadata.content, 160);
+  const term = cleanText(metadata.utm_term || metadata.term, 160);
+  return {
+    source,
+    medium,
+    campaign,
+    content,
+    term,
+    language: cleanText(metadata.language, 20),
+  };
+}
+
 function hasProAccessProfile(profile = null) {
   return profile?.plan === "pro" && ["active", "manual"].includes(profile?.planStatus);
 }
@@ -242,6 +263,7 @@ function subscriptionBusinessType(subscription, profile = null) {
 function mapSubscription(subscription, profile = null) {
   const customer = getCustomer(subscription);
   const pricing = subscriptionPricing(subscription);
+  const attribution = subscriptionAttribution(subscription);
   const manualAccess = profile?.plan === "pro" && profile?.planStatus === "manual";
   const businessType = subscriptionBusinessType(subscription, profile);
 
@@ -269,6 +291,10 @@ function mapSubscription(subscription, profile = null) {
     batchLimit: profile?.batchLimit || 0,
     stripeDashboardUrl: `https://dashboard.stripe.com/subscriptions/${subscription.id}`,
     customerDashboardUrl: customer.id ? `https://dashboard.stripe.com/customers/${customer.id}` : "",
+    attribution,
+    attributionSource: attribution.source,
+    attributionMedium: attribution.medium,
+    attributionCampaign: attribution.campaign,
     ...pricing,
   };
 }
@@ -297,7 +323,9 @@ function summarizeSubscriptions(subscriptions) {
       unlinked: 0,
       review: 0,
     },
+    mrrBySource: [],
   };
+  const mrrBySource = new Map();
 
   for (const subscription of subscriptions) {
     const typeKey = subscription.businessType?.key || "review";
@@ -313,6 +341,17 @@ function summarizeSubscriptions(subscriptions) {
         } else {
           summary.renewing += 1;
           summary.mrrAmount += Number(subscription.monthlyAmount || 0) || 0;
+          const sourceKey = subscription.attributionSource || "sem origem";
+          const sourceRow = mrrBySource.get(sourceKey) || {
+            source: sourceKey,
+            campaign: subscription.attributionCampaign || "",
+            amount: 0,
+            count: 0,
+          };
+          sourceRow.amount += Number(subscription.monthlyAmount || 0) || 0;
+          sourceRow.count += 1;
+          if (!sourceRow.campaign && subscription.attributionCampaign) sourceRow.campaign = subscription.attributionCampaign;
+          mrrBySource.set(sourceKey, sourceRow);
         }
       }
     }
@@ -330,6 +369,8 @@ function summarizeSubscriptions(subscriptions) {
       summary.attention += 1;
     }
   }
+
+  summary.mrrBySource = Array.from(mrrBySource.values()).sort((a, b) => b.amount - a.amount || b.count - a.count);
 
   return summary;
 }

@@ -862,6 +862,7 @@
             </article>
           </div>
           <p class="live-status" id="subscriptionsStatus">A carregar subscrições...</p>
+          <p class="live-status" id="subscriptionSourceSummary">A carregar MRR por origem...</p>
           <div class="table-wrap">
             <table class="subscriptions-table">
               <thead>
@@ -873,12 +874,13 @@
                   <th>Valor</th>
                   <th>Renovação</th>
                   <th>Acesso BatchCutout</th>
+                  <th>Origem</th>
                   <th>Stripe</th>
                 </tr>
               </thead>
               <tbody id="subscriptionsRowsBody">
                 <tr>
-                  <td class="empty" colspan="8">A carregar subscrições.</td>
+                  <td class="empty" colspan="9">A carregar subscrições.</td>
                 </tr>
               </tbody>
             </table>
@@ -2030,6 +2032,10 @@
         document.querySelector("#decisionText").textContent = attentionCount
           ? `${attentionLabel}. ${nonRevenueRenewing ? `${nonRevenueText}. ` : ""}Verifique estados pendentes, contas manuais, cancelamentos ou contas sem ligação.`
           : `MRR pago renovável: ${mrrLabel}. As subscrições pagas a renovar estão ligadas ao acesso BatchCutout.`;
+        const mrrBySource = Array.isArray(summary.mrrBySource) ? summary.mrrBySource : [];
+        document.querySelector("#subscriptionSourceSummary").textContent = mrrBySource.length
+          ? `MRR por origem: ${mrrBySource.map((row) => `${sourceLabel(row.source)} ${formatCurrencyFromCents(row.amount || 0, summary.currency || "eur")} (${row.count || 0})`).join(" · ")}`
+          : "MRR por origem: ainda sem origem atribuída nas subscrições pagas.";
 
         subscriptionsRowsBody.innerHTML = data.subscriptions?.length
           ? data.subscriptions.map((subscription) => {
@@ -2049,6 +2055,9 @@
               const periodText = subscription.currentPeriodEnd
                 ? formatDate(subscription.currentPeriodEnd)
                 : formatDate(subscription.canceledAt);
+              const attributionSource = subscription.attributionSource || "-";
+              const attributionCampaign = subscription.attributionCampaign || "";
+              const attributionMedium = subscription.attributionMedium || "";
 
               return `
                 <tr>
@@ -2076,6 +2085,11 @@
                     ${linkSourceLabel ? `<span class="muted-small">${escapeHtml(linkSourceLabel)}</span>` : ""}
                   </td>
                   <td>
+                    ${escapeHtml(sourceLabel(attributionSource))}
+                    ${attributionCampaign ? `<span class="muted-small">${escapeHtml(attributionCampaign)}</span>` : ""}
+                    ${attributionMedium ? `<span class="muted-small">${escapeHtml(attributionMedium)}</span>` : ""}
+                  </td>
+                  <td>
                     <a class="subscription-link" href="${escapeHtml(subscription.stripeDashboardUrl)}" target="_blank" rel="noreferrer">Subscrição</a>
                     ${subscription.customerDashboardUrl ? `<span class="muted-small"><a class="subscription-link" href="${escapeHtml(subscription.customerDashboardUrl)}" target="_blank" rel="noreferrer">Cliente</a></span>` : ""}
                     ${subscription.status === "active" && !subscription.cancelAtPeriodEnd ? `<span class="muted-small"><button class="secondary" type="button" data-subscription-action="cancel-renewal" data-subscription-id="${escapeHtml(subscription.id)}">Cancelar renovação</button></span>` : ""}
@@ -2083,7 +2097,7 @@
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="8">Ainda não existem subscrições Stripe.</td></tr>`;
+          : `<tr><td class="empty" colspan="9">Ainda não existem subscrições Stripe.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString("pt-PT") : "";
         subscriptionsStatus.textContent = `${summary.total || 0} subscrições lidas. Última atualização: ${generatedAt}`;
@@ -2202,7 +2216,7 @@
           }
           renderSubscriptions(data);
         } catch {
-          subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="8">Não foi possível carregar subscrições Stripe.</td></tr>`;
+          subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="9">Não foi possível carregar subscrições Stripe.</td></tr>`;
           subscriptionsStatus.textContent = "Erro ao carregar Stripe. Verificar chave Stripe e permissão do admin.";
         }
       }
@@ -2439,7 +2453,7 @@
           recoveryRowsBody.innerHTML = `<tr><td class="empty" colspan="4">Não foi possível carregar oportunidades comerciais.</td></tr>`;
           outreachProspectsBody.innerHTML = `<tr><td class="empty" colspan="8">Não foi possível carregar prospects.</td></tr>`;
           supportRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar a caixa de suporte.</td></tr>`;
-          subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="8">Não foi possível carregar subscrições Stripe.</td></tr>`;
+          subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="9">Não foi possível carregar subscrições Stripe.</td></tr>`;
           liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variáveis Vercel.";
           subscriptionsStatus.textContent = "Erro ao carregar subscrições.";
         }
