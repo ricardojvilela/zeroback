@@ -136,3 +136,4 @@ Interpretation:
 - The main tool now localizes its Pro pricing and policy/legal links for EN/ES, avoiding Portuguese legal pages or pricing after users switch language in the app.
 - Added Spanish acquisition pages for Shopify, WooCommerce, Etsy, eBay and Amazon product-photo workflows, linked from the Spanish hub, sitemap, llms discovery and PT/EN hreflang clusters.
 - Prepared paused Spanish Google Ads import files for the new Shopify, WooCommerce, Etsy, eBay and Amazon landing pages without changing live spend.
+- Added Spanish alternative-intent SEO pages for remove.bg, Photoroom, Pixelcut and Canva, linked from the Spanish hub and product-photo page with hreflang/discovery support.
