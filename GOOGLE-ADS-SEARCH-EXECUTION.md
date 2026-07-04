@@ -181,6 +181,37 @@ Files prepared for Google Ads Editor or manual bulk import:
 - `google-ads-imports/batchcutout-competitor-responsive-ads.csv`
 - `google-ads-imports/batchcutout-competitor-negatives.csv`
 
+## Prepared Spanish campaign
+
+Status: prepared only. Do not import as active without Ricardo approving spend.
+
+Campaign:
+`Search - BatchCutout - ES - Producto Lote`
+
+Import files:
+
+- `google-ads-imports/batchcutout-spanish-product-campaign.csv`
+- `google-ads-imports/batchcutout-spanish-product-adgroups.csv`
+- `google-ads-imports/batchcutout-spanish-product-keywords.csv`
+- `google-ads-imports/batchcutout-spanish-product-rsa.csv`
+- `google-ads-imports/batchcutout-spanish-product-negatives.csv`
+
+Initial setup in the files:
+
+- Status: paused.
+- Budget: 2 EUR/day.
+- Language: Spanish.
+- Locations: Spain, United States, Mexico, Chile, Colombia.
+- Ad groups: `quitar fondo fotos producto` and `removedor fondos lote`.
+- Landing pages: `/es/quitar-fondo-fotos-producto-lote/` and `/es/`.
+- Conversion goal: use the same account-default subscription goal when imported.
+
+Activation rule:
+
+- Start only if the total Search budget remains at or below the approved limit, or if Ricardo explicitly approves a new budget.
+- Review after 48 hours or 20 clicks.
+- Keep only search terms that produce upload, download, Pro click, checkout start or paid subscription.
+
 ## First review
 
 Review after 48 hours from activation or 20 clicks, whichever comes first.

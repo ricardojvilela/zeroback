@@ -54,6 +54,15 @@ https://batchcutout.com/en/pixelcut-alternative-for-product-photos/?utm_source=g
 Canva alternative:
 https://batchcutout.com/en/canva-background-remover-alternative-for-product-photos/?utm_source=google_ads&utm_medium=cpc&utm_campaign=canva_alternative&utm_content=search
 
+Spanish hub:
+https://batchcutout.com/es/?utm_source=google_ads&utm_medium=cpc&utm_campaign=spanish_bulk_background_remover&utm_content=search
+
+Spanish product background remover:
+https://batchcutout.com/es/quitar-fondo-fotos-producto-lote/?utm_source=google_ads&utm_medium=cpc&utm_campaign=spanish_product_background_remover&utm_content=search
+
+Spanish pricing:
+https://batchcutout.com/pricing/?lang=es&utm_source=google_ads&utm_medium=cpc&utm_campaign=spanish_pro_pricing&utm_content=search
+
 ## Sitelinks
 
 Bulk Background Remover
@@ -75,6 +84,16 @@ Plans
 Description 1: Pro from EUR 15/month
 Description 2: Up to 100 images per batch
 URL: https://batchcutout.com/pricing/?lang=en&utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_pricing
+
+ES Fotos Producto
+Description 1: Quita fondos en lote
+Description 2: Exporta PNGs o ZIP
+URL: https://batchcutout.com/es/quitar-fondo-fotos-producto-lote/?utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_es_product
+
+ES Plan Fundador
+Description 1: Pro desde 15 EUR/mes
+Description 2: Hasta 100 imagenes por lote
+URL: https://batchcutout.com/pricing/?lang=es&utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_es_pricing
 
 ## Callouts
 
@@ -140,3 +159,15 @@ Every 48 hours:
 - Import/search execution files are in `GOOGLE-ADS-SEARCH-EXECUTION.md` and `google-ads-imports/`.
 - Do not use competitor names in ad headlines/descriptions. Keep them in keywords and factual landing pages.
 - Do not apply `[removebg]`, `[remove.bg]`, `[photoroom]`, `[pixelcut]` or `[canva]` as account-level negatives, otherwise the alternative campaign can be blocked.
+
+## Spanish Search assets
+
+Prepared campaign files are paused by default:
+
+- `google-ads-imports/batchcutout-spanish-product-campaign.csv`
+- `google-ads-imports/batchcutout-spanish-product-adgroups.csv`
+- `google-ads-imports/batchcutout-spanish-product-keywords.csv`
+- `google-ads-imports/batchcutout-spanish-product-rsa.csv`
+- `google-ads-imports/batchcutout-spanish-product-negatives.csv`
+
+Use the Spanish assets only for searches around product photos, transparent PNGs and batch background removal. Avoid broad design traffic.
