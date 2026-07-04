@@ -132,3 +132,4 @@ Interpretation:
 - Added English and Spanish legal/support pages and made pricing legal links switch by selected language, reducing checkout trust friction for non-Portuguese buyers.
 - Added subscription attribution in `/admin`: each Stripe subscription now shows source/campaign/medium and the subscriptions panel summarizes renewing MRR by origin.
 - Stripe Checkout success/cancel return URLs now preserve EN/ES language, so buyers return to the same localized experience after paying or abandoning checkout.
+- Manual recovery templates for account-created and checkout-not-paid prospects now support PT/ES variants and checkout recoveries choose the template from the stored checkout language.

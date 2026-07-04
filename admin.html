@@ -1382,17 +1382,31 @@
         const isPro = user.plan === "pro" || Number(user.monthlyLimit || 0) > 0;
         if (isPro) return "proof";
         if (user.plan === "free" && user.stripeCustomerId && !user.stripeSubscriptionId && hoursSince(user.updatedAt || user.createdAt) >= 24) {
-          return "checkout_not_paid";
+          return localizedRecoverySegment("checkout_not_paid", recoveryEmailLanguage(user));
         }
         if (user.plan === "free" && !user.stripeCustomerId && hoursSince(user.createdAt || user.updatedAt) >= 2) {
-          return "account_no_checkout";
+          return localizedRecoverySegment("account_no_checkout", recoveryEmailLanguage(user));
         }
         return "";
       }
 
-      function recoveryPlanUrl(plan = "early") {
+      function recoveryEmailLanguage(context = {}) {
+        const language = String(context.language || "").toLowerCase();
+        if (language.startsWith("pt")) return "pt";
+        if (language.startsWith("es")) return "es";
+        return "en";
+      }
+
+      function localizedRecoverySegment(baseSegment, language = "en") {
+        if (language === "pt") return `${baseSegment}_pt`;
+        if (language === "es") return `${baseSegment}_es`;
+        return baseSegment;
+      }
+
+      function recoveryPlanUrl(plan = "early", language = "en", campaign = "checkout_not_paid") {
         const checkoutPlan = ["early", "monthly", "annual"].includes(plan) ? plan : "early";
-        return `https://batchcutout.com/pricing/?lang=en&checkout_plan=${checkoutPlan}&utm_source=email&utm_medium=recovery&utm_campaign=checkout_not_paid#pricing-account-title`;
+        const langParam = language === "pt" ? "" : `lang=${encodeURIComponent(language)}&`;
+        return `https://batchcutout.com/pricing/?${langParam}checkout_plan=${checkoutPlan}&utm_source=email&utm_medium=recovery&utm_campaign=${encodeURIComponent(campaign)}#pricing-account-title`;
       }
 
       function recoveryCopy(segment, context = {}) {
@@ -1403,10 +1417,34 @@
             body: `Hi,\n\nYou created a BatchCutout account but did not choose a Pro plan yet.\n\nIf you are preparing product photos in batches, Pro unlocks:\n\n- Up to 100 images per batch\n- Up to 2,000 images per month\n- ZIP export for product workflows\n\nChoose the current founder plan here:\nhttps://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=account_no_checkout#pricing-account-title\n\nThanks,\nNexaFlow Labs`,
             reason: "Conta gratuita criada há mais de 2 horas sem cliente Stripe.",
           },
+          account_no_checkout_pt: {
+            label: "Conta sem checkout PT",
+            subject: "Concluir configuração do BatchCutout Pro",
+            body: `Ola,\n\nCriou uma conta BatchCutout mas ainda nao escolheu um plano Pro.\n\nSe esta a preparar fotos de produto em lote, o Pro desbloqueia:\n\n- Ate 100 imagens por lote\n- Ate 2.000 imagens por mes\n- Exportacao ZIP para fluxos de produto\n\nEscolha o plano fundador atual aqui:\n${recoveryPlanUrl("early", "pt", "account_no_checkout")}\n\nObrigado,\nNexaFlow Labs`,
+            reason: "Conta gratuita criada há mais de 2 horas sem cliente Stripe.",
+          },
+          account_no_checkout_es: {
+            label: "Cuenta sin checkout ES",
+            subject: "Completa la configuración de BatchCutout Pro",
+            body: `Hola,\n\nCreaste una cuenta BatchCutout pero todavia no elegiste un plan Pro.\n\nSi estas preparando fotos de producto en lote, Pro desbloquea:\n\n- Hasta 100 imagenes por lote\n- Hasta 2.000 imagenes al mes\n- Exportacion ZIP para flujos de producto\n\nElige el plan fundador actual aqui:\n${recoveryPlanUrl("early", "es", "account_no_checkout")}\n\nGracias,\nNexaFlow Labs`,
+            reason: "Conta gratuita criada há mais de 2 horas sem cliente Stripe.",
+          },
           checkout_not_paid: {
             label: "Checkout sem pagamento",
             subject: "Need help activating BatchCutout Pro?",
             body: `Hi,\n\nIt looks like you opened BatchCutout Pro checkout but did not complete payment.\n\nIf anything blocked you, reply to this email and we will help. The current Pro offer keeps the same limits:\n\n- 100 images per batch\n- 2,000 images per month\n- Monthly, founder, and annual billing options\n\nContinue checkout:\n${recoveryPlanUrl(context.plan)}\n\nThanks,\nNexaFlow Labs`,
+            reason: "Cliente Stripe criado, mas sem subscrição ativa após 24 horas.",
+          },
+          checkout_not_paid_pt: {
+            label: "Checkout sem pagamento PT",
+            subject: "Precisa de ajuda para ativar o BatchCutout Pro?",
+            body: `Ola,\n\nParece que abriu o checkout do BatchCutout Pro mas nao concluiu o pagamento.\n\nSe alguma coisa bloqueou a compra, responda a este email e ajudamos. A oferta Pro atual mantem os mesmos limites:\n\n- 100 imagens por lote\n- 2.000 imagens por mes\n- Opcoes mensal, fundador e anual\n\nContinuar checkout:\n${recoveryPlanUrl(context.plan, "pt", "checkout_not_paid")}\n\nObrigado,\nNexaFlow Labs`,
+            reason: "Cliente Stripe criado, mas sem subscrição ativa após 24 horas.",
+          },
+          checkout_not_paid_es: {
+            label: "Checkout sin pago ES",
+            subject: "¿Necesitas ayuda para activar BatchCutout Pro?",
+            body: `Hola,\n\nParece que abriste el checkout de BatchCutout Pro pero no completaste el pago.\n\nSi algo bloqueo la compra, responde a este email y te ayudamos. La oferta Pro actual mantiene los mismos limites:\n\n- 100 imagenes por lote\n- 2.000 imagenes al mes\n- Opciones mensual, fundador y anual\n\nContinuar checkout:\n${recoveryPlanUrl(context.plan, "es", "checkout_not_paid")}\n\nGracias,\nNexaFlow Labs`,
             reason: "Cliente Stripe criado, mas sem subscrição ativa após 24 horas.",
           },
           proof: {
@@ -1780,18 +1818,18 @@
         const checkoutRows = checkoutRecoveries
           .filter((checkout) => checkout.email && checkout.recoverable && !checkout.recoverySentAt)
           .filter((checkout) => !proEmails.has(String(checkout.email).toLowerCase()))
-          .filter((checkout) => !recoveryAlreadySent(checkout.email, "checkout_not_paid"))
+          .filter((checkout) => !recoveryAlreadySent(checkout.email, localizedRecoverySegment("checkout_not_paid", recoveryEmailLanguage(checkout))))
           .map((checkout) => ({
             type: "checkout",
             checkout,
             email: checkout.email || "",
-            segment: "checkout_not_paid",
+            segment: localizedRecoverySegment("checkout_not_paid", recoveryEmailLanguage(checkout)),
           }));
         const checkoutEmails = new Set(checkoutRows.map((row) => String(row.email || "").toLowerCase()).filter(Boolean));
         const userRows = recoveryUsers
           .map((user) => ({ type: "user", user, email: user.email || "", segment: recoverySegment(user) }))
           .filter((row) => row.segment)
-          .filter((row) => !(row.segment === "checkout_not_paid" && checkoutEmails.has(String(row.email || "").toLowerCase())))
+          .filter((row) => !(String(row.segment || "").startsWith("checkout_not_paid") && checkoutEmails.has(String(row.email || "").toLowerCase())))
           .filter((row) => !recoveryAlreadySent(row.email, row.segment));
         const leadRows = capturedLeads
           .filter((lead) => lead.email && !proEmails.has(String(lead.email).toLowerCase()))
@@ -1805,8 +1843,8 @@
           }))
           .filter((row) => !recoveryAlreadySent(row.email, row.segment));
         const rows = [...checkoutRows, ...userRows, ...leadRows];
-        const accountNoCheckout = rows.filter((row) => row.segment === "account_no_checkout").length;
-        const checkoutNotPaid = rows.filter((row) => row.segment === "checkout_not_paid").length;
+        const accountNoCheckout = rows.filter((row) => String(row.segment || "").startsWith("account_no_checkout")).length;
+        const checkoutNotPaid = rows.filter((row) => String(row.segment || "").startsWith("checkout_not_paid")).length;
         const leadCaptures = rows.filter((row) => row.segment === "lead_capture" || row.segment === "lead_capture_pt" || row.segment === "lead_capture_es").length;
         const autoLeadReplies = capturedLeads.filter((lead) => lead.autoReplySentAt).length;
         const proofCandidates = rows.filter((row) => row.segment === "proof").length;

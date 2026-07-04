@@ -755,8 +755,8 @@ async function listRecoveryEmails(settings) {
     emails,
     summary: {
       total: emails.length,
-      checkoutNotPaid: emails.filter((email) => email.segment === "checkout_not_paid").length,
-      accountNoCheckout: emails.filter((email) => email.segment === "account_no_checkout").length,
+      checkoutNotPaid: emails.filter((email) => String(email.segment || "").startsWith("checkout_not_paid")).length,
+      accountNoCheckout: emails.filter((email) => String(email.segment || "").startsWith("account_no_checkout")).length,
       leads: emails.filter((email) => email.segment === "lead_capture" || email.segment === "lead_capture_pt" || email.segment === "lead_capture_es").length,
       proof: emails.filter((email) => email.segment === "proof").length,
     },
@@ -785,6 +785,7 @@ function checkoutRecoveryFromEvent(event, profile, recoveryEvent = null) {
     stripeCustomerId: cleanText(detail.stripe_customer_id || profile?.stripeCustomerId || "", 160),
     source: cleanText(detail.utm_source || detail.source || event.source || detail.last_source || detail.first_source, 160),
     campaign: cleanText(event.campaign || detail.utm_campaign || detail.campaign || detail.last_campaign || detail.first_campaign, 160),
+    language: cleanText(detail.language, 20) || "en",
     pageLocation: cleanText(detail.page_location, 1000),
     createdAt,
     hoursSinceCreated: Math.round(hoursSinceCreated * 10) / 10,
@@ -843,10 +844,10 @@ async function listCheckoutRecoveries(settings) {
     }
 
     if (event.event_name === "recovery_email_sent") {
-      if (detail.segment === "checkout_not_paid" && stripeSessionId && !recoveryBySession.has(stripeSessionId)) {
+      if (String(detail.segment || "").startsWith("checkout_not_paid") && stripeSessionId && !recoveryBySession.has(stripeSessionId)) {
         recoveryBySession.set(stripeSessionId, event);
       }
-      if (detail.segment === "checkout_not_paid" && email && !recoveryByEmail.has(email)) {
+      if (String(detail.segment || "").startsWith("checkout_not_paid") && email && !recoveryByEmail.has(email)) {
         recoveryByEmail.set(email, event);
       }
       continue;
