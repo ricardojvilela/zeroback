@@ -87,6 +87,11 @@ const paidConversionStorageKey = "batchcutout_paid_conversion_sessions";
 const leadCaptureEmailStorageKey = "batchcutout_lead_capture_email";
 const leadCaptureDismissedStorageKey = "batchcutout_lead_capture_dismissed";
 const pendingCheckoutPlanStorageKey = "batchcutout_pending_checkout_plan";
+const localizedPolicyLinks = {
+  pt: "./privacidade.html",
+  en: "./en/privacy.html",
+  es: "./es/privacidad.html",
+};
 const serverEventNames = new Set([
   "tool_page_view",
   "tool_drag_upload_intent",
@@ -1710,6 +1715,14 @@ function applyLanguage() {
 
   for (const element of document.querySelectorAll("[data-i18n-placeholder]")) {
     element.setAttribute("placeholder", t(element.dataset.i18nPlaceholder));
+  }
+
+  const langParam = currentLanguage === "pt" ? "" : `lang=${encodeURIComponent(currentLanguage)}&`;
+  for (const element of document.querySelectorAll("[data-pricing-link]")) {
+    element.setAttribute("href", `./pricing/?${langParam}checkout_plan=early#pricing-account-title`);
+  }
+  for (const element of document.querySelectorAll("[data-policy-link]")) {
+    element.setAttribute("href", localizedPolicyLinks[currentLanguage] || localizedPolicyLinks.en);
   }
 
   languageSelect.value = currentLanguage;
