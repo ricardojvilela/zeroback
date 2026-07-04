@@ -9,6 +9,9 @@ Google Ads can target competitor searches with keywords, but keep competitor nam
 Reference:
 https://support.google.com/adspolicy/answer/6118
 
+Google Ads text limits used for prepared RSA assets:
+https://support.google.com/google-ads/answer/1704389
+
 ## Budget
 
 Do not increase total launch spend above 10 EUR/day yet.
@@ -195,6 +198,9 @@ Import files:
 - `google-ads-imports/batchcutout-spanish-product-keywords.csv`
 - `google-ads-imports/batchcutout-spanish-product-rsa.csv`
 - `google-ads-imports/batchcutout-spanish-product-negatives.csv`
+- `google-ads-imports/batchcutout-spanish-platform-adgroups.csv`
+- `google-ads-imports/batchcutout-spanish-platform-keywords.csv`
+- `google-ads-imports/batchcutout-spanish-platform-rsa.csv`
 
 Initial setup in the files:
 
@@ -202,8 +208,10 @@ Initial setup in the files:
 - Budget: 2 EUR/day.
 - Language: Spanish.
 - Locations: Spain, United States, Mexico, Chile, Colombia.
-- Ad groups: `quitar fondo fotos producto` and `removedor fondos lote`.
-- Landing pages: `/es/quitar-fondo-fotos-producto-lote/` and `/es/`.
+- Core ad groups: `quitar fondo fotos producto` and `removedor fondos lote`.
+- Prepared platform ad groups: `shopify fotos producto`, `woocommerce fotos producto`, `etsy fotos producto`, `ebay fotos producto` and `amazon fotos producto`.
+- Core landing pages: `/es/quitar-fondo-fotos-producto-lote/` and `/es/`.
+- Platform landing pages: `/es/quitar-fondo-fotos-shopify/`, `/es/quitar-fondo-fotos-woocommerce/`, `/es/quitar-fondo-fotos-etsy/`, `/es/quitar-fondo-fotos-ebay/` and `/es/quitar-fondo-fotos-amazon/`.
 - Conversion goal: use the same account-default subscription goal when imported.
 
 Activation rule:
