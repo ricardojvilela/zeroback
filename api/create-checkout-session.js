@@ -606,6 +606,8 @@ export default async function handler(request, response) {
     }
 
     const siteUrl = getSiteUrl();
+    const checkoutReturnLanguage = checkoutLanguage(attribution);
+    const checkoutReturnLangParam = checkoutReturnLanguage === "pt" ? "" : `lang=${encodeURIComponent(checkoutReturnLanguage)}&`;
     const metadata = {
       supabase_user_id: user.id,
       batchcutout_plan: "pro",
@@ -618,8 +620,8 @@ export default async function handler(request, response) {
       client_reference_id: user.id,
       line_items: [{ price: priceId, quantity: 1 }],
       allow_promotion_codes: true,
-      success_url: `${siteUrl}/?checkout=success&session_id={CHECKOUT_SESSION_ID}#accountTitle`,
-      cancel_url: `${siteUrl}/pricing/?checkout=cancelled&checkout_plan=${encodeURIComponent(plan)}#pricing-account-title`,
+      success_url: `${siteUrl}/?${checkoutReturnLangParam}checkout=success&session_id={CHECKOUT_SESSION_ID}#accountTitle`,
+      cancel_url: `${siteUrl}/pricing/?${checkoutReturnLangParam}checkout=cancelled&checkout_plan=${encodeURIComponent(plan)}#pricing-account-title`,
       subscription_data: {
         metadata,
       },
