@@ -126,7 +126,10 @@ function leadMailSettings() {
 }
 
 function leadLanguage(detail) {
-  return String(detail.language || "").toLowerCase().startsWith("pt") ? "pt" : "en";
+  const language = String(detail.language || "").toLowerCase();
+  if (language.startsWith("pt")) return "pt";
+  if (language.startsWith("es")) return "es";
+  return "en";
 }
 
 function leadAutoreplyCopy(language) {
@@ -149,6 +152,28 @@ function leadAutoreplyCopy(language) {
         "Depois do recorte, descarregue PNG para uma imagem ou ZIP para vários produtos.",
       ],
       bullets: ["100 imagens por lote", "2.000 imagens por mês", "PNG transparente e ZIP"],
+    };
+  }
+
+  if (language === "es") {
+    return {
+      subject: "Tu enlace y checklist de BatchCutout",
+      greeting: "Hola,",
+      toolUrl: "https://batchcutout.com/?lang=es&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply#tool",
+      pricingUrl: "https://batchcutout.com/pricing/?lang=es&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply#pricing-account-title",
+      intro: "Aqui tienes el enlace para volver a BatchCutout y preparar fotos de producto.",
+      checklistLine: "Checklist rapido para tu proximo lote:",
+      proLine: "Si necesitas repetir este flujo para catalogos, variantes o marketplaces, Pro desbloquea:",
+      cta: "Abrir BatchCutout",
+      pricingCta: "Ver planes Pro",
+      optOut: "Si esto no te resulta util, responde \"remover\" y no enviaremos seguimiento de producto.",
+      thanks: "Gracias,\nNexaFlow Labs",
+      checklistBullets: [
+        "Usa fotos donde el producto aparezca completo y sin cortes en los bordes.",
+        "Evita sombras muy fuertes o fondos con colores demasiado parecidos al producto.",
+        "Despues del recorte, descarga PNG para una imagen o ZIP para varios productos.",
+      ],
+      bullets: ["100 imagenes por lote", "2.000 imagenes al mes", "PNG transparente y ZIP"],
     };
   }
 

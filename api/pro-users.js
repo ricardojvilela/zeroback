@@ -716,7 +716,7 @@ async function listRecoveryEmails(settings) {
       total: emails.length,
       checkoutNotPaid: emails.filter((email) => email.segment === "checkout_not_paid").length,
       accountNoCheckout: emails.filter((email) => email.segment === "account_no_checkout").length,
-      leads: emails.filter((email) => email.segment === "lead_capture" || email.segment === "lead_capture_pt").length,
+      leads: emails.filter((email) => email.segment === "lead_capture" || email.segment === "lead_capture_pt" || email.segment === "lead_capture_es").length,
       proof: emails.filter((email) => email.segment === "proof").length,
     },
     generatedAt: new Date().toISOString(),

@@ -239,6 +239,22 @@ function proWelcomeCopy(language = "en") {
     };
   }
 
+  if (String(language || "").toLowerCase().startsWith("es")) {
+    return {
+      subject: "Tu BatchCutout Pro esta activo",
+      heading: "BatchCutout Pro esta activo",
+      intro: "Tu acceso Pro ya esta disponible.",
+      usage: "Puedes procesar hasta 100 imagenes por lote y hasta 2.000 imagenes al mes.",
+      next: "Empieza con un lote real de producto para confirmar tu flujo de PNG transparente y ZIP.",
+      toolCta: "Abrir BatchCutout",
+      pricingCta: "Gestionar plan",
+      tips: ["Arrastra un lote de fotos de producto.", "Quita fondos y descarga PNGs transparentes.", "Usa ZIP cuando quieras entregar o archivar el lote completo."],
+      footer: "NexaFlow Labs. Puedes gestionar el pago desde el panel de cuenta de BatchCutout.",
+      toolUrl: "https://batchcutout.com/?lang=es&utm_source=email&utm_medium=onboarding&utm_campaign=pro_welcome#tool",
+      pricingUrl: "https://batchcutout.com/pricing/?lang=es&utm_source=email&utm_medium=onboarding&utm_campaign=pro_welcome#pricing-account-title",
+    };
+  }
+
   return {
     subject: "Your BatchCutout Pro is active",
     heading: "BatchCutout Pro is active",

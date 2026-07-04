@@ -114,7 +114,10 @@ function checkoutMailSettings() {
 }
 
 function checkoutLanguage(attribution) {
-  return String(attribution.language || "").toLowerCase().startsWith("pt") ? "pt" : "en";
+  const language = String(attribution.language || "").toLowerCase();
+  if (language.startsWith("pt")) return "pt";
+  if (language.startsWith("es")) return "es";
+  return "en";
 }
 
 function checkoutPlanText(plan, language) {
@@ -122,6 +125,11 @@ function checkoutPlanText(plan, language) {
     if (plan === "annual") return "Pro anual - 190 EUR/ano";
     if (plan === "early") return "Plano fundador - 15 EUR/mes";
     return "Pro mensal - 19 EUR/mes";
+  }
+  if (language === "es") {
+    if (plan === "annual") return "Pro anual - 190 EUR/año";
+    if (plan === "early") return "Plan fundador - 15 EUR/mes";
+    return "Pro mensual - 19 EUR/mes";
   }
   if (plan === "annual") return "Annual Pro - EUR 190/year";
   if (plan === "early") return "Founder plan - EUR 15/month";
@@ -149,6 +157,24 @@ function checkoutLinkCopy({ language, plan, sessionUrl }) {
       note: "O botao retoma a mesma sessao segura do Stripe. Se ja concluiu o pagamento, pode ignorar este email.",
       support: "Se alguma coisa bloquear a ativacao, responda a este email.",
       thanks: "Obrigado,\nNexaFlow Labs",
+      sessionUrl,
+    };
+  }
+  if (language === "es") {
+    return {
+      subject: "Tu enlace seguro para completar BatchCutout Pro",
+      title: "Completar BatchCutout Pro",
+      intro: "Abriste el checkout de BatchCutout Pro. Si la pestaña de Stripe se cierra o quieres continuar en otro dispositivo, usa este enlace seguro:",
+      cta: "Completar pago",
+      planLine: `Plan: ${planText}`,
+      benefits: [
+        "Hasta 100 imagenes por lote",
+        "Hasta 2.000 imagenes al mes",
+        "PNG transparente y ZIP organizado para trabajo de producto",
+      ],
+      note: "El boton retoma la misma sesion segura de Stripe. Si ya completaste el pago, puedes ignorar este email.",
+      support: "Si algo bloquea la activacion, responde a este email.",
+      thanks: "Gracias,\nNexaFlow Labs",
       sessionUrl,
     };
   }
