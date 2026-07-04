@@ -119,3 +119,4 @@ Interpretation:
 - The sitemap now includes `lastmod` dates for all public URLs, helping search crawlers notice the updated commercial pages.
 - Manual recovery templates in `/admin` now match the link-plus-checklist lead capture and default recovery checkout links to the founder plan.
 - Five new qualified ecommerce/product-photo prospects were added to the outreach CSV as ready proof-page candidates, staged for a small domain-safe batch after support replies are checked.
+- Added an English Canva background remover alternative landing page focused on product-photo batches, transparent PNGs and ZIP export, with founder-plan CTAs and UTM tracking.
