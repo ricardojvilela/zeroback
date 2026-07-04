@@ -41,7 +41,7 @@ Documento interno para orientar testes pagos quando houver dados iniciais.
 - app download
 - tutorial
 - photoshop
-- canva
+- canva fora da campanha de alternativas
 - wallpaper
 - remove transparent background
 - no background png

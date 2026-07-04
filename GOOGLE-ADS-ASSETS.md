@@ -51,6 +51,9 @@ https://batchcutout.com/en/photoroom-alternative-for-ecommerce/?utm_source=googl
 Pixelcut alternative:
 https://batchcutout.com/en/pixelcut-alternative-for-product-photos/?utm_source=google_ads&utm_medium=cpc&utm_campaign=pixelcut_alternative&utm_content=search
 
+Canva alternative:
+https://batchcutout.com/en/canva-background-remover-alternative-for-product-photos/?utm_source=google_ads&utm_medium=cpc&utm_campaign=canva_alternative&utm_content=search
+
 ## Sitelinks
 
 Bulk Background Remover
@@ -136,4 +139,4 @@ Every 48 hours:
 - Exclude paid customers from acquisition campaigns when the `paid_customer` audience is large enough.
 - Import/search execution files are in `GOOGLE-ADS-SEARCH-EXECUTION.md` and `google-ads-imports/`.
 - Do not use competitor names in ad headlines/descriptions. Keep them in keywords and factual landing pages.
-- Do not apply `[removebg]`, `[remove.bg]`, `[photoroom]` or `[pixelcut]` as account-level negatives, otherwise the alternative campaign can be blocked.
+- Do not apply `[removebg]`, `[remove.bg]`, `[photoroom]`, `[pixelcut]` or `[canva]` as account-level negatives, otherwise the alternative campaign can be blocked.

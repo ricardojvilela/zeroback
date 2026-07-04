@@ -154,10 +154,11 @@ Decision rules:
 
 ## Executed growth work - competitor intent and recovery
 
-- Added 3 English competitor-intent pages:
+- Added 4 English competitor-intent pages:
   - `/en/remove-bg-alternative-for-bulk-product-photos/`
   - `/en/photoroom-alternative-for-ecommerce/`
   - `/en/pixelcut-alternative-for-product-photos/`
+  - `/en/canva-background-remover-alternative-for-product-photos/`
 - Added those pages to `sitemap.xml` and linked them from the English product-photo page.
 - Expanded `CUSTOMER-RECOVERY-EMAILS.md` with recovery segments, PT/EN copy, sender setup, and opt-out language.
 - Added ready-to-use HTML recovery/onboarding email templates in `/emails/`.

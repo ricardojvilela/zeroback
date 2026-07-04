@@ -98,9 +98,27 @@ Keywords:
 - "pixelcut background remover"
 - "pixelcut bulk background remover"
 
+### Canva alternative
+
+Landing page:
+https://batchcutout.com/en/canva-background-remover-alternative-for-product-photos/?utm_source=google_ads&utm_medium=cpc&utm_campaign=canva_alternative&utm_content=search
+
+Keywords:
+
+- [canva background remover alternative]
+- [canva alternative for product photos]
+- [canva product photo background remover]
+- [canva bulk background remover]
+- [canva background remover ecommerce]
+- [canva pro background remover alternative]
+- "canva background remover alternative"
+- "canva product photo background remover"
+- "canva bulk background remover"
+- "canva alternative product photos"
+
 ## Ad copy
 
-Do not use remove.bg, Photoroom, or Pixelcut in the ad text.
+Do not use remove.bg, Photoroom, Pixelcut, or Canva in the ad text.
 
 Headlines:
 
@@ -126,7 +144,7 @@ Descriptions:
 
 ## Negative keyword handling
 
-Do not add `[removebg]`, `[remove.bg]`, `[photoroom]`, or `[pixelcut]` as account-level negatives. They can block this campaign.
+Do not add `[removebg]`, `[remove.bg]`, `[photoroom]`, `[pixelcut]`, or `[canva]` as account-level negatives. They can block this campaign.
 
 Use competitor-name negatives only inside non-alternative campaigns if those campaigns start wasting spend on competitor searches.
 
@@ -145,6 +163,14 @@ Keep these negatives on the alternatives campaign:
 - video background
 - passport photo
 - logo maker
+- presentation
+- resume
+- template
+- templates
+- poster
+- flyer
+- font
+- logo design
 
 ## Import files
 
