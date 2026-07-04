@@ -1,6 +1,6 @@
 # BatchCutout - revenue maximization operating plan
 
-Updated: 2026-07-03
+Updated: 2026-07-04
 
 ## Objective
 
@@ -123,3 +123,4 @@ Interpretation:
 - English ecommerce and product-photo pages now link internally to the Canva alternative page, giving the new acquisition page crawl support from relevant existing content.
 - Added a Portuguese Canva alternative landing page and linked it from relevant Portuguese product-photo pages, expanding the same competitor-intent acquisition route to Portuguese users.
 - Prepared the Canva alternative ad group in Google Ads documentation/import files with competitor-safe ad copy, targeted keywords and generic-design negatives.
+- Added a Spanish ecommerce landing page for "quitar fondo de fotos de producto en lote", linked with hreflang from the Portuguese and English product-photo pages and added to sitemap/LLM discovery.
