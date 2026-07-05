@@ -1,6 +1,6 @@
 # BatchCutout - directory submission kit
 
-Updated: 2026-07-03
+Updated: 2026-07-05
 
 Use this kit for Product Hunt, Uneed, BetaList, SaaSHub, Indie Hackers and AI/ecommerce tool directories.
 
@@ -59,14 +59,17 @@ https://batchcutout.com/launch/?utm_source=saashub&utm_medium=directory&utm_camp
 Indie Hackers:
 https://batchcutout.com/launch/?utm_source=indie_hackers&utm_medium=community&utm_campaign=directory_launch
 
-Pricing:
-https://batchcutout.com/pricing/?checkout_plan=early&utm_source=directory&utm_medium=profile&utm_campaign=directory_launch#pricing-account-title
+Secondary links:
 
-Proof page:
-https://batchcutout.com/en/customer-results/?utm_source=directory&utm_medium=profile&utm_campaign=directory_launch
+| Platform | Pricing | Proof page | Partner page |
+| --- | --- | --- | --- |
+| Product Hunt | `https://batchcutout.com/pricing/?checkout_plan=early&utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch#pricing-account-title` | `https://batchcutout.com/en/customer-results/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch` | `https://batchcutout.com/partners/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch` |
+| Uneed | `https://batchcutout.com/pricing/?checkout_plan=early&utm_source=uneed&utm_medium=directory&utm_campaign=directory_launch#pricing-account-title` | `https://batchcutout.com/en/customer-results/?utm_source=uneed&utm_medium=directory&utm_campaign=directory_launch` | `https://batchcutout.com/partners/?utm_source=uneed&utm_medium=directory&utm_campaign=directory_launch` |
+| BetaList | `https://batchcutout.com/pricing/?checkout_plan=early&utm_source=betalist&utm_medium=directory&utm_campaign=directory_launch#pricing-account-title` | `https://batchcutout.com/en/customer-results/?utm_source=betalist&utm_medium=directory&utm_campaign=directory_launch` | `https://batchcutout.com/partners/?utm_source=betalist&utm_medium=directory&utm_campaign=directory_launch` |
+| SaaSHub | `https://batchcutout.com/pricing/?checkout_plan=early&utm_source=saashub&utm_medium=directory&utm_campaign=directory_launch#pricing-account-title` | `https://batchcutout.com/en/customer-results/?utm_source=saashub&utm_medium=directory&utm_campaign=directory_launch` | `https://batchcutout.com/partners/?utm_source=saashub&utm_medium=directory&utm_campaign=directory_launch` |
+| Indie Hackers | `https://batchcutout.com/pricing/?checkout_plan=early&utm_source=indie_hackers&utm_medium=community&utm_campaign=directory_launch#pricing-account-title` | `https://batchcutout.com/en/customer-results/?utm_source=indie_hackers&utm_medium=community&utm_campaign=directory_launch` | `https://batchcutout.com/partners/?utm_source=indie_hackers&utm_medium=community&utm_campaign=directory_launch` |
 
-Partner page:
-https://batchcutout.com/partners/?utm_source=directory&utm_medium=profile&utm_campaign=directory_launch
+Use the platform-specific row whenever a directory allows extra pricing, proof or partner links. Avoid generic `utm_source=directory` links because they hide the acquisition source in `/admin`.
 
 ## Assets
 

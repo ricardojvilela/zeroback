@@ -27,7 +27,7 @@ Primary URL:
 https://batchcutout.com/launch/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch
 
 Pricing URL:
-https://batchcutout.com/pricing/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch
+https://batchcutout.com/pricing/?checkout_plan=early&utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch#pricing-account-title
 
 Partner/proof URL:
 https://batchcutout.com/en/customer-results/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch
@@ -67,6 +67,7 @@ Before submitting:
 On launch day:
 
 - Submit with UTM links for the directory.
+- Use platform-specific pricing and proof links from `DIRECTORY-SUBMISSION-KIT.md`; do not use generic directory UTMs.
 - Reply manually to comments.
 - Check `/admin` for uploads, leads, Pro clicks and checkouts every few hours.
 - Do not raise ad spend until launch traffic shows uploads or plan clicks.
