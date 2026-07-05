@@ -141,3 +141,5 @@ Interpretation:
 - Added Portuguese alternative-intent SEO pages for remove.bg, Photoroom and Pixelcut, linked from Portuguese product-photo pages with PT/EN/ES hreflang and discovery support.
 - Prepared a paused Portuguese Google Ads alternatives campaign for remove.bg, Photoroom, Pixelcut and Canva queries, with competitor names kept out of ad copy and no live spend changes.
 - Added visible FAQ blocks and FAQPage structured data to Portuguese alternative pages to reduce pre-upgrade objections and improve search result eligibility.
+- Added a dedicated `/launch/` directory landing page with source-specific CTAs and tracking for Product Hunt, Uneed, BetaList, SaaSHub and Indie Hackers traffic.
+- Added an English `/en/customer-results/` proof page so international directory visitors can inspect examples without switching to Portuguese.

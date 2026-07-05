@@ -45,22 +45,25 @@ bulk background remover, product photo background remover, ecommerce product pho
 ## Links with UTM
 
 Product Hunt:
-https://batchcutout.com/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch#tool
+https://batchcutout.com/launch/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch
 
 Uneed:
-https://batchcutout.com/?utm_source=uneed&utm_medium=directory&utm_campaign=directory_launch#tool
+https://batchcutout.com/launch/?utm_source=uneed&utm_medium=directory&utm_campaign=directory_launch
 
 BetaList:
-https://batchcutout.com/?utm_source=betalist&utm_medium=directory&utm_campaign=directory_launch#tool
+https://batchcutout.com/launch/?utm_source=betalist&utm_medium=directory&utm_campaign=directory_launch
 
 SaaSHub:
-https://batchcutout.com/?utm_source=saashub&utm_medium=directory&utm_campaign=directory_launch#tool
+https://batchcutout.com/launch/?utm_source=saashub&utm_medium=directory&utm_campaign=directory_launch
 
 Indie Hackers:
-https://batchcutout.com/?utm_source=indie_hackers&utm_medium=community&utm_campaign=directory_launch#tool
+https://batchcutout.com/launch/?utm_source=indie_hackers&utm_medium=community&utm_campaign=directory_launch
 
 Pricing:
 https://batchcutout.com/pricing/?checkout_plan=early&utm_source=directory&utm_medium=profile&utm_campaign=directory_launch#pricing-account-title
+
+Proof page:
+https://batchcutout.com/en/customer-results/?utm_source=directory&utm_medium=profile&utm_campaign=directory_launch
 
 Partner page:
 https://batchcutout.com/partners/?utm_source=directory&utm_medium=profile&utm_campaign=directory_launch
@@ -90,7 +93,7 @@ First comment:
 Use the Product Hunt maker comment below.
 
 Primary link:
-https://batchcutout.com/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch#tool
+https://batchcutout.com/launch/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch
 
 Pricing link:
 https://batchcutout.com/pricing/?checkout_plan=early&utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch#pricing-account-title
@@ -107,7 +110,7 @@ Problem solved:
 Small ecommerce teams often repeat the same background-removal task across catalog, variant and marketplace photos. BatchCutout makes that workflow direct: upload, remove background, review, export.
 
 Link:
-https://batchcutout.com/?utm_source=uneed&utm_medium=directory&utm_campaign=directory_launch#tool
+https://batchcutout.com/launch/?utm_source=uneed&utm_medium=directory&utm_campaign=directory_launch
 
 ### BetaList
 
@@ -118,7 +121,7 @@ Market:
 Ecommerce sellers, catalog teams, product photographers, marketplace sellers and small agencies.
 
 Link:
-https://batchcutout.com/?utm_source=betalist&utm_medium=directory&utm_campaign=directory_launch#tool
+https://batchcutout.com/launch/?utm_source=betalist&utm_medium=directory&utm_campaign=directory_launch
 
 ### SaaSHub
 
@@ -129,7 +132,7 @@ Alternative positioning:
 A focused alternative to generic background remover tools when the job is repeated ecommerce product batches.
 
 Link:
-https://batchcutout.com/?utm_source=saashub&utm_medium=directory&utm_campaign=directory_launch#tool
+https://batchcutout.com/launch/?utm_source=saashub&utm_medium=directory&utm_campaign=directory_launch
 
 ## Product Hunt maker comment
 
@@ -165,7 +168,7 @@ Free users can test 2 images without a card. Pro unlocks 100 images per batch an
 I am looking for feedback from sellers, VAs, product photographers and small agencies who prepare repeated catalog or marketplace photos.
 
 Link:
-https://batchcutout.com/?utm_source=indie_hackers&utm_medium=community&utm_campaign=directory_launch#tool
+https://batchcutout.com/launch/?utm_source=indie_hackers&utm_medium=community&utm_campaign=directory_launch
 
 ## Reply snippets
 

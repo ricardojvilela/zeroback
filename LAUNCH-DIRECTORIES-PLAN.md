@@ -24,13 +24,13 @@ Short description:
 Remove backgrounds from product photos in batches and export transparent PNGs or one organized ZIP. Built for Shopify, WooCommerce, Etsy, eBay, Amazon sellers and small ecommerce teams.
 
 Primary URL:
-https://batchcutout.com/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch#tool
+https://batchcutout.com/launch/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch
 
 Pricing URL:
 https://batchcutout.com/pricing/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch
 
 Partner/proof URL:
-https://batchcutout.com/customer-results/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch
+https://batchcutout.com/en/customer-results/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch
 
 ## Product Hunt assets
 
@@ -58,7 +58,8 @@ I would especially like feedback from Shopify, WooCommerce, Etsy, eBay and Amazo
 Before submitting:
 
 - Confirm homepage and pricing work on mobile.
-- Confirm `https://batchcutout.com/customer-results/` is live.
+- Confirm `https://batchcutout.com/launch/` works on mobile.
+- Confirm `https://batchcutout.com/en/customer-results/` is live.
 - Social image ready: `assets/social-preview.png` (1200x630).
 - Prepare one short screen recording of upload -> remove background -> ZIP export.
 - Make sure support email is monitored on launch day.
