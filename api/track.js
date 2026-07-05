@@ -51,6 +51,8 @@ const allowedEvents = new Set([
   "partner_referral_copy",
   "proof_page_view",
   "proof_cta_clicked",
+  "directory_launch_page_view",
+  "directory_launch_cta_clicked",
 ]);
 
 const allowedEmailDomains = new Set(["batchcutout.com"]);

@@ -1096,6 +1096,8 @@
                   <th>Page views</th>
                   <th>Landing SEO</th>
                   <th>CTA SEO</th>
+                  <th>Lanç.</th>
+                  <th>CTA lanç.</th>
                   <th>Uploads</th>
                   <th>Imagens</th>
                   <th>Downloads</th>
@@ -1122,7 +1124,7 @@
               </thead>
               <tbody id="sourceRowsBody">
                 <tr>
-                  <td class="empty" colspan="27">A carregar origens.</td>
+                  <td class="empty" colspan="29">A carregar origens.</td>
                 </tr>
               </tbody>
             </table>
@@ -1167,6 +1169,8 @@
                 <th>Page views</th>
                 <th>Landing SEO</th>
                 <th>CTA SEO</th>
+                <th>Lanç.</th>
+                <th>CTA lanç.</th>
                 <th>Uploads</th>
                 <th>Imagens</th>
                 <th>Limite</th>
@@ -1692,6 +1696,8 @@
                   <td>${row.pageViews}</td>
                   <td>${row.seoLandingViews || 0}</td>
                   <td>${row.seoLandingCtaClicks || 0}</td>
+                  <td>${row.directoryLaunchPageViews || 0}</td>
+                  <td>${row.directoryLaunchCtaClicks || 0}</td>
                   <td>${row.uploadsStarted}</td>
                   <td>${row.imagesAccepted}</td>
                   <td>${row.limitAttempts}</td>
@@ -1718,7 +1724,7 @@
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="28">Ainda não existem eventos reais no período.</td></tr>`;
+          : `<tr><td class="empty" colspan="30">Ainda não existem eventos reais no período.</td></tr>`;
 
         sourceRowsBody.innerHTML = data.sourceBreakdown?.length
           ? data.sourceBreakdown.map((row) => `
@@ -1728,6 +1734,8 @@
                 <td>${row.pageViews || 0}</td>
                 <td>${row.seoLandingViews || 0}</td>
                 <td>${row.seoLandingCtaClicks || 0}</td>
+                <td>${row.directoryLaunchPageViews || 0}</td>
+                <td>${row.directoryLaunchCtaClicks || 0}</td>
                 <td>${row.uploadsStarted || 0}</td>
                 <td>${row.imagesAccepted || 0}</td>
                 <td>${row.downloads || 0}</td>
@@ -1752,7 +1760,7 @@
                 <td>${row.billingPortalOpens || 0}</td>
               </tr>
             `).join("")
-          : `<tr><td class="empty" colspan="27">Ainda não existem origens identificadas.</td></tr>`;
+          : `<tr><td class="empty" colspan="29">Ainda não existem origens identificadas.</td></tr>`;
 
         landingRowsBody.innerHTML = data.landingBreakdown?.length
           ? data.landingBreakdown.map((row) => `

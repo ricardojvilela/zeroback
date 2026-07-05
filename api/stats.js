@@ -28,6 +28,8 @@ function emptyDay(date) {
     pageViews: 0,
     seoLandingViews: 0,
     seoLandingCtaClicks: 0,
+    directoryLaunchPageViews: 0,
+    directoryLaunchCtaClicks: 0,
     uploadsStarted: 0,
     imagesAccepted: 0,
     limitAttempts: 0,
@@ -128,13 +130,13 @@ function classifySource(event, detail) {
   }
   if (raw.includes("saashub")) return "SaaSHub";
   if (raw.includes("uneed")) return "Uneed";
-  if (raw.includes("betalist") || raw.includes("beta list")) return "BetaList";
-  if (raw.includes("indiehackers") || raw.includes("indie hackers")) return "Indie Hackers";
+  if (raw.includes("betalist") || raw.includes("beta list") || raw.includes("beta_list")) return "BetaList";
+  if (raw.includes("indiehackers") || raw.includes("indie hackers") || raw.includes("indie_hackers")) return "Indie Hackers";
   if (raw.includes("zearches")) return "Zearches";
   if (raw.includes("listai")) return "ListAI";
   if (raw.includes("thenextai") || raw.includes("the next ai")) return "The Next AI";
   if (raw.includes("future-pedia") || raw.includes("futurepedia")) return "Future-pedia";
-  if (raw.includes("producthunt") || raw.includes("product hunt")) return "Product Hunt";
+  if (raw.includes("producthunt") || raw.includes("product hunt") || raw.includes("product_hunt")) return "Product Hunt";
   if (raw.includes("facebook") || raw.includes("fbclid")) return "Facebook";
   if (raw.includes("reddit")) return "Reddit";
   if (raw.includes("linkedin")) return "LinkedIn";
@@ -154,6 +156,8 @@ function emptySourceRow(source) {
     pageViews: 0,
     seoLandingViews: 0,
     seoLandingCtaClicks: 0,
+    directoryLaunchPageViews: 0,
+    directoryLaunchCtaClicks: 0,
     uploadsStarted: 0,
     imagesAccepted: 0,
     downloads: 0,
@@ -355,7 +359,12 @@ export default async function handler(request, response) {
 
       if (event.visitor_id) visitorsByDay.get(date).add(event.visitor_id);
 
-      if (event.event_name === "seo_landing_view" || event.event_name === "seo_landing_cta_clicked") {
+      if ([
+        "seo_landing_view",
+        "seo_landing_cta_clicked",
+        "directory_launch_page_view",
+        "directory_launch_cta_clicked",
+      ].includes(event.event_name)) {
         const landingPath = landingPageFromEvent(event, detail);
         if (landingPath) {
           if (!byLandingPage.has(landingPath)) byLandingPage.set(landingPath, emptyLandingPageRow(landingPath));
@@ -366,7 +375,7 @@ export default async function handler(request, response) {
           if (title && !landingRow.pageTitle) landingRow.pageTitle = title;
           if (event.visitor_id) visitorsByLandingPage.get(landingPath).add(event.visitor_id);
 
-          if (event.event_name === "seo_landing_view") {
+          if (event.event_name === "seo_landing_view" || event.event_name === "directory_launch_page_view") {
             landingRow.views += 1;
           } else {
             landingRow.ctaClicks += 1;
@@ -394,6 +403,23 @@ export default async function handler(request, response) {
         case "seo_landing_cta_clicked":
           row.seoLandingCtaClicks += 1;
           sourceRow.seoLandingCtaClicks += 1;
+          if (detail.target === "pricing") {
+            row.pricingCtaClicks += 1;
+            sourceRow.pricingCtaClicks += 1;
+          } else if (detail.target === "tool") {
+            row.proClicks += 1;
+            sourceRow.proClicks += 1;
+          }
+          break;
+        case "directory_launch_page_view":
+          row.pageViews += 1;
+          row.directoryLaunchPageViews += 1;
+          sourceRow.pageViews += 1;
+          sourceRow.directoryLaunchPageViews += 1;
+          break;
+        case "directory_launch_cta_clicked":
+          row.directoryLaunchCtaClicks += 1;
+          sourceRow.directoryLaunchCtaClicks += 1;
           if (detail.target === "pricing") {
             row.pricingCtaClicks += 1;
             sourceRow.pricingCtaClicks += 1;
