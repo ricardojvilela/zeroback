@@ -3511,10 +3511,41 @@ progress::-moz-progress-bar {
   }
 
   .landing-comparison {
-    overflow-x: auto;
+    overflow: hidden;
+  }
+
+  .landing-table,
+  .landing-table tbody,
+  .landing-table tr,
+  .landing-table td {
+    display: block;
+    width: 100%;
   }
 
   .landing-table {
-    min-width: 620px;
+    min-width: 0;
+  }
+
+  .landing-table thead {
+    display: none;
+  }
+
+  .landing-table tr {
+    border-top: 1px solid rgba(219, 227, 238, 0.9);
+    padding: 14px 16px;
+  }
+
+  .landing-table th,
+  .landing-table td {
+    border-top: 0;
+    padding: 0;
+  }
+
+  .landing-table td {
+    overflow-wrap: anywhere;
+  }
+
+  .landing-table td + td {
+    margin-top: 8px;
   }
 }
