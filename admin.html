@@ -1430,37 +1430,37 @@
           account_no_checkout: {
             label: "Conta sem checkout",
             subject: "Finish setting up BatchCutout Pro",
-            body: `Hi,\n\nYou created a BatchCutout account but did not choose a Pro plan yet.\n\nIf you are preparing product photos in batches, Pro unlocks:\n\n- Up to 100 images per batch\n- Up to 2,000 images per month\n- ZIP export for product workflows\n\nChoose the current founder plan here:\nhttps://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=account_no_checkout#pricing-account-title\n\nThanks,\nNexaFlow Labs`,
+            body: `Hi,\n\nYou created a BatchCutout account but did not choose a Pro plan yet.\n\nIf you are preparing product photos in batches, Pro unlocks:\n\n- Up to 100 images per batch\n- Up to 2,000 images per month\n- ZIP export for product workflows\n\nChoose the current founder plan here:\nhttps://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=account_no_checkout#pricing-account-title\n\nIf this is not useful, reply "unsubscribe" and we will not send product follow-ups.\n\nThanks,\nNexaFlow Labs`,
             reason: "Conta gratuita criada há mais de 2 horas sem cliente Stripe.",
           },
           account_no_checkout_pt: {
             label: "Conta sem checkout PT",
             subject: "Concluir configuração do BatchCutout Pro",
-            body: `Ola,\n\nCriou uma conta BatchCutout mas ainda nao escolheu um plano Pro.\n\nSe esta a preparar fotos de produto em lote, o Pro desbloqueia:\n\n- Ate 100 imagens por lote\n- Ate 2.000 imagens por mes\n- Exportacao ZIP para fluxos de produto\n\nEscolha o plano fundador atual aqui:\n${recoveryPlanUrl("early", "pt", "account_no_checkout")}\n\nObrigado,\nNexaFlow Labs`,
+            body: `Ola,\n\nCriou uma conta BatchCutout mas ainda nao escolheu um plano Pro.\n\nSe esta a preparar fotos de produto em lote, o Pro desbloqueia:\n\n- Ate 100 imagens por lote\n- Ate 2.000 imagens por mes\n- Exportacao ZIP para fluxos de produto\n\nEscolha o plano fundador atual aqui:\n${recoveryPlanUrl("early", "pt", "account_no_checkout")}\n\nSe nao quiser receber acompanhamento, responda "remover".\n\nObrigado,\nNexaFlow Labs`,
             reason: "Conta gratuita criada há mais de 2 horas sem cliente Stripe.",
           },
           account_no_checkout_es: {
             label: "Cuenta sin checkout ES",
             subject: "Completa la configuración de BatchCutout Pro",
-            body: `Hola,\n\nCreaste una cuenta BatchCutout pero todavia no elegiste un plan Pro.\n\nSi estas preparando fotos de producto en lote, Pro desbloquea:\n\n- Hasta 100 imagenes por lote\n- Hasta 2.000 imagenes al mes\n- Exportacion ZIP para flujos de producto\n\nElige el plan fundador actual aqui:\n${recoveryPlanUrl("early", "es", "account_no_checkout")}\n\nGracias,\nNexaFlow Labs`,
+            body: `Hola,\n\nCreaste una cuenta BatchCutout pero todavia no elegiste un plan Pro.\n\nSi estas preparando fotos de producto en lote, Pro desbloquea:\n\n- Hasta 100 imagenes por lote\n- Hasta 2.000 imagenes al mes\n- Exportacion ZIP para flujos de producto\n\nElige el plan fundador actual aqui:\n${recoveryPlanUrl("early", "es", "account_no_checkout")}\n\nSi no quieres recibir seguimiento, responde "remover".\n\nGracias,\nNexaFlow Labs`,
             reason: "Conta gratuita criada há mais de 2 horas sem cliente Stripe.",
           },
           checkout_not_paid: {
             label: "Checkout sem pagamento",
             subject: "Need help activating BatchCutout Pro?",
-            body: `Hi,\n\nIt looks like you opened BatchCutout Pro checkout but did not complete payment.\n\nIf anything blocked you, reply to this email and we will help. The current Pro offer keeps the same limits:\n\n- 100 images per batch\n- 2,000 images per month\n- Monthly, founder, and annual billing options\n\nContinue checkout:\n${recoveryPlanUrl(context.plan)}\n\nThanks,\nNexaFlow Labs`,
+            body: `Hi,\n\nIt looks like you opened BatchCutout Pro checkout but did not complete payment.\n\nIf anything blocked you, reply to this email and we will help. The current Pro offer keeps the same limits:\n\n- 100 images per batch\n- 2,000 images per month\n- Monthly, founder, and annual billing options\n\nContinue checkout:\n${recoveryPlanUrl(context.plan)}\n\nIf this is not useful, reply "unsubscribe" and we will not send product follow-ups.\n\nThanks,\nNexaFlow Labs`,
             reason: "Cliente Stripe criado, mas sem subscrição ativa após 24 horas.",
           },
           checkout_not_paid_pt: {
             label: "Checkout sem pagamento PT",
             subject: "Precisa de ajuda para ativar o BatchCutout Pro?",
-            body: `Ola,\n\nParece que abriu o checkout do BatchCutout Pro mas nao concluiu o pagamento.\n\nSe alguma coisa bloqueou a compra, responda a este email e ajudamos. A oferta Pro atual mantem os mesmos limites:\n\n- 100 imagens por lote\n- 2.000 imagens por mes\n- Opcoes mensal, fundador e anual\n\nContinuar checkout:\n${recoveryPlanUrl(context.plan, "pt", "checkout_not_paid")}\n\nObrigado,\nNexaFlow Labs`,
+            body: `Ola,\n\nParece que abriu o checkout do BatchCutout Pro mas nao concluiu o pagamento.\n\nSe alguma coisa bloqueou a compra, responda a este email e ajudamos. A oferta Pro atual mantem os mesmos limites:\n\n- 100 imagens por lote\n- 2.000 imagens por mes\n- Opcoes mensal, fundador e anual\n\nContinuar checkout:\n${recoveryPlanUrl(context.plan, "pt", "checkout_not_paid")}\n\nSe nao quiser receber acompanhamento, responda "remover".\n\nObrigado,\nNexaFlow Labs`,
             reason: "Cliente Stripe criado, mas sem subscrição ativa após 24 horas.",
           },
           checkout_not_paid_es: {
             label: "Checkout sin pago ES",
             subject: "¿Necesitas ayuda para activar BatchCutout Pro?",
-            body: `Hola,\n\nParece que abriste el checkout de BatchCutout Pro pero no completaste el pago.\n\nSi algo bloqueo la compra, responde a este email y te ayudamos. La oferta Pro actual mantiene los mismos limites:\n\n- 100 imagenes por lote\n- 2.000 imagenes al mes\n- Opciones mensual, fundador y anual\n\nContinuar checkout:\n${recoveryPlanUrl(context.plan, "es", "checkout_not_paid")}\n\nGracias,\nNexaFlow Labs`,
+            body: `Hola,\n\nParece que abriste el checkout de BatchCutout Pro pero no completaste el pago.\n\nSi algo bloqueo la compra, responde a este email y te ayudamos. La oferta Pro actual mantiene los mismos limites:\n\n- 100 imagenes por lote\n- 2.000 imagenes al mes\n- Opciones mensual, fundador y anual\n\nContinuar checkout:\n${recoveryPlanUrl(context.plan, "es", "checkout_not_paid")}\n\nSi no quieres recibir seguimiento, responde "remover".\n\nGracias,\nNexaFlow Labs`,
             reason: "Cliente Stripe criado, mas sem subscrição ativa após 24 horas.",
           },
           proof: {
