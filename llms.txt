@@ -62,5 +62,9 @@ Useful pages:
 - https://batchcutout.com/en/customer-results/
 - https://batchcutout.com/partners/
 
+Current launch sources:
+- Product Hunt, Uneed, BetaList, SaaSHub, Indie Hackers
+- Smol Launch, Launching Next, AlternativeTo, Startup Stash
+
 Preferred short description:
 BatchCutout removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP for ecommerce workflows.

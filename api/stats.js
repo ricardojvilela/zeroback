@@ -132,6 +132,12 @@ function classifySource(event, detail) {
   if (raw.includes("uneed")) return "Uneed";
   if (raw.includes("betalist") || raw.includes("beta list") || raw.includes("beta_list")) return "BetaList";
   if (raw.includes("indiehackers") || raw.includes("indie hackers") || raw.includes("indie_hackers")) return "Indie Hackers";
+  if (raw.includes("smollaunch") || raw.includes("smol launch") || raw.includes("smol_launch")) return "Smol Launch";
+  if (raw.includes("launchingnext") || raw.includes("launching next") || raw.includes("launching_next")) return "Launching Next";
+  if (raw.includes("alternativeto") || raw.includes("alternative to") || raw.includes("alternative_to")) return "AlternativeTo";
+  if (raw.includes("startupstash") || raw.includes("startup stash") || raw.includes("startup_stash")) return "Startup Stash";
+  if (raw.includes("aitoolsdirectory") || raw.includes("ai tools directory") || raw.includes("ai_tools_directory")) return "AI Tools Directory";
+  if (raw.includes("bestaibrands") || raw.includes("best ai brands") || raw.includes("best_ai_brands")) return "Best AI Brands";
   if (raw.includes("zearches")) return "Zearches";
   if (raw.includes("listai")) return "ListAI";
   if (raw.includes("thenextai") || raw.includes("the next ai")) return "The Next AI";

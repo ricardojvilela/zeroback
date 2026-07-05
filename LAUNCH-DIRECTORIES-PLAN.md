@@ -12,6 +12,8 @@ Goal: create low-cost discovery loops outside Google Ads and manual outreach.
 6. AlternativeTo-style software directories when relevant
 7. AI tool directories with ecommerce/software categories
 
+Wave 2 is detailed in `DIRECTORY-WAVE2-PLAN.md`. Use it after the first submissions are live, or sooner if a platform account/login is already available.
+
 ## Launch positioning
 
 Name:
@@ -81,6 +83,10 @@ Use source names:
 - `betalist`
 - `indie_hackers`
 - `saashub`
+- `smol_launch`
+- `launching_next`
+- `alternativeto`
+- `startup_stash`
 
 Success signals:
 
