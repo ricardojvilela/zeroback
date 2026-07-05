@@ -254,6 +254,40 @@ Activation rule:
 - Review after 48 hours or 20 clicks.
 - Keep only search terms that produce upload, download, Pro click, checkout start or paid subscription.
 
+## Prepared Portuguese alternatives campaign
+
+Status: prepared only. Do not import as active without Ricardo approving spend.
+
+Campaign:
+`Search - BatchCutout - PT - Alternatives`
+
+Import files:
+
+- `google-ads-imports/batchcutout-portuguese-alternatives-campaign.csv`
+- `google-ads-imports/batchcutout-portuguese-alternatives-adgroups.csv`
+- `google-ads-imports/batchcutout-portuguese-alternatives-keywords.csv`
+- `google-ads-imports/batchcutout-portuguese-alternatives-rsa.csv`
+- `google-ads-imports/batchcutout-portuguese-alternatives-negatives.csv`
+
+Initial setup in the files:
+
+- Status: paused.
+- Budget: 2 EUR/day.
+- Language: Portuguese.
+- Locations: Portugal, Brazil and United States.
+- Ad groups: `remove bg alternativa`, `photoroom alternativa`, `pixelcut alternativa` and `canva alternativa`.
+- Landing pages: Portuguese alternative-intent pages for remove.bg, Photoroom, Pixelcut and Canva.
+- Ad copy does not use competitor names in headlines or descriptions.
+- Competitor names are not added as negatives inside this campaign.
+- Conversion goal: use the same account-default subscription goal when imported.
+
+Activation rule:
+
+- Start only if the total Search budget remains at or below the approved limit, or if Ricardo explicitly approves a new budget.
+- Keep this campaign separate from generic Portuguese product searches so competitor-intent terms can be paused independently.
+- Review after 48 hours or 20 clicks.
+- Keep only search terms that produce upload, download, Pro click, checkout start or paid subscription.
+
 ## First review
 
 Review after 48 hours from activation or 20 clicks, whichever comes first.
