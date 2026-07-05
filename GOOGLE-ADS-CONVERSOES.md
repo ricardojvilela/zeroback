@@ -46,7 +46,7 @@ Nota operacional: recomendacoes automaticas de correspondencia ampla e Maxima IA
 
 Atualizacao 2026-07-01: o site passou a definir `gtag("set", "user_data", { email })` quando existe email conhecido e o utilizador aceitou a medicao. Isto cobre login, criacao de conta, checkout e novo formulario opcional de lead pós-download. A submissao do lead gera `lead_capture_submitted` no Supabase, mas nao deve ser conversao principal de Google Ads.
 
-### Lead Pro BatchCutout
+### Lead Pro BatchCutout (legado)
 
 Objetivo: medir contacto comercial antigo/lead manual.
 
@@ -56,7 +56,7 @@ Estado pretendido:
 - Contagem: uma
 - Usar para lances: nao
 
-Evento no site:
+Evento historico:
 
 - `pro_waitlist_submitted`
 
@@ -64,9 +64,11 @@ Snippet usado:
 
 - `AW-18177126609/riWOCOiI67McENHhw9tD`
 
-Nota: existem duas acoes Lead Pro no Google Ads. O codigo usa `Lead Pro BatchCutout (1)`. Nao criar uma terceira ate haver necessidade.
+Nota: existem duas acoes Lead Pro no Google Ads. Nao criar uma terceira ate haver necessidade.
 
 Atualizacao 2026-06-30: as duas acoes antigas `Lead Pro BatchCutout` e `Lead Pro BatchCutout (1)` foram passadas para secundarias e removidas dos objetivos ao nivel da conta. Ficam apenas como historico/intencao secundaria.
+
+Atualizacao 2026-07-05: ja nao existe fluxo ativo de waitlist/pedido Pro no site. A conversao comercial principal e a subscricao paga confirmada por Stripe; leads e formularios ficam apenas como sinais secundarios.
 
 ## Conversoes secundarias
 

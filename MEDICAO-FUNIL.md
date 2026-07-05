@@ -78,6 +78,12 @@ Atualizacao em 2026-05-28 - Pro early access:
 - Os CTAs de limite da ferramenta passaram a encaminhar para `/pricing/?source=app&reason=...&limit=3#pro-waitlist`.
 - Validacao online: `/pricing/` mostra a nova proposta e o CTA Pro da homepage redireciona corretamente.
 
+Atualizacao em 2026-07-05:
+
+- Esta seccao de early access/waitlist e historica. O site atual vende subscricao Pro por Stripe, com plano fundador, mensal e anual.
+- O funil principal atual e: teste gratuito de 2 imagens -> conta/login -> checkout Stripe -> `pro_subscription_paid`.
+- Nao configurar campanhas novas para `#pro-waitlist` ou `pro_waitlist_submitted`.
+
 Atualizacao em 2026-05-28 - simplificacao da homepage:
 
 - Removidos da homepage os blocos longos de casos de uso, prova visual, formulario Pro completo, audiencia e feedback inicial.

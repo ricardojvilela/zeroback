@@ -188,7 +188,7 @@ Nao exagerar em fixar headlines no inicio. Deixar o Google testar combinacoes.
 Use Cases:
 https://batchcutout.com/use-cases/?utm_source=google_ads&utm_medium=cpc&utm_campaign=pro_limit_test&utm_content=sitelink_use_cases
 
-Pro Waitlist:
+Pro pricing:
 https://batchcutout.com/pricing/?utm_source=google_ads&utm_medium=cpc&utm_campaign=pro_limit_test&utm_content=sitelink_pricing
 
 Shopify Photos:
