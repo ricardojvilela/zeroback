@@ -628,6 +628,18 @@
             <strong id="liveSeoLandingCtaClicks">0</strong>
           </article>
           <article class="live-card">
+            <span>Launch diretórios</span>
+            <strong id="liveDirectoryLaunchViews">0</strong>
+          </article>
+          <article class="live-card">
+            <span>CTA launch</span>
+            <strong id="liveDirectoryLaunchCtaClicks">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Taxa launch</span>
+            <strong id="liveDirectoryLaunchRate">0%</strong>
+          </article>
+          <article class="live-card">
             <span>Oferta pós-download</span>
             <strong id="livePostDownloadNext">0</strong>
           </article>
@@ -1555,7 +1567,7 @@
         const key = outreachTemplateKey(prospect);
         const campaign = outreachCampaign(prospect);
         const toolUrl = `https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=${campaign}#tool`;
-        const demoUrl = `https://batchcutout.com/customer-results/?utm_source=manual_outreach&utm_medium=email&utm_campaign=${campaign}_demo`;
+        const demoUrl = `https://batchcutout.com/en/customer-results/?utm_source=manual_outreach&utm_medium=email&utm_campaign=${campaign}_demo`;
         const usesDemo = prospect.outreach_variant === "demo_video";
         const demoBlock = usesDemo
           ? `\n\nI put together a visual proof page so you can see the result before testing it:\n${demoUrl}`
@@ -1575,7 +1587,7 @@
       function outreachContactFormCopy(prospect) {
         const campaign = outreachCampaign(prospect);
         const demoLine = prospect.outreach_variant === "demo_video"
-          ? ` I put together a visual proof page here: https://batchcutout.com/customer-results/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${campaign}_demo`
+          ? ` I put together a visual proof page here: https://batchcutout.com/en/customer-results/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${campaign}_demo`
           : "";
         return `Hi, ${outreachIntro(prospect)} BatchCutout removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP.${demoLine} You can also test 2 images free, no account or card needed: https://batchcutout.com/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${campaign}#tool Founder plan is 15 EUR/month for 100 images per batch and 2,000/month. - Ricardo, NexaFlow Labs`;
       }
@@ -1628,6 +1640,12 @@
         document.querySelector("#liveDownloadReady").textContent = totals.downloadReadyShown || 0;
         document.querySelector("#liveSeoLandingViews").textContent = totals.seoLandingViews || 0;
         document.querySelector("#liveSeoLandingCtaClicks").textContent = totals.seoLandingCtaClicks || 0;
+        document.querySelector("#liveDirectoryLaunchViews").textContent = totals.directoryLaunchPageViews || 0;
+        document.querySelector("#liveDirectoryLaunchCtaClicks").textContent = totals.directoryLaunchCtaClicks || 0;
+        document.querySelector("#liveDirectoryLaunchRate").textContent = formatPercent(conversionRate(
+          totals.directoryLaunchCtaClicks,
+          totals.directoryLaunchPageViews,
+        ));
         document.querySelector("#livePostDownloadNext").textContent = totals.postDownloadNextShown || 0;
         document.querySelector("#livePostDownloadFounder").textContent = totals.postDownloadFounderClicks || 0;
         document.querySelector("#livePostDownloadFounderRate").textContent = formatPercent(conversionRate(
