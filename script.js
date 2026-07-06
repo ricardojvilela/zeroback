@@ -1,4 +1,4 @@
-﻿import JSZip from "https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm";
+import JSZip from "https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm";
 import { removeBackground } from "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.6.0/+esm";
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -192,7 +192,7 @@ const baseTranslation = {
   proInlineKicker: "BatchCutout Pro",
   proInlineTitle: "Transforme este teste em produção por 15 EUR/mês",
   proInlineLead: "Já viu o resultado com fotos reais. O plano fundador desbloqueia lotes até 100 imagens para catálogos, variantes e marketplaces.",
-  proInlineBenefits: "Plano fundador 15 EUR/mês. Pro mensal 19 EUR/mês. Anual 190 EUR/ano.",
+  proInlineBenefits: "Plano fundador 15 EUR/mês. Pro mensal 19 EUR/mês. Anual 190 EUR/ano, poupa 38 EUR face ao mensal.",
   proPlanContrastLabel: "Comparação entre grátis e Pro",
   proFreeLabel: "Grátis",
   proFreeLimit: "2 imagens por lote",
@@ -240,7 +240,7 @@ const baseTranslation = {
   accountLogout: "Sair",
   billingEarly: "Plano fundador - 15 EUR/mês (melhor entrada)",
   billingMonthly: "Pro mensal - 19 EUR/mês",
-  billingAnnual: "Pro anual - 190 EUR/ano",
+  billingAnnual: "Pro anual - 190 EUR/ano (poupe 38 EUR)",
   billingPortal: "Gerir pagamento",
   billingCheckoutStarting: "A abrir pagamento...",
   billingPortalStarting: "A abrir gestão de pagamento...",
@@ -366,7 +366,7 @@ const translations = {
     proInlineKicker: "BatchCutout Pro",
     proInlineTitle: "Turn this test into production for EUR 15/month",
     proInlineLead: "You have seen the result with real photos. The founder plan unlocks batches up to 100 images for catalogs, variants, and marketplaces.",
-    proInlineBenefits: "Founder plan EUR 15/month. Monthly Pro EUR 19/month. Annual EUR 190/year.",
+    proInlineBenefits: "Founder plan EUR 15/month. Monthly Pro EUR 19/month. Annual EUR 190/year saves EUR 38.",
     proPlanContrastLabel: "Free versus Pro comparison",
     proFreeLabel: "Free",
     proFreeLimit: "2 images per batch",
@@ -405,7 +405,7 @@ const translations = {
     accountLogout: "Sign out",
     billingEarly: "Founder plan - EUR 15/month (best start)",
     billingMonthly: "Pro monthly - EUR 19/month",
-    billingAnnual: "Pro annual - EUR 190/year",
+    billingAnnual: "Pro annual - EUR 190/year (save EUR 38)",
     billingPortal: "Manage payment",
     billingCheckoutStarting: "Opening payment...",
     billingPortalStarting: "Opening billing...",
@@ -1043,7 +1043,7 @@ const proTranslations = {
     proInlineKicker: "BatchCutout Pro",
     proInlineTitle: "Transforme este teste em produção por 15 EUR/mês",
     proInlineLead: "Já viu o resultado com fotos reais. O plano fundador desbloqueia lotes até 100 imagens para catálogos, variantes e marketplaces.",
-    proInlineBenefits: "Plano fundador 15 EUR/mês. Pro mensal 19 EUR/mês. Anual 190 EUR/ano.",
+    proInlineBenefits: "Plano fundador 15 EUR/mês. Pro mensal 19 EUR/mês. Anual 190 EUR/ano, poupa 38 EUR face ao mensal.",
     proEmailPlaceholder: "O seu email",
     proInlineButton: "Comprar Pro",
     proInlineNote: "Pagamento seguro por Stripe Checkout.",
@@ -1099,7 +1099,7 @@ const proTranslations = {
     proInlineKicker: "BatchCutout Pro",
     proInlineTitle: "Turn this test into production for EUR 15/month",
     proInlineLead: "You have seen the result with real photos. The founder plan unlocks batches up to 100 images for catalogs, variants, and marketplaces.",
-    proInlineBenefits: "Founder plan EUR 15/month. Monthly Pro EUR 19/month. Annual EUR 190/year.",
+    proInlineBenefits: "Founder plan EUR 15/month. Monthly Pro EUR 19/month. Annual EUR 190/year saves EUR 38.",
     proEmailPlaceholder: "Your email",
     proInlineButton: "Buy Pro",
     proInlineNote: "Secure payment through Stripe Checkout.",
