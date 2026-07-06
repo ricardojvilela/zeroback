@@ -150,4 +150,5 @@ Interpretation:
 - The result-ready moment in the main tool now shows a stronger founder-plan upgrade block as soon as a free user has processed images, including a direct checkout CTA for one-image and multi-image results, while remaining hidden for active Pro subscribers.
 - The same result-ready block now also offers a secondary "link and checklist" action for free users without a known email, reusing the existing lead-capture and automatic follow-up flow instead of waiting until after a download.
 - Lead capture events now preserve an explicit `capture_source`, and `/admin` separates leads captured from the result-ready block so the new recovery option can be evaluated without confusing traffic attribution.
+- The account panel shown after a Pro click now displays a compact three-step checkout guide, clarifying that account creation/sign-in leads directly to Stripe and automatic Pro activation.
 - The internal admin panel now adds an automatic funnel diagnosis so the daily routine identifies whether the current bottleneck is result-to-Pro, pricing-to-Stripe, checkout-to-paid, or upload-to-download.

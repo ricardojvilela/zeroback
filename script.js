@@ -48,6 +48,7 @@ const proInlineSuccessCard = document.querySelector("#proInlineSuccessCard");
 const accountPanel = document.querySelector("#accountPanel");
 const accountBadge = document.querySelector("#accountBadge");
 const accountStatus = document.querySelector("#accountStatus");
+const accountCheckoutGuide = document.querySelector("#accountCheckoutGuide");
 const accountUsage = document.querySelector("#accountUsage");
 const accountUsageCount = document.querySelector("#accountUsageCount");
 const accountUsageBar = document.querySelector("#accountUsageBar");
@@ -233,6 +234,10 @@ const baseTranslation = {
   accountBadgePro: "Pro",
   accountStatusGuest: "Crie conta para ativar Pro ou entre para gerir o seu acesso.",
   accountStatusCheckoutPending: "Plano escolhido: {plan}. Crie conta ou entre e abrimos o pagamento automaticamente.",
+  accountCheckoutGuideLabel: "Passos para ativar Pro",
+  accountCheckoutGuideAccount: "Crie conta ou entre",
+  accountCheckoutGuideStripe: "Pagamento Stripe",
+  accountCheckoutGuideActive: "Pro ativo automaticamente",
   accountStatusLoading: "A verificar a sua conta...",
   accountStatusFree: "Conta gratuita. O Pro ativa até 100 imagens por lote e 2.000 imagens por mês.",
   accountStatusPro: "Conta Pro ativa. Até {batchLimit} imagens por lote e {monthlyRemaining} de {monthlyLimit} disponíveis este mês.",
@@ -402,6 +407,10 @@ const translations = {
     accountBadgePro: "Pro",
     accountStatusGuest: "Create an account to activate Pro, or sign in to manage your access.",
     accountStatusCheckoutPending: "Selected plan: {plan}. Create an account or sign in and we will open payment automatically.",
+    accountCheckoutGuideLabel: "Steps to activate Pro",
+    accountCheckoutGuideAccount: "Create account or sign in",
+    accountCheckoutGuideStripe: "Stripe payment",
+    accountCheckoutGuideActive: "Pro activates automatically",
     accountStatusLoading: "Checking your account...",
     accountStatusFree: "Free account. Pro unlocks up to 100 images per batch and 2,000 images per month.",
     accountStatusPro: "Pro account active. Up to {batchLimit} images per batch and {monthlyRemaining} of {monthlyLimit} available this month.",
@@ -925,6 +934,10 @@ const translatedAddons = {
     accountUsageCount: "{used} de {limit} imágenes usadas",
     accountUsageReset: "El límite mensual se renueva el {date}.",
     accountUsageResetUnknown: "El límite mensual se renueva al inicio del próximo mes.",
+    accountCheckoutGuideLabel: "Pasos para activar Pro",
+    accountCheckoutGuideAccount: "Crea cuenta o entra",
+    accountCheckoutGuideStripe: "Pago Stripe",
+    accountCheckoutGuideActive: "Pro se activa automáticamente",
     resultReadyKicker: "Resultado listo",
     resultReadyTitle: "¿Quieres repetir esto en lotes mayores?",
     downloadReadyHint: "Si el recorte quedó bien, el plan fundador convierte esta prueba en producción: hasta 100 imágenes por lote, 2.000 al mes y ZIP listo para tienda.",
@@ -1906,6 +1919,7 @@ function updateAccountUi() {
     accountBadge.textContent = t("accountBadgeGuest");
     accountStatus.textContent = t("accountStatusConfigMissing");
     accountPanel.classList.remove("has-pending-checkout");
+    accountCheckoutGuide?.classList.add("hidden");
     prefillAccountEmail();
     accountForm?.classList.remove("hidden");
     accountActions?.classList.add("hidden");
@@ -1924,6 +1938,7 @@ function updateAccountUi() {
     const waitingPlanName = checkoutPlanDisplayName(waitingPlan);
 
     accountPanel.classList.toggle("has-pending-checkout", Boolean(waitingPlanName));
+    accountCheckoutGuide?.classList.toggle("hidden", !waitingPlanName);
     accountBadge.textContent = waitingPlanName ? t("accountBadgeCheckout") : t("accountBadgeGuest");
     accountStatus.textContent = waitingPlanName
       ? t("accountStatusCheckoutPending", { plan: waitingPlanName })
@@ -1955,6 +1970,7 @@ function updateAccountUi() {
   accountBadge.textContent = t(badgeKey);
   accountStatus.textContent = email ? `${email} - ${statusTextValue}` : statusTextValue;
   accountPanel.classList.remove("has-pending-checkout");
+  accountCheckoutGuide?.classList.add("hidden");
   accountForm?.classList.add("hidden");
   accountActions?.classList.remove("hidden");
   billingActions?.classList.toggle("hidden", Boolean(access.canUsePro));
@@ -2216,6 +2232,7 @@ async function startCheckout(plan = defaultCheckoutPlan, triggerButton = null) {
     updateAccountUi();
     setAccountMessage("billingLoginRequired");
     accountPanel?.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.setTimeout(() => accountEmail?.focus({ preventScroll: true }), 280);
     return;
   }
 
