@@ -780,6 +780,21 @@ h2 {
   filter: brightness(0.96);
 }
 
+.result-ready-secondary {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid rgba(38, 70, 216, 0.2);
+  background: #ffffff;
+  color: var(--blue-strong);
+  font-size: 0.88rem;
+  font-weight: 900;
+}
+
+.result-ready-secondary:hover:not(:disabled) {
+  background: #eef2ff;
+  color: var(--blue-strong);
+}
+
 .post-download-next {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);

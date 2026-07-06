@@ -24,6 +24,7 @@ const proPromptButton = document.querySelector("#proPromptButton");
 const statusVolumeContact = document.querySelector("#statusVolumeContact");
 const inlineProCta = document.querySelector("#inlineProCta");
 const zipProCta = document.querySelector("#zipProCta");
+const resultReadySaveLinkCta = document.querySelector("#resultReadySaveLinkCta");
 const progressBar = document.querySelector("#progressBar");
 const countText = document.querySelector("#countText");
 const postDownloadNextPanel = document.querySelector("#postDownloadNextPanel");
@@ -216,6 +217,7 @@ const baseTranslation = {
   resultReadyTitle: "Quer repetir isto em lotes maiores?",
   downloadReadyHint: "Se o recorte ficou bom, o plano fundador transforma este teste em produção: até 100 imagens por lote, 2.000 por mês e ZIP pronto para loja.",
   zipProCta: "Criar conta e ativar fundador - 15 EUR/mês",
+  resultReadySaveLinkCta: "Receber link e checklist",
   resultReadyMicrocopy: "Sem fidelização. Pagamento seguro por Stripe.",
   benefitsLabel: "Vantagens do serviço",
   benefitPng: "PNG transparente",
@@ -449,6 +451,7 @@ const translations = {
     resultReadyTitle: "Want to repeat this for larger batches?",
     downloadReadyHint: "If the cutout looks good, the founder plan turns this test into production: up to 100 images per batch, 2,000 per month, and a store-ready ZIP.",
     zipProCta: "Create account and start founder plan - EUR 15/month",
+    resultReadySaveLinkCta: "Get link and checklist",
     resultReadyMicrocopy: "No lock-in. Secure Stripe payment.",
     eyebrow: "Bulk background removal",
     title: "BatchCutout",
@@ -926,6 +929,7 @@ const translatedAddons = {
     resultReadyTitle: "¿Quieres repetir esto en lotes mayores?",
     downloadReadyHint: "Si el recorte quedó bien, el plan fundador convierte esta prueba en producción: hasta 100 imágenes por lote, 2.000 al mes y ZIP listo para tienda.",
     zipProCta: "Crear cuenta y activar fundador - 15 EUR/mes",
+    resultReadySaveLinkCta: "Recibir enlace y checklist",
     resultReadyMicrocopy: "Sin permanencia. Pago seguro por Stripe.",
     privacyLink: "Privacidad y términos",
     statusTooManyFiles: "Se añadieron {accepted} de {total} imágenes. Para procesar lotes mayores de una vez, elige Pro.",
@@ -1080,6 +1084,7 @@ const proTranslations = {
     resultReadyTitle: "Quer repetir isto em lotes maiores?",
     downloadReadyHint: "Se o recorte ficou bom, o plano fundador transforma este teste em produção: até 100 imagens por lote, 2.000 por mês e ZIP pronto para loja.",
     zipProCta: "Criar conta e ativar fundador - 15 EUR/mês",
+    resultReadySaveLinkCta: "Receber link e checklist",
     resultReadyMicrocopy: "Sem fidelização. Pagamento seguro por Stripe.",
     emptyTitle: "Os seus PNGs transparentes aparecem aqui",
     emptyState: "Depois pode descarregar uma imagem ou exportar tudo em ZIP.",
@@ -1139,6 +1144,7 @@ const proTranslations = {
     resultReadyTitle: "Want to repeat this for larger batches?",
     downloadReadyHint: "If the cutout looks good, the founder plan turns this test into production: up to 100 images per batch, 2,000 per month, and a store-ready ZIP.",
     zipProCta: "Create account and start founder plan - EUR 15/month",
+    resultReadySaveLinkCta: "Get link and checklist",
     resultReadyMicrocopy: "No lock-in. Secure Stripe payment.",
     emptyTitle: "Your transparent PNGs appear here",
     emptyState: "Then download one image or export everything as a ZIP.",
@@ -1871,6 +1877,7 @@ function syncPaidAccessUi() {
     proPromptButton?.classList.add("hidden");
     downloadReadyHint?.classList.add("hidden");
     zipProCta?.classList.add("hidden");
+    resultReadySaveLinkCta?.classList.add("hidden");
     postDownloadNextPanel?.classList.add("hidden");
     proInterestPanel?.classList.add("hidden");
     leadCapturePanel?.classList.add("hidden");
@@ -2462,8 +2469,10 @@ function updateControls() {
   pngButton.disabled = !singleReady || running;
   zipButton.disabled = !allReady || running;
   clearButton.disabled = !hasItems || running;
+  const hasLeadContact = Boolean(currentAccount?.email || getCapturedLeadEmail());
   downloadReadyHint?.classList.toggle("hidden", paidAccess || !downloadReady);
   zipProCta?.classList.toggle("hidden", paidAccess || !downloadReady || running);
+  resultReadySaveLinkCta?.classList.toggle("hidden", paidAccess || !downloadReady || running || hasLeadContact);
   emptyState.classList.toggle("hidden", hasItems);
   countText.textContent = `${items.length} ${items.length === 1 ? t("photoSingular") : t("photoPlural")}`;
 
@@ -2864,6 +2873,22 @@ function focusPostDownloadLeadCapture() {
   leadCaptureEmail?.focus({ preventScroll: true });
 }
 
+function focusResultReadyLeadCapture() {
+  const count = items.filter((item) => item.outputBlob).length;
+  const downloadType = count > 1 ? "zip_available" : "png_available";
+  localStorage.removeItem(leadCaptureDismissedStorageKey);
+  showLeadCapture(downloadType, count);
+  trackEvent("post_download_save_link_clicked", {
+    downloadType,
+    count,
+    source: "result_ready",
+    totalInQueue: items.length,
+    free_limit: maxFilesPerBatch,
+  });
+  leadCapturePanel?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  leadCaptureEmail?.focus({ preventScroll: true });
+}
+
 function showPostDownloadFeedback(downloadType, count) {
   showPostDownloadNext(downloadType, count);
   postDownloadFeedback?.classList.remove("hidden");
@@ -2902,6 +2927,7 @@ function recordLeadCapture(email, { downloadType = "unknown", count = 0, source 
   if (accountEmail && !accountEmail.value.trim()) accountEmail.value = email;
   localStorage.removeItem(leadCaptureDismissedStorageKey);
   postDownloadSaveLinkCta?.classList.add("hidden");
+  resultReadySaveLinkCta?.classList.add("hidden");
   postDownloadEmailForm?.classList.add("hidden");
   setGoogleUserData(email);
   trackEvent("lead_capture_submitted", {
@@ -3066,6 +3092,7 @@ postDownloadFounderCta?.addEventListener("click", () => {
   trackEvent("tool_pro_clicked", detail);
   startCheckout("early", postDownloadFounderCta);
 });
+resultReadySaveLinkCta?.addEventListener("click", focusResultReadyLeadCapture);
 postDownloadSaveLinkCta?.addEventListener("click", focusPostDownloadLeadCapture);
 postDownloadEmailForm?.addEventListener("submit", handlePostDownloadEmailSubmit);
 proInlineForm?.addEventListener("click", (event) => {

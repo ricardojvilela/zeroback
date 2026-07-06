@@ -148,4 +148,5 @@ Interpretation:
 - Prepared a paused English Google Ads campaign for ecommerce assistants, product listing services and bulk product photo editing searches, pointing to the new agency workflow landing page without changing live spend.
 - Live data on 2026-07-06 showed strong product usage from Google Ads, with 83 visitors, 78 uploads and 48 downloads in 14 days, but no pricing clicks or checkout sessions from that source.
 - The result-ready moment in the main tool now shows a stronger founder-plan upgrade block as soon as a free user has processed images, including a direct checkout CTA for one-image and multi-image results, while remaining hidden for active Pro subscribers.
+- The same result-ready block now also offers a secondary "link and checklist" action for free users without a known email, reusing the existing lead-capture and automatic follow-up flow instead of waiting until after a download.
 - The internal admin panel now adds an automatic funnel diagnosis so the daily routine identifies whether the current bottleneck is result-to-Pro, pricing-to-Stripe, checkout-to-paid, or upload-to-download.
