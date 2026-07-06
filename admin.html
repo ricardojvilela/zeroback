@@ -257,6 +257,18 @@
         font-weight: 800;
       }
 
+      .funnel-diagnosis {
+        margin: 0 0 14px;
+        border: 1px solid rgba(15, 139, 124, 0.2);
+        border-radius: 8px;
+        padding: 12px 14px;
+        background: #f1fbf8;
+        color: #173346;
+        font-size: 13px;
+        font-weight: 850;
+        line-height: 1.45;
+      }
+
       .table-actions {
         display: flex;
         flex-wrap: wrap;
@@ -820,6 +832,7 @@
             <strong id="liveBillingPortalOpens">0</strong>
           </article>
         </div>
+        <p class="funnel-diagnosis" id="liveFunnelDiagnosis">A carregar diagnóstico do funil...</p>
         <p class="live-status" id="liveStatus">A carregar atividade...</p>
         <section class="source-live-block" aria-label="Subscrições Stripe">
           <div class="panel-head compact">
@@ -1308,6 +1321,44 @@
         return (Number(numerator || 0) || 0) / total;
       }
 
+      function funnelDiagnosis(totals = {}) {
+        const uploads = Number(totals.uploadsStarted || 0) || 0;
+        const downloads = Number(totals.downloads || 0) || 0;
+        const resultReady = Number(totals.downloadReadyShown || 0) || 0;
+        const resultUpgradeClicks = Number(totals.postDownloadFounderClicks || 0) || 0;
+        const leadCaptures = Number(totals.leadCaptures || 0) || 0;
+        const planClicks = Number(totals.proClicks || 0) + Number(totals.pricingCtaClicks || 0);
+        const checkoutSessions = Number(totals.checkoutSessionsCreated || 0) || 0;
+        const paidSubscriptions = Number(totals.paidSubscriptions || 0) || 0;
+        const accountEntrants = Number(totals.accountSignups || 0) + Number(totals.accountLogins || 0);
+
+        if (downloads >= 10 && resultUpgradeClicks === 0 && leadCaptures === 0) {
+          return "Gargalo principal: os utilizadores chegam ao download, mas ainda não clicam no plano fundador nem deixam email. Prioridade: reforçar o bloco de resultado pronto e medir se gera cliques nos próximos dados.";
+        }
+
+        if (resultReady >= 10 && conversionRate(resultUpgradeClicks, resultReady) < 0.06) {
+          return "Gargalo principal: há resultados prontos, mas poucos cliques no upgrade. Prioridade: testar copy/CTA pós-resultado antes de aumentar orçamento.";
+        }
+
+        if (planClicks >= 3 && checkoutSessions === 0) {
+          return "Gargalo principal: existe interesse em Pro, mas nenhuma sessão Stripe criada. Prioridade: rever fluxo conta/login/checkout e erros de criação de sessão.";
+        }
+
+        if (checkoutSessions >= 3 && paidSubscriptions === 0) {
+          return "Gargalo principal: o checkout abre, mas não converte em pagamento. Prioridade: rever confiança, preço, retorno ao site e emails de recuperação.";
+        }
+
+        if (uploads >= 10 && conversionRate(downloads, uploads) < 0.45) {
+          return "Gargalo principal: muitos uploads não chegam a download. Prioridade: rever velocidade, qualidade do recorte e clareza dos botões de descarga.";
+        }
+
+        if (paidSubscriptions > 0) {
+          return "Sinal positivo: já há pagamentos atribuídos no funil. Prioridade: identificar origem, repetir o canal e proteger retenção.";
+        }
+
+        return "Diagnóstico: ainda falta volume suficiente para escolher um único gargalo. Continue a observar uploads, downloads, cliques Pro e sessões Stripe.";
+      }
+
       function formatDate(value) {
         if (!value) return "-";
         const date = new Date(value);
@@ -1710,6 +1761,7 @@
         document.querySelector("#liveBillingPortalOpens").textContent = totals.billingPortalOpens || 0;
         const accountEntrants = (totals.accountSignups || 0) + (totals.accountLogins || 0);
         document.querySelector("#liveAccountCheckoutGap").textContent = Math.max(accountEntrants - (totals.checkoutStarts || 0), 0);
+        document.querySelector("#liveFunnelDiagnosis").textContent = funnelDiagnosis(totals);
 
         liveRowsBody.innerHTML = data.rows?.length
           ? data.rows.slice().reverse().map((row) => {
