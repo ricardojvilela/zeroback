@@ -288,6 +288,39 @@ Activation rule:
 - Review after 48 hours or 20 clicks.
 - Keep only search terms that produce upload, download, Pro click, checkout start or paid subscription.
 
+## Prepared English agency workflow campaign
+
+Status: prepared only. Do not import as active without Ricardo approving spend.
+
+Campaign:
+`Search - BatchCutout - EN - Agencies`
+
+Import files:
+
+- `google-ads-imports/batchcutout-agency-campaign.csv`
+- `google-ads-imports/batchcutout-agency-adgroups.csv`
+- `google-ads-imports/batchcutout-agency-keywords.csv`
+- `google-ads-imports/batchcutout-agency-rsa.csv`
+- `google-ads-imports/batchcutout-agency-negatives.csv`
+
+Initial setup in the files:
+
+- Status: paused.
+- Budget: 2 EUR/day.
+- Language: English.
+- Locations: United States, United Kingdom, Canada, Australia and Ireland.
+- Ad groups: `ecommerce assistants`, `product listing services` and `bulk product photo editing`.
+- Landing page: `/en/ecommerce-agency-product-photo-workflow/`.
+- Ad copy positions BatchCutout as a focused batch cutout utility for ecommerce assistants, small agencies and recurring product listing work.
+- Conversion goal: use the same account-default subscription goal when imported.
+
+Activation rule:
+
+- Start only if the total Search budget remains at or below the approved limit, or if Ricardo explicitly approves a new budget.
+- Keep this campaign separate from generic product-photo search so agency/service-operator traffic can be judged on its own.
+- Review after 48 hours or 20 clicks.
+- Keep only search terms that produce upload, download, Pro click, checkout start or paid subscription.
+
 ## First review
 
 Review after 48 hours from activation or 20 clicks, whichever comes first.
