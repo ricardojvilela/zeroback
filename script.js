@@ -212,8 +212,11 @@ const baseTranslation = {
   proInlineSuccessTitle: "Pagamento seguro",
   proInlineSuccessDetail: "Depois do pagamento, o acesso Pro é ativado automaticamente na conta.",
   proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
-  downloadReadyHint: "Resultado pronto. Se quiser repetir isto com mais produtos, o plano fundador desbloqueia 100 imagens por lote.",
+  resultReadyKicker: "Resultado pronto",
+  resultReadyTitle: "Quer repetir isto em lotes maiores?",
+  downloadReadyHint: "Se o recorte ficou bom, o plano fundador transforma este teste em produção: até 100 imagens por lote, 2.000 por mês e ZIP pronto para loja.",
   zipProCta: "Criar conta e ativar fundador - 15 EUR/mês",
+  resultReadyMicrocopy: "Sem fidelização. Pagamento seguro por Stripe.",
   benefitsLabel: "Vantagens do serviço",
   benefitPng: "PNG transparente",
   benefitZip: "ZIP pronto para loja",
@@ -442,8 +445,11 @@ const translations = {
     volumeReasonBatch: "batch limit reached",
     volumeReasonGeneral: "higher volume request",
     statusTooManyFilesPro: "Your current access allows up to {limit} images per batch.",
-    downloadReadyHint: "Result ready. If you want to repeat this with more products, the founder plan unlocks 100 images per batch.",
+    resultReadyKicker: "Result ready",
+    resultReadyTitle: "Want to repeat this for larger batches?",
+    downloadReadyHint: "If the cutout looks good, the founder plan turns this test into production: up to 100 images per batch, 2,000 per month, and a store-ready ZIP.",
     zipProCta: "Create account and start founder plan - EUR 15/month",
+    resultReadyMicrocopy: "No lock-in. Secure Stripe payment.",
     eyebrow: "Bulk background removal",
     title: "BatchCutout",
     lead: "Free plan: remove the background from up to {limit} images now. Download transparent PNGs or a store-ready ZIP.",
@@ -916,6 +922,11 @@ const translatedAddons = {
     accountUsageCount: "{used} de {limit} imágenes usadas",
     accountUsageReset: "El límite mensual se renueva el {date}.",
     accountUsageResetUnknown: "El límite mensual se renueva al inicio del próximo mes.",
+    resultReadyKicker: "Resultado listo",
+    resultReadyTitle: "¿Quieres repetir esto en lotes mayores?",
+    downloadReadyHint: "Si el recorte quedó bien, el plan fundador convierte esta prueba en producción: hasta 100 imágenes por lote, 2.000 al mes y ZIP listo para tienda.",
+    zipProCta: "Crear cuenta y activar fundador - 15 EUR/mes",
+    resultReadyMicrocopy: "Sin permanencia. Pago seguro por Stripe.",
     privacyLink: "Privacidad y términos",
     statusTooManyFiles: "Se añadieron {accepted} de {total} imágenes. Para procesar lotes mayores de una vez, elige Pro.",
     statusNoSupportedFiles: "No se encontró ningún archivo de imagen compatible.",
@@ -1065,8 +1076,11 @@ const proTranslations = {
     proInlineNote: "Pagamento seguro por Stripe Checkout.",
     proInlineSuccess: "A abrir pagamento Pro.",
     proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
-    downloadReadyHint: "Resultado pronto. Se quiser repetir isto com mais produtos, o plano fundador desbloqueia 100 imagens por lote.",
+    resultReadyKicker: "Resultado pronto",
+    resultReadyTitle: "Quer repetir isto em lotes maiores?",
+    downloadReadyHint: "Se o recorte ficou bom, o plano fundador transforma este teste em produção: até 100 imagens por lote, 2.000 por mês e ZIP pronto para loja.",
     zipProCta: "Criar conta e ativar fundador - 15 EUR/mês",
+    resultReadyMicrocopy: "Sem fidelização. Pagamento seguro por Stripe.",
     emptyTitle: "Os seus PNGs transparentes aparecem aqui",
     emptyState: "Depois pode descarregar uma imagem ou exportar tudo em ZIP.",
     demoLabel: "Exemplo antes e depois",
@@ -1121,8 +1135,11 @@ const proTranslations = {
     proInlineNote: "Secure payment through Stripe Checkout.",
     proInlineSuccess: "Opening Pro payment.",
     proInlineError: "We could not submit automatically. Opening an email draft instead.",
-    downloadReadyHint: "Result ready. If you want to repeat this with more products, the founder plan unlocks 100 images per batch.",
+    resultReadyKicker: "Result ready",
+    resultReadyTitle: "Want to repeat this for larger batches?",
+    downloadReadyHint: "If the cutout looks good, the founder plan turns this test into production: up to 100 images per batch, 2,000 per month, and a store-ready ZIP.",
     zipProCta: "Create account and start founder plan - EUR 15/month",
+    resultReadyMicrocopy: "No lock-in. Secure Stripe payment.",
     emptyTitle: "Your transparent PNGs appear here",
     emptyState: "Then download one image or export everything as a ZIP.",
     demoLabel: "Before and after example",
@@ -1852,6 +1869,7 @@ function syncPaidAccessUi() {
 
   if (paidAccess) {
     proPromptButton?.classList.add("hidden");
+    downloadReadyHint?.classList.add("hidden");
     zipProCta?.classList.add("hidden");
     postDownloadNextPanel?.classList.add("hidden");
     proInterestPanel?.classList.add("hidden");
@@ -2444,8 +2462,8 @@ function updateControls() {
   pngButton.disabled = !singleReady || running;
   zipButton.disabled = !allReady || running;
   clearButton.disabled = !hasItems || running;
-  downloadReadyHint?.classList.toggle("hidden", !downloadReady);
-  zipProCta?.classList.toggle("hidden", paidAccess || !allReady || running);
+  downloadReadyHint?.classList.toggle("hidden", paidAccess || !downloadReady);
+  zipProCta?.classList.toggle("hidden", paidAccess || !downloadReady || running);
   emptyState.classList.toggle("hidden", hasItems);
   countText.textContent = `${items.length} ${items.length === 1 ? t("photoSingular") : t("photoPlural")}`;
 

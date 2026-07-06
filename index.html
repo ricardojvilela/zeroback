@@ -343,12 +343,21 @@
             Descarregar ZIP
           </button>
         </div>
-        <p class="download-ready-hint hidden" id="downloadReadyHint" data-i18n="downloadReadyHint">
-          Resultado pronto. Se quiser repetir isto com mais produtos, o plano fundador desbloqueia 100 imagens por lote.
-        </p>
-        <button class="zip-pro-nudge hidden" id="zipProCta" type="button" data-i18n="zipProCta">
-          Criar conta e ativar fundador - 15 EUR/mês
-        </button>
+        <section class="result-ready-upgrade hidden" id="downloadReadyHint" aria-labelledby="result-ready-upgrade-title">
+          <div>
+            <p class="section-kicker" data-i18n="resultReadyKicker">Resultado pronto</p>
+            <h2 id="result-ready-upgrade-title" data-i18n="resultReadyTitle">Quer repetir isto em lotes maiores?</h2>
+            <p data-i18n="downloadReadyHint">
+              Se o recorte ficou bom, o plano fundador transforma este teste em produção: até 100 imagens por lote, 2.000 por mês e ZIP pronto para loja.
+            </p>
+          </div>
+          <div class="result-ready-upgrade-actions">
+            <button class="zip-pro-nudge hidden" id="zipProCta" type="button" data-i18n="zipProCta">
+              Criar conta e ativar fundador - 15 EUR/mês
+            </button>
+            <span data-i18n="resultReadyMicrocopy">Sem fidelização. Pagamento seguro por Stripe.</span>
+          </div>
+        </section>
 
         <section class="post-download-next hidden" id="postDownloadNextPanel" aria-labelledby="post-download-next-title">
           <div>
