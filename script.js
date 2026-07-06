@@ -47,6 +47,10 @@ const proInlineSuccessCard = document.querySelector("#proInlineSuccessCard");
 const accountPanel = document.querySelector("#accountPanel");
 const accountBadge = document.querySelector("#accountBadge");
 const accountStatus = document.querySelector("#accountStatus");
+const accountUsage = document.querySelector("#accountUsage");
+const accountUsageCount = document.querySelector("#accountUsageCount");
+const accountUsageBar = document.querySelector("#accountUsageBar");
+const accountUsageReset = document.querySelector("#accountUsageReset");
 const accountMessage = document.querySelector("#accountMessage");
 const accountForm = document.querySelector("#accountForm");
 const accountEmail = document.querySelector("#accountEmail");
@@ -227,6 +231,10 @@ const baseTranslation = {
   accountStatusLoading: "A verificar a sua conta...",
   accountStatusFree: "Conta gratuita. O Pro ativa até 100 imagens por lote e 2.000 imagens por mês.",
   accountStatusPro: "Conta Pro ativa. Até {batchLimit} imagens por lote e {monthlyRemaining} de {monthlyLimit} disponíveis este mês.",
+  accountUsageTitle: "Utilização mensal",
+  accountUsageCount: "{used} de {limit} imagens usadas",
+  accountUsageReset: "O limite mensal renova em {date}.",
+  accountUsageResetUnknown: "O limite mensal renova no início do próximo mês.",
   accountStatusConfigMissing: "Login Pro ainda não configurado neste ambiente.",
   accountEmailPlaceholder: "O seu email",
   accountPasswordPlaceholder: "A sua password",
@@ -392,6 +400,10 @@ const translations = {
     accountStatusLoading: "Checking your account...",
     accountStatusFree: "Free account. Pro unlocks up to 100 images per batch and 2,000 images per month.",
     accountStatusPro: "Pro account active. Up to {batchLimit} images per batch and {monthlyRemaining} of {monthlyLimit} available this month.",
+    accountUsageTitle: "Monthly usage",
+    accountUsageCount: "{used} of {limit} images used",
+    accountUsageReset: "Monthly limit resets on {date}.",
+    accountUsageResetUnknown: "Monthly limit resets at the start of next month.",
     accountStatusConfigMissing: "Pro login is not configured in this environment yet.",
     accountEmailPlaceholder: "Your email",
     accountPasswordPlaceholder: "Your password",
@@ -900,6 +912,10 @@ const translatedAddons = {
     privacyNote: "Las imágenes se procesan en tu dispositivo y no se suben a nuestros servidores.",
     formatNote: "Algunos formatos pueden depender del soporte del navegador.",
     batchLimitNote: "{limit} imágenes gratis. Para más volumen, elige Pro.",
+    accountUsageTitle: "Uso mensual",
+    accountUsageCount: "{used} de {limit} imágenes usadas",
+    accountUsageReset: "El límite mensual se renueva el {date}.",
+    accountUsageResetUnknown: "El límite mensual se renueva al inicio del próximo mes.",
     privacyLink: "Privacidad y términos",
     statusTooManyFiles: "Se añadieron {accepted} de {total} imágenes. Para procesar lotes mayores de una vez, elige Pro.",
     statusNoSupportedFiles: "No se encontró ningún archivo de imagen compatible.",
@@ -1736,6 +1752,44 @@ function setAccountMessage(key = "", params = {}) {
   accountMessage.textContent = key ? t(key, params) : "";
 }
 
+function formatAccountDate(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  try {
+    return new Intl.DateTimeFormat(languageNames[currentLanguage] || currentLanguage || "en", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(date);
+  } catch {
+    return date.toISOString().slice(0, 10);
+  }
+}
+
+function updateAccountUsageUi(access = {}) {
+  if (!accountUsage || !accountUsageCount || !accountUsageBar || !accountUsageReset) return;
+
+  if (!access.canUsePro) {
+    accountUsage.classList.add("hidden");
+    accountUsageBar.style.width = "0%";
+    return;
+  }
+
+  const monthlyLimit = Number(access.monthlyLimit || 0) || defaultProMonthlyLimit;
+  const monthlyUsed = Math.max(Number(access.monthlyUsed || 0) || 0, 0);
+  const boundedUsed = Math.min(monthlyUsed, monthlyLimit);
+  const percent = monthlyLimit > 0 ? Math.min(Math.round((boundedUsed / monthlyLimit) * 100), 100) : 0;
+  const resetDate = formatAccountDate(access.periodEnd);
+
+  accountUsage.classList.remove("hidden");
+  accountUsageCount.textContent = t("accountUsageCount", { used: boundedUsed, limit: monthlyLimit });
+  accountUsageBar.style.width = `${percent}%`;
+  accountUsageReset.textContent = resetDate
+    ? t("accountUsageReset", { date: resetDate })
+    : t("accountUsageResetUnknown");
+}
+
 function checkoutPlanDisplayName(plan) {
   if (!checkoutPlans.has(plan || "")) return "";
   return t(checkoutPlanLabelKey(plan));
@@ -1773,7 +1827,9 @@ function getPaidAccessParams() {
   return {
     limit: Number(access.batchLimit || 0) || defaultProBatchLimit,
     monthlyLimit: Number(access.monthlyLimit || 0) || defaultProMonthlyLimit,
+    monthlyUsed: Number(access.monthlyUsed || 0) || 0,
     monthlyRemaining: access.monthlyRemaining ?? access.monthlyLimit ?? defaultProMonthlyLimit,
+    periodEnd: access.periodEnd || "",
   };
 }
 
@@ -1830,6 +1886,7 @@ function updateAccountUi() {
     accountActions?.classList.add("hidden");
     billingActions?.classList.add("hidden");
     billingPortal?.classList.add("hidden");
+    updateAccountUsageUi({});
     if (accountCreate) accountCreate.textContent = t("accountCreate");
     if (accountSubmit) accountSubmit.textContent = t("accountSubmit");
     syncPaidAccessUi();
@@ -1851,6 +1908,7 @@ function updateAccountUi() {
     accountActions?.classList.add("hidden");
     billingActions?.classList.add("hidden");
     billingPortal?.classList.add("hidden");
+    updateAccountUsageUi({});
     syncAccountAuthButtons();
     syncPaidAccessUi();
     updateControls();
@@ -1876,6 +1934,7 @@ function updateAccountUi() {
   accountActions?.classList.remove("hidden");
   billingActions?.classList.toggle("hidden", Boolean(access.canUsePro));
   billingPortal?.classList.toggle("hidden", !access.canUsePro || !currentAccount?.billing?.hasStripeCustomer);
+  updateAccountUsageUi(access);
   syncPaidAccessUi();
   updateControls();
 }

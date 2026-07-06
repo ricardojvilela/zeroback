@@ -234,6 +234,16 @@
           <p class="account-status" id="accountStatus" data-i18n="accountStatusGuest">
             Crie conta para ativar Pro ou entre para gerir o seu acesso.
           </p>
+          <div class="account-usage hidden" id="accountUsage" aria-live="polite">
+            <div class="account-usage-head">
+              <span data-i18n="accountUsageTitle">Utilização mensal</span>
+              <strong id="accountUsageCount">0 / 0</strong>
+            </div>
+            <div class="account-usage-bar" aria-hidden="true">
+              <span id="accountUsageBar"></span>
+            </div>
+            <p id="accountUsageReset">O limite renova no início do próximo mês.</p>
+          </div>
           <form class="account-form" id="accountForm" novalidate>
             <input
               id="accountEmail"

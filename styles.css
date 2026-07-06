@@ -314,6 +314,55 @@ h2 {
   font-weight: 750;
 }
 
+.account-usage {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px;
+  border: 1px solid rgba(81, 215, 198, 0.26);
+  border-radius: 8px;
+  background: rgba(81, 215, 198, 0.1);
+}
+
+.account-usage-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.account-usage-head strong {
+  color: #ffffff;
+  font-size: 0.84rem;
+  text-align: right;
+}
+
+.account-usage-bar {
+  overflow: hidden;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.account-usage-bar span {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: #51d7c6;
+  transition: width 180ms ease;
+}
+
+.account-usage p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
 .account-form,
 .account-actions {
   display: grid;
