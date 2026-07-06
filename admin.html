@@ -1566,8 +1566,10 @@
       function outreachEmailCopy(prospect) {
         const key = outreachTemplateKey(prospect);
         const campaign = outreachCampaign(prospect);
-        const toolUrl = `https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=${campaign}#tool`;
-        const demoUrl = `https://batchcutout.com/en/customer-results/?utm_source=manual_outreach&utm_medium=email&utm_campaign=${campaign}_demo`;
+        const trackedCampaign = campaign === "partner" ? "partner_outreach" : campaign;
+        const toolUrl = `https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=${trackedCampaign}#tool`;
+        const demoUrl = `https://batchcutout.com/en/customer-results/?utm_source=manual_outreach&utm_medium=email&utm_campaign=${trackedCampaign}_demo`;
+        const agencyUrl = `https://batchcutout.com/en/ecommerce-agency-product-photo-workflow/?utm_source=manual_outreach&utm_medium=email&utm_campaign=${trackedCampaign}`;
         const usesDemo = prospect.outreach_variant === "demo_video";
         const demoBlock = usesDemo
           ? `\n\nI put together a visual proof page so you can see the result before testing it:\n${demoUrl}`
@@ -1575,7 +1577,7 @@
         if (key === "email_partner") {
           return {
             subject: "Batch background removal for ecommerce photo workflows",
-            body: `Hi,\n\n${outreachIntro(prospect)}\n\nBatchCutout is a simple batch background remover for product photo workflows. It is not a full design suite; it is focused on repeat cutouts, transparent PNGs, and ZIP export.${demoBlock}\n\nYou can also test 2 images free here, no card needed:\nhttps://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach#tool\n\nFounder plan:\nhttps://batchcutout.com/pricing/?checkout_plan=early&utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach#pricing-account-title\n\nIf this is not relevant, reply "no thanks" and I will not contact you again.\n\nThanks,\nRicardo\nNexaFlow Labs`,
+            body: `Hi,\n\n${outreachIntro(prospect)}\n\nBatchCutout is a simple batch background remover for product photo workflows. It is not a full design suite; it is focused on repeat cutouts, transparent PNGs, and ZIP export for client or catalog handoff.${demoBlock}\n\nI made a short agency workflow page here:\n${agencyUrl}\n\nYou can also test 2 images free here, no card needed:\n${toolUrl}\n\nFounder plan:\nhttps://batchcutout.com/pricing/?checkout_plan=early&utm_source=manual_outreach&utm_medium=email&utm_campaign=${trackedCampaign}#pricing-account-title\n\nIf this is not relevant, reply "no thanks" and I will not contact you again.\n\nThanks,\nRicardo\nNexaFlow Labs`,
           };
         }
         return {
@@ -1586,10 +1588,14 @@
 
       function outreachContactFormCopy(prospect) {
         const campaign = outreachCampaign(prospect);
+        const trackedCampaign = campaign === "partner" ? "partner_outreach" : campaign;
         const demoLine = prospect.outreach_variant === "demo_video"
-          ? ` I put together a visual proof page here: https://batchcutout.com/en/customer-results/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${campaign}_demo`
+          ? ` I put together a visual proof page here: https://batchcutout.com/en/customer-results/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${trackedCampaign}_demo`
           : "";
-        return `Hi, ${outreachIntro(prospect)} BatchCutout removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP.${demoLine} You can also test 2 images free, no account or card needed: https://batchcutout.com/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${campaign}#tool Founder plan is 15 EUR/month for 100 images per batch and 2,000/month. - Ricardo, NexaFlow Labs`;
+        const agencyLine = campaign === "partner"
+          ? ` Agency workflow page: https://batchcutout.com/en/ecommerce-agency-product-photo-workflow/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${trackedCampaign}`
+          : "";
+        return `Hi, ${outreachIntro(prospect)} BatchCutout removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP.${demoLine}${agencyLine} You can also test 2 images free, no account or card needed: https://batchcutout.com/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${trackedCampaign}#tool Founder plan is 15 EUR/month for 100 images per batch and 2,000/month. - Ricardo, NexaFlow Labs`;
       }
 
       function outreachStatusLabel(status) {

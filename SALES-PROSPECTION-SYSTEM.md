@@ -96,7 +96,11 @@ Batch background removal for ecommerce photo workflows
 
 Use this for product photographers, ecommerce assistants and small agencies. The message should position BatchCutout as a utility for repeat cutouts before final editing or client delivery, not as a replacement for their service.
 
-The partner email must link to the visual proof page first:
+The partner email should link to the agency/assistant workflow page first:
+
+https://batchcutout.com/en/ecommerce-agency-product-photo-workflow/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach
+
+If using the proof variant, also include the visual proof page:
 
 https://batchcutout.com/en/customer-results/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach_demo
 
