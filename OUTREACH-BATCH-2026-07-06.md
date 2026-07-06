@@ -1,6 +1,6 @@
-# BatchCutout - outreach batch 2026-07-05
+# BatchCutout - outreach batch 2026-07-06
 
-Prepared: 2026-07-05
+Prepared: 2026-07-06
 
 Do not send before checking `support@batchcutout.com` in `/admin` for negative replies, opt-outs or unresolved support messages.
 
@@ -167,8 +167,8 @@ NexaFlow Labs
 
 Update each CSV row:
 
-- `status`: `sent_2026-07-05`
+- `status`: `sent_2026-07-06`
 - `next_action`: `follow_up_if_no_reply`
-- `follow_up_date`: `2026-07-09`
+- `follow_up_date`: `2026-07-10`
 - `send_id`: Resend ID from `/admin`
 - keep `outreach_variant`: `demo_video`
