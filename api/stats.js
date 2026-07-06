@@ -70,6 +70,7 @@ function emptyDay(date) {
     accountLogins: 0,
     accountLoginFailures: 0,
     leadCaptures: 0,
+    resultReadyLeadCaptures: 0,
     leadAutorepliesSent: 0,
     leadAutorepliesFailed: 0,
     proWelcomeEmailsSent: 0,
@@ -100,6 +101,9 @@ function classifySource(event, detail) {
     "tool_limit_prompt",
     "tool_empty_state",
     "post_download",
+    "post_download_next",
+    "post_download_inline",
+    "result_ready",
     "hero",
     "pricing",
     "pricing-page",
@@ -200,6 +204,7 @@ function emptySourceRow(source) {
     accountLogins: 0,
     accountLoginFailures: 0,
     leadCaptures: 0,
+    resultReadyLeadCaptures: 0,
     leadAutorepliesSent: 0,
     leadAutorepliesFailed: 0,
     proWelcomeEmailsSent: 0,
@@ -596,6 +601,10 @@ export default async function handler(request, response) {
         case "lead_capture_submitted":
           row.leadCaptures += 1;
           sourceRow.leadCaptures += 1;
+          if ((detail.capture_source || detail.source) === "result_ready") {
+            row.resultReadyLeadCaptures += 1;
+            sourceRow.resultReadyLeadCaptures += 1;
+          }
           break;
         case "lead_capture_autoreply_sent":
           row.leadAutorepliesSent += 1;

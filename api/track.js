@@ -477,7 +477,7 @@ export default async function handler(request, response) {
     language: asString(detail.language, 20),
     session_id: asString(body?.sessionId, 80),
     visitor_id: asString(body?.visitorId, 80),
-    source: asString(detail.source || detail.utm_source || detail.last_source || detail.first_source, 160),
+    source: asString(detail.utm_source || detail.last_source || detail.first_source || detail.source, 160),
     campaign: asString(detail.utm_campaign || detail.last_campaign || detail.first_campaign, 160),
     free_limit: Number(detail.free_limit || 0) || null,
     value: Number(detail.value || 0) || 0,

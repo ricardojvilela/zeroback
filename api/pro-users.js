@@ -838,7 +838,8 @@ async function listLeadCaptures(settings) {
     leads.push({
       email,
       language: cleanText(detail.language, 20) || "en",
-      source: cleanText(detail.source || event.source || detail.utm_source || detail.last_source || detail.first_source, 160),
+      source: cleanText(detail.utm_source || detail.last_source || detail.first_source || event.source || detail.source, 160),
+      captureSource: cleanText(detail.capture_source || detail.source, 80),
       campaign: cleanText(event.campaign || detail.utm_campaign || detail.last_campaign || detail.first_campaign, 160),
       downloadType: cleanText(detail.downloadType, 80),
       count: Number(detail.count || 0) || 0,

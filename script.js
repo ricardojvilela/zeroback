@@ -2862,7 +2862,7 @@ function focusPostDownloadLeadCapture() {
   const downloadType = postDownloadNextPanel?.dataset.downloadType || "unknown";
   const count = Number(postDownloadNextPanel?.dataset.downloadCount || 0) || 0;
   localStorage.removeItem(leadCaptureDismissedStorageKey);
-  showLeadCapture(downloadType, count);
+  showLeadCapture(downloadType, count, "post_download_next");
   trackEvent("post_download_save_link_clicked", {
     downloadType,
     count,
@@ -2877,7 +2877,7 @@ function focusResultReadyLeadCapture() {
   const count = items.filter((item) => item.outputBlob).length;
   const downloadType = count > 1 ? "zip_available" : "png_available";
   localStorage.removeItem(leadCaptureDismissedStorageKey);
-  showLeadCapture(downloadType, count);
+  showLeadCapture(downloadType, count, "result_ready");
   trackEvent("post_download_save_link_clicked", {
     downloadType,
     count,
@@ -2894,7 +2894,7 @@ function showPostDownloadFeedback(downloadType, count) {
   postDownloadFeedback?.classList.remove("hidden");
   postDownloadFeedback?.setAttribute("data-download-type", downloadType);
   postDownloadFeedback?.setAttribute("data-download-count", String(count));
-  if (!postDownloadEmailForm) showLeadCapture(downloadType, count);
+  if (!postDownloadEmailForm) showLeadCapture(downloadType, count, "post_download");
   showProPrompt(`post_download_${downloadType}`, { scroll: false });
 }
 
@@ -2904,16 +2904,19 @@ function shouldShowLeadCapture() {
   return !getCapturedLeadEmail();
 }
 
-function showLeadCapture(downloadType = "unknown", count = 0) {
+function showLeadCapture(downloadType = "unknown", count = 0, captureSource = "post_download") {
   if (!shouldShowLeadCapture()) return;
 
   leadCapturePanel.classList.remove("hidden");
   leadCapturePanel.dataset.downloadType = downloadType;
   leadCapturePanel.dataset.downloadCount = String(count);
+  leadCapturePanel.dataset.captureSource = captureSource;
   if (leadCaptureMessage) leadCaptureMessage.textContent = "";
   trackEvent("lead_capture_shown", {
     downloadType,
     count,
+    source: captureSource,
+    capture_source: captureSource,
     has_account: Boolean(currentAccount?.email),
   });
 }
@@ -2922,7 +2925,7 @@ function hideLeadCapture() {
   leadCapturePanel?.classList.add("hidden");
 }
 
-function recordLeadCapture(email, { downloadType = "unknown", count = 0, source = "post_download" } = {}) {
+function recordLeadCapture(email, { downloadType = "unknown", count = 0, source = "post_download", captureSource = source } = {}) {
   localStorage.setItem(leadCaptureEmailStorageKey, email);
   if (accountEmail && !accountEmail.value.trim()) accountEmail.value = email;
   localStorage.removeItem(leadCaptureDismissedStorageKey);
@@ -2936,6 +2939,7 @@ function recordLeadCapture(email, { downloadType = "unknown", count = 0, source 
     downloadType,
     count,
     source,
+    capture_source: captureSource,
   });
 }
 
@@ -2952,10 +2956,11 @@ async function handleLeadCaptureSubmit(event) {
   const email = normalizeEmail(leadCaptureEmail.value);
   const downloadType = leadCapturePanel?.dataset.downloadType || "unknown";
   const count = Number(leadCapturePanel?.dataset.downloadCount || 0) || 0;
+  const captureSource = leadCapturePanel?.dataset.captureSource || "post_download";
 
   if (!isValidEmail(email)) {
     if (leadCaptureMessage) leadCaptureMessage.textContent = t("leadCaptureInvalid");
-    trackEvent("lead_capture_invalid", { downloadType, count });
+    trackEvent("lead_capture_invalid", { downloadType, count, source: captureSource, capture_source: captureSource });
     leadCaptureEmail.focus();
     return;
   }
@@ -2963,7 +2968,8 @@ async function handleLeadCaptureSubmit(event) {
   recordLeadCapture(email, {
     downloadType,
     count,
-    source: "post_download",
+    source: captureSource,
+    captureSource,
   });
 
   if (leadCaptureMessage) leadCaptureMessage.textContent = t("leadCaptureSuccess");
@@ -2997,6 +3003,7 @@ function handlePostDownloadEmailSubmit(event) {
     downloadType,
     count,
     source: "post_download_inline",
+    captureSource: "post_download_inline",
   });
 
   hideLeadCapture();
@@ -3009,6 +3016,8 @@ function dismissLeadCapture() {
   trackEvent("lead_capture_dismissed", {
     downloadType: leadCapturePanel?.dataset.downloadType || "unknown",
     count: Number(leadCapturePanel?.dataset.downloadCount || 0) || 0,
+    source: leadCapturePanel?.dataset.captureSource || "post_download",
+    capture_source: leadCapturePanel?.dataset.captureSource || "post_download",
   });
   hideLeadCapture();
 }

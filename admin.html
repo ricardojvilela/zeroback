@@ -792,6 +792,10 @@
             <strong id="liveLeadCaptures">0</strong>
           </article>
           <article class="live-card">
+            <span>Leads resultado pronto</span>
+            <strong id="liveResultReadyLeadCaptures">0</strong>
+          </article>
+          <article class="live-card">
             <span>Auto email lead</span>
             <strong id="liveLeadAutoreplies">0</strong>
           </article>
@@ -1747,6 +1751,7 @@
         document.querySelector("#liveAccountLogins").textContent = totals.accountLogins || 0;
         document.querySelector("#liveAccountLoginFailures").textContent = totals.accountLoginFailures || 0;
         document.querySelector("#liveLeadCaptures").textContent = totals.leadCaptures || 0;
+        document.querySelector("#liveResultReadyLeadCaptures").textContent = totals.resultReadyLeadCaptures || 0;
         document.querySelector("#liveLeadAutoreplies").textContent = totals.leadAutorepliesSent || 0;
         document.querySelector("#liveLeadAutoreplyRate").textContent = formatPercent(conversionRate(
           totals.leadAutorepliesSent,
@@ -1946,7 +1951,7 @@
               const reason = checkout
                 ? `${copy.reason || "-"} Plano: ${checkout.plan || "monthly"}. Sessão Stripe há ${checkout.hoursSinceCreated || 0}h.`
                 : lead
-                  ? `${copy.reason || "-"} ${lead.count ? `${lead.count} imagem(ns), ${lead.downloadType || "download"}.` : ""}${lead.autoReplyFailedAt ? ` Auto email falhou: ${lead.autoReplyFailureReason || "ver Resend"}.` : ""}`
+                  ? `${copy.reason || "-"} ${lead.count ? `${lead.count} imagem(ns), ${lead.downloadType || "download"}.` : ""}${lead.captureSource ? ` Origem: ${lead.captureSource}.` : ""}${lead.autoReplyFailedAt ? ` Auto email falhou: ${lead.autoReplyFailureReason || "ver Resend"}.` : ""}`
                   : copy.reason || "-";
               return `
                 <tr>
