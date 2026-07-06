@@ -529,6 +529,156 @@ async function insertCommercialEvent(settings, eventName, detail, eventLabel = "
   }
 }
 
+function searchableText(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+function firstReplyText(value) {
+  const cleaned = String(value || "").replace(/\r\n/g, "\n");
+  const firstPart = cleaned.split(/\n\s*(on .+wrote:|em .+escreveu:|from:|de:|--+\s*original message\s*--+)/i)[0] || cleaned;
+  return firstPart
+    .split("\n")
+    .filter((line) => !line.trim().startsWith(">"))
+    .slice(0, 12)
+    .join("\n")
+    .trim()
+    .slice(0, 1200);
+}
+
+function optOutReasonFromText(value) {
+  const text = searchableText(firstReplyText(value));
+  if (!text) return "";
+  const patterns = [
+    ["unsubscribe", /\bunsubscribe\b/],
+    ["no_thanks", /\bno\s+thanks\b|\bno\s+thank\s+you\b/],
+    ["not_interested", /\bnot\s+interested\b|\bno\s+interest\b/],
+    ["remove_me", /\bremove\s+me\b|\bopt\s*out\b/],
+    ["do_not_contact", /\bdo\s+not\s+contact\b|\bdon'?t\s+contact\b|\bstop\s+contacting\b/],
+    ["pt_remove", /\bremova-me\b|\bremover-me\b|\bnao\s+contactar\b|\bnao\s+contatar\b|\bsem\s+interesse\b/],
+    ["es_remove", /\bno\s+contactar\b|\bsin\s+interes\b/],
+  ];
+  const match = patterns.find(([, pattern]) => pattern.test(text));
+  return match ? match[0] : "";
+}
+
+async function findSupportOptOut(settings, email) {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) return null;
+
+  const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
+  const query = new URLSearchParams({
+    select: "id,event_name,event_label,detail,occurred_at",
+    event_name: "eq.support_email_received",
+    order: "occurred_at.desc",
+    limit: "500",
+  });
+  const response = await fetch(`${settings.supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}?${query}`, {
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+    },
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`support_opt_out_read_failed:${response.status}:${detail.slice(0, 300)}`);
+  }
+
+  for (const event of await response.json()) {
+    const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+    const from = fromEmail(detail.from || "");
+    if (from !== normalizedEmail) continue;
+
+    const reason = optOutReasonFromText(detail.text || detail.html || "");
+    if (reason) {
+      return {
+        reason,
+        email: normalizedEmail,
+        supportEmailId: cleanText(detail.email_id || event.event_label || "", 120),
+        receivedAt: event.occurred_at || "",
+      };
+    }
+  }
+
+  return null;
+}
+
+async function findDuplicateCommercialEmail(settings, email, { recoverySegment = "", subject = "" } = {}) {
+  const normalizedEmail = normalizeEmail(email);
+  if (!normalizedEmail) return null;
+
+  const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
+  const query = new URLSearchParams({
+    select: "id,event_name,event_label,detail,occurred_at",
+    event_name: "in.(recovery_email_sent,manual_outreach_email_sent)",
+    order: "occurred_at.desc",
+    limit: "1000",
+  });
+  const response = await fetch(`${settings.supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}?${query}`, {
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+    },
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`commercial_duplicate_read_failed:${response.status}:${detail.slice(0, 300)}`);
+  }
+
+  for (const event of await response.json()) {
+    const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+    if (normalizeEmail(detail.email) !== normalizedEmail) continue;
+
+    const sameRecoverySegment = recoverySegment && cleanText(detail.segment, 80) === recoverySegment;
+    if (sameRecoverySegment && (event.event_name === "recovery_email_sent" || cleanText(detail.purpose, 80) === "recovery")) {
+      return { type: "recovery", sentAt: event.occurred_at || "", resendId: cleanText(detail.resend_id, 120) };
+    }
+
+    if (!recoverySegment && event.event_name === "manual_outreach_email_sent" && cleanText(detail.subject, 160) === subject) {
+      return { type: "manual_subject", sentAt: event.occurred_at || "", resendId: cleanText(detail.resend_id, 120) };
+    }
+  }
+
+  return null;
+}
+
+async function guardCommercialEmailSend(settings, { to, recoverySegment = "", subject = "", dryRun = false } = {}) {
+  if (dryRun) return null;
+
+  const optOut = await findSupportOptOut(settings, to);
+  if (optOut) {
+    return {
+      status: 409,
+      body: {
+        ok: false,
+        error: "outreach_blocked_opt_out",
+        reason: optOut.reason,
+        supportEmailId: optOut.supportEmailId,
+        receivedAt: optOut.receivedAt,
+      },
+    };
+  }
+
+  const duplicate = await findDuplicateCommercialEmail(settings, to, { recoverySegment, subject });
+  if (duplicate) {
+    return {
+      status: 409,
+      body: {
+        ok: false,
+        error: duplicate.type === "recovery" ? "outreach_duplicate_recovery" : "outreach_duplicate_subject",
+        sentAt: duplicate.sentAt,
+        resendId: duplicate.resendId,
+      },
+    };
+  }
+
+  return null;
+}
+
 function supportMessageFromEvent(event, replyIds, resolvedIds) {
   const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
   const emailId = cleanText(detail.email_id || event.event_label || "", 120);
@@ -976,6 +1126,14 @@ async function sendOutreach(supabaseSettings, body) {
     return { status: 400, body: { ok: false, error: "invalid_email_payload" } };
   }
 
+  const guardResult = await guardCommercialEmailSend(supabaseSettings, {
+    to,
+    recoverySegment,
+    subject,
+    dryRun,
+  });
+  if (guardResult) return guardResult;
+
   const payload = {
     from: mailSettings.from,
     to,
@@ -1014,6 +1172,18 @@ async function sendOutreach(supabaseSettings, body) {
       },
     };
   }
+
+  await insertCommercialEvent(supabaseSettings, "manual_outreach_email_sent", {
+    email: to,
+    segment: recoverySegment,
+    stripe_session_id: stripeSessionId,
+    plan: recoveryPlan,
+    from: payload.from,
+    reply_to: payload.replyTo,
+    subject: payload.subject,
+    resend_id: sent.data?.id || "",
+    purpose: recoverySegment ? "recovery" : "prospecting",
+  }, to);
 
   if (recoverySegment) {
     await insertCommercialEvent(supabaseSettings, "recovery_email_sent", {

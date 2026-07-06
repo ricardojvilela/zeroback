@@ -2366,6 +2366,16 @@
         await loadSubscriptions();
       }
 
+      function commercialEmailErrorMessage(error, fallback) {
+        const code = String(error?.message || "");
+        const messages = {
+          outreach_blocked_opt_out: "Envio bloqueado: este contacto pediu para não receber mais emails.",
+          outreach_duplicate_recovery: "Envio bloqueado: esta recuperação já foi enviada para este contacto.",
+          outreach_duplicate_subject: "Envio bloqueado: este email comercial já foi enviado para este contacto.",
+        };
+        return messages[code] || fallback;
+      }
+
       async function sendRecoveryEmail(email, segment, context = {}) {
         const token = getAdminToken();
         if (!token) return;
@@ -2583,9 +2593,9 @@
           await loadRecoveryEmails();
           await loadLeadCaptures();
           await loadCheckoutRecoveries();
-        } catch {
+        } catch (error) {
           button.textContent = originalText;
-          alert("Não foi possível enviar via domínio.");
+          alert(commercialEmailErrorMessage(error, "Não foi possível enviar via domínio."));
         } finally {
           button.disabled = false;
         }
@@ -2637,9 +2647,9 @@
           try {
             await sendOutreachEmail(email, copy);
             button.textContent = "Enviado";
-          } catch {
+          } catch (error) {
             button.textContent = originalText;
-            alert("Não foi possível enviar o email comercial.");
+            alert(commercialEmailErrorMessage(error, "Não foi possível enviar o email comercial."));
           } finally {
             button.disabled = false;
           }
