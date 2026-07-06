@@ -144,3 +144,4 @@ Interpretation:
 - Added a dedicated `/launch/` directory landing page with source-specific CTAs and tracking for Product Hunt, Uneed, BetaList, SaaSHub and Indie Hackers traffic.
 - Added an English `/en/customer-results/` proof page so international directory visitors can inspect examples without switching to Portuguese.
 - Added directory launch events to `/api/track` and `/admin`, including Product Hunt and Indie Hackers source classification for launch page views and CTAs.
+- Added an English ecommerce agency/assistant landing page for recurring client product-photo workflows, linked from the English hub, product-photo page, sitemap and LLM discovery.
