@@ -157,3 +157,4 @@ Interpretation:
 - Checkout sessions started from the main tool now send the active site language to Stripe/session recovery, and email-confirmation redirects preserve the selected app language, avoiding Portuguese buyers being returned to English by default.
 - The funnel now tracks accounts that require email confirmation separately from completed account access, and `/admin` shows this step in totals, source rows and the automatic diagnosis so account-to-Stripe drop-off is easier to diagnose.
 - `/admin` now also surfaces unconfirmed Supabase Auth accounts as manual recovery opportunities with PT/EN/ES follow-up templates, so confirmation-blocked buyers can be handled without automatic extra email volume.
+- Added an English product catalog background remover acquisition page for supplier photos, SKU updates and variant batches, linked from the English hub, product-photo page, agency workflow, sitemap and LLM discovery.
