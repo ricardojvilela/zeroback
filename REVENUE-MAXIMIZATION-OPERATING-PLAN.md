@@ -177,3 +177,4 @@ Interpretation:
 - Checkout and Stripe subscription metadata now preserve first/last campaign context, including medium, content, search term and ad click IDs, so paid revenue can be tied back to acquisition journeys even when checkout happens after a later visit.
 - Subscription MRR reporting now ignores internal sources such as `pricing_page` and falls back to the real first/last acquisition source, so revenue by source reflects marketing channels instead of checkout UI labels.
 - Subscription, lead and checkout-recovery reporting now also ignores internal pricing campaigns such as `founder_plan`, falling back to the acquisition campaign that actually brought the visitor.
+- Admin funnel diagnosis now flags Stripe session failures, checkout-link email failures, email non-clicks, tracking mismatches and repeated Stripe cancellations before generic conversion advice.

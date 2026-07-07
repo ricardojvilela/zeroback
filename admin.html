@@ -1356,11 +1356,33 @@
         const leadCaptures = Number(totals.leadCaptures || 0) || 0;
         const planClicks = Number(totals.proClicks || 0) + Number(totals.pricingCtaClicks || 0);
         const checkoutSessions = Number(totals.checkoutSessionsCreated || 0) || 0;
+        const checkoutStarts = Number(totals.checkoutStarts || 0) || 0;
+        const checkoutSessionFailures = Number(totals.checkoutSessionFailures || 0) || 0;
+        const checkoutCancelledReturns = Number(totals.checkoutCancelledReturns || 0) || 0;
+        const checkoutLinkEmails = Number(totals.checkoutLinkEmailsSent || 0) || 0;
+        const checkoutLinkEmailClicks = Number(totals.checkoutLinkEmailClicks || 0) || 0;
+        const checkoutLinkEmailFailures = Number(totals.checkoutLinkEmailFailures || 0) || 0;
         const paidSubscriptions = Number(totals.paidSubscriptions || 0) || 0;
         const accountValidationFailures = Number(totals.accountValidationFailures || 0) || 0;
         const emailConfirmations = Number(totals.accountEmailConfirmations || 0) || 0;
         const confirmationResends = Number(totals.accountEmailConfirmationResends || 0) || 0;
         const activeAccountEntrants = Math.max((Number(totals.accountSignups || 0) || 0) - emailConfirmations, 0) + Number(totals.accountLogins || 0);
+
+        if (checkoutSessionFailures > 0 && checkoutSessions === 0) {
+          return "Gargalo principal: a criação da sessão Stripe falhou depois de haver intenção de pagamento. Prioridade: verificar preços/env vars Stripe, ligação do cliente e detalhe do erro no painel.";
+        }
+
+        if (checkoutLinkEmailFailures > 0) {
+          return "Gargalo principal: o email de continuação de checkout falhou. Prioridade: rever Resend/remetente do domínio e garantir que compradores sem sessão recebem o link de pagamento.";
+        }
+
+        if (checkoutLinkEmails >= 2 && checkoutLinkEmailClicks === 0 && checkoutSessions === 0) {
+          return "Gargalo principal: emails de checkout foram enviados mas ainda não geraram cliques. Prioridade: rever entregabilidade, assunto e clareza do link de continuação.";
+        }
+
+        if (checkoutStarts > 0 && checkoutSessions === 0) {
+          return "Gargalo principal: o browser registou início de checkout, mas a API não registou sessão Stripe criada. Prioridade: rever consistência de tracking/API antes de tomar decisões comerciais.";
+        }
 
         if (confirmationResends > 0 && checkoutSessions === 0) {
           return "Gargalo principal: compradores tentaram entrar antes de confirmar email e receberam novo link. Prioridade: acompanhar se voltam pelo link e chegam ao Stripe.";
@@ -1392,6 +1414,10 @@
 
         if (checkoutSessions >= 3 && paidSubscriptions === 0) {
           return "Gargalo principal: o checkout abre, mas não converte em pagamento. Prioridade: rever confiança, preço, retorno ao site e emails de recuperação.";
+        }
+
+        if (checkoutCancelledReturns >= 2 && paidSubscriptions === 0) {
+          return "Gargalo principal: compradores voltam do Stripe com pagamento cancelado. Prioridade: rever objeções na página de preços, segurança percebida e recuperação pós-cancelamento.";
         }
 
         if (uploads >= 10 && conversionRate(downloads, uploads) < 0.45) {
