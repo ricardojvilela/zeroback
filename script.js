@@ -1339,6 +1339,7 @@ function getAttributionParams() {
     page_path: window.location.pathname,
     page_title: document.title,
     page_location: window.location.href.split("#")[0],
+    language: currentLanguage,
     free_limit: maxFilesPerBatch,
     limit_variant: maxFilesPerBatch === defaultMaxFilesPerBatch ? "default" : `limit_${maxFilesPerBatch}`,
     utm_source: params.get("utm_source"),
@@ -2228,6 +2229,11 @@ function accountEmailRedirectUrl(plan = "") {
   const url = new URL(`${window.location.pathname}${window.location.search}`, window.location.origin);
   if (checkoutPlans.has(plan || "")) {
     url.searchParams.set("checkout_plan", plan);
+  }
+  if (currentLanguage && currentLanguage !== "pt") {
+    url.searchParams.set("lang", currentLanguage);
+  } else {
+    url.searchParams.delete("lang");
   }
   return url.toString();
 }

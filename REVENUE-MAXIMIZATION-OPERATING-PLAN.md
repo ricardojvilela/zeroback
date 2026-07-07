@@ -1,6 +1,6 @@
 # BatchCutout - revenue maximization operating plan
 
-Updated: 2026-07-06
+Updated: 2026-07-07
 
 ## Objective
 
@@ -154,3 +154,4 @@ Interpretation:
 - The internal admin panel now adds an automatic funnel diagnosis so the daily routine identifies whether the current bottleneck is result-to-Pro, pricing-to-Stripe, checkout-to-paid, or upload-to-download.
 - Live data on 2026-07-07 showed 154 visitors, 85 uploads, 53 downloads, 11 combined Pro/pricing clicks, 3 checkout-login-required events, 1 signup and 0 Stripe checkout sessions in the previous 14 days. `/bulk-background-remover/` was the highest-volume landing with 21 visitors and 0 pricing clicks.
 - The PT and EN bulk-background-remover landings now make the paid batch path the primary hero CTA for visitors who already have a real product batch, while keeping the 2-image free test as the secondary validation path. This is meant to increase pricing clicks from the highest-volume landing without increasing ad spend.
+- Checkout sessions started from the main tool now send the active site language to Stripe/session recovery, and email-confirmation redirects preserve the selected app language, avoiding Portuguese buyers being returned to English by default.

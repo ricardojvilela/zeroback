@@ -117,7 +117,8 @@ function checkoutLanguage(attribution) {
   const language = String(attribution.language || "").toLowerCase();
   if (language.startsWith("pt")) return "pt";
   if (language.startsWith("es")) return "es";
-  return "en";
+  if (language.startsWith("en")) return "en";
+  return "pt";
 }
 
 function checkoutPlanText(plan, language) {
