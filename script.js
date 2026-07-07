@@ -129,6 +129,7 @@ const serverEventNames = new Set([
   "billing_portal_opened",
   "account_signup_started",
   "account_signup_succeeded",
+  "account_email_confirmation_required",
   "account_signup_failed",
   "account_login_succeeded",
   "account_login_failed",
@@ -1228,6 +1229,7 @@ const analyticsEvents = {
   billing_portal_opened: { category: "account", label: "billing_portal_opened" },
   account_signup_started: { category: "account", label: "signup_started" },
   account_signup_succeeded: { category: "account", label: "signup_succeeded" },
+  account_email_confirmation_required: { category: "account", label: "email_confirmation_required" },
   account_signup_failed: { category: "account", label: "signup_failed" },
   account_login_succeeded: { category: "account", label: "login_succeeded" },
   account_login_failed: { category: "account", label: "login_failed" },
@@ -2156,6 +2158,11 @@ async function handleAccountCreate(event) {
       setAccountMessage(waitingPlan ? "accountSignupReady" : "accountSignupReadyNoPlan");
       await maybeStartRequestedCheckout();
     } else {
+      trackEvent("account_email_confirmation_required", {
+        source: waitingPlan ? "checkout_plan" : "account_panel",
+        has_requested_checkout: Boolean(waitingPlan),
+        checkout_plan: waitingPlan || "",
+      });
       setAccountMessage(waitingPlan ? "accountSignupSuccessCheckout" : "accountSignupSuccess");
     }
   } catch (error) {

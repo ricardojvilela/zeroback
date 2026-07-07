@@ -67,6 +67,7 @@ function emptyDay(date) {
     accountSignupStarts: 0,
     accountSignupFailures: 0,
     accountSignups: 0,
+    accountEmailConfirmations: 0,
     accountLogins: 0,
     accountLoginFailures: 0,
     leadCaptures: 0,
@@ -201,6 +202,7 @@ function emptySourceRow(source) {
     accountSignupStarts: 0,
     accountSignupFailures: 0,
     accountSignups: 0,
+    accountEmailConfirmations: 0,
     accountLogins: 0,
     accountLoginFailures: 0,
     leadCaptures: 0,
@@ -589,6 +591,10 @@ export default async function handler(request, response) {
         case "account_signup_succeeded":
           row.accountSignups += 1;
           sourceRow.accountSignups += 1;
+          break;
+        case "account_email_confirmation_required":
+          row.accountEmailConfirmations += 1;
+          sourceRow.accountEmailConfirmations += 1;
           break;
         case "account_login_succeeded":
           row.accountLogins += 1;

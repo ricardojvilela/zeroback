@@ -43,6 +43,7 @@ const allowedEvents = new Set([
   "billing_portal_opened",
   "account_signup_started",
   "account_signup_succeeded",
+  "account_email_confirmation_required",
   "account_signup_failed",
   "account_login_succeeded",
   "account_login_failed",

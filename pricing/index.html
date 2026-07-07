@@ -918,6 +918,7 @@
         "pro_volume_selected",
         "pro_submit_attempt",
         "pro_checkout_interest_submitted",
+        "account_email_confirmation_required",
       ]);
       let debugList;
       let hasTrackedFormStart = false;
@@ -1738,6 +1739,11 @@
             hasStartedPricingCheckout = true;
             await startPricingCheckout(selectedPricingPlan);
           } else {
+            trackPricingCheckoutEvent("account_email_confirmation_required", {
+              source: "pricing_page",
+              has_requested_checkout: true,
+              plan: selectedPricingPlan,
+            });
             setPricingStatus("checkoutCreatedCheckEmail");
           }
         } catch (error) {
