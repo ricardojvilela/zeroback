@@ -158,7 +158,7 @@
               <option value="es">ES</option>
             </select>
           </label>
-          <a data-i18n="navTry" href="/?utm_source=pricing&utm_medium=nav&utm_campaign=pro_pricing#tool">
+          <a data-i18n="navTry" href="/?utm_source=pricing&utm_medium=nav&utm_campaign=pro_pricing#tool" data-pricing-locale-link>
             Testar 2 imagens grátis
           </a>
         </div>
@@ -175,11 +175,11 @@
           </p>
           <p class="pricing-free-test-note">
             <span data-i18n="heroFreeTestNote">Ainda não testou a qualidade?</span>
-            <a href="/?utm_source=pricing&utm_medium=hero_free_test&utm_campaign=try_before_pro#tool" data-i18n="heroFreeTestLink">Teste 2 imagens grátis antes de pagar</a>
+            <a href="/?utm_source=pricing&utm_medium=hero_free_test&utm_campaign=try_before_pro#tool" data-i18n="heroFreeTestLink" data-pricing-locale-link>Teste 2 imagens grátis antes de pagar</a>
           </p>
           <div class="landing-actions">
-            <a class="landing-button" href="/pricing/?checkout_plan=early&utm_source=pricing&utm_medium=hero&utm_campaign=founder_plan#pricing-account-title" data-i18n="primaryCta">Plano fundador - 15 EUR/mês</a>
-            <a class="landing-secondary" href="/pricing/?checkout_plan=annual&utm_source=pricing&utm_medium=hero&utm_campaign=pro_annual#pricing-account-title" data-i18n="secondaryCta">
+            <a class="landing-button" href="/pricing/?checkout_plan=early&utm_source=pricing&utm_medium=hero&utm_campaign=founder_plan#pricing-account-title" data-i18n="primaryCta" data-pricing-locale-link>Plano fundador - 15 EUR/mês</a>
+            <a class="landing-secondary" href="/pricing/?checkout_plan=annual&utm_source=pricing&utm_medium=hero&utm_campaign=pro_annual#pricing-account-title" data-i18n="secondaryCta" data-pricing-locale-link>
               Pro anual - 190 EUR/ano (poupe 38 EUR)
             </a>
           </div>
@@ -229,8 +229,8 @@
             Mesmo com poucos lotes, o custo por imagem fica abaixo do tempo gasto em edição manual repetida.
           </p>
           <div class="pricing-value-actions">
-            <a class="landing-button" href="/pricing/?checkout_plan=early&utm_source=pricing&utm_medium=value_case&utm_campaign=founder_value#pricing-account-title" data-i18n="valuePrimaryCta">Ativar fundador</a>
-            <a class="landing-secondary" href="/?utm_source=pricing&utm_medium=value_case&utm_campaign=try_value#tool" data-i18n="valueSecondaryCta">Testar 2 imagens</a>
+            <a class="landing-button" href="/pricing/?checkout_plan=early&utm_source=pricing&utm_medium=value_case&utm_campaign=founder_value#pricing-account-title" data-i18n="valuePrimaryCta" data-pricing-locale-link>Ativar fundador</a>
+            <a class="landing-secondary" href="/?utm_source=pricing&utm_medium=value_case&utm_campaign=try_value#tool" data-i18n="valueSecondaryCta" data-pricing-locale-link>Testar 2 imagens</a>
           </div>
         </div>
         <div class="pricing-value-grid" aria-label="Custo estimado por imagem" data-i18n-aria="valueGridLabel">
@@ -276,7 +276,7 @@
           <span data-i18n="calculatorResultLabel">Estimativa mensal</span>
           <strong id="pricingCalcValue">80 EUR</strong>
           <p id="pricingCalcDetail">4 h poupadas/mês. Depois do plano fundador: 65 EUR.</p>
-          <a class="landing-button" href="/pricing/?checkout_plan=early&utm_source=pricing&utm_medium=calculator&utm_campaign=founder_roi#pricing-account-title" data-i18n="calculatorCta">Usar plano fundador</a>
+          <a class="landing-button" href="/pricing/?checkout_plan=early&utm_source=pricing&utm_medium=calculator&utm_campaign=founder_roi#pricing-account-title" data-i18n="calculatorCta" data-pricing-locale-link>Usar plano fundador</a>
         </div>
       </section>
 
@@ -1134,6 +1134,20 @@
         pricingVolumeContact.href = `mailto:support@batchcutout.com?subject=${subject}&body=${body}`;
       }
 
+      function updatePricingLocaleLinks(language) {
+        const nextLanguage = pricingTranslations[language] ? language : "en";
+        for (const link of document.querySelectorAll("[data-pricing-locale-link]")) {
+          const url = new URL(link.getAttribute("href"), window.location.origin);
+          if (url.origin !== window.location.origin) continue;
+          if (nextLanguage === "pt") {
+            url.searchParams.delete("lang");
+          } else {
+            url.searchParams.set("lang", nextLanguage);
+          }
+          link.setAttribute("href", `${url.pathname}${url.search}${url.hash}`);
+        }
+      }
+
       function applyPricingLanguage(language) {
         const nextLanguage = pricingTranslations[language] ? language : "en";
         const dictionary = pricingTranslations[nextLanguage];
@@ -1167,6 +1181,7 @@
         window.updatePricingPasswordToggle?.();
         updatePricingSavingsCalculator();
         updatePricingVolumeContactLink();
+        updatePricingLocaleLinks(nextLanguage);
       }
 
       const initialLanguage = detectPricingLanguage();
