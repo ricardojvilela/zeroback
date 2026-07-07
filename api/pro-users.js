@@ -172,10 +172,10 @@ function subscriptionAttribution(subscription) {
     ...(subscription.metadata || {}),
   };
   const source = cleanText(metadata.utm_source || metadata.source || metadata.last_source || metadata.first_source, 120);
-  const medium = cleanText(metadata.utm_medium || metadata.medium, 120);
+  const medium = cleanText(metadata.utm_medium || metadata.medium || metadata.last_medium || metadata.first_medium, 120);
   const campaign = cleanText(metadata.utm_campaign || metadata.campaign || metadata.last_campaign || metadata.first_campaign, 160);
-  const content = cleanText(metadata.utm_content || metadata.content, 160);
-  const term = cleanText(metadata.utm_term || metadata.term, 160);
+  const content = cleanText(metadata.utm_content || metadata.content || metadata.last_content || metadata.first_content, 160);
+  const term = cleanText(metadata.utm_term || metadata.term || metadata.last_term || metadata.first_term, 160);
   return {
     source,
     medium,

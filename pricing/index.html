@@ -1536,6 +1536,7 @@
       }
 
       function pricingAttribution() {
+        const storedAttributionFields = ["source", "medium", "campaign", "content", "term", "gclid", "gbraid", "wbraid", "landing_page", "seen_at"];
         const detail = {
           page_path: window.location.pathname,
           page_location: window.location.href.split("#")[0],
@@ -1549,6 +1550,14 @@
         }
         try {
           const stored = JSON.parse(localStorage.getItem("batchcutout_attribution") || "{}");
+          for (const prefix of ["first", "last"]) {
+            const storedVisit = stored?.[prefix] || {};
+            for (const key of storedAttributionFields) {
+              const value = storedVisit[key];
+              const detailKey = `${prefix}_${key}`;
+              if (typeof value === "string" && value && !detail[detailKey]) detail[detailKey] = value.slice(0, 500);
+            }
+          }
           for (const [key, value] of Object.entries(stored || {})) {
             if (typeof value === "string" && value && !detail[key]) detail[key] = value.slice(0, 500);
           }

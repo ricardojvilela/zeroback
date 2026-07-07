@@ -174,3 +174,4 @@ Interpretation:
 - Pricing-page CTA links now preserve the selected PT/EN/ES language when visitors move between free test and direct checkout, avoiding silent language resets in the purchase path.
 - The main tool now uses a dedicated Pro prompt when free visitors select more images than the free batch allows, framing the moment as real batch demand instead of post-result copy.
 - Homepage-to-pricing Pro links now preserve UTM/source/ad-click parameters, keeping campaign attribution intact when visitors move from the free tool to the direct checkout page.
+- Checkout and Stripe subscription metadata now preserve first/last campaign context, including medium, content, search term and ad click IDs, so paid revenue can be tied back to acquisition journeys even when checkout happens after a later visit.
