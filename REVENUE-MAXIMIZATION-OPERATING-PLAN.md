@@ -178,3 +178,4 @@ Interpretation:
 - Subscription MRR reporting now ignores internal sources such as `pricing_page` and falls back to the real first/last acquisition source, so revenue by source reflects marketing channels instead of checkout UI labels.
 - Subscription, lead and checkout-recovery reporting now also ignores internal pricing campaigns such as `founder_plan`, falling back to the acquisition campaign that actually brought the visitor.
 - Admin funnel diagnosis now flags Stripe session failures, checkout-link email failures, email non-clicks, tracking mismatches and repeated Stripe cancellations before generic conversion advice.
+- Reordered admin diagnosis so repeated Stripe cancellations are shown before the generic "checkout opened but did not pay" recommendation.

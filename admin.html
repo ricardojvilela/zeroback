@@ -1412,12 +1412,12 @@
           return "Gargalo principal: existe interesse em Pro, mas nenhuma sessão Stripe criada. Prioridade: rever fluxo conta/login/checkout e erros de criação de sessão.";
         }
 
-        if (checkoutSessions >= 3 && paidSubscriptions === 0) {
-          return "Gargalo principal: o checkout abre, mas não converte em pagamento. Prioridade: rever confiança, preço, retorno ao site e emails de recuperação.";
-        }
-
         if (checkoutCancelledReturns >= 2 && paidSubscriptions === 0) {
           return "Gargalo principal: compradores voltam do Stripe com pagamento cancelado. Prioridade: rever objeções na página de preços, segurança percebida e recuperação pós-cancelamento.";
+        }
+
+        if (checkoutSessions >= 3 && paidSubscriptions === 0) {
+          return "Gargalo principal: o checkout abre, mas não converte em pagamento. Prioridade: rever confiança, preço, retorno ao site e emails de recuperação.";
         }
 
         if (uploads >= 10 && conversionRate(downloads, uploads) < 0.45) {
