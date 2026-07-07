@@ -423,6 +423,18 @@ h2 {
   color: rgba(255, 255, 255, 0.62);
 }
 
+.account-auth-note {
+  margin: -2px 0 0;
+  border: 1px solid rgba(81, 215, 198, 0.22);
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: rgba(81, 215, 198, 0.09);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.78rem;
+  font-weight: 760;
+  line-height: 1.35;
+}
+
 .account-form button,
 .account-actions .ghost-button {
   width: 100%;
