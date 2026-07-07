@@ -268,7 +268,8 @@ const baseTranslation = {
   billingCheckoutError: "Não foi possível abrir o pagamento agora.",
   billingPortalError: "Não foi possível abrir a gestão de pagamento agora.",
   accountMagicLinkSent: "Sessão iniciada.",
-  accountSignupSuccess: "Conta criada. Se a confirmação de email estiver ativa, verifique a sua caixa de entrada antes de entrar.",
+  accountSignupSuccess: "Conta criada. Confirme o email e volte a esta página para entrar.",
+  accountSignupSuccessCheckout: "Conta criada. Confirme o email e volte a esta página; mantemos o plano escolhido para continuar para pagamento.",
   accountSignupReady: "Conta criada. A abrir o pagamento Pro escolhido...",
   accountSignupReadyNoPlan: "Conta criada. Escolha o plano Pro quando quiser ativar os limites pagos.",
   accountLoggedOut: "Sessão terminada.",
@@ -441,7 +442,8 @@ const translations = {
     billingCheckoutError: "We could not open payment right now.",
     billingPortalError: "We could not open billing management right now.",
     accountMagicLinkSent: "Signed in.",
-    accountSignupSuccess: "Account created. If email confirmation is enabled, check your inbox before signing in.",
+    accountSignupSuccess: "Account created. Confirm your email and return to this page to sign in.",
+    accountSignupSuccessCheckout: "Account created. Confirm your email and return to this page; we keep the selected plan ready for payment.",
     accountSignupReady: "Account created. Opening the Pro payment you chose...",
     accountSignupReadyNoPlan: "Account created. Choose a Pro plan whenever you want to activate paid limits.",
     accountLoggedOut: "Signed out.",
@@ -2131,7 +2133,7 @@ async function handleAccountCreate(event) {
   });
 
   try {
-    const redirectTo = `${window.location.origin}${window.location.pathname}${window.location.search}`;
+    const redirectTo = accountEmailRedirectUrl(waitingPlan);
     const { data, error } = await supabaseClient.auth.signUp({
       email,
       password,
@@ -2153,7 +2155,7 @@ async function handleAccountCreate(event) {
       setAccountMessage(waitingPlan ? "accountSignupReady" : "accountSignupReadyNoPlan");
       await maybeStartRequestedCheckout();
     } else {
-      setAccountMessage("accountSignupSuccess");
+      setAccountMessage(waitingPlan ? "accountSignupSuccessCheckout" : "accountSignupSuccess");
     }
   } catch (error) {
     trackEvent("account_signup_failed", {
@@ -2220,6 +2222,14 @@ function clearPendingCheckoutPlan() {
 
 function checkoutPlanWaitingForAuth() {
   return checkoutPlans.has(requestedCheckoutPlan || "") ? requestedCheckoutPlan : getPendingCheckoutPlan();
+}
+
+function accountEmailRedirectUrl(plan = "") {
+  const url = new URL(`${window.location.pathname}${window.location.search}`, window.location.origin);
+  if (checkoutPlans.has(plan || "")) {
+    url.searchParams.set("checkout_plan", plan);
+  }
+  return url.toString();
 }
 
 async function startCheckout(plan = defaultCheckoutPlan, triggerButton = null) {
