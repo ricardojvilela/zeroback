@@ -170,3 +170,4 @@ Interpretation:
 - Buyers who try to sign in before confirming email now get a fresh confirmation link with the selected plan/language preserved, and `/admin` tracks confirmation resends as a separate pre-Stripe bottleneck.
 - If a buyer clicks "create account" with an email that already exists, the app now tries to sign in with the entered password and continue to Stripe automatically, instead of leaving them at a generic signup error.
 - The main tool account, billing, post-download and volume-limit messages now have explicit Spanish translations, avoiding English fallback text in the Spanish Pro conversion path.
+- Google Ads/pricing campaign assets, partner referral links and structured offer URLs now point directly to the selected plan checkout panel; Pro welcome emails now send paying users to the account panel for billing management instead of generic pricing.

@@ -235,7 +235,7 @@ function proWelcomeCopy(language = "en") {
       tips: ["Arraste um lote de fotos de produto.", "Remova fundos e descarregue PNGs transparentes.", "Use ZIP quando quiser entregar ou arquivar o lote completo."],
       footer: "NexaFlow Labs. Pode gerir o pagamento no painel da conta BatchCutout.",
       toolUrl: "https://batchcutout.com/?utm_source=email&utm_medium=onboarding&utm_campaign=pro_welcome#tool",
-      pricingUrl: "https://batchcutout.com/pricing/?utm_source=email&utm_medium=onboarding&utm_campaign=pro_welcome#pricing-account-title",
+      pricingUrl: "https://batchcutout.com/?utm_source=email&utm_medium=onboarding&utm_campaign=pro_welcome#accountTitle",
     };
   }
 
@@ -251,7 +251,7 @@ function proWelcomeCopy(language = "en") {
       tips: ["Arrastra un lote de fotos de producto.", "Quita fondos y descarga PNGs transparentes.", "Usa ZIP cuando quieras entregar o archivar el lote completo."],
       footer: "NexaFlow Labs. Puedes gestionar el pago desde el panel de cuenta de BatchCutout.",
       toolUrl: "https://batchcutout.com/?lang=es&utm_source=email&utm_medium=onboarding&utm_campaign=pro_welcome#tool",
-      pricingUrl: "https://batchcutout.com/pricing/?lang=es&utm_source=email&utm_medium=onboarding&utm_campaign=pro_welcome#pricing-account-title",
+      pricingUrl: "https://batchcutout.com/?lang=es&utm_source=email&utm_medium=onboarding&utm_campaign=pro_welcome#accountTitle",
     };
   }
 
@@ -266,7 +266,7 @@ function proWelcomeCopy(language = "en") {
     tips: ["Drag in a batch of product photos.", "Remove backgrounds and download transparent PNGs.", "Use ZIP when you want to deliver or archive the full batch."],
     footer: "NexaFlow Labs. You can manage billing from your BatchCutout account panel.",
     toolUrl: "https://batchcutout.com/?lang=en&utm_source=email&utm_medium=onboarding&utm_campaign=pro_welcome#tool",
-    pricingUrl: "https://batchcutout.com/pricing/?lang=en&utm_source=email&utm_medium=onboarding&utm_campaign=pro_welcome#pricing-account-title",
+    pricingUrl: "https://batchcutout.com/?lang=en&utm_source=email&utm_medium=onboarding&utm_campaign=pro_welcome#accountTitle",
   };
 }
 

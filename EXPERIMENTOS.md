@@ -32,7 +32,7 @@ Comunidades Shopify:
 https://batchcutout.com/?limit=3&utm_source=community&utm_medium=organic&utm_campaign=shopify_limit_test
 
 Pagina pricing:
-https://batchcutout.com/pricing/?utm_source=experiment&utm_medium=internal&utm_campaign=pro_limit_test
+https://batchcutout.com/pricing/?checkout_plan=early&utm_source=experiment&utm_medium=internal&utm_campaign=pro_limit_test#pricing-account-title
 
 ### Metricas principais
 - uploads

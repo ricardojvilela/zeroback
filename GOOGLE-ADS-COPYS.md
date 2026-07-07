@@ -31,7 +31,7 @@ Etsy:
 https://batchcutout.com/en/etsy-product-photo-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=etsy_background_remover&utm_content=search
 
 Pricing:
-https://batchcutout.com/pricing/?lang=en&utm_source=google_ads&utm_medium=cpc&utm_campaign=pro_pricing&utm_content=search
+https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=google_ads&utm_medium=cpc&utm_campaign=pro_pricing&utm_content=search#pricing-account-title
 
 ## Campaign 1: Bulk background remover
 
@@ -164,7 +164,7 @@ Etsy Photos:
 https://batchcutout.com/en/etsy-product-photo-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_etsy
 
 Plans:
-https://batchcutout.com/pricing/?lang=en&utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_pricing
+https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_pricing#pricing-account-title
 
 ## Callouts
 

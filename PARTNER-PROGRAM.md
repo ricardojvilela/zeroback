@@ -47,7 +47,7 @@ https://batchcutout.com/?utm_source=partner_referral&utm_medium=partner&utm_camp
 Pricing link:
 
 ```text
-https://batchcutout.com/pricing/?utm_source=partner_referral&utm_medium=partner&utm_campaign=partner_[name]
+https://batchcutout.com/pricing/?checkout_plan=early&utm_source=partner_referral&utm_medium=partner&utm_campaign=partner_[name]#pricing-account-title
 ```
 
 Partner page:

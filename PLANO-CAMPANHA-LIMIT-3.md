@@ -189,7 +189,7 @@ Use Cases:
 https://batchcutout.com/use-cases/?utm_source=google_ads&utm_medium=cpc&utm_campaign=pro_limit_test&utm_content=sitelink_use_cases
 
 Pro pricing:
-https://batchcutout.com/pricing/?utm_source=google_ads&utm_medium=cpc&utm_campaign=pro_limit_test&utm_content=sitelink_pricing
+https://batchcutout.com/pricing/?checkout_plan=early&utm_source=google_ads&utm_medium=cpc&utm_campaign=pro_limit_test&utm_content=sitelink_pricing#pricing-account-title
 
 Shopify Photos:
 https://batchcutout.com/remove-background-for-shopify/?utm_source=google_ads&utm_medium=cpc&utm_campaign=pro_limit_test&utm_content=sitelink_shopify
