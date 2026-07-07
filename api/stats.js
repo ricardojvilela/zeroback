@@ -64,6 +64,8 @@ function emptyDay(date) {
     paymentFailureValue: 0,
     subscriptionCancelScheduled: 0,
     subscriptionCanceled: 0,
+    accountCheckoutPanelViews: 0,
+    accountFormInteractions: 0,
     accountValidationFailures: 0,
     accountSignupStarts: 0,
     accountSignupFailures: 0,
@@ -208,6 +210,8 @@ function emptySourceRow(source) {
     paymentFailureValue: 0,
     subscriptionCancelScheduled: 0,
     subscriptionCanceled: 0,
+    accountCheckoutPanelViews: 0,
+    accountFormInteractions: 0,
     accountValidationFailures: 0,
     accountSignupStarts: 0,
     accountSignupFailures: 0,
@@ -538,6 +542,14 @@ export default async function handler(request, response) {
         case "pro_checkout_login_required":
           row.checkoutLoginRequired += 1;
           sourceRow.checkoutLoginRequired += 1;
+          break;
+        case "account_checkout_panel_shown":
+          row.accountCheckoutPanelViews += 1;
+          sourceRow.accountCheckoutPanelViews += 1;
+          break;
+        case "account_form_interacted":
+          row.accountFormInteractions += 1;
+          sourceRow.accountFormInteractions += 1;
           break;
         case "pro_checkout_started":
           row.checkoutStarts += 1;

@@ -30,6 +30,8 @@ const allowedEvents = new Set([
   "pro_volume_selected",
   "pro_submit_attempt",
   "pro_checkout_interest_submitted",
+  "account_checkout_panel_shown",
+  "account_form_interacted",
   "pro_checkout_login_required",
   "pro_checkout_started",
   "pro_checkout_cancelled_return",
@@ -59,7 +61,8 @@ const allowedEvents = new Set([
 ]);
 
 const allowedEmailDomains = new Set(["batchcutout.com"]);
-const leadAutoreplySources = new Set(["post_download", "post_download_inline"]);
+const leadAutoreplySources = new Set(["post_download", "post_download_inline", "result_ready", "result_ready_inline"]);
+const leadAutoreplyDownloadTypes = new Set(["png", "zip", "png_available", "zip_available"]);
 const leadAutoreplyWindowMs = 30 * 24 * 60 * 60 * 1000;
 
 const corsHeaders = {
@@ -310,7 +313,7 @@ async function sendLeadAutoreply(settings, tableName, detail, row) {
   if (detail.consent !== true) return { sent: false, skipped: true, reason: "no_consent" };
   if (!leadAutoreplySources.has(String(detail.source || ""))) return { sent: false, skipped: true, reason: "not_post_download" };
   if ((Number(detail.count || 0) || 0) <= 0) return { sent: false, skipped: true, reason: "missing_download_count" };
-  if (!["png", "zip"].includes(String(detail.downloadType || ""))) {
+  if (!leadAutoreplyDownloadTypes.has(String(detail.downloadType || ""))) {
     return { sent: false, skipped: true, reason: "unknown_download_type" };
   }
 

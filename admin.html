@@ -768,6 +768,14 @@
             <strong id="liveCheckoutLoginRequired">0</strong>
           </article>
           <article class="live-card">
+            <span>Painel conta visto</span>
+            <strong id="liveAccountCheckoutPanelViews">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Conta começou</span>
+            <strong id="liveAccountFormInteractions">0</strong>
+          </article>
+          <article class="live-card">
             <span>Validação conta</span>
             <strong id="liveAccountValidationFailures">0</strong>
           </article>
@@ -1363,6 +1371,8 @@
         const checkoutLinkEmailClicks = Number(totals.checkoutLinkEmailClicks || 0) || 0;
         const checkoutLinkEmailFailures = Number(totals.checkoutLinkEmailFailures || 0) || 0;
         const paidSubscriptions = Number(totals.paidSubscriptions || 0) || 0;
+        const accountPanelViews = Number(totals.accountCheckoutPanelViews || 0) || 0;
+        const accountFormInteractions = Number(totals.accountFormInteractions || 0) || 0;
         const accountValidationFailures = Number(totals.accountValidationFailures || 0) || 0;
         const emailConfirmations = Number(totals.accountEmailConfirmations || 0) || 0;
         const confirmationResends = Number(totals.accountEmailConfirmationResends || 0) || 0;
@@ -1398,6 +1408,14 @@
 
         if (emailConfirmations > 0 && checkoutSessions === 0) {
           return "Gargalo principal: há contas criadas a aguardar confirmação de email antes do Stripe. Prioridade: acompanhar se esses utilizadores voltam após confirmar.";
+        }
+
+        if (accountPanelViews >= 3 && accountFormInteractions === 0 && checkoutSessions === 0) {
+          return "Gargalo principal: compradores veem o painel de conta mas não começam a preencher. Prioridade: reduzir fricção percebida da conta antes do Stripe.";
+        }
+
+        if (accountFormInteractions >= 3 && Number(totals.accountSignupStarts || 0) === 0 && checkoutSessions === 0) {
+          return "Gargalo principal: compradores começam a preencher a conta, mas não submetem. Prioridade: rever campos, botão principal e confiança no passo de conta.";
         }
 
         if (accountValidationFailures >= 3 && checkoutSessions === 0) {
@@ -1831,6 +1849,8 @@
         document.querySelector("#liveSubscriptionCancelScheduled").textContent = totals.subscriptionCancelScheduled || 0;
         document.querySelector("#liveSubscriptionCanceledEvents").textContent = totals.subscriptionCanceled || 0;
         document.querySelector("#liveCheckoutLoginRequired").textContent = totals.checkoutLoginRequired || 0;
+        document.querySelector("#liveAccountCheckoutPanelViews").textContent = totals.accountCheckoutPanelViews || 0;
+        document.querySelector("#liveAccountFormInteractions").textContent = totals.accountFormInteractions || 0;
         document.querySelector("#liveAccountValidationFailures").textContent = totals.accountValidationFailures || 0;
         document.querySelector("#liveAccountSignupStarts").textContent = totals.accountSignupStarts || 0;
         document.querySelector("#liveAccountSignupFailures").textContent = totals.accountSignupFailures || 0;

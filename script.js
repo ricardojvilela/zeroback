@@ -127,6 +127,8 @@ const serverEventNames = new Set([
   "pro_prompt_shown",
   "pro_form_started",
   "pro_submit_attempt",
+  "account_checkout_panel_shown",
+  "account_form_interacted",
   "pro_checkout_login_required",
   "pro_checkout_started",
   "pro_purchase_conversion_sent",
@@ -152,6 +154,8 @@ let lastAccountValidationFailureAt = 0;
 let hasStartedRequestedCheckout = false;
 let hasTrackedRequestedCheckoutLoginRequired = false;
 let hasTrackedResultReadyEmailShown = false;
+let lastTrackedAccountCheckoutPanelPlan = "";
+let hasTrackedAccountFormInteraction = false;
 
 const supportedExtensions = [
   ".jpg",
@@ -247,8 +251,8 @@ const baseTranslation = {
   accountBadgeCheckout: "Plano escolhido",
   accountBadgeFree: "Grátis",
   accountBadgePro: "Pro",
-  accountStatusGuest: "Crie conta para ativar Pro ou entre para gerir o seu acesso.",
-  accountStatusCheckoutPending: "Plano escolhido: {plan}. Crie conta ou entre e abrimos o pagamento automaticamente.",
+  accountStatusGuest: "Crie uma conta grátis para ligar o Pro ao seu email, ou entre para gerir o acesso.",
+  accountStatusCheckoutPending: "Plano escolhido: {plan}. Crie uma conta grátis com email e password; depois abrimos o Stripe para pagar.",
   accountCheckoutGuideLabel: "Passos para ativar Pro",
   accountCheckoutGuideAccount: "Crie conta ou entre",
   accountCheckoutGuideStripe: "Pagamento Stripe",
@@ -265,7 +269,7 @@ const baseTranslation = {
   accountPasswordPlaceholder: "A sua password (mín. 6 caracteres)",
   passwordShow: "Mostrar",
   passwordHide: "Ocultar",
-  accountAuthNote: "A conta serve apenas para ligar o pagamento Stripe ao acesso Pro. As suas imagens continuam no browser.",
+  accountAuthNote: "Não há pagamento neste passo. A conta só liga o Stripe ao acesso Pro; as imagens continuam no browser.",
   accountSubmit: "Entrar",
   accountSubmitCheckout: "Entrar e continuar",
   accountSubmitSending: "A entrar...",
@@ -282,7 +286,7 @@ const baseTranslation = {
   billingPortalStarting: "A abrir gestão de pagamento...",
   billingCheckoutSuccess: "Pagamento recebido. A ativação Pro pode demorar alguns segundos.",
   billingCheckoutCancelled: "Pagamento cancelado. Pode tentar novamente quando quiser.",
-  billingLoginRequired: "Crie conta ou entre. Depois abrimos automaticamente o plano Pro escolhido.",
+  billingLoginRequired: "Crie uma conta grátis ou entre. Só depois abrimos o Stripe para pagar o plano escolhido.",
   billingCheckoutError: "Não foi possível abrir o pagamento agora.",
   billingPortalError: "Não foi possível abrir a gestão de pagamento agora.",
   accountMagicLinkSent: "Sessão iniciada.",
@@ -430,8 +434,8 @@ const translations = {
     accountBadgeCheckout: "Plan selected",
     accountBadgeFree: "Free",
     accountBadgePro: "Pro",
-    accountStatusGuest: "Create an account to activate Pro, or sign in to manage your access.",
-    accountStatusCheckoutPending: "Selected plan: {plan}. Create an account or sign in and we will open payment automatically.",
+    accountStatusGuest: "Create a free account to connect Pro to your email, or sign in to manage access.",
+    accountStatusCheckoutPending: "Selected plan: {plan}. Create a free account with email and password; then we open Stripe for payment.",
     accountCheckoutGuideLabel: "Steps to activate Pro",
     accountCheckoutGuideAccount: "Create account or sign in",
     accountCheckoutGuideStripe: "Stripe payment",
@@ -448,7 +452,7 @@ const translations = {
     accountPasswordPlaceholder: "Your password (min. 6 characters)",
     passwordShow: "Show",
     passwordHide: "Hide",
-    accountAuthNote: "The account only connects Stripe payment to Pro access. Your images stay in the browser.",
+    accountAuthNote: "No payment happens at this step. The account only connects Stripe to Pro access; your images stay in the browser.",
     accountSubmit: "Sign in",
     accountSubmitCheckout: "Sign in and continue",
     accountSubmitSending: "Signing in...",
@@ -465,7 +469,7 @@ const translations = {
     billingPortalStarting: "Opening billing...",
     billingCheckoutSuccess: "Payment received. Pro activation can take a few seconds.",
     billingCheckoutCancelled: "Payment cancelled. You can try again whenever you want.",
-    billingLoginRequired: "Create an account or sign in. Then we automatically open the Pro plan you chose.",
+    billingLoginRequired: "Create a free account or sign in. Only then do we open Stripe for the selected plan.",
     billingCheckoutError: "We could not open payment right now.",
     billingPortalError: "We could not open billing management right now.",
     accountMagicLinkSent: "Signed in.",
@@ -990,8 +994,8 @@ const translatedAddons = {
     accountBadgeCheckout: "Plan elegido",
     accountBadgeFree: "Gratis",
     accountBadgePro: "Pro",
-    accountStatusGuest: "Crea una cuenta para activar Pro o entra para gestionar tu acceso.",
-    accountStatusCheckoutPending: "Plan elegido: {plan}. Crea una cuenta o entra y abrimos el pago automáticamente.",
+    accountStatusGuest: "Crea una cuenta gratis para conectar Pro con tu email, o entra para gestionar el acceso.",
+    accountStatusCheckoutPending: "Plan elegido: {plan}. Crea una cuenta gratis con email y contraseña; después abrimos Stripe para pagar.",
     accountUsageTitle: "Uso mensual",
     accountUsageCount: "{used} de {limit} imágenes usadas",
     accountUsageReset: "El límite mensual se renueva el {date}.",
@@ -1005,7 +1009,7 @@ const translatedAddons = {
     accountStatusPro: "Cuenta Pro activa. Hasta {batchLimit} imágenes por lote y {monthlyRemaining} de {monthlyLimit} disponibles este mes.",
     accountStatusConfigMissing: "El login Pro todavía no está configurado en este entorno.",
     accountEmailPlaceholder: "Tu email",
-    accountAuthNote: "La cuenta solo conecta el pago de Stripe con el acceso Pro. Tus imágenes siguen en el navegador.",
+    accountAuthNote: "No hay pago en este paso. La cuenta solo conecta Stripe con el acceso Pro; tus imágenes siguen en el navegador.",
     accountPasswordPlaceholder: "Tu contraseña (mín. 6 caracteres)",
     passwordShow: "Mostrar",
     passwordHide: "Ocultar",
@@ -1025,7 +1029,7 @@ const translatedAddons = {
     billingPortalStarting: "Abriendo gestión de pago...",
     billingCheckoutSuccess: "Pago recibido. La activación Pro puede tardar unos segundos.",
     billingCheckoutCancelled: "Pago cancelado. Puedes intentarlo de nuevo cuando quieras.",
-    billingLoginRequired: "Crea una cuenta o entra. Después abrimos automáticamente el plan Pro elegido.",
+    billingLoginRequired: "Crea una cuenta gratis o entra. Solo después abrimos Stripe para pagar el plan elegido.",
     billingCheckoutError: "No se pudo abrir el pago ahora.",
     billingPortalError: "No se pudo abrir la gestión de pago ahora.",
     accountMagicLinkSent: "Sesión iniciada.",
@@ -2081,6 +2085,31 @@ function syncAccountAuthButtons() {
   }
 }
 
+function trackAccountCheckoutPanelShown(plan = "") {
+  if (!checkoutPlans.has(plan || "")) return;
+  if (lastTrackedAccountCheckoutPanelPlan === plan) return;
+  lastTrackedAccountCheckoutPanelPlan = plan;
+  hasTrackedAccountFormInteraction = false;
+  trackEvent("account_checkout_panel_shown", {
+    source: "checkout_plan",
+    has_requested_checkout: true,
+    checkout_plan: plan,
+  });
+}
+
+function trackAccountFormInteraction(method = "unknown") {
+  if (hasTrackedAccountFormInteraction) return;
+  const waitingPlan = checkoutPlanWaitingForAuth();
+  if (!checkoutPlans.has(waitingPlan || "")) return;
+  hasTrackedAccountFormInteraction = true;
+  trackEvent("account_form_interacted", {
+    source: "checkout_plan",
+    has_requested_checkout: true,
+    checkout_plan: waitingPlan,
+    method,
+  });
+}
+
 function getRequestedBatchLimit() {
   if (![2, 3, 5, 10, 20].includes(requestedLimit)) return defaultMaxFilesPerBatch;
   return requestedLimit;
@@ -2176,6 +2205,7 @@ function updateAccountUi() {
 
     accountPanel.classList.toggle("has-pending-checkout", Boolean(waitingPlanName));
     accountCheckoutGuide?.classList.toggle("hidden", !waitingPlanName);
+    if (waitingPlanName) trackAccountCheckoutPanelShown(waitingPlan);
     accountBadge.textContent = waitingPlanName ? t("accountBadgeCheckout") : t("accountBadgeGuest");
     accountStatus.textContent = waitingPlanName
       ? t("accountStatusCheckoutPending", { plan: waitingPlanName })
@@ -3500,6 +3530,8 @@ proInlineForm?.addEventListener("click", (event) => {
   if (!button) return;
   startCheckout(button.dataset.checkoutPlan, button);
 });
+accountForm?.addEventListener("focusin", () => trackAccountFormInteraction("focus"));
+accountForm?.addEventListener("input", () => trackAccountFormInteraction("input"));
 accountForm?.addEventListener("invalid", handleAccountFormInvalid, true);
 accountForm?.addEventListener("submit", handleAccountCreate);
 accountPasswordToggle?.addEventListener("click", () => togglePasswordVisibility(accountPassword, accountPasswordToggle));
