@@ -181,3 +181,4 @@ Interpretation:
 - Reordered admin diagnosis so repeated Stripe cancellations are shown before the generic "checkout opened but did not pay" recommendation.
 - Source classification now uses first/last medium and ad click IDs, so delayed checkout events from prior Google Ads visits still group under Google Ads instead of Google organic or raw campaign labels.
 - The result-ready block now includes a direct email field before download, using the existing link/checklist autoreply and tracking it as `result_ready_inline`, to address the current 54 downloads / 0 lead captures bottleneck.
+- The highest-traffic bulk landing pages now make the 2-image free test the primary action again, while keeping the founder plan as the secondary path for visitors with a real batch, because `/bulk-background-remover/` had 24 visitors, 2 tool clicks and 0 pricing clicks.
