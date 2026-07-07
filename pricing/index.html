@@ -571,6 +571,8 @@
           checkoutOpening: "A abrir Stripe...",
           checkoutCreatedCheckEmail: "Conta criada. Confirme o email e volte a esta página; o plano escolhido fica guardado para abrir o pagamento.",
           checkoutConfirmationResent: "Este email ainda precisa de confirmação. Reenviámos o link; confirme o email e volte a esta página para continuar o pagamento.",
+          checkoutExistingLoginReady: "Conta existente encontrada. A entrar e continuar para o pagamento...",
+          checkoutExistingLoginError: "Este email já tem conta. Use Entrar e continuar com a password correta.",
           checkoutAuthError: "Não foi possível validar a conta agora.",
           checkoutLoginError: "Não foi possível entrar. Confirme a password ou crie conta se ainda não tiver.",
           checkoutSignupError: "Não foi possível criar a conta. Se este email já existir, use Entrar e continuar.",
@@ -720,6 +722,8 @@
           checkoutOpening: "Opening Stripe...",
           checkoutCreatedCheckEmail: "Account created. Confirm your email and return to this page; the selected plan stays ready to open payment.",
           checkoutConfirmationResent: "This email still needs confirmation. We resent the link; confirm your email and return to this page to continue payment.",
+          checkoutExistingLoginReady: "Existing account found. Signing in and continuing to payment...",
+          checkoutExistingLoginError: "This email already has an account. Use Sign in and continue with the correct password.",
           checkoutAuthError: "We could not verify the account right now.",
           checkoutLoginError: "We could not sign you in. Check the password or create an account if you do not have one yet.",
           checkoutSignupError: "We could not create the account. If this email already exists, use Sign in and continue.",
@@ -869,6 +873,8 @@
           checkoutOpening: "Abriendo Stripe...",
           checkoutCreatedCheckEmail: "Cuenta creada. Confirma tu email y vuelve a esta página; el plan elegido queda listo para abrir el pago.",
           checkoutConfirmationResent: "Este email todavía necesita confirmación. Reenviamos el enlace; confirma el email y vuelve a esta página para continuar el pago.",
+          checkoutExistingLoginReady: "Cuenta existente encontrada. Entrando y continuando al pago...",
+          checkoutExistingLoginError: "Este email ya tiene cuenta. Usa Entrar y continuar con la contraseña correcta.",
           checkoutAuthError: "No se pudo validar la cuenta ahora.",
           checkoutLoginError: "No se pudo iniciar sesión. Confirma la contraseña o crea una cuenta si todavía no tienes una.",
           checkoutSignupError: "No se pudo crear la cuenta. Si este email ya existe, usa Entrar y continuar.",
@@ -1415,6 +1421,22 @@
         return reason.includes("email_not_confirmed") || reason.includes("not_confirmed") || reason.includes("confirm");
       }
 
+      function isPricingExistingAccountError(error) {
+        const reason = pricingAuthFailureReason(error);
+        return (
+          reason.includes("user_already_exists") ||
+          reason.includes("identity_already_exists") ||
+          reason.includes("already_registered") ||
+          reason.includes("already_exists") ||
+          (reason.includes("already") && (reason.includes("registered") || reason.includes("exists")))
+        );
+      }
+
+      function isPricingExistingAccountSignupData(data) {
+        const identities = data?.user?.identities;
+        return Array.isArray(identities) && identities.length === 0;
+      }
+
       async function resendPricingAccountConfirmation(email, plan = selectedPricingPlan) {
         if (!pricingSupabase || !email) return false;
         const { error } = await pricingSupabase.auth.resend({
@@ -1425,6 +1447,44 @@
           },
         });
         return !error;
+      }
+
+      async function continuePricingExistingAccountAfterSignup(email, password, plan = selectedPricingPlan) {
+        hasStartedPricingCheckout = true;
+        try {
+          const { error } = await pricingSupabase.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+          trackPricingCheckoutEvent("account_login_succeeded", {
+            source: "signup_existing_account",
+            has_requested_checkout: true,
+            plan,
+            recovered_from_signup: true,
+          });
+          setPricingStatus("checkoutExistingLoginReady");
+          await refreshPricingAccount();
+          await startPricingCheckout(plan);
+        } catch (error) {
+          hasStartedPricingCheckout = false;
+          if (isPricingEmailConfirmationRequiredError(error)) {
+            const resent = await resendPricingAccountConfirmation(email, plan);
+            trackPricingCheckoutEvent("account_email_confirmation_resent", {
+              source: "signup_existing_account",
+              has_requested_checkout: true,
+              plan,
+              resent,
+            });
+            setPricingStatus(resent ? "checkoutConfirmationResent" : "checkoutExistingLoginError");
+            return;
+          }
+          trackPricingCheckoutEvent("account_login_failed", {
+            source: "signup_existing_account",
+            has_requested_checkout: true,
+            plan,
+            recovered_from_signup: true,
+            reason: pricingAuthFailureReason(error),
+          });
+          setPricingStatus("checkoutExistingLoginError");
+        }
       }
 
       function trackPricingAccountValidationFailure(form = "signup") {
@@ -1826,6 +1886,10 @@
             options: { emailRedirectTo: redirectTo },
           });
           if (error) throw error;
+          if (isPricingExistingAccountSignupData(data)) {
+            await continuePricingExistingAccountAfterSignup(email, pricingPassword.value, selectedPricingPlan);
+            return;
+          }
           trackPricingCheckoutEvent("account_signup_succeeded", {
             source: "pricing_page",
             has_requested_checkout: true,
@@ -1844,6 +1908,10 @@
             setPricingStatus("checkoutCreatedCheckEmail");
           }
         } catch (error) {
+          if (isPricingExistingAccountError(error)) {
+            await continuePricingExistingAccountAfterSignup(email, pricingPassword.value, selectedPricingPlan);
+            return;
+          }
           trackPricingCheckoutEvent("account_signup_failed", {
             source: "pricing_page",
             has_requested_checkout: true,

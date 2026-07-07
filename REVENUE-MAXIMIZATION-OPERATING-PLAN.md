@@ -168,3 +168,4 @@ Interpretation:
 - Cleaned source attribution classification so internal pricing-page labels do not appear as external traffic origins in the admin funnel.
 - Added show/hide password controls to the main tool and pricing checkout account forms in PT/EN/ES, reducing password entry friction before Stripe.
 - Buyers who try to sign in before confirming email now get a fresh confirmation link with the selected plan/language preserved, and `/admin` tracks confirmation resends as a separate pre-Stripe bottleneck.
+- If a buyer clicks "create account" with an email that already exists, the app now tries to sign in with the entered password and continue to Stripe automatically, instead of leaving them at a generic signup error.

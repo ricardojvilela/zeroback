@@ -278,6 +278,8 @@ const baseTranslation = {
   accountSignupSuccess: "Conta criada. Confirme o email e volte a esta página para entrar.",
   accountSignupSuccessCheckout: "Conta criada. Confirme o email e volte a esta página; o plano escolhido fica guardado para abrir o pagamento.",
   accountConfirmationResent: "Este email ainda precisa de confirmação. Reenviámos o link; confirme o email e volte a esta página para continuar para pagamento.",
+  accountExistingLoginReady: "Conta existente encontrada. A entrar e continuar para o pagamento...",
+  accountExistingLoginError: "Este email já tem conta. Use Entrar com a password correta para continuar.",
   accountSignupReady: "Conta criada. A abrir o pagamento Pro escolhido...",
   accountSignupReadyNoPlan: "Conta criada. Escolha o plano Pro quando quiser ativar os limites pagos.",
   accountLoggedOut: "Sessão terminada.",
@@ -456,6 +458,8 @@ const translations = {
     accountSignupSuccess: "Account created. Confirm your email and return to this page to sign in.",
     accountSignupSuccessCheckout: "Account created. Confirm your email and return to this page; the selected plan stays ready to open payment.",
     accountConfirmationResent: "This email still needs confirmation. We resent the link; confirm your email and return to this page to continue to payment.",
+    accountExistingLoginReady: "Existing account found. Signing in and continuing to payment...",
+    accountExistingLoginError: "This email already has an account. Use Sign in with the correct password to continue.",
     accountSignupReady: "Account created. Opening the Pro payment you chose...",
     accountSignupReadyNoPlan: "Account created. Choose a Pro plan whenever you want to activate paid limits.",
     accountLoggedOut: "Signed out.",
@@ -960,6 +964,8 @@ const translatedAddons = {
     passwordHide: "Ocultar",
     accountSignupSuccessCheckout: "Cuenta creada. Confirma el email y vuelve a esta página; el plan elegido queda listo para abrir el pago.",
     accountConfirmationResent: "Este email todavía necesita confirmación. Reenviamos el enlace; confirma el email y vuelve a esta página para continuar al pago.",
+    accountExistingLoginReady: "Cuenta existente encontrada. Entrando y continuando al pago...",
+    accountExistingLoginError: "Este email ya tiene cuenta. Usa Entrar con la contraseña correcta para continuar.",
     resultReadyKicker: "Resultado listo",
     resultReadyTitle: "¿Quieres repetir esto en lotes mayores?",
     downloadReadyHint: "Si el recorte quedó bien, el plan fundador convierte esta prueba en producción: hasta 100 imágenes por lote, 2.000 al mes y ZIP listo para tienda.",
@@ -1540,6 +1546,22 @@ function isEmailConfirmationRequiredError(error) {
   return reason.includes("email_not_confirmed") || reason.includes("not_confirmed") || reason.includes("confirm");
 }
 
+function isExistingAccountError(error) {
+  const reason = authFailureReason(error);
+  return (
+    reason.includes("user_already_exists") ||
+    reason.includes("identity_already_exists") ||
+    reason.includes("already_registered") ||
+    reason.includes("already_exists") ||
+    (reason.includes("already") && (reason.includes("registered") || reason.includes("exists")))
+  );
+}
+
+function isExistingAccountSignupData(data) {
+  const identities = data?.user?.identities;
+  return Array.isArray(identities) && identities.length === 0;
+}
+
 async function resendAccountConfirmation(email, plan = "") {
   if (!supabaseClient || !email) return false;
   const redirectTo = accountEmailRedirectUrl(plan);
@@ -1551,6 +1573,43 @@ async function resendAccountConfirmation(email, plan = "") {
     },
   });
   return !error;
+}
+
+async function continueExistingAccountAfterSignup(email, password, waitingPlan = "") {
+  try {
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    setGoogleUserData(email);
+    trackEvent("account_login_succeeded", {
+      source: "signup_existing_account",
+      has_requested_checkout: Boolean(waitingPlan),
+      checkout_plan: waitingPlan || "",
+      recovered_from_signup: true,
+    });
+    await refreshAccount();
+    setAccountMessage(waitingPlan ? "accountExistingLoginReady" : "accountMagicLinkSent");
+    await maybeStartRequestedCheckout();
+  } catch (error) {
+    if (isEmailConfirmationRequiredError(error)) {
+      const resent = await resendAccountConfirmation(email, waitingPlan);
+      trackEvent("account_email_confirmation_resent", {
+        source: "signup_existing_account",
+        has_requested_checkout: Boolean(waitingPlan),
+        checkout_plan: waitingPlan || "",
+        resent,
+      });
+      setAccountMessage(resent ? "accountConfirmationResent" : "accountExistingLoginError");
+      return;
+    }
+    trackEvent("account_login_failed", {
+      source: "signup_existing_account",
+      has_requested_checkout: Boolean(waitingPlan),
+      checkout_plan: waitingPlan || "",
+      recovered_from_signup: true,
+      reason: authFailureReason(error),
+    });
+    setAccountMessage("accountExistingLoginError");
+  }
 }
 
 function setKnownGoogleUserData() {
@@ -2214,6 +2273,10 @@ async function handleAccountCreate(event) {
     });
 
     if (error) throw error;
+    if (isExistingAccountSignupData(data)) {
+      await continueExistingAccountAfterSignup(email, password, waitingPlan);
+      return;
+    }
     setGoogleUserData(email);
     const waitingPlan = checkoutPlanWaitingForAuth();
     trackEvent("account_signup_succeeded", {
@@ -2234,6 +2297,10 @@ async function handleAccountCreate(event) {
       setAccountMessage(waitingPlan ? "accountSignupSuccessCheckout" : "accountSignupSuccess");
     }
   } catch (error) {
+    if (isExistingAccountError(error)) {
+      await continueExistingAccountAfterSignup(email, password, waitingPlan);
+      return;
+    }
     trackEvent("account_signup_failed", {
       source: waitingPlan ? "checkout_plan" : "account_panel",
       has_requested_checkout: Boolean(waitingPlan),
