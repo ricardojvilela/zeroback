@@ -96,12 +96,32 @@ const internalAttributionSources = new Set([
   "partners_page",
 ]);
 
+const internalAttributionCampaigns = new Set([
+  "pro_pricing",
+  "try_before_pro",
+  "founder_plan",
+  "pro_annual",
+  "founder_value",
+  "try_value",
+  "founder_roi",
+]);
+
 function attributionSourceFrom(...values) {
   for (const value of values) {
     const source = cleanText(value, 160);
     if (!source) continue;
     if (internalAttributionSources.has(source.toLowerCase())) continue;
     return source;
+  }
+  return "";
+}
+
+function attributionCampaignFrom(...values) {
+  for (const value of values) {
+    const campaign = cleanText(value, 160);
+    if (!campaign) continue;
+    if (internalAttributionCampaigns.has(campaign.toLowerCase())) continue;
+    return campaign;
   }
   return "";
 }
@@ -204,7 +224,7 @@ function subscriptionAttribution(subscription) {
   };
   const source = attributionSourceFrom(metadata.utm_source, metadata.source, metadata.last_source, metadata.first_source);
   const medium = cleanText(metadata.utm_medium || metadata.medium || metadata.last_medium || metadata.first_medium, 120);
-  const campaign = cleanText(metadata.utm_campaign || metadata.campaign || metadata.last_campaign || metadata.first_campaign, 160);
+  const campaign = attributionCampaignFrom(metadata.utm_campaign, metadata.campaign, metadata.last_campaign, metadata.first_campaign);
   const content = cleanText(metadata.utm_content || metadata.content || metadata.last_content || metadata.first_content, 160);
   const term = cleanText(metadata.utm_term || metadata.term || metadata.last_term || metadata.first_term, 160);
   return {
@@ -954,7 +974,7 @@ async function listLeadCaptures(settings) {
       language: cleanText(detail.language, 20) || "en",
       source: attributionSourceFrom(detail.utm_source, detail.last_source, detail.first_source, event.source, detail.source),
       captureSource: cleanText(detail.capture_source || detail.source, 80),
-      campaign: cleanText(event.campaign || detail.utm_campaign || detail.last_campaign || detail.first_campaign, 160),
+      campaign: attributionCampaignFrom(event.campaign, detail.utm_campaign, detail.last_campaign, detail.first_campaign),
       downloadType: cleanText(detail.downloadType, 80),
       count: Number(detail.count || 0) || 0,
       capturedAt: event.occurred_at || "",
@@ -1049,7 +1069,7 @@ function checkoutRecoveryFromEvent(event, profile, recoveryEvent = null) {
     stripeSessionId: cleanText(detail.stripe_session_id || "", 160),
     stripeCustomerId: cleanText(detail.stripe_customer_id || profile?.stripeCustomerId || "", 160),
     source: attributionSourceFrom(detail.utm_source, detail.source, event.source, detail.last_source, detail.first_source),
-    campaign: cleanText(event.campaign || detail.utm_campaign || detail.campaign || detail.last_campaign || detail.first_campaign, 160),
+    campaign: attributionCampaignFrom(event.campaign, detail.utm_campaign, detail.campaign, detail.last_campaign, detail.first_campaign),
     language: cleanText(detail.language, 20) || "en",
     pageLocation: cleanText(detail.page_location, 1000),
     createdAt,
