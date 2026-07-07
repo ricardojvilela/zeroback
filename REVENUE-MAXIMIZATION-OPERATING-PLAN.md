@@ -160,3 +160,4 @@ Interpretation:
 - Added an English product catalog background remover acquisition page for supplier photos, SKU updates and variant batches, linked from the English hub, product-photo page, agency workflow, sitemap and LLM discovery.
 - Prepared paused Google Ads import files for the new product catalog page, targeting catalog cleanup, supplier image cleanup and SKU/variant photo batches without changing live spend.
 - Added a checkout-account reassurance note in the main tool explaining that the account only connects Stripe payment to Pro access and images stay in the browser, reducing friction after a Pro click.
+- Localized Portuguese social-preview alt metadata that still used English copy across PT acquisition pages, improving consistency for shared links and localized page quality.
