@@ -28,6 +28,9 @@ const resultReadySaveLinkCta = document.querySelector("#resultReadySaveLinkCta")
 const resultReadyEmailForm = document.querySelector("#resultReadyEmailForm");
 const resultReadyEmail = document.querySelector("#resultReadyEmail");
 const resultReadyEmailMessage = document.querySelector("#resultReadyEmailMessage");
+const resultReadyStickyCta = document.querySelector("#resultReadyStickyCta");
+const resultReadyStickyPro = document.querySelector("#resultReadyStickyPro");
+const resultReadyStickyLead = document.querySelector("#resultReadyStickyLead");
 const progressBar = document.querySelector("#progressBar");
 const countText = document.querySelector("#countText");
 const postDownloadNextPanel = document.querySelector("#postDownloadNextPanel");
@@ -154,6 +157,7 @@ let lastAccountValidationFailureAt = 0;
 let hasStartedRequestedCheckout = false;
 let hasTrackedRequestedCheckoutLoginRequired = false;
 let hasTrackedResultReadyEmailShown = false;
+let hasTrackedResultReadyStickyShown = false;
 let lastTrackedAccountCheckoutPanelPlan = "";
 let hasTrackedAccountFormInteraction = false;
 
@@ -239,6 +243,11 @@ const baseTranslation = {
   zipProCta: "Criar conta e ativar fundador - 15 EUR/mês",
   resultReadySaveLinkCta: "Receber link e checklist",
   resultReadyMicrocopy: "Sem fidelização. Pagamento seguro por Stripe.",
+  resultReadyStickyLabel: "Opções depois do resultado pronto",
+  resultReadyStickyKicker: "Resultado pronto",
+  resultReadyStickyText: "Tem mais fotos para tratar? Pro desbloqueia 100 imagens por lote por 15 EUR/mês.",
+  resultReadyStickyProCta: "Ativar fundador",
+  resultReadyStickySaveCta: "Receber link",
   benefitsLabel: "Vantagens do serviço",
   benefitPng: "PNG transparente",
   benefitZip: "ZIP pronto para loja",
@@ -498,6 +507,11 @@ const translations = {
     zipProCta: "Create account and start founder plan - EUR 15/month",
     resultReadySaveLinkCta: "Get link and checklist",
     resultReadyMicrocopy: "No lock-in. Secure Stripe payment.",
+    resultReadyStickyLabel: "Options after the result is ready",
+    resultReadyStickyKicker: "Result ready",
+    resultReadyStickyText: "Have more photos to process? Pro unlocks 100 images per batch for EUR 15/month.",
+    resultReadyStickyProCta: "Start founder plan",
+    resultReadyStickySaveCta: "Get link",
     eyebrow: "Bulk background removal",
     title: "BatchCutout",
     lead: "Free plan: remove the background from up to {limit} images now. Download transparent PNGs or a store-ready ZIP.",
@@ -1057,6 +1071,11 @@ const translatedAddons = {
     zipProCta: "Crear cuenta y activar fundador - 15 EUR/mes",
     resultReadySaveLinkCta: "Recibir enlace y checklist",
     resultReadyMicrocopy: "Sin permanencia. Pago seguro por Stripe.",
+    resultReadyStickyLabel: "Opciones después del resultado listo",
+    resultReadyStickyKicker: "Resultado listo",
+    resultReadyStickyText: "¿Tienes más fotos? Pro desbloquea 100 imágenes por lote por 15 EUR/mes.",
+    resultReadyStickyProCta: "Activar fundador",
+    resultReadyStickySaveCta: "Recibir enlace",
     privacyLink: "Privacidad y términos",
     statusTooManyFiles: "Se añadieron {accepted} de {total} imágenes. Para procesar lotes mayores de una vez, elige Pro.",
     statusNoSupportedFiles: "No se encontró ningún archivo de imagen compatible.",
@@ -2818,10 +2837,13 @@ function updateControls() {
   const hasLeadContact = Boolean(currentAccount?.email || getCapturedLeadEmail());
   const readyCount = items.filter((item) => item.outputBlob).length;
   const shouldShowResultReadyEmail = !paidAccess && downloadReady && !running && !hasLeadContact;
+  const shouldShowResultReadySticky = !paidAccess && downloadReady && !running;
   downloadReadyHint?.classList.toggle("hidden", paidAccess || !downloadReady);
   zipProCta?.classList.toggle("hidden", paidAccess || !downloadReady || running);
   resultReadySaveLinkCta?.classList.toggle("hidden", paidAccess || !downloadReady || running || hasLeadContact);
   resultReadyEmailForm?.classList.toggle("hidden", !shouldShowResultReadyEmail);
+  resultReadyStickyCta?.classList.toggle("hidden", !shouldShowResultReadySticky);
+  resultReadyStickyLead?.classList.toggle("hidden", hasLeadContact);
   if (!shouldShowResultReadyEmail && resultReadyEmailMessage) resultReadyEmailMessage.textContent = "";
   emptyState.classList.toggle("hidden", hasItems);
   countText.textContent = `${items.length} ${items.length === 1 ? t("photoSingular") : t("photoPlural")}`;
@@ -2845,8 +2867,19 @@ function updateControls() {
     });
   }
 
+  if (shouldShowResultReadySticky && !hasTrackedResultReadyStickyShown) {
+    hasTrackedResultReadyStickyShown = true;
+    trackEvent("pro_prompt_shown", {
+      reason: "result_ready_sticky",
+      count: readyCount,
+      totalInQueue: items.length,
+      free_limit: maxFilesPerBatch,
+    });
+  }
+
   if (!downloadReady && !running) {
     hasTrackedDownloadReady = false;
+    hasTrackedResultReadyStickyShown = false;
   }
   if (!downloadReady || running || hasLeadContact) {
     hasTrackedResultReadyEmailShown = false;
@@ -3152,6 +3185,7 @@ function clearAll() {
   fileInput.value = "";
   setStatus("statusWaiting");
   postDownloadNextPanel?.classList.add("hidden");
+  resultReadyStickyCta?.classList.add("hidden");
   trackEvent("queue_cleared");
   render();
 }
@@ -3254,15 +3288,15 @@ function focusPostDownloadLeadCapture() {
   leadCaptureEmail?.focus({ preventScroll: true });
 }
 
-function focusResultReadyLeadCapture() {
+function focusResultReadyLeadCapture(source = "result_ready") {
   const count = items.filter((item) => item.outputBlob).length;
   const downloadType = count > 1 ? "zip_available" : "png_available";
   localStorage.removeItem(leadCaptureDismissedStorageKey);
-  showLeadCapture(downloadType, count, "result_ready");
+  showLeadCapture(downloadType, count, source);
   trackEvent("post_download_save_link_clicked", {
     downloadType,
     count,
-    source: "result_ready",
+    source,
     totalInQueue: items.length,
     free_limit: maxFilesPerBatch,
   });
@@ -3509,6 +3543,19 @@ zipProCta?.addEventListener("click", () => {
   trackEvent("tool_pro_clicked", detail);
   startCheckout("early", zipProCta);
 });
+resultReadyStickyPro?.addEventListener("click", () => {
+  const readyCount = items.filter((item) => item.outputBlob).length;
+  const detail = {
+    reason: "result_ready_sticky",
+    downloadType: readyCount > 1 ? "zip_available" : "png_available",
+    count: readyCount,
+    totalInQueue: items.length,
+    free_limit: maxFilesPerBatch,
+  };
+  trackEvent("post_download_founder_clicked", detail);
+  trackEvent("tool_pro_clicked", detail);
+  startCheckout("early", resultReadyStickyPro);
+});
 postDownloadFounderCta?.addEventListener("click", () => {
   const downloadType = postDownloadNextPanel?.dataset.downloadType || "unknown";
   const count = Number(postDownloadNextPanel?.dataset.downloadCount || 0) || 0;
@@ -3523,7 +3570,8 @@ postDownloadFounderCta?.addEventListener("click", () => {
   trackEvent("tool_pro_clicked", detail);
   startCheckout("early", postDownloadFounderCta);
 });
-resultReadySaveLinkCta?.addEventListener("click", focusResultReadyLeadCapture);
+resultReadySaveLinkCta?.addEventListener("click", () => focusResultReadyLeadCapture());
+resultReadyStickyLead?.addEventListener("click", () => focusResultReadyLeadCapture("result_ready_sticky"));
 postDownloadSaveLinkCta?.addEventListener("click", focusPostDownloadLeadCapture);
 resultReadyEmailForm?.addEventListener("submit", handleResultReadyEmailSubmit);
 postDownloadEmailForm?.addEventListener("submit", handlePostDownloadEmailSubmit);

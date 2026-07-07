@@ -905,6 +905,78 @@ h2 {
   color: var(--blue-strong);
 }
 
+.result-ready-sticky {
+  position: sticky;
+  bottom: 12px;
+  z-index: 8;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  margin: 12px 0 0;
+  border: 1px solid rgba(26, 39, 57, 0.16);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 14px 34px rgba(26, 39, 57, 0.16);
+  backdrop-filter: blur(12px);
+}
+
+.result-ready-sticky strong,
+.result-ready-sticky span {
+  display: block;
+}
+
+.result-ready-sticky strong {
+  color: var(--charcoal);
+  font-size: 0.78rem;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.result-ready-sticky span {
+  margin-top: 2px;
+  color: #52606d;
+  font-size: 0.86rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.result-ready-sticky-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.result-ready-sticky-actions button {
+  min-height: 38px;
+  border-radius: 8px;
+  padding: 0 12px;
+  font-size: 0.82rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.result-ready-sticky-actions button:first-child {
+  border: 0;
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.result-ready-sticky-actions button:first-child:hover:not(:disabled) {
+  background: var(--accent-strong);
+}
+
+.result-ready-sticky-actions button:last-child {
+  border: 1px solid rgba(38, 70, 216, 0.2);
+  background: #ffffff;
+  color: var(--blue-strong);
+}
+
+.result-ready-sticky-actions button:last-child:hover:not(:disabled) {
+  background: #eef2ff;
+}
+
 .post-download-next {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
@@ -3516,6 +3588,21 @@ progress::-moz-progress-bar {
 
   .result-ready-upgrade {
     grid-template-columns: 1fr;
+  }
+
+  .result-ready-sticky {
+    grid-template-columns: 1fr;
+    bottom: 8px;
+  }
+
+  .result-ready-sticky-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 100%;
+  }
+
+  .result-ready-sticky-actions button {
+    width: 100%;
   }
 
   .result-ready-upgrade-actions span {
