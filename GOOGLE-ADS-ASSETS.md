@@ -171,3 +171,15 @@ Prepared campaign files are paused by default:
 - `google-ads-imports/batchcutout-spanish-product-negatives.csv`
 
 Use the Spanish assets only for searches around product photos, transparent PNGs and batch background removal. Avoid broad design traffic.
+
+## Catalog Search assets
+
+Prepared campaign files are paused by default:
+
+- `google-ads-imports/batchcutout-catalog-campaign.csv`
+- `google-ads-imports/batchcutout-catalog-adgroups.csv`
+- `google-ads-imports/batchcutout-catalog-keywords.csv`
+- `google-ads-imports/batchcutout-catalog-rsa.csv`
+- `google-ads-imports/batchcutout-catalog-negatives.csv`
+
+Use these assets only for searches around product catalog cleanup, supplier product photos, SKU images and variant photo batches. Keep exact/phrase match first and do not raise spend until the funnel shows checkout starts or paid subscriptions.
