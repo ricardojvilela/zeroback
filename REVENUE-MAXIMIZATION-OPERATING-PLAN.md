@@ -162,3 +162,4 @@ Interpretation:
 - Added a checkout-account reassurance note in the main tool explaining that the account only connects Stripe payment to Pro access and images stay in the browser, reducing friction after a Pro click.
 - Localized Portuguese social-preview alt metadata that still used English copy across PT acquisition pages, improving consistency for shared links and localized page quality.
 - Added the same account/Stripe reassurance note to the pricing checkout panel in PT/EN/ES, reducing account-step friction for visitors arriving from landing pages or ads.
+- Made the 6-character password requirement explicit in the main tool and pricing checkout placeholders in PT/EN/ES to reduce avoidable account-creation validation failures before Stripe.
