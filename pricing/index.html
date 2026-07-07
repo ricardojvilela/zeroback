@@ -384,15 +384,25 @@
               placeholder="O seu email"
               data-i18n-placeholder="checkoutEmailPlaceholder"
             />
-            <input
-              id="pricingAccountPassword"
-              type="password"
-              autocomplete="new-password"
-              required
-              minlength="6"
-              placeholder="A sua password (mín. 6 caracteres)"
-              data-i18n-placeholder="checkoutPasswordPlaceholder"
-            />
+            <div class="password-field">
+              <input
+                id="pricingAccountPassword"
+                type="password"
+                autocomplete="new-password"
+                required
+                minlength="6"
+                placeholder="A sua password (mín. 6 caracteres)"
+                data-i18n-placeholder="checkoutPasswordPlaceholder"
+              />
+              <button
+                class="password-toggle pricing-password-toggle"
+                id="pricingPasswordToggle"
+                type="button"
+                aria-controls="pricingAccountPassword"
+                aria-pressed="false"
+                data-i18n="passwordShow"
+              >Mostrar</button>
+            </div>
             <p class="pricing-auth-note" data-i18n="checkoutAuthNote">
               A conta serve apenas para ligar o pagamento Stripe ao acesso Pro. As suas imagens continuam no browser.
             </p>
@@ -550,6 +560,8 @@
           selectedPlanPrefix: "Plano selecionado",
           checkoutEmailPlaceholder: "O seu email",
           checkoutPasswordPlaceholder: "A sua password (mín. 6 caracteres)",
+          passwordShow: "Mostrar",
+          passwordHide: "Ocultar",
           checkoutAuthNote: "A conta serve apenas para ligar o pagamento Stripe ao acesso Pro. As suas imagens continuam no browser.",
           checkoutLogin: "Entrar e continuar",
           checkoutCreate: "Criar conta e continuar",
@@ -696,6 +708,8 @@
           selectedPlanPrefix: "Selected plan",
           checkoutEmailPlaceholder: "Your email",
           checkoutPasswordPlaceholder: "Your password (min. 6 characters)",
+          passwordShow: "Show",
+          passwordHide: "Hide",
           checkoutAuthNote: "The account only connects Stripe payment to Pro access. Your images stay in the browser.",
           checkoutLogin: "Sign in and continue",
           checkoutCreate: "Create account and continue",
@@ -842,6 +856,8 @@
           selectedPlanPrefix: "Plan seleccionado",
           checkoutEmailPlaceholder: "Tu email",
           checkoutPasswordPlaceholder: "Tu contraseña (mín. 6 caracteres)",
+          passwordShow: "Mostrar",
+          passwordHide: "Ocultar",
           checkoutAuthNote: "La cuenta solo conecta el pago de Stripe con el acceso Pro. Tus imágenes siguen en el navegador.",
           checkoutLogin: "Entrar y continuar",
           checkoutCreate: "Crear cuenta y continuar",
@@ -1139,6 +1155,7 @@
         languageSelect.value = nextLanguage;
         pricingForm.querySelector('[name="language"]').value = nextLanguage;
         localStorage.setItem("language", nextLanguage);
+        updatePricingPasswordToggle();
         updatePricingSavingsCalculator();
         updatePricingVolumeContactLink();
       }
@@ -1292,6 +1309,7 @@
       const pricingAuthForm = document.querySelector("#pricingAccountForm");
       const pricingEmail = document.querySelector("#pricingAccountEmail");
       const pricingPassword = document.querySelector("#pricingAccountPassword");
+      const pricingPasswordToggle = document.querySelector("#pricingPasswordToggle");
       const pricingLoginButton = document.querySelector("#pricingLoginButton");
       const pricingCreateButton = document.querySelector("#pricingCreateButton");
       const pricingCheckoutPanel = document.querySelector(".pricing-checkout-panel");
@@ -1323,6 +1341,20 @@
           (text, [name, replacement]) => text.replace(`{${name}}`, replacement),
           value,
         );
+      }
+
+      function updatePricingPasswordToggle() {
+        if (!pricingPassword || !pricingPasswordToggle) return;
+        const visible = pricingPassword.type === "text";
+        pricingPasswordToggle.textContent = pricingText(visible ? "passwordHide" : "passwordShow");
+        pricingPasswordToggle.setAttribute("aria-pressed", String(visible));
+      }
+
+      function togglePricingPasswordVisibility() {
+        if (!pricingPassword || !pricingPasswordToggle) return;
+        pricingPassword.type = pricingPassword.type === "password" ? "text" : "password";
+        updatePricingPasswordToggle();
+        pricingPassword.focus({ preventScroll: true });
       }
 
       function setPricingStatus(keyOrText, isRaw = false, params = {}) {
@@ -1848,6 +1880,7 @@
 
       pricingAuthForm?.addEventListener("invalid", handlePricingAuthInvalid, true);
       pricingAuthForm?.addEventListener("submit", handlePricingCreateAccount);
+      pricingPasswordToggle?.addEventListener("click", togglePricingPasswordVisibility);
       pricingLoginButton?.addEventListener("click", handlePricingLogin);
       languageSelect?.addEventListener("change", updatePricingAccountUi);
       pricingCheckoutActions?.addEventListener("click", (event) => {

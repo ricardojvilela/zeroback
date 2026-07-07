@@ -258,15 +258,25 @@
               placeholder="O seu email"
               data-i18n-placeholder="accountEmailPlaceholder"
             />
-            <input
-              id="accountPassword"
-              type="password"
-              autocomplete="new-password"
-              required
-              minlength="6"
-              placeholder="A sua password (mín. 6 caracteres)"
-              data-i18n-placeholder="accountPasswordPlaceholder"
-            />
+            <div class="password-field">
+              <input
+                id="accountPassword"
+                type="password"
+                autocomplete="new-password"
+                required
+                minlength="6"
+                placeholder="A sua password (mín. 6 caracteres)"
+                data-i18n-placeholder="accountPasswordPlaceholder"
+              />
+              <button
+                class="password-toggle"
+                id="accountPasswordToggle"
+                type="button"
+                aria-controls="accountPassword"
+                aria-pressed="false"
+                data-i18n="passwordShow"
+              >Mostrar</button>
+            </div>
             <p class="account-auth-note" data-i18n="accountAuthNote">
               A conta serve apenas para ligar o pagamento Stripe ao acesso Pro. As suas imagens continuam no browser.
             </p>

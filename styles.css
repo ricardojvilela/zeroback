@@ -423,6 +423,35 @@ h2 {
   color: rgba(255, 255, 255, 0.62);
 }
 
+.password-field {
+  position: relative;
+  display: grid;
+}
+
+.password-field input {
+  padding-right: 88px;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  min-height: 30px;
+  transform: translateY(-50%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 7px;
+  padding: 0 10px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-size: 0.74rem;
+  font-weight: 900;
+}
+
+.password-toggle:hover:not(:disabled) {
+  border-color: rgba(81, 215, 198, 0.52);
+  background: rgba(81, 215, 198, 0.18);
+}
+
 .account-auth-note {
   margin: -2px 0 0;
   border: 1px solid rgba(81, 215, 198, 0.22);
@@ -435,7 +464,7 @@ h2 {
   line-height: 1.35;
 }
 
-.account-form button,
+.account-form > button,
 .account-actions .ghost-button {
   width: 100%;
 }
@@ -2947,6 +2976,17 @@ progress::-moz-progress-bar {
 .pricing-auth-form input:focus {
   outline: 2px solid rgba(15, 139, 124, 0.2);
   border-color: rgba(15, 139, 124, 0.45);
+}
+
+.pricing-auth-form .password-toggle {
+  border-color: rgba(15, 139, 124, 0.2);
+  background: rgba(15, 139, 124, 0.07);
+  color: var(--accent-strong);
+}
+
+.pricing-auth-form .password-toggle:hover:not(:disabled) {
+  border-color: rgba(15, 139, 124, 0.36);
+  background: rgba(15, 139, 124, 0.12);
 }
 
 .pricing-auth-note {

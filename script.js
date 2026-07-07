@@ -57,6 +57,7 @@ const accountMessage = document.querySelector("#accountMessage");
 const accountForm = document.querySelector("#accountForm");
 const accountEmail = document.querySelector("#accountEmail");
 const accountPassword = document.querySelector("#accountPassword");
+const accountPasswordToggle = document.querySelector("#accountPasswordToggle");
 const accountSubmit = document.querySelector("#accountSubmit");
 const accountCreate = document.querySelector("#accountCreate");
 const accountActions = document.querySelector("#accountActions");
@@ -251,6 +252,8 @@ const baseTranslation = {
   accountStatusConfigMissing: "Login Pro ainda não configurado neste ambiente.",
   accountEmailPlaceholder: "O seu email",
   accountPasswordPlaceholder: "A sua password (mín. 6 caracteres)",
+  passwordShow: "Mostrar",
+  passwordHide: "Ocultar",
   accountAuthNote: "A conta serve apenas para ligar o pagamento Stripe ao acesso Pro. As suas imagens continuam no browser.",
   accountSubmit: "Entrar",
   accountSubmitCheckout: "Entrar e continuar",
@@ -426,6 +429,8 @@ const translations = {
     accountStatusConfigMissing: "Pro login is not configured in this environment yet.",
     accountEmailPlaceholder: "Your email",
     accountPasswordPlaceholder: "Your password (min. 6 characters)",
+    passwordShow: "Show",
+    passwordHide: "Hide",
     accountAuthNote: "The account only connects Stripe payment to Pro access. Your images stay in the browser.",
     accountSubmit: "Sign in",
     accountSubmitCheckout: "Sign in and continue",
@@ -544,6 +549,8 @@ const translations = {
     statusPngReady: "PNG listo",
     zipFilename: "fotos-sin-fondo.zip",
     fileSuffix: "sin-fondo",
+    passwordShow: "Mostrar",
+    passwordHide: "Ocultar",
   },
   fr: {
     ...baseTranslation,
@@ -947,6 +954,8 @@ const translatedAddons = {
     accountCheckoutGuideActive: "Pro se activa automáticamente",
     accountAuthNote: "La cuenta solo conecta el pago de Stripe con el acceso Pro. Tus imágenes siguen en el navegador.",
     accountPasswordPlaceholder: "Tu contraseña (mín. 6 caracteres)",
+    passwordShow: "Mostrar",
+    passwordHide: "Ocultar",
     accountSignupSuccessCheckout: "Cuenta creada. Confirma el email y vuelve a esta página; el plan elegido queda listo para abrir el pago.",
     resultReadyKicker: "Resultado listo",
     resultReadyTitle: "¿Quieres repetir esto en lotes mayores?",
@@ -1704,7 +1713,8 @@ function t(key, params = {}) {
   const currentValues = translations[currentLanguage] || translations.en || translations.pt;
   let value = currentValues[key];
 
-  if (currentLanguage !== "pt" && value === baseTranslation[key] && translations.en?.[key]) {
+  const hasExplicitAddon = Object.prototype.hasOwnProperty.call(translatedAddons[currentLanguage] || {}, key);
+  if (currentLanguage !== "pt" && value === baseTranslation[key] && translations.en?.[key] && !hasExplicitAddon) {
     value = translations.en[key];
   }
 
@@ -1766,6 +1776,20 @@ function updateStatusVolumeContactLink(params = {}) {
   statusVolumeContact.href = `mailto:support@batchcutout.com?subject=${subject}&body=${body}`;
 }
 
+function updatePasswordToggle(input, button) {
+  if (!input || !button) return;
+  const visible = input.type === "text";
+  button.textContent = t(visible ? "passwordHide" : "passwordShow");
+  button.setAttribute("aria-pressed", String(visible));
+}
+
+function togglePasswordVisibility(input, button) {
+  if (!input || !button) return;
+  input.type = input.type === "password" ? "text" : "password";
+  updatePasswordToggle(input, button);
+  input.focus({ preventScroll: true });
+}
+
 function applyLanguage() {
   document.documentElement.lang = languageNames[currentLanguage] || currentLanguage;
   document.title = t("pageTitle");
@@ -1791,6 +1815,7 @@ function applyLanguage() {
   }
 
   languageSelect.value = currentLanguage;
+  updatePasswordToggle(accountPassword, accountPasswordToggle);
   refreshStatusText();
   updateAccountUi();
   render();
@@ -3182,6 +3207,7 @@ proInlineForm?.addEventListener("click", (event) => {
 });
 accountForm?.addEventListener("invalid", handleAccountFormInvalid, true);
 accountForm?.addEventListener("submit", handleAccountCreate);
+accountPasswordToggle?.addEventListener("click", () => togglePasswordVisibility(accountPassword, accountPasswordToggle));
 accountSubmit?.addEventListener("click", handleAccountLogin);
 accountRefresh?.addEventListener("click", refreshAccount);
 accountLogout?.addEventListener("click", handleAccountLogout);
