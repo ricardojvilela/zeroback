@@ -930,6 +930,7 @@
       const languageSelect = document.querySelector("#pricingLanguage");
       const pricingSubmitButton = pricingForm.querySelector("[data-pricing-fallback-submit]");
       const pricingPageParams = new URLSearchParams(window.location.search);
+      const pricingCampaignParamKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "source", "campaign", "gclid", "gbraid", "wbraid"];
       const pricingCalculator = document.querySelector("#pricingSavingsCalculator");
       const pricingCalcImages = document.querySelector("#pricingCalcImages");
       const pricingCalcMinutes = document.querySelector("#pricingCalcMinutes");
@@ -1535,7 +1536,6 @@
       }
 
       function pricingAttribution() {
-        const keys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "gbraid", "wbraid"];
         const detail = {
           page_path: window.location.pathname,
           page_location: window.location.href.split("#")[0],
@@ -1543,7 +1543,7 @@
           visitor_id: getPricingStableId(localStorage, pricingVisitorStorageKey),
           session_id: getPricingStableId(sessionStorage, pricingSessionStorageKey),
         };
-        for (const key of keys) {
+        for (const key of pricingCampaignParamKeys) {
           const value = pricingPageParams.get(key);
           if (value) detail[key] = value;
         }
@@ -1559,15 +1559,14 @@
       }
 
       function preservePricingCampaignParams() {
-        const keys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "gbraid", "wbraid"];
-        if (!keys.some((key) => pricingPageParams.has(key))) return;
+        if (!pricingCampaignParamKeys.some((key) => pricingPageParams.has(key))) return;
 
         document.querySelectorAll("a[href]").forEach((link) => {
           const url = new URL(link.getAttribute("href"), window.location.origin);
           if (url.origin !== window.location.origin) return;
 
           let changed = false;
-          keys.forEach((key) => {
+          pricingCampaignParamKeys.forEach((key) => {
             if (pricingPageParams.has(key) && !url.searchParams.has(key)) {
               url.searchParams.set(key, pricingPageParams.get(key));
               changed = true;

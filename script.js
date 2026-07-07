@@ -87,6 +87,7 @@ const defaultProMonthlyLimit = 2000;
 const downloadZipConversionId = "AW-18177126609/2EdRCMzF7bMcENHhw9tD";
 const batchLimitConversionId = "AW-18177126609/prPXCPXD8LMcENHhw9tD";
 const paidSubscriptionConversionId = "AW-18177126609/fpcoCP2kmMgcENHhw9tD";
+const campaignParamKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "source", "campaign", "gclid", "gbraid", "wbraid"];
 const consentStorageKey = "batchcutout_consent";
 const debugMode = pageParams.get("debug") === "1";
 const debugEventsStorageKey = "batchcutout_debug_events";
@@ -1505,7 +1506,7 @@ function getVisitAttribution() {
 function persistAttribution() {
   const current = getVisitAttribution();
   const stored = getStoredAttribution();
-  const hasCampaignSignal = ["utm_source", "utm_medium", "utm_campaign", "source", "gclid", "gbraid", "wbraid"]
+  const hasCampaignSignal = campaignParamKeys
     .some((key) => new URLSearchParams(window.location.search).has(key));
   const next = {
     first: stored.first || current,
@@ -1514,6 +1515,24 @@ function persistAttribution() {
 
   localStorage.setItem(attributionStorageKey, JSON.stringify(next));
   recordDebugEvent("attribution_saved", next);
+}
+
+function pricingLinkHref(plan = defaultCheckoutPlan) {
+  const url = new URL("./pricing/", window.location.origin);
+  const selectedPlan = checkoutPlans.has(plan) ? plan : defaultCheckoutPlan;
+  if (currentLanguage && currentLanguage !== "pt") {
+    url.searchParams.set("lang", currentLanguage);
+  }
+  url.searchParams.set("checkout_plan", selectedPlan);
+
+  const params = new URLSearchParams(window.location.search);
+  for (const key of campaignParamKeys) {
+    const value = params.get(key);
+    if (value) url.searchParams.set(key, value);
+  }
+
+  url.hash = "pricing-account-title";
+  return `${url.pathname}${url.search}${url.hash}`;
 }
 
 function trackGoogleAdsConversion(sendTo, { value = 1.0, currency = "EUR", transaction_id = "" } = {}) {
@@ -1966,9 +1985,8 @@ function applyLanguage() {
     element.setAttribute("placeholder", t(element.dataset.i18nPlaceholder));
   }
 
-  const langParam = currentLanguage === "pt" ? "" : `lang=${encodeURIComponent(currentLanguage)}&`;
   for (const element of document.querySelectorAll("[data-pricing-link]")) {
-    element.setAttribute("href", `./pricing/?${langParam}checkout_plan=early#pricing-account-title`);
+    element.setAttribute("href", pricingLinkHref("early"));
   }
   for (const element of document.querySelectorAll("[data-policy-link]")) {
     element.setAttribute("href", localizedPolicyLinks[currentLanguage] || localizedPolicyLinks.en);
