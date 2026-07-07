@@ -41,6 +41,9 @@ function emptyDay(date) {
     postDownloadNextShown: 0,
     postDownloadFounderClicks: 0,
     postDownloadSaveLinkClicks: 0,
+    resultReadyStickyShown: 0,
+    resultReadyStickyFounderClicks: 0,
+    resultReadyStickySaveLinkClicks: 0,
     postDownloadFeedbacks: 0,
     postDownloadLargerBatchFeedbacks: 0,
     proofPageViews: 0,
@@ -187,6 +190,9 @@ function emptySourceRow(source) {
     postDownloadNextShown: 0,
     postDownloadFounderClicks: 0,
     postDownloadSaveLinkClicks: 0,
+    resultReadyStickyShown: 0,
+    resultReadyStickyFounderClicks: 0,
+    resultReadyStickySaveLinkClicks: 0,
     postDownloadFeedbacks: 0,
     postDownloadLargerBatchFeedbacks: 0,
     proofPageViews: 0,
@@ -510,10 +516,18 @@ export default async function handler(request, response) {
         case "post_download_founder_clicked":
           row.postDownloadFounderClicks += 1;
           sourceRow.postDownloadFounderClicks += 1;
+          if (detail.reason === "result_ready_sticky") {
+            row.resultReadyStickyFounderClicks += 1;
+            sourceRow.resultReadyStickyFounderClicks += 1;
+          }
           break;
         case "post_download_save_link_clicked":
           row.postDownloadSaveLinkClicks += 1;
           sourceRow.postDownloadSaveLinkClicks += 1;
+          if (detail.source === "result_ready_sticky") {
+            row.resultReadyStickySaveLinkClicks += 1;
+            sourceRow.resultReadyStickySaveLinkClicks += 1;
+          }
           break;
         case "post_download_feedback_selected":
           row.postDownloadFeedbacks += 1;
@@ -526,6 +540,12 @@ export default async function handler(request, response) {
         case "tool_pro_clicked":
           row.proClicks += 1;
           sourceRow.proClicks += 1;
+          break;
+        case "pro_prompt_shown":
+          if (detail.reason === "result_ready_sticky") {
+            row.resultReadyStickyShown += 1;
+            sourceRow.resultReadyStickyShown += 1;
+          }
           break;
         case "pro_cta_clicked":
           row.pricingCtaClicks += 1;
@@ -638,7 +658,7 @@ export default async function handler(request, response) {
         case "lead_capture_submitted":
           row.leadCaptures += 1;
           sourceRow.leadCaptures += 1;
-          if (["result_ready", "result_ready_inline"].includes(detail.capture_source || detail.source)) {
+          if (["result_ready", "result_ready_inline", "result_ready_sticky"].includes(detail.capture_source || detail.source)) {
             row.resultReadyLeadCaptures += 1;
             sourceRow.resultReadyLeadCaptures += 1;
           }

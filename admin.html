@@ -668,6 +668,22 @@
             <strong id="livePostDownloadSaveLink">0</strong>
           </article>
           <article class="live-card">
+            <span>Barra resultado</span>
+            <strong id="liveResultReadyStickyShown">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Fundador barra</span>
+            <strong id="liveResultReadyStickyFounder">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Link barra</span>
+            <strong id="liveResultReadyStickySaveLink">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Taxa barra</span>
+            <strong id="liveResultReadyStickyRate">0%</strong>
+          </article>
+          <article class="live-card">
             <span>Feedback pós-download</span>
             <strong id="livePostDownloadFeedbacks">0</strong>
           </article>
@@ -1361,6 +1377,8 @@
         const downloads = Number(totals.downloads || 0) || 0;
         const resultReady = Number(totals.downloadReadyShown || 0) || 0;
         const resultUpgradeClicks = Number(totals.postDownloadFounderClicks || 0) || 0;
+        const stickyShown = Number(totals.resultReadyStickyShown || 0) || 0;
+        const stickyDecisions = (Number(totals.resultReadyStickyFounderClicks || 0) || 0) + (Number(totals.resultReadyStickySaveLinkClicks || 0) || 0);
         const leadCaptures = Number(totals.leadCaptures || 0) || 0;
         const planClicks = Number(totals.proClicks || 0) + Number(totals.pricingCtaClicks || 0);
         const checkoutSessions = Number(totals.checkoutSessionsCreated || 0) || 0;
@@ -1400,6 +1418,10 @@
 
         if (downloads >= 10 && resultUpgradeClicks === 0 && leadCaptures === 0) {
           return "Gargalo principal: os utilizadores chegam ao download, mas ainda não clicam no plano fundador nem deixam email. Prioridade: reforçar o bloco de resultado pronto e medir se gera cliques nos próximos dados.";
+        }
+
+        if (stickyShown >= 10 && stickyDecisions === 0) {
+          return "Gargalo principal: a barra fixa pós-resultado aparece, mas ainda não gera cliques no fundador nem pedidos de link. Prioridade: testar texto/oferta da barra antes de aumentar tráfego pago.";
         }
 
         if (resultReady >= 10 && conversionRate(resultUpgradeClicks, resultReady) < 0.06) {
@@ -1818,6 +1840,13 @@
           totals.postDownloadNextShown,
         ));
         document.querySelector("#livePostDownloadSaveLink").textContent = totals.postDownloadSaveLinkClicks || 0;
+        document.querySelector("#liveResultReadyStickyShown").textContent = totals.resultReadyStickyShown || 0;
+        document.querySelector("#liveResultReadyStickyFounder").textContent = totals.resultReadyStickyFounderClicks || 0;
+        document.querySelector("#liveResultReadyStickySaveLink").textContent = totals.resultReadyStickySaveLinkClicks || 0;
+        document.querySelector("#liveResultReadyStickyRate").textContent = formatPercent(conversionRate(
+          (totals.resultReadyStickyFounderClicks || 0) + (totals.resultReadyStickySaveLinkClicks || 0),
+          totals.resultReadyStickyShown,
+        ));
         document.querySelector("#livePostDownloadFeedbacks").textContent = totals.postDownloadFeedbacks || 0;
         document.querySelector("#livePostDownloadLargerBatch").textContent = totals.postDownloadLargerBatchFeedbacks || 0;
         document.querySelector("#liveProofPageViews").textContent = totals.proofPageViews || 0;
