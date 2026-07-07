@@ -768,6 +768,10 @@
             <strong id="liveCheckoutLoginRequired">0</strong>
           </article>
           <article class="live-card">
+            <span>Validação conta</span>
+            <strong id="liveAccountValidationFailures">0</strong>
+          </article>
+          <article class="live-card">
             <span>Registos iniciados</span>
             <strong id="liveAccountSignupStarts">0</strong>
           </article>
@@ -1144,6 +1148,7 @@
                   <th>Cliques planos</th>
                   <th>CTA pricing</th>
                   <th>Sem login</th>
+                  <th>Validação</th>
                   <th>Registos</th>
                   <th>Registos falhados</th>
                   <th>Contas</th>
@@ -1162,7 +1167,7 @@
               </thead>
               <tbody id="sourceRowsBody">
                 <tr>
-                  <td class="empty" colspan="30">A carregar origens.</td>
+                  <td class="empty" colspan="31">A carregar origens.</td>
                 </tr>
               </tbody>
             </table>
@@ -1219,6 +1224,7 @@
                 <th>Cliques planos</th>
                 <th>CTA pricing</th>
                 <th>Sem login</th>
+                <th>Validação</th>
                 <th>Registos</th>
                 <th>Registos falhados</th>
                 <th>Contas</th>
@@ -1237,7 +1243,7 @@
             </thead>
             <tbody id="liveRowsBody">
               <tr>
-                <td class="empty" colspan="31">A carregar atividade.</td>
+                <td class="empty" colspan="32">A carregar atividade.</td>
               </tr>
             </tbody>
           </table>
@@ -1345,6 +1351,7 @@
         const planClicks = Number(totals.proClicks || 0) + Number(totals.pricingCtaClicks || 0);
         const checkoutSessions = Number(totals.checkoutSessionsCreated || 0) || 0;
         const paidSubscriptions = Number(totals.paidSubscriptions || 0) || 0;
+        const accountValidationFailures = Number(totals.accountValidationFailures || 0) || 0;
         const emailConfirmations = Number(totals.accountEmailConfirmations || 0) || 0;
         const activeAccountEntrants = Math.max((Number(totals.accountSignups || 0) || 0) - emailConfirmations, 0) + Number(totals.accountLogins || 0);
 
@@ -1358,6 +1365,10 @@
 
         if (emailConfirmations > 0 && checkoutSessions === 0) {
           return "Gargalo principal: há contas criadas a aguardar confirmação de email antes do Stripe. Prioridade: acompanhar se esses utilizadores voltam após confirmar.";
+        }
+
+        if (accountValidationFailures >= 3 && checkoutSessions === 0) {
+          return "Gargalo principal: há utilizadores bloqueados pela validação local do formulário de conta antes do Stripe. Prioridade: rever clareza de email/password e mensagens de erro.";
         }
 
         if (activeAccountEntrants > 0 && checkoutSessions === 0) {
@@ -1783,6 +1794,7 @@
         document.querySelector("#liveSubscriptionCancelScheduled").textContent = totals.subscriptionCancelScheduled || 0;
         document.querySelector("#liveSubscriptionCanceledEvents").textContent = totals.subscriptionCanceled || 0;
         document.querySelector("#liveCheckoutLoginRequired").textContent = totals.checkoutLoginRequired || 0;
+        document.querySelector("#liveAccountValidationFailures").textContent = totals.accountValidationFailures || 0;
         document.querySelector("#liveAccountSignupStarts").textContent = totals.accountSignupStarts || 0;
         document.querySelector("#liveAccountSignupFailures").textContent = totals.accountSignupFailures || 0;
         document.querySelector("#liveAccountSignups").textContent = totals.accountSignups || 0;
@@ -1828,6 +1840,7 @@
                   <td>${row.proClicks}</td>
                   <td>${row.pricingCtaClicks || 0}</td>
                   <td>${row.checkoutLoginRequired || 0}</td>
+                  <td>${row.accountValidationFailures || 0}</td>
                   <td>${row.accountSignupStarts || 0}</td>
                   <td>${row.accountSignupFailures || 0}</td>
                   <td>${row.accountSignups || 0}</td>
@@ -1845,7 +1858,7 @@
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="31">Ainda não existem eventos reais no período.</td></tr>`;
+          : `<tr><td class="empty" colspan="32">Ainda não existem eventos reais no período.</td></tr>`;
 
         sourceRowsBody.innerHTML = data.sourceBreakdown?.length
           ? data.sourceBreakdown.map((row) => `
@@ -1866,6 +1879,7 @@
                 <td>${row.proClicks || 0}</td>
                 <td>${row.pricingCtaClicks || 0}</td>
                 <td>${row.checkoutLoginRequired || 0}</td>
+                <td>${row.accountValidationFailures || 0}</td>
                 <td>${row.accountSignupStarts || 0}</td>
                 <td>${row.accountSignupFailures || 0}</td>
                 <td>${row.accountSignups || 0}</td>
@@ -1882,7 +1896,7 @@
                 <td>${row.billingPortalOpens || 0}</td>
               </tr>
             `).join("")
-          : `<tr><td class="empty" colspan="30">Ainda não existem origens identificadas.</td></tr>`;
+          : `<tr><td class="empty" colspan="31">Ainda não existem origens identificadas.</td></tr>`;
 
         landingRowsBody.innerHTML = data.landingBreakdown?.length
           ? data.landingBreakdown.map((row) => `
@@ -2664,8 +2678,8 @@
             localStorage.removeItem(adminTokenExpiryStorageKey);
             document.body.classList.add("locked");
           }
-          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="31">Não foi possível carregar atividade.</td></tr>`;
-          sourceRowsBody.innerHTML = `<tr><td class="empty" colspan="30">Não foi possível carregar origens.</td></tr>`;
+          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="32">Não foi possível carregar atividade.</td></tr>`;
+          sourceRowsBody.innerHTML = `<tr><td class="empty" colspan="31">Não foi possível carregar origens.</td></tr>`;
           landingRowsBody.innerHTML = `<tr><td class="empty" colspan="9">Não foi possível carregar páginas SEO.</td></tr>`;
           proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar contas.</td></tr>`;
           recoveryRowsBody.innerHTML = `<tr><td class="empty" colspan="4">Não foi possível carregar oportunidades comerciais.</td></tr>`;

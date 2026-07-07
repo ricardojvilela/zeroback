@@ -130,6 +130,7 @@ const serverEventNames = new Set([
   "account_signup_started",
   "account_signup_succeeded",
   "account_email_confirmation_required",
+  "account_form_validation_failed",
   "account_signup_failed",
   "account_login_succeeded",
   "account_login_failed",
@@ -139,6 +140,7 @@ let supabaseClient = null;
 let authConfig = null;
 let currentAccount = null;
 let lastUsageReservation = null;
+let lastAccountValidationFailureAt = 0;
 let hasStartedRequestedCheckout = false;
 let hasTrackedRequestedCheckoutLoginRequired = false;
 
@@ -1235,6 +1237,7 @@ const analyticsEvents = {
   account_signup_started: { category: "account", label: "signup_started" },
   account_signup_succeeded: { category: "account", label: "signup_succeeded" },
   account_email_confirmation_required: { category: "account", label: "email_confirmation_required" },
+  account_form_validation_failed: { category: "account", label: "form_validation_failed" },
   account_signup_failed: { category: "account", label: "signup_failed" },
   account_login_succeeded: { category: "account", label: "login_succeeded" },
   account_login_failed: { category: "account", label: "login_failed" },
@@ -2076,6 +2079,7 @@ async function handleAccountLogin(event) {
   const email = normalizeEmail(accountEmail.value);
   const password = accountPassword.value;
   if (!accountEmail.checkValidity() || !accountPassword.checkValidity()) {
+    trackAccountFormValidationFailure("login");
     accountForm?.reportValidity();
     return;
   }
@@ -2125,6 +2129,7 @@ async function handleAccountCreate(event) {
   const email = normalizeEmail(accountEmail.value);
   const password = accountPassword.value;
   if (!accountEmail.checkValidity() || !accountPassword.checkValidity()) {
+    trackAccountFormValidationFailure("signup");
     accountForm?.reportValidity();
     return;
   }
@@ -2197,6 +2202,27 @@ async function getCurrentAccessToken() {
   if (!supabaseClient) return "";
   const { data: sessionData } = await supabaseClient.auth.getSession();
   return sessionData?.session?.access_token || "";
+}
+
+function trackAccountFormValidationFailure(form = "signup") {
+  const now = Date.now();
+  if (now - lastAccountValidationFailureAt < 500) return;
+  lastAccountValidationFailureAt = now;
+
+  const waitingPlan = checkoutPlanWaitingForAuth();
+  trackEvent("account_form_validation_failed", {
+    form,
+    source: waitingPlan ? "checkout_plan" : "account_panel",
+    has_requested_checkout: Boolean(waitingPlan),
+    checkout_plan: waitingPlan || "",
+    email_valid: accountEmail?.checkValidity() || false,
+    password_length: accountPassword?.value?.length || 0,
+    password_valid: accountPassword?.checkValidity() || false,
+  });
+}
+
+function handleAccountFormInvalid() {
+  trackAccountFormValidationFailure(document.activeElement === accountSubmit ? "login" : "signup");
 }
 
 function checkoutPlanLabelKey(plan) {
@@ -3154,6 +3180,7 @@ proInlineForm?.addEventListener("click", (event) => {
   if (!button) return;
   startCheckout(button.dataset.checkoutPlan, button);
 });
+accountForm?.addEventListener("invalid", handleAccountFormInvalid, true);
 accountForm?.addEventListener("submit", handleAccountCreate);
 accountSubmit?.addEventListener("click", handleAccountLogin);
 accountRefresh?.addEventListener("click", refreshAccount);

@@ -925,11 +925,13 @@
         "pro_submit_attempt",
         "pro_checkout_interest_submitted",
         "account_email_confirmation_required",
+        "account_form_validation_failed",
       ]);
       let debugList;
       let hasTrackedFormStart = false;
       let hasTrackedSubmitAttempt = false;
       let lastSubmitAttemptAt = 0;
+      let lastPricingValidationFailureAt = 0;
       pricingMessage.className = "pricing-message hidden";
       pricingForm.after(pricingMessage);
 
@@ -1371,6 +1373,26 @@
           .slice(0, 120);
       }
 
+      function trackPricingAccountValidationFailure(form = "signup") {
+        const now = Date.now();
+        if (now - lastPricingValidationFailureAt < 500) return;
+        lastPricingValidationFailureAt = now;
+
+        trackPricingCheckoutEvent("account_form_validation_failed", {
+          form,
+          source: "pricing_page",
+          has_requested_checkout: true,
+          plan: selectedPricingPlan,
+          email_valid: pricingEmail?.checkValidity() || false,
+          password_length: pricingPassword?.value?.length || 0,
+          password_valid: pricingPassword?.checkValidity() || false,
+        });
+      }
+
+      function handlePricingAuthInvalid() {
+        trackPricingAccountValidationFailure(document.activeElement === pricingLoginButton ? "login" : "signup");
+      }
+
       function getPricingStableId(storage, key) {
         try {
           const existing = storage.getItem(key);
@@ -1673,6 +1695,7 @@
         }
         const email = String(pricingEmail.value || "").trim().toLowerCase();
         if (!pricingEmail.checkValidity() || !pricingPassword.checkValidity()) {
+          trackPricingAccountValidationFailure("login");
           pricingAuthForm.reportValidity();
           return;
         }
@@ -1716,6 +1739,7 @@
         }
         const email = String(pricingEmail.value || "").trim().toLowerCase();
         if (!pricingEmail.checkValidity() || !pricingPassword.checkValidity()) {
+          trackPricingAccountValidationFailure("signup");
           pricingAuthForm.reportValidity();
           return;
         }
@@ -1822,6 +1846,7 @@
         }
       }
 
+      pricingAuthForm?.addEventListener("invalid", handlePricingAuthInvalid, true);
       pricingAuthForm?.addEventListener("submit", handlePricingCreateAccount);
       pricingLoginButton?.addEventListener("click", handlePricingLogin);
       languageSelect?.addEventListener("change", updatePricingAccountUi);

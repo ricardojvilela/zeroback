@@ -64,6 +64,7 @@ function emptyDay(date) {
     paymentFailureValue: 0,
     subscriptionCancelScheduled: 0,
     subscriptionCanceled: 0,
+    accountValidationFailures: 0,
     accountSignupStarts: 0,
     accountSignupFailures: 0,
     accountSignups: 0,
@@ -107,6 +108,8 @@ function classifySource(event, detail) {
     "result_ready",
     "hero",
     "pricing",
+    "pricing_page",
+    "pricing_page_checkout_panel",
     "pricing-page",
     "seo",
     "landing",
@@ -199,6 +202,7 @@ function emptySourceRow(source) {
     paymentFailureValue: 0,
     subscriptionCancelScheduled: 0,
     subscriptionCanceled: 0,
+    accountValidationFailures: 0,
     accountSignupStarts: 0,
     accountSignupFailures: 0,
     accountSignups: 0,
@@ -583,6 +587,10 @@ export default async function handler(request, response) {
         case "account_signup_started":
           row.accountSignupStarts += 1;
           sourceRow.accountSignupStarts += 1;
+          break;
+        case "account_form_validation_failed":
+          row.accountValidationFailures += 1;
+          sourceRow.accountValidationFailures += 1;
           break;
         case "account_signup_failed":
           row.accountSignupFailures += 1;

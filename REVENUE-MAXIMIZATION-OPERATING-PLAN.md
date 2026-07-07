@@ -164,3 +164,5 @@ Interpretation:
 - Added the same account/Stripe reassurance note to the pricing checkout panel in PT/EN/ES, reducing account-step friction for visitors arriving from landing pages or ads.
 - Made the 6-character password requirement explicit in the main tool and pricing checkout placeholders in PT/EN/ES to reduce avoidable account-creation validation failures before Stripe.
 - Aligned pricing-page email confirmation redirects with the selected language, removing stale `lang` parameters when buyers switch back to Portuguese before account confirmation.
+- Added tracking and admin reporting for local account-form validation failures before Supabase, including source/day breakdown and automatic diagnosis, so email/password friction is visible before Stripe.
+- Cleaned source attribution classification so internal pricing-page labels do not appear as external traffic origins in the admin funnel.
