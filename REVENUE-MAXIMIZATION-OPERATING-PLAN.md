@@ -172,3 +172,4 @@ Interpretation:
 - The main tool account, billing, post-download and volume-limit messages now have explicit Spanish translations, avoiding English fallback text in the Spanish Pro conversion path.
 - Google Ads/pricing campaign assets, partner referral links and structured offer URLs now point directly to the selected plan checkout panel; Pro welcome emails now send paying users to the account panel for billing management instead of generic pricing.
 - Pricing-page CTA links now preserve the selected PT/EN/ES language when visitors move between free test and direct checkout, avoiding silent language resets in the purchase path.
+- The main tool now uses a dedicated Pro prompt when free visitors select more images than the free batch allows, framing the moment as real batch demand instead of post-result copy.

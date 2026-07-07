@@ -42,6 +42,9 @@ const leadCaptureEmail = document.querySelector("#leadCaptureEmail");
 const leadCaptureDismiss = document.querySelector("#leadCaptureDismiss");
 const leadCaptureMessage = document.querySelector("#leadCaptureMessage");
 const proInterestPanel = document.querySelector("#proInterestPanel");
+const proInterestTitle = document.querySelector("#pro-interest-title");
+const proInterestLead = document.querySelector("[data-i18n='proInlineLead']");
+const proInterestBenefits = document.querySelector(".pro-benefits");
 const proInlineForm = document.querySelector("#proInlineForm");
 const proInlineMessage = document.querySelector("#proInlineMessage");
 const proInlineSuccessCard = document.querySelector("#proInlineSuccessCard");
@@ -203,6 +206,9 @@ const baseTranslation = {
   proInlineTitle: "Transforme este teste em produção por 15 EUR/mês",
   proInlineLead: "Já viu o resultado com fotos reais. O plano fundador desbloqueia lotes até 100 imagens para catálogos, variantes e marketplaces.",
   proInlineBenefits: "Plano fundador 15 EUR/mês. Pro mensal 19 EUR/mês. Anual 190 EUR/ano, poupa 38 EUR face ao mensal.",
+  proInlineTitleBatchLimit: "Selecionou {total} imagens. O fundador desbloqueia o lote completo.",
+  proInlineLeadBatchLimit: "No teste grátis entram {accepted}. Com Pro processa até 100 imagens por lote e 2.000 por mês, com ZIP pronto para loja.",
+  proInlineBenefitsBatchLimit: "Se este é um lote real para catálogo ou marketplace, comece pelo plano fundador: 15 EUR/mês e cancele quando quiser.",
   proPlanContrastLabel: "Comparação entre grátis e Pro",
   proFreeLabel: "Grátis",
   proFreeLimit: "2 imagens por lote",
@@ -396,6 +402,9 @@ const translations = {
     proInlineTitle: "Turn this test into production for EUR 15/month",
     proInlineLead: "You have seen the result with real photos. The founder plan unlocks batches up to 100 images for catalogs, variants, and marketplaces.",
     proInlineBenefits: "Founder plan EUR 15/month. Monthly Pro EUR 19/month. Annual EUR 190/year saves EUR 38.",
+    proInlineTitleBatchLimit: "You selected {total} images. Founder unlocks the full batch.",
+    proInlineLeadBatchLimit: "The free test adds {accepted}. Pro processes up to 100 images per batch and 2,000 per month, with store-ready ZIP export.",
+    proInlineBenefitsBatchLimit: "If this is a real catalog or marketplace batch, start with the founder plan: EUR 15/month and cancel anytime.",
     proPlanContrastLabel: "Free versus Pro comparison",
     proFreeLabel: "Free",
     proFreeLimit: "2 images per batch",
@@ -965,6 +974,12 @@ const translatedAddons = {
     postDownloadFounderCta: "Crear cuenta y activar fundador - 15 EUR/mes",
     postDownloadSaveLinkCta: "Recibir enlace y checklist",
     postDownloadNextNote: "Sin tarjeta en la prueba gratis. Pago seguro por Stripe cuando elijas Pro.",
+    proInlineTitle: "Convierte esta prueba en producción por 15 EUR/mes",
+    proInlineLead: "Ya viste el resultado con fotos reales. El plan fundador desbloquea lotes de hasta 100 imágenes para catálogos, variantes y marketplaces.",
+    proInlineBenefits: "Plan fundador 15 EUR/mes. Pro mensual 19 EUR/mes. Anual 190 EUR/año, ahorra 38 EUR frente al mensual.",
+    proInlineTitleBatchLimit: "Seleccionaste {total} imágenes. El fundador desbloquea el lote completo.",
+    proInlineLeadBatchLimit: "En la prueba gratis entran {accepted}. Con Pro procesas hasta 100 imágenes por lote y 2.000 al mes, con ZIP listo para tienda.",
+    proInlineBenefitsBatchLimit: "Si este es un lote real para catálogo o marketplace, empieza con el plan fundador: 15 EUR/mes y cancela cuando quieras.",
     accountKicker: "Acceso Pro",
     accountBadgeGuest: "Sin sesión",
     accountBadgeCheckout: "Plan elegido",
@@ -1287,6 +1302,8 @@ let currentLanguage = getRequestedLanguage() || localStorage.getItem("language")
 let engineHasLoaded = false;
 let hasTrackedDragIntent = false;
 let hasTrackedDownloadReady = false;
+let activeProPromptReason = "";
+let activeProPromptParams = {};
 
 const analyticsEvents = {
   tool_page_view: { category: "funnel", label: "page_view", step: 0 },
@@ -1962,6 +1979,7 @@ function applyLanguage() {
   refreshStatusText();
   updateAccountUi();
   render();
+  updateProPromptCopy();
 }
 
 function setAccountMessage(key = "", params = {}) {
@@ -2816,7 +2834,7 @@ function addFiles(fileList) {
     });
     render();
     if (imageFiles.length) {
-      trackBatchLimitExceeded({
+      const limitDetail = {
         accepted: 0,
         attempted: imageFiles.length,
         selected: selectedFiles.length,
@@ -2824,9 +2842,10 @@ function addFiles(fileList) {
         rejected: imageFiles.length,
         totalInQueue: items.length,
         reason: "batch_limit",
-      });
+      };
+      trackBatchLimitExceeded(limitDetail);
       if (!canUsePaidAccess()) {
-        showProInterest("batch_limit");
+        showProInterest("batch_limit", limitDetail);
       }
     }
     trackEvent("upload_rejected", { reason: imageFiles.length ? "batch_limit" : "unsupported_files" });
@@ -2850,7 +2869,7 @@ function addFiles(fileList) {
     total: imageFiles.length,
   });
   if (rejectedByLimit) {
-    trackBatchLimitExceeded({
+    const limitDetail = {
       accepted: acceptedFiles.length,
       attempted: imageFiles.length,
       selected: selectedFiles.length,
@@ -2858,9 +2877,10 @@ function addFiles(fileList) {
       rejected: rejectedByLimit,
       totalInQueue: items.length,
       reason: "batch_limit",
-    });
+    };
+    trackBatchLimitExceeded(limitDetail);
     if (!canUsePaidAccess()) {
-      showProInterest("batch_limit");
+      showProInterest("batch_limit", limitDetail);
     }
   }
   trackEvent("photos_selected", {
@@ -3048,15 +3068,28 @@ function clearAll() {
   render();
 }
 
-function showProInterest(reason = "manual") {
+function showProInterest(reason = "manual", params = {}) {
   if (canUsePaidAccess()) {
     return;
   }
 
-  const detail = { reason, totalInQueue: items.length, free_limit: maxFilesPerBatch };
+  const detail = { reason, totalInQueue: items.length, free_limit: maxFilesPerBatch, ...params };
   trackEvent("pro_interest_prompt_clicked", detail);
   trackEvent("tool_pro_clicked", detail);
-  showProPrompt(reason);
+  showProPrompt(reason, { params });
+}
+
+function updateProPromptCopy() {
+  if (!proInterestPanel || !proInterestTitle || !proInterestLead || !proInterestBenefits) return;
+  const batchLimitPrompt = activeProPromptReason === "batch_limit";
+  const copyParams = {
+    accepted: activeProPromptParams.accepted ?? maxFilesPerBatch,
+    rejected: activeProPromptParams.rejected ?? 0,
+    total: activeProPromptParams.attempted ?? activeProPromptParams.total ?? activeProPromptParams.selected ?? items.length,
+  };
+  proInterestTitle.textContent = t(batchLimitPrompt ? "proInlineTitleBatchLimit" : "proInlineTitle", copyParams);
+  proInterestLead.textContent = t(batchLimitPrompt ? "proInlineLeadBatchLimit" : "proInlineLead", copyParams);
+  proInterestBenefits.textContent = t(batchLimitPrompt ? "proInlineBenefitsBatchLimit" : "proInlineBenefits", copyParams);
 }
 
 function showProPrompt(reason = "post_download", options = {}) {
@@ -3071,16 +3104,18 @@ function showProPrompt(reason = "post_download", options = {}) {
   const wasHidden = proInterestPanel.classList.contains("hidden");
   proInterestPanel.classList.remove("hidden");
   proInterestPanel.dataset.reason = reason;
-  if (proInlineLanguage) proInlineLanguage.value = currentLanguage;
-  if (proInlinePageUrl) proInlinePageUrl.value = window.location.href;
+  activeProPromptReason = reason;
+  activeProPromptParams = options.params || {};
   if (proInlineMessage) proInlineMessage.textContent = "";
   if (proInlineSuccessCard) proInlineSuccessCard.hidden = true;
+  updateProPromptCopy();
 
   if (wasHidden) {
     trackEvent("pro_prompt_shown", {
       reason,
       totalInQueue: items.length,
       free_limit: maxFilesPerBatch,
+      ...activeProPromptParams,
     });
   }
 
