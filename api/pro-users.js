@@ -75,6 +75,37 @@ function cleanText(value, maxLength) {
   return String(value || "").trim().slice(0, maxLength);
 }
 
+const internalAttributionSources = new Set([
+  "tool_inline",
+  "tool_limit_prompt",
+  "tool_empty_state",
+  "post_download",
+  "post_download_next",
+  "post_download_inline",
+  "result_ready",
+  "hero",
+  "pricing",
+  "pricing_page",
+  "pricing_page_checkout_panel",
+  "pricing-page",
+  "seo",
+  "landing",
+  "use-cases",
+  "admin",
+  "customer_results",
+  "partners_page",
+]);
+
+function attributionSourceFrom(...values) {
+  for (const value of values) {
+    const source = cleanText(value, 160);
+    if (!source) continue;
+    if (internalAttributionSources.has(source.toLowerCase())) continue;
+    return source;
+  }
+  return "";
+}
+
 function outreachSettings() {
   const from = process.env.OUTREACH_FROM || defaultOutreachFrom;
   const replyTo = process.env.OUTREACH_REPLY_TO || defaultOutreachReplyTo;
@@ -171,7 +202,7 @@ function subscriptionAttribution(subscription) {
     ...(customer.metadata || {}),
     ...(subscription.metadata || {}),
   };
-  const source = cleanText(metadata.utm_source || metadata.source || metadata.last_source || metadata.first_source, 120);
+  const source = attributionSourceFrom(metadata.utm_source, metadata.source, metadata.last_source, metadata.first_source);
   const medium = cleanText(metadata.utm_medium || metadata.medium || metadata.last_medium || metadata.first_medium, 120);
   const campaign = cleanText(metadata.utm_campaign || metadata.campaign || metadata.last_campaign || metadata.first_campaign, 160);
   const content = cleanText(metadata.utm_content || metadata.content || metadata.last_content || metadata.first_content, 160);
@@ -921,7 +952,7 @@ async function listLeadCaptures(settings) {
     leads.push({
       email,
       language: cleanText(detail.language, 20) || "en",
-      source: cleanText(detail.utm_source || detail.last_source || detail.first_source || event.source || detail.source, 160),
+      source: attributionSourceFrom(detail.utm_source, detail.last_source, detail.first_source, event.source, detail.source),
       captureSource: cleanText(detail.capture_source || detail.source, 80),
       campaign: cleanText(event.campaign || detail.utm_campaign || detail.last_campaign || detail.first_campaign, 160),
       downloadType: cleanText(detail.downloadType, 80),
@@ -1017,7 +1048,7 @@ function checkoutRecoveryFromEvent(event, profile, recoveryEvent = null) {
     plan,
     stripeSessionId: cleanText(detail.stripe_session_id || "", 160),
     stripeCustomerId: cleanText(detail.stripe_customer_id || profile?.stripeCustomerId || "", 160),
-    source: cleanText(detail.utm_source || detail.source || event.source || detail.last_source || detail.first_source, 160),
+    source: attributionSourceFrom(detail.utm_source, detail.source, event.source, detail.last_source, detail.first_source),
     campaign: cleanText(event.campaign || detail.utm_campaign || detail.campaign || detail.last_campaign || detail.first_campaign, 160),
     language: cleanText(detail.language, 20) || "en",
     pageLocation: cleanText(detail.page_location, 1000),

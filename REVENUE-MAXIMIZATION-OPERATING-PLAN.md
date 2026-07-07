@@ -175,3 +175,4 @@ Interpretation:
 - The main tool now uses a dedicated Pro prompt when free visitors select more images than the free batch allows, framing the moment as real batch demand instead of post-result copy.
 - Homepage-to-pricing Pro links now preserve UTM/source/ad-click parameters, keeping campaign attribution intact when visitors move from the free tool to the direct checkout page.
 - Checkout and Stripe subscription metadata now preserve first/last campaign context, including medium, content, search term and ad click IDs, so paid revenue can be tied back to acquisition journeys even when checkout happens after a later visit.
+- Subscription MRR reporting now ignores internal sources such as `pricing_page` and falls back to the real first/last acquisition source, so revenue by source reflects marketing channels instead of checkout UI labels.
