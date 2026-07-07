@@ -25,6 +25,9 @@ const statusVolumeContact = document.querySelector("#statusVolumeContact");
 const inlineProCta = document.querySelector("#inlineProCta");
 const zipProCta = document.querySelector("#zipProCta");
 const resultReadySaveLinkCta = document.querySelector("#resultReadySaveLinkCta");
+const resultReadyEmailForm = document.querySelector("#resultReadyEmailForm");
+const resultReadyEmail = document.querySelector("#resultReadyEmail");
+const resultReadyEmailMessage = document.querySelector("#resultReadyEmailMessage");
 const progressBar = document.querySelector("#progressBar");
 const countText = document.querySelector("#countText");
 const postDownloadNextPanel = document.querySelector("#postDownloadNextPanel");
@@ -148,6 +151,7 @@ let lastUsageReservation = null;
 let lastAccountValidationFailureAt = 0;
 let hasStartedRequestedCheckout = false;
 let hasTrackedRequestedCheckoutLoginRequired = false;
+let hasTrackedResultReadyEmailShown = false;
 
 const supportedExtensions = [
   ".jpg",
@@ -2123,6 +2127,7 @@ function syncPaidAccessUi() {
     downloadReadyHint?.classList.add("hidden");
     zipProCta?.classList.add("hidden");
     resultReadySaveLinkCta?.classList.add("hidden");
+    resultReadyEmailForm?.classList.add("hidden");
     postDownloadNextPanel?.classList.add("hidden");
     proInterestPanel?.classList.add("hidden");
     leadCapturePanel?.classList.add("hidden");
@@ -2779,22 +2784,40 @@ function updateControls() {
   zipButton.disabled = !allReady || running;
   clearButton.disabled = !hasItems || running;
   const hasLeadContact = Boolean(currentAccount?.email || getCapturedLeadEmail());
+  const readyCount = items.filter((item) => item.outputBlob).length;
+  const shouldShowResultReadyEmail = !paidAccess && downloadReady && !running && !hasLeadContact;
   downloadReadyHint?.classList.toggle("hidden", paidAccess || !downloadReady);
   zipProCta?.classList.toggle("hidden", paidAccess || !downloadReady || running);
   resultReadySaveLinkCta?.classList.toggle("hidden", paidAccess || !downloadReady || running || hasLeadContact);
+  resultReadyEmailForm?.classList.toggle("hidden", !shouldShowResultReadyEmail);
+  if (!shouldShowResultReadyEmail && resultReadyEmailMessage) resultReadyEmailMessage.textContent = "";
   emptyState.classList.toggle("hidden", hasItems);
   countText.textContent = `${items.length} ${items.length === 1 ? t("photoSingular") : t("photoPlural")}`;
 
   if (downloadReady && !hasTrackedDownloadReady) {
     hasTrackedDownloadReady = true;
     trackEvent("download_ready_shown", {
-      count: items.filter((item) => item.outputBlob).length,
+      count: readyCount,
       mode: allReady ? "zip_available" : "single_png_available",
+    });
+  }
+
+  if (shouldShowResultReadyEmail && !hasTrackedResultReadyEmailShown) {
+    hasTrackedResultReadyEmailShown = true;
+    trackEvent("lead_capture_shown", {
+      downloadType: readyCount > 1 ? "zip_available" : "png_available",
+      count: readyCount,
+      source: "result_ready_inline",
+      capture_source: "result_ready_inline",
+      has_account: Boolean(currentAccount?.email),
     });
   }
 
   if (!downloadReady && !running) {
     hasTrackedDownloadReady = false;
+  }
+  if (!downloadReady || running || hasLeadContact) {
+    hasTrackedResultReadyEmailShown = false;
   }
 }
 
@@ -3257,6 +3280,7 @@ function recordLeadCapture(email, { downloadType = "unknown", count = 0, source 
   localStorage.removeItem(leadCaptureDismissedStorageKey);
   postDownloadSaveLinkCta?.classList.add("hidden");
   resultReadySaveLinkCta?.classList.add("hidden");
+  resultReadyEmailForm?.classList.add("hidden");
   postDownloadEmailForm?.classList.add("hidden");
   setGoogleUserData(email);
   trackEvent("lead_capture_submitted", {
@@ -3300,6 +3324,46 @@ async function handleLeadCaptureSubmit(event) {
 
   if (leadCaptureMessage) leadCaptureMessage.textContent = t("leadCaptureSuccess");
   disableFormControls(leadCaptureForm);
+}
+
+function handleResultReadyEmailSubmit(event) {
+  event.preventDefault();
+  if (!resultReadyEmail || !resultReadyEmailForm) return;
+
+  const email = normalizeEmail(resultReadyEmail.value);
+  const count = items.filter((item) => item.outputBlob).length;
+  const downloadType = count > 1 ? "zip_available" : "png_available";
+
+  if (!isValidEmail(email)) {
+    if (resultReadyEmailMessage) resultReadyEmailMessage.textContent = t("leadCaptureInvalid");
+    trackEvent("lead_capture_invalid", {
+      downloadType,
+      count,
+      source: "result_ready_inline",
+      capture_source: "result_ready_inline",
+    });
+    resultReadyEmail.focus();
+    return;
+  }
+
+  trackEvent("post_download_save_link_clicked", {
+    downloadType,
+    count,
+    source: "result_ready_inline",
+    totalInQueue: items.length,
+    free_limit: maxFilesPerBatch,
+  });
+
+  recordLeadCapture(email, {
+    downloadType,
+    count,
+    source: "result_ready_inline",
+    captureSource: "result_ready_inline",
+  });
+
+  hideLeadCapture();
+  if (resultReadyEmailMessage) resultReadyEmailMessage.textContent = t("leadCaptureSuccess");
+  disableFormControls(resultReadyEmailForm);
 }
 
 function handlePostDownloadEmailSubmit(event) {
@@ -3429,6 +3493,7 @@ postDownloadFounderCta?.addEventListener("click", () => {
 });
 resultReadySaveLinkCta?.addEventListener("click", focusResultReadyLeadCapture);
 postDownloadSaveLinkCta?.addEventListener("click", focusPostDownloadLeadCapture);
+resultReadyEmailForm?.addEventListener("submit", handleResultReadyEmailSubmit);
 postDownloadEmailForm?.addEventListener("submit", handlePostDownloadEmailSubmit);
 proInlineForm?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-checkout-plan]");

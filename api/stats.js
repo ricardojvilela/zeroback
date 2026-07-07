@@ -626,7 +626,7 @@ export default async function handler(request, response) {
         case "lead_capture_submitted":
           row.leadCaptures += 1;
           sourceRow.leadCaptures += 1;
-          if ((detail.capture_source || detail.source) === "result_ready") {
+          if (["result_ready", "result_ready_inline"].includes(detail.capture_source || detail.source)) {
             row.resultReadyLeadCaptures += 1;
             sourceRow.resultReadyLeadCaptures += 1;
           }

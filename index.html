@@ -373,9 +373,22 @@
             <button class="zip-pro-nudge hidden" id="zipProCta" type="button" data-i18n="zipProCta">
               Criar conta e ativar fundador - 15 EUR/mês
             </button>
-            <button class="result-ready-secondary hidden" id="resultReadySaveLinkCta" type="button" data-i18n="resultReadySaveLinkCta">
-              Receber link e checklist
-            </button>
+            <form class="result-ready-email-form hidden" id="resultReadyEmailForm" novalidate>
+              <input
+                id="resultReadyEmail"
+                type="email"
+                autocomplete="email"
+                required
+                aria-label="O seu email"
+                data-i18n-aria="leadCapturePlaceholder"
+                placeholder="O seu email"
+                data-i18n-placeholder="leadCapturePlaceholder"
+              />
+              <button class="result-ready-secondary" type="submit" data-i18n="leadCaptureSubmit">
+                Receber link e checklist
+              </button>
+            </form>
+            <p class="result-ready-email-message" id="resultReadyEmailMessage" aria-live="polite"></p>
             <span data-i18n="resultReadyMicrocopy">Sem fidelização. Pagamento seguro por Stripe.</span>
           </div>
         </section>
