@@ -128,13 +128,18 @@ function classifySource(event, detail) {
     cleanSource(detail.last_source) ||
     cleanSource(detail.first_source) ||
     cleanSource(event.source);
-  const medium = asCleanText(detail.utm_medium || detail.medium, 80).toLowerCase();
+  const medium = asCleanText(detail.utm_medium || detail.medium || detail.last_medium || detail.first_medium, 80).toLowerCase();
   const campaign = asCleanText(event.campaign || detail.utm_campaign || detail.campaign || detail.last_campaign || detail.first_campaign, 200);
   const referrer = asCleanText(detail.referrer || "", 500);
   const referrerHost = hostnameFrom(referrer);
   const raw = [source, campaign, referrerHost].filter(Boolean).join(" ").toLowerCase();
+  const hasAdClickId = Boolean(
+    detail.gclid || detail.gbraid || detail.wbraid ||
+    detail.last_gclid || detail.last_gbraid || detail.last_wbraid ||
+    detail.first_gclid || detail.first_gbraid || detail.first_wbraid
+  );
 
-  if (detail.gclid || detail.gbraid || detail.wbraid || (raw.includes("google") && ["cpc", "paid", "ads"].some((term) => medium.includes(term)))) {
+  if (hasAdClickId || (raw.includes("google") && ["cpc", "paid", "ads"].some((term) => medium.includes(term)))) {
     return "Google Ads";
   }
   if (raw.includes("saashub")) return "SaaSHub";
