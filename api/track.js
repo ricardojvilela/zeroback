@@ -310,6 +310,14 @@ async function hasRecentLeadAutoreply(settings, tableName, email) {
 
 async function sendLeadAutoreply(settings, tableName, detail, row) {
   if (eventAutoreplyDisabled()) return { sent: false, skipped: true, reason: "disabled" };
+  if (
+    detail.event_category === "validation" ||
+    detail.source === "codex_validation" ||
+    row.visitor_id === "codex-validation-visitor" ||
+    String(row.session_id || "").startsWith("validation-")
+  ) {
+    return { sent: false, skipped: true, reason: "validation_event" };
+  }
   if (detail.consent !== true) return { sent: false, skipped: true, reason: "no_consent" };
   if (!leadAutoreplySources.has(String(detail.source || ""))) return { sent: false, skipped: true, reason: "not_post_download" };
   if ((Number(detail.count || 0) || 0) <= 0) return { sent: false, skipped: true, reason: "missing_download_count" };
