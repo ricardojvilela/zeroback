@@ -2358,6 +2358,8 @@ async function handleAccountLogin(event) {
       checkout_plan: waitingPlan || "",
     });
     setAccountMessage("accountMagicLinkSent");
+    await refreshAccount();
+    await maybeStartRequestedCheckout();
   } catch (error) {
     const waitingPlan = checkoutPlanWaitingForAuth();
     if (isEmailConfirmationRequiredError(error)) {

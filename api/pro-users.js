@@ -75,6 +75,18 @@ function cleanText(value, maxLength) {
   return String(value || "").trim().slice(0, maxLength);
 }
 
+function isInternalValidationEvent(event) {
+  const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+  return (
+    detail.event_category === "validation" ||
+    detail.source === "codex_validation" ||
+    event.source === "codex_validation" ||
+    event.visitor_id === "codex-validation-visitor" ||
+    event.visitor_id === "validation-probe" ||
+    String(event.session_id || "").startsWith("validation-")
+  );
+}
+
 const internalAttributionSources = new Set([
   "tool_inline",
   "tool_limit_prompt",
@@ -910,7 +922,7 @@ async function resolveSupportEmail(settings, body) {
 async function listLeadCaptures(settings) {
   const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
   const leadQuery = new URLSearchParams({
-    select: "id,event_name,event_label,detail,source,campaign,occurred_at",
+    select: "id,event_name,event_label,detail,source,campaign,visitor_id,session_id,occurred_at",
     event_name: "eq.lead_capture_submitted",
     order: "occurred_at.desc",
     limit: "250",
@@ -964,6 +976,7 @@ async function listLeadCaptures(settings) {
   const leads = [];
   const events = await response.json();
   for (const event of events) {
+    if (isInternalValidationEvent(event)) continue;
     const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
     const email = normalizeEmail(detail.email);
     if (!email || seen.has(email)) continue;
