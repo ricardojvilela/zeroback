@@ -788,6 +788,10 @@
             <strong id="liveAccountEmailConfirmations">0</strong>
           </article>
           <article class="live-card">
+            <span>Confirmações reenviadas</span>
+            <strong id="liveAccountEmailConfirmationResends">0</strong>
+          </article>
+          <article class="live-card">
             <span>Logins</span>
             <strong id="liveAccountLogins">0</strong>
           </article>
@@ -1153,6 +1157,7 @@
                   <th>Registos falhados</th>
                   <th>Contas</th>
                   <th>Confirmar email</th>
+                  <th>Reenvio confirmação</th>
                   <th>Logins</th>
                   <th>Logins falhados</th>
                   <th>Leads</th>
@@ -1167,7 +1172,7 @@
               </thead>
               <tbody id="sourceRowsBody">
                 <tr>
-                  <td class="empty" colspan="31">A carregar origens.</td>
+                  <td class="empty" colspan="32">A carregar origens.</td>
                 </tr>
               </tbody>
             </table>
@@ -1229,6 +1234,7 @@
                 <th>Registos falhados</th>
                 <th>Contas</th>
                 <th>Confirmar email</th>
+                <th>Reenvio confirmação</th>
                 <th>Logins</th>
                 <th>Logins falhados</th>
                 <th>Leads</th>
@@ -1243,7 +1249,7 @@
             </thead>
             <tbody id="liveRowsBody">
               <tr>
-                <td class="empty" colspan="32">A carregar atividade.</td>
+                <td class="empty" colspan="33">A carregar atividade.</td>
               </tr>
             </tbody>
           </table>
@@ -1353,7 +1359,12 @@
         const paidSubscriptions = Number(totals.paidSubscriptions || 0) || 0;
         const accountValidationFailures = Number(totals.accountValidationFailures || 0) || 0;
         const emailConfirmations = Number(totals.accountEmailConfirmations || 0) || 0;
+        const confirmationResends = Number(totals.accountEmailConfirmationResends || 0) || 0;
         const activeAccountEntrants = Math.max((Number(totals.accountSignups || 0) || 0) - emailConfirmations, 0) + Number(totals.accountLogins || 0);
+
+        if (confirmationResends > 0 && checkoutSessions === 0) {
+          return "Gargalo principal: compradores tentaram entrar antes de confirmar email e receberam novo link. Prioridade: acompanhar se voltam pelo link e chegam ao Stripe.";
+        }
 
         if (downloads >= 10 && resultUpgradeClicks === 0 && leadCaptures === 0) {
           return "Gargalo principal: os utilizadores chegam ao download, mas ainda não clicam no plano fundador nem deixam email. Prioridade: reforçar o bloco de resultado pronto e medir se gera cliques nos próximos dados.";
@@ -1799,6 +1810,7 @@
         document.querySelector("#liveAccountSignupFailures").textContent = totals.accountSignupFailures || 0;
         document.querySelector("#liveAccountSignups").textContent = totals.accountSignups || 0;
         document.querySelector("#liveAccountEmailConfirmations").textContent = totals.accountEmailConfirmations || 0;
+        document.querySelector("#liveAccountEmailConfirmationResends").textContent = totals.accountEmailConfirmationResends || 0;
         document.querySelector("#liveAccountLogins").textContent = totals.accountLogins || 0;
         document.querySelector("#liveAccountLoginFailures").textContent = totals.accountLoginFailures || 0;
         document.querySelector("#liveLeadCaptures").textContent = totals.leadCaptures || 0;
@@ -1845,6 +1857,7 @@
                   <td>${row.accountSignupFailures || 0}</td>
                   <td>${row.accountSignups || 0}</td>
                   <td>${row.accountEmailConfirmations || 0}</td>
+                  <td>${row.accountEmailConfirmationResends || 0}</td>
                   <td>${row.accountLogins || 0}</td>
                   <td>${row.accountLoginFailures || 0}</td>
                   <td>${row.leadCaptures || 0}</td>
@@ -1858,7 +1871,7 @@
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="32">Ainda não existem eventos reais no período.</td></tr>`;
+          : `<tr><td class="empty" colspan="33">Ainda não existem eventos reais no período.</td></tr>`;
 
         sourceRowsBody.innerHTML = data.sourceBreakdown?.length
           ? data.sourceBreakdown.map((row) => `
@@ -1884,6 +1897,7 @@
                 <td>${row.accountSignupFailures || 0}</td>
                 <td>${row.accountSignups || 0}</td>
                 <td>${row.accountEmailConfirmations || 0}</td>
+                <td>${row.accountEmailConfirmationResends || 0}</td>
                 <td>${row.accountLogins || 0}</td>
                 <td>${row.accountLoginFailures || 0}</td>
                 <td>${row.leadCaptures || 0}</td>
@@ -1896,7 +1910,7 @@
                 <td>${row.billingPortalOpens || 0}</td>
               </tr>
             `).join("")
-          : `<tr><td class="empty" colspan="31">Ainda não existem origens identificadas.</td></tr>`;
+          : `<tr><td class="empty" colspan="32">Ainda não existem origens identificadas.</td></tr>`;
 
         landingRowsBody.innerHTML = data.landingBreakdown?.length
           ? data.landingBreakdown.map((row) => `
@@ -2678,8 +2692,8 @@
             localStorage.removeItem(adminTokenExpiryStorageKey);
             document.body.classList.add("locked");
           }
-          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="32">Não foi possível carregar atividade.</td></tr>`;
-          sourceRowsBody.innerHTML = `<tr><td class="empty" colspan="31">Não foi possível carregar origens.</td></tr>`;
+          liveRowsBody.innerHTML = `<tr><td class="empty" colspan="33">Não foi possível carregar atividade.</td></tr>`;
+          sourceRowsBody.innerHTML = `<tr><td class="empty" colspan="32">Não foi possível carregar origens.</td></tr>`;
           landingRowsBody.innerHTML = `<tr><td class="empty" colspan="9">Não foi possível carregar páginas SEO.</td></tr>`;
           proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar contas.</td></tr>`;
           recoveryRowsBody.innerHTML = `<tr><td class="empty" colspan="4">Não foi possível carregar oportunidades comerciais.</td></tr>`;

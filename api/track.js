@@ -44,6 +44,7 @@ const allowedEvents = new Set([
   "account_signup_started",
   "account_signup_succeeded",
   "account_email_confirmation_required",
+  "account_email_confirmation_resent",
   "account_form_validation_failed",
   "account_signup_failed",
   "account_login_succeeded",
