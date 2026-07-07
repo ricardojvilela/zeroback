@@ -50,6 +50,12 @@ function mapUser(row) {
   };
 }
 
+function hoursSince(value) {
+  const date = new Date(value || 0);
+  if (Number.isNaN(date.getTime())) return 0;
+  return Math.max((Date.now() - date.getTime()) / 36e5, 0);
+}
+
 function normalizeEmail(value) {
   const email = String(value || "").trim().toLowerCase();
   const valid = /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(email);
@@ -404,6 +410,83 @@ async function listUsers(settings) {
 
   const rows = await response.json();
   return rows.map(mapUser);
+}
+
+function authUsersFromPayload(payload) {
+  if (Array.isArray(payload)) return payload;
+  if (Array.isArray(payload?.users)) return payload.users;
+  return [];
+}
+
+async function listUnconfirmedAuthUsers(settings) {
+  const query = new URLSearchParams({
+    page: "1",
+    per_page: "100",
+  });
+  const response = await fetch(`${settings.supabaseUrl}/auth/v1/admin/users?${query}`, {
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+    },
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`auth_users_read_failed:${response.status}:${detail.slice(0, 300)}`);
+  }
+
+  return authUsersFromPayload(await response.json())
+    .filter((user) => normalizeEmail(user.email))
+    .filter((user) => !(user.email_confirmed_at || user.confirmed_at));
+}
+
+async function listEmailConfirmationRecoveries(settings) {
+  const [authUsers, profiles, recoveryEmails] = await Promise.all([
+    listUnconfirmedAuthUsers(settings),
+    listUsers(settings),
+    listRecoveryEmails(settings),
+  ]);
+  const profilesByUserId = new Map(profiles.map((profile) => [profile.userId, profile]));
+  const profilesByEmail = new Map(profiles.map((profile) => [normalizeEmail(profile.email), profile]).filter(([email]) => email));
+  const recoveryByEmail = new Map();
+  for (const email of recoveryEmails.emails || []) {
+    if (String(email.segment || "").startsWith("confirm_email") && email.email && !recoveryByEmail.has(email.email)) {
+      recoveryByEmail.set(email.email, email);
+    }
+  }
+
+  const recoveries = authUsers.map((user) => {
+    const email = normalizeEmail(user.email);
+    const profile = profilesByUserId.get(user.id) || profilesByEmail.get(email) || null;
+    const recovery = recoveryByEmail.get(email) || null;
+    const createdAt = user.created_at || user.createdAt || "";
+    const ageHours = hoursSince(createdAt);
+    return {
+      userId: cleanText(user.id, 160),
+      email,
+      createdAt,
+      lastSignInAt: user.last_sign_in_at || "",
+      hoursSinceCreated: Math.round(ageHours * 10) / 10,
+      profilePlan: profile?.plan || "none",
+      stripeCustomerId: profile?.stripeCustomerId || "",
+      stripeSubscriptionId: profile?.stripeSubscriptionId || "",
+      recoverable: ageHours >= 2 && !recovery && !profileHasProAccess(profile),
+      tooFresh: ageHours < 2,
+      recoverySentAt: recovery?.sentAt || "",
+      recoveryResendId: recovery?.resendId || "",
+    };
+  });
+
+  return {
+    recoveries,
+    summary: {
+      total: recoveries.length,
+      ready: recoveries.filter((recovery) => recovery.recoverable).length,
+      tooFresh: recoveries.filter((recovery) => recovery.tooFresh).length,
+      alreadySent: recoveries.filter((recovery) => recovery.recoverySentAt).length,
+    },
+    generatedAt: new Date().toISOString(),
+  };
 }
 
 async function listSubscriptions(settings) {
@@ -1247,6 +1330,10 @@ export default async function handler(request, response) {
       }
       if (url.searchParams.get("view") === "checkout-recoveries") {
         const recoveryData = await listCheckoutRecoveries(settings);
+        return sendJson(response, 200, { ok: true, ...recoveryData });
+      }
+      if (url.searchParams.get("view") === "email-confirmation-recoveries") {
+        const recoveryData = await listEmailConfirmationRecoveries(settings);
         return sendJson(response, 200, { ok: true, ...recoveryData });
       }
 

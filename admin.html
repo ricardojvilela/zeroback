@@ -966,6 +966,10 @@
               <strong id="recoveryCheckoutNotPaid">0</strong>
             </article>
             <article class="live-card">
+              <span>Confirmar email</span>
+              <strong id="recoveryConfirmEmail">0</strong>
+            </article>
+            <article class="live-card">
               <span>Leads por contactar</span>
               <strong id="recoveryLeadCaptures">0</strong>
             </article>
@@ -1264,6 +1268,7 @@
       let recoveryUsers = [];
       let capturedLeads = [];
       let checkoutRecoveries = [];
+      let emailConfirmationRecoveries = [];
       let sentRecoveryEmailKeys = new Set();
       const liveStatus = document.querySelector("#liveStatus");
 
@@ -1532,6 +1537,24 @@
             subject: "¿Necesitas ayuda para activar BatchCutout Pro?",
             body: `Hola,\n\nParece que abriste el checkout de BatchCutout Pro pero no completaste el pago.\n\nSi algo bloqueo la compra, responde a este email y te ayudamos. La oferta Pro actual mantiene los mismos limites:\n\n- 100 imagenes por lote\n- 2.000 imagenes al mes\n- Opciones mensual, fundador y anual\n\nContinuar checkout:\n${recoveryPlanUrl(context.plan, "es", "checkout_not_paid")}\n\nSi no quieres recibir seguimiento, responde "remover".\n\nGracias,\nNexaFlow Labs`,
             reason: "Cliente Stripe criado, mas sem subscrição ativa após 24 horas.",
+          },
+          confirm_email: {
+            label: "Confirmar email",
+            subject: "Confirm your BatchCutout account",
+            body: `Hi,\n\nYou started creating a BatchCutout account, but the email confirmation step still looks unfinished.\n\nPlease check your inbox for the BatchCutout confirmation email. After confirming, return here and the selected Pro plan can continue:\n${recoveryPlanUrl("early", "en", "confirm_email")}\n\nIf you cannot find the confirmation email or something is blocking you, reply here and we will help.\n\nThanks,\nNexaFlow Labs`,
+            reason: "Conta criada há mais de 2 horas, mas o email ainda não foi confirmado.",
+          },
+          confirm_email_pt: {
+            label: "Confirmar email PT",
+            subject: "Confirme a sua conta BatchCutout",
+            body: `Ola,\n\nComecou a criar uma conta BatchCutout, mas a confirmacao por email ainda parece estar por concluir.\n\nVerifique a sua caixa de entrada e confirme o email da BatchCutout. Depois de confirmar, volte aqui e pode continuar para o plano Pro escolhido:\n${recoveryPlanUrl("early", "pt", "confirm_email")}\n\nSe nao encontrar o email de confirmacao ou algo estiver a bloquear, responda a este email e ajudamos.\n\nObrigado,\nNexaFlow Labs`,
+            reason: "Conta criada há mais de 2 horas, mas o email ainda não foi confirmado.",
+          },
+          confirm_email_es: {
+            label: "Confirmar email ES",
+            subject: "Confirma tu cuenta de BatchCutout",
+            body: `Hola,\n\nEmpezaste a crear una cuenta de BatchCutout, pero la confirmacion por email todavia parece pendiente.\n\nRevisa tu bandeja de entrada y confirma el email de BatchCutout. Despues de confirmar, vuelve aqui y puedes continuar con el plan Pro elegido:\n${recoveryPlanUrl("early", "es", "confirm_email")}\n\nSi no encuentras el email de confirmacion o algo te bloquea, responde a este email y te ayudamos.\n\nGracias,\nNexaFlow Labs`,
+            reason: "Conta criada há mais de 2 horas, mas o email ainda não foi confirmado.",
           },
           proof: {
             label: "Pedir prova real",
@@ -1933,9 +1956,21 @@
             segment: localizedRecoverySegment("checkout_not_paid", recoveryEmailLanguage(checkout)),
           }));
         const checkoutEmails = new Set(checkoutRows.map((row) => String(row.email || "").toLowerCase()).filter(Boolean));
+        const emailConfirmationRows = emailConfirmationRecoveries
+          .filter((recovery) => recovery.email && recovery.recoverable && !recovery.recoverySentAt)
+          .filter((recovery) => !proEmails.has(String(recovery.email).toLowerCase()))
+          .filter((recovery) => !recoveryAlreadySent(recovery.email, localizedRecoverySegment("confirm_email", recoveryEmailLanguage(recovery))))
+          .map((recovery) => ({
+            type: "email_confirmation",
+            emailConfirmation: recovery,
+            email: recovery.email || "",
+            segment: localizedRecoverySegment("confirm_email", recoveryEmailLanguage(recovery)),
+          }));
+        const emailConfirmationEmails = new Set(emailConfirmationRows.map((row) => String(row.email || "").toLowerCase()).filter(Boolean));
         const userRows = recoveryUsers
           .map((user) => ({ type: "user", user, email: user.email || "", segment: recoverySegment(user) }))
           .filter((row) => row.segment)
+          .filter((row) => !emailConfirmationEmails.has(String(row.email || "").toLowerCase()))
           .filter((row) => !(String(row.segment || "").startsWith("checkout_not_paid") && checkoutEmails.has(String(row.email || "").toLowerCase())))
           .filter((row) => !recoveryAlreadySent(row.email, row.segment));
         const leadRows = capturedLeads
@@ -1949,25 +1984,29 @@
             segment: leadRecoverySegment(lead),
           }))
           .filter((row) => !recoveryAlreadySent(row.email, row.segment));
-        const rows = [...checkoutRows, ...userRows, ...leadRows];
+        const rows = [...checkoutRows, ...emailConfirmationRows, ...userRows, ...leadRows];
         const accountNoCheckout = rows.filter((row) => String(row.segment || "").startsWith("account_no_checkout")).length;
         const checkoutNotPaid = rows.filter((row) => String(row.segment || "").startsWith("checkout_not_paid")).length;
+        const confirmEmail = rows.filter((row) => String(row.segment || "").startsWith("confirm_email")).length;
         const leadCaptures = rows.filter((row) => row.segment === "lead_capture" || row.segment === "lead_capture_pt" || row.segment === "lead_capture_es").length;
         const autoLeadReplies = capturedLeads.filter((lead) => lead.autoReplySentAt).length;
         const proofCandidates = rows.filter((row) => row.segment === "proof").length;
 
         document.querySelector("#recoveryAccountNoCheckout").textContent = accountNoCheckout;
         document.querySelector("#recoveryCheckoutNotPaid").textContent = checkoutNotPaid;
+        document.querySelector("#recoveryConfirmEmail").textContent = confirmEmail;
         document.querySelector("#recoveryLeadCaptures").textContent = leadCaptures;
         document.querySelector("#recoveryAutoLeadReplies").textContent = autoLeadReplies;
         document.querySelector("#recoveryProofCandidates").textContent = proofCandidates;
         recoverySummary.textContent = `${rows.length} contactos manuais potenciais. ${autoLeadReplies} lead(s) ja receberam o link automaticamente. ${sentRecoveryEmailKeys.size} recuperacao(oes) manuais ja registadas. Use contacto manual apenas com consentimento ou relação comercial válida.`;
 
         recoveryRowsBody.innerHTML = rows.length
-          ? rows.map(({ user, lead, checkout, email, segment }) => {
-              const copy = recoveryCopy(segment, checkout || {});
+          ? rows.map(({ user, lead, checkout, emailConfirmation, email, segment }) => {
+              const copy = recoveryCopy(segment, checkout || emailConfirmation || {});
               const reason = checkout
                 ? `${copy.reason || "-"} Plano: ${checkout.plan || "monthly"}. Sessão Stripe há ${checkout.hoursSinceCreated || 0}h.`
+                : emailConfirmation
+                  ? `${copy.reason || "-"} Conta criada há ${emailConfirmation.hoursSinceCreated || 0}h.`
                 : lead
                   ? `${copy.reason || "-"} ${lead.count ? `${lead.count} imagem(ns), ${lead.downloadType || "download"}.` : ""}${lead.captureSource ? ` Origem: ${lead.captureSource}.` : ""}${lead.autoReplyFailedAt ? ` Auto email falhou: ${lead.autoReplyFailureReason || "ver Resend"}.` : ""}`
                   : copy.reason || "-";
@@ -2343,6 +2382,29 @@
         }
       }
 
+      async function loadEmailConfirmationRecoveries() {
+        const token = getAdminToken();
+        if (!token) return;
+
+        try {
+          const response = await fetch("/api/pro-users?view=email-confirmation-recoveries", {
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await response.json();
+          if (!response.ok || !data.ok) {
+            throw new Error(data.error || "email_confirmation_recoveries_failed");
+          }
+          emailConfirmationRecoveries = data.recoveries || [];
+          renderRecoveryActions();
+        } catch {
+          emailConfirmationRecoveries = [];
+          renderRecoveryActions();
+        }
+      }
+
       async function loadSubscriptions() {
         const token = getAdminToken();
         if (!token) return;
@@ -2592,6 +2654,7 @@
           await loadRecoveryEmails();
           await loadLeadCaptures();
           await loadCheckoutRecoveries();
+          await loadEmailConfirmationRecoveries();
           await loadSubscriptions();
           await loadOutreachProspects();
           await loadSupportMailbox();
