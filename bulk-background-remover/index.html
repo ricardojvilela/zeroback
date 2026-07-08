@@ -86,7 +86,7 @@
       }
     </script>
 
-    <link rel="stylesheet" href="../styles.css?v=20260708-bulk-sticky-cta" />
+    <link rel="stylesheet" href="../styles.css?v=20260708-bulk-intent-strip" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
   <body class="landing-page bulk-landing-page">
@@ -116,6 +116,30 @@
         </div>
         <div class="landing-visual">
           <img src="../assets/product-before-after-v5.png" alt="Foto de produto antes e depois da remoção de fundo" />
+        </div>
+      </section>
+
+      <section class="bulk-intent-strip" aria-labelledby="bulk-intent-title">
+        <div>
+          <p class="section-kicker">Escolha o fluxo</p>
+          <h2 id="bulk-intent-title">O que tem para tratar agora?</h2>
+        </div>
+        <div class="bulk-intent-grid">
+          <article>
+            <strong>Quero só validar o recorte</strong>
+            <p>Use 2 imagens reais sem conta nem cartão.</p>
+            <a class="landing-secondary" href="/?utm_source=seo&utm_medium=landing&utm_campaign=bulk_background_remover_intent_validate#tool" data-preserve-utm>Testar 2 grátis</a>
+          </article>
+          <article class="is-featured">
+            <strong>Tenho um lote de produto</strong>
+            <p>Ative 100 imagens por lote para preparar catálogo, marketplace ou loja online.</p>
+            <a class="landing-button" href="/pricing/?checkout_plan=early&utm_source=seo&utm_medium=landing&utm_campaign=bulk_background_remover_intent_founder#pricing-account-title" data-preserve-utm>Ativar fundador 15 EUR/mês</a>
+          </article>
+          <article>
+            <strong>Faço isto todos os meses</strong>
+            <p>Use até 2.000 imagens/mês e ZIP final para organizar entregas.</p>
+            <a class="landing-secondary" href="/pricing/?checkout_plan=annual&utm_source=seo&utm_medium=landing&utm_campaign=bulk_background_remover_intent_annual#pricing-account-title" data-preserve-utm>Ver plano anual</a>
+          </article>
         </div>
       </section>
 
@@ -257,7 +281,7 @@
             return;
           }
 
-          var heroActions = document.querySelector(".landing-hero-actions");
+          var heroActions = document.querySelector(".landing-hero .landing-actions");
           var revealPoint = 220;
           if (heroActions) {
             var rect = heroActions.getBoundingClientRect();

@@ -2165,6 +2165,68 @@ progress::-moz-progress-bar {
   white-space: nowrap;
 }
 
+.bulk-intent-strip {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.34fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: stretch;
+  border-bottom: 1px solid rgba(202, 213, 226, 0.82);
+  padding: 24px 0;
+}
+
+.bulk-intent-strip h2 {
+  max-width: 10ch;
+  margin: 0;
+  color: var(--charcoal);
+  font-size: clamp(1.75rem, 3vw, 2.6rem);
+  line-height: 1.02;
+}
+
+.bulk-intent-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.bulk-intent-grid article {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+  border: 1px solid rgba(202, 213, 226, 0.9);
+  border-radius: 8px;
+  padding: 14px;
+  background: #ffffff;
+}
+
+.bulk-intent-grid article.is-featured {
+  border-color: rgba(15, 139, 124, 0.5);
+  background: #f0fffc;
+  box-shadow: 0 16px 40px rgba(15, 139, 124, 0.12);
+}
+
+.bulk-intent-grid strong {
+  color: var(--charcoal);
+  font-size: 0.98rem;
+  line-height: 1.25;
+}
+
+.bulk-intent-grid p {
+  margin: 0;
+  color: #52606d;
+  font-size: 0.86rem;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.bulk-intent-grid .landing-button,
+.bulk-intent-grid .landing-secondary {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  text-align: center;
+}
+
 .landing-visual {
   overflow: hidden;
   border: 1px solid var(--line);
@@ -3898,6 +3960,20 @@ progress::-moz-progress-bar {
     white-space: normal;
     text-align: center;
     font-size: 0.82rem;
+  }
+
+  .bulk-intent-strip,
+  .bulk-intent-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .bulk-intent-strip {
+    gap: 14px;
+    padding: 20px 0;
+  }
+
+  .bulk-intent-strip h2 {
+    max-width: 100%;
   }
 
   .partner-copy-row {
