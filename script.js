@@ -63,6 +63,7 @@ const accountPanel = document.querySelector("#accountPanel");
 const accountBadge = document.querySelector("#accountBadge");
 const accountStatus = document.querySelector("#accountStatus");
 const accountCheckoutGuide = document.querySelector("#accountCheckoutGuide");
+const accountCheckoutProof = document.querySelector("#accountCheckoutProof");
 const accountUsage = document.querySelector("#accountUsage");
 const accountUsageCount = document.querySelector("#accountUsageCount");
 const accountUsageBar = document.querySelector("#accountUsageBar");
@@ -276,6 +277,10 @@ const baseTranslation = {
   accountCheckoutGuideAccount: "Crie conta ou entre",
   accountCheckoutGuideStripe: "Pagamento Stripe",
   accountCheckoutGuideActive: "Pro ativo automaticamente",
+  accountCheckoutProofLabel: "Resumo do plano Pro",
+  accountCheckoutProofPrice: "Plano fundador: 15 EUR/mês",
+  accountCheckoutProofBatch: "100 imagens por lote",
+  accountCheckoutProofStripe: "Pagamento só no Stripe",
   accountStatusLoading: "A verificar a sua conta...",
   accountStatusFree: "Conta gratuita. O Pro ativa até 100 imagens por lote e 2.000 imagens por mês.",
   accountStatusPro: "Conta Pro ativa. Até {batchLimit} imagens por lote e {monthlyRemaining} de {monthlyLimit} disponíveis este mês.",
@@ -288,7 +293,7 @@ const baseTranslation = {
   accountPasswordPlaceholder: "A sua password (mín. 6 caracteres)",
   passwordShow: "Mostrar",
   passwordHide: "Ocultar",
-  accountAuthNote: "Não há pagamento neste passo. A conta só liga o Stripe ao acesso Pro; as imagens continuam no browser.",
+  accountAuthNote: "Depois de criar conta, abrimos o Stripe automaticamente. Não há pagamento neste passo; as imagens continuam no browser.",
   accountSubmit: "Entrar",
   accountSubmitCheckout: "Entrar e continuar",
   accountSubmitSending: "A entrar...",
@@ -464,6 +469,10 @@ const translations = {
     accountCheckoutGuideAccount: "Create account or sign in",
     accountCheckoutGuideStripe: "Stripe payment",
     accountCheckoutGuideActive: "Pro activates automatically",
+    accountCheckoutProofLabel: "Pro plan summary",
+    accountCheckoutProofPrice: "Founder plan: EUR 15/month",
+    accountCheckoutProofBatch: "100 images per batch",
+    accountCheckoutProofStripe: "Payment only on Stripe",
     accountStatusLoading: "Checking your account...",
     accountStatusFree: "Free account. Pro unlocks up to 100 images per batch and 2,000 images per month.",
     accountStatusPro: "Pro account active. Up to {batchLimit} images per batch and {monthlyRemaining} of {monthlyLimit} available this month.",
@@ -476,7 +485,7 @@ const translations = {
     accountPasswordPlaceholder: "Your password (min. 6 characters)",
     passwordShow: "Show",
     passwordHide: "Hide",
-    accountAuthNote: "No payment happens at this step. The account only connects Stripe to Pro access; your images stay in the browser.",
+    accountAuthNote: "After creating the account, we open Stripe automatically. No payment happens at this step; your images stay in the browser.",
     accountSubmit: "Sign in",
     accountSubmitCheckout: "Sign in and continue",
     accountSubmitSending: "Signing in...",
@@ -1037,12 +1046,16 @@ const translatedAddons = {
     accountCheckoutGuideAccount: "Crea cuenta o entra",
     accountCheckoutGuideStripe: "Pago Stripe",
     accountCheckoutGuideActive: "Pro se activa automáticamente",
+    accountCheckoutProofLabel: "Resumen del plan Pro",
+    accountCheckoutProofPrice: "Plan fundador: 15 EUR/mes",
+    accountCheckoutProofBatch: "100 imágenes por lote",
+    accountCheckoutProofStripe: "Pago solo en Stripe",
     accountStatusLoading: "Verificando tu cuenta...",
     accountStatusFree: "Cuenta gratuita. Pro activa hasta 100 imágenes por lote y 2.000 imágenes al mes.",
     accountStatusPro: "Cuenta Pro activa. Hasta {batchLimit} imágenes por lote y {monthlyRemaining} de {monthlyLimit} disponibles este mes.",
     accountStatusConfigMissing: "El login Pro todavía no está configurado en este entorno.",
     accountEmailPlaceholder: "Tu email",
-    accountAuthNote: "No hay pago en este paso. La cuenta solo conecta Stripe con el acceso Pro; tus imágenes siguen en el navegador.",
+    accountAuthNote: "Después de crear la cuenta, abrimos Stripe automáticamente. No hay pago en este paso; tus imágenes siguen en el navegador.",
     accountPasswordPlaceholder: "Tu contraseña (mín. 6 caracteres)",
     passwordShow: "Mostrar",
     passwordHide: "Ocultar",
@@ -2231,6 +2244,7 @@ function updateAccountUi() {
     accountStatus.textContent = t("accountStatusConfigMissing");
     accountPanel.classList.remove("has-pending-checkout");
     accountCheckoutGuide?.classList.add("hidden");
+    accountCheckoutProof?.classList.add("hidden");
     prefillAccountEmail();
     accountForm?.classList.remove("hidden");
     accountCheckoutLink?.classList.add("hidden");
@@ -2251,6 +2265,7 @@ function updateAccountUi() {
 
     accountPanel.classList.toggle("has-pending-checkout", Boolean(waitingPlanName));
     accountCheckoutGuide?.classList.toggle("hidden", !waitingPlanName);
+    accountCheckoutProof?.classList.toggle("hidden", !waitingPlanName);
     accountCheckoutLink?.classList.toggle("hidden", !waitingPlanName || Boolean(getCapturedLeadEmail()));
     if (waitingPlanName) trackAccountCheckoutPanelShown(waitingPlan);
     accountBadge.textContent = waitingPlanName ? t("accountBadgeCheckout") : t("accountBadgeGuest");
@@ -2285,6 +2300,7 @@ function updateAccountUi() {
   accountStatus.textContent = email ? `${email} - ${statusTextValue}` : statusTextValue;
   accountPanel.classList.remove("has-pending-checkout");
   accountCheckoutGuide?.classList.add("hidden");
+  accountCheckoutProof?.classList.add("hidden");
   accountCheckoutLink?.classList.add("hidden");
   accountForm?.classList.add("hidden");
   accountActions?.classList.remove("hidden");

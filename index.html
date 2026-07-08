@@ -174,7 +174,7 @@
         ]
       }
     </script>
-    <link rel="stylesheet" href="./styles.css?v=20260708-actions-founder-cta" />
+    <link rel="stylesheet" href="./styles.css?v=20260708-account-checkout-proof" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
   <body>
@@ -238,6 +238,11 @@
             <span><strong>1</strong><em data-i18n="accountCheckoutGuideAccount">Crie conta ou entre</em></span>
             <span><strong>2</strong><em data-i18n="accountCheckoutGuideStripe">Pagamento Stripe</em></span>
             <span><strong>3</strong><em data-i18n="accountCheckoutGuideActive">Pro ativo automaticamente</em></span>
+          </div>
+          <div class="account-checkout-proof hidden" id="accountCheckoutProof" aria-label="Resumo do plano Pro" data-i18n-aria="accountCheckoutProofLabel">
+            <span data-i18n="accountCheckoutProofPrice">Plano fundador: 15 EUR/mês</span>
+            <span data-i18n="accountCheckoutProofBatch">100 imagens por lote</span>
+            <span data-i18n="accountCheckoutProofStripe">Pagamento só no Stripe</span>
           </div>
           <div class="account-usage hidden" id="accountUsage" aria-live="polite">
             <div class="account-usage-head">
@@ -648,7 +653,7 @@
       </section>
     </main>
 
-    <script type="module" src="./script.js?v=20260708-checkout-link-lead"></script>
+    <script type="module" src="./script.js?v=20260708-account-checkout-proof"></script>
   </body>
 </html>
 
