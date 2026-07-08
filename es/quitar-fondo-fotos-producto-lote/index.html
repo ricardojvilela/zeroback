@@ -88,10 +88,10 @@
         ]
       }
     </script>
-    <link rel="stylesheet" href="../../styles.css?v=20260630-growth3" />
+    <link rel="stylesheet" href="../../styles.css?v=20260708-es-intent-strip" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
-  <body class="landing-page">
+  <body class="landing-page bulk-landing-page">
     <main class="landing-shell">
       <nav class="landing-nav" aria-label="BatchCutout">
         <a class="landing-logo" href="/es/">
@@ -129,6 +129,30 @@
         <figure class="landing-visual">
           <img src="../../assets/product-before-after-v5.png" alt="Foto de producto antes y después de quitar el fondo" />
         </figure>
+      </section>
+
+      <section class="bulk-intent-strip" aria-labelledby="es-product-intent-title">
+        <div>
+          <p class="section-kicker">Elige el flujo</p>
+          <h2 id="es-product-intent-title">¿Qué tienes que preparar ahora?</h2>
+        </div>
+        <div class="bulk-intent-grid">
+          <article>
+            <strong>Solo quiero validar el recorte</strong>
+            <p>Usa 2 imágenes reales sin cuenta y sin tarjeta.</p>
+            <a class="landing-secondary" href="/?lang=es&utm_source=seo&utm_medium=es_landing&utm_campaign=quitar_fondo_fotos_producto_lote_intent_validate#tool" data-preserve-utm>Probar 2 gratis</a>
+          </article>
+          <article class="is-featured">
+            <strong>Tengo un lote de producto</strong>
+            <p>Activa 100 imágenes por lote para preparar catálogo, marketplace o tienda online.</p>
+            <a class="landing-button" href="/pricing/?lang=es&checkout_plan=early&utm_source=seo&utm_medium=es_landing&utm_campaign=quitar_fondo_fotos_producto_lote_intent_founder#pricing-account-title" data-preserve-utm>Activar fundador 15 EUR/mes</a>
+          </article>
+          <article>
+            <strong>Trabajo esto todos los meses</strong>
+            <p>Usa hasta 2.000 imágenes/mes y un ZIP final para organizar entregas.</p>
+            <a class="landing-secondary" href="/pricing/?lang=es&checkout_plan=annual&utm_source=seo&utm_medium=es_landing&utm_campaign=quitar_fondo_fotos_producto_lote_intent_annual#pricing-account-title" data-preserve-utm>Ver plan anual</a>
+          </article>
+        </div>
       </section>
 
       <section class="landing-metrics" aria-label="Límites de BatchCutout Pro">
@@ -200,6 +224,45 @@
         >Limpiar fotos ahora</a>
       </section>
     </main>
+    <aside class="bulk-sticky-conversion" aria-label="Acción rápida para lote de producto">
+      <p><strong>¿Tienes un lote real?</strong><span>Prueba 2 fotos o activa 100 por lote.</span></p>
+      <div>
+        <a class="landing-secondary" href="/?lang=es&utm_source=seo&utm_medium=es_landing&utm_campaign=quitar_fondo_fotos_producto_lote_sticky_free#tool" data-preserve-utm>Probar 2 gratis</a>
+        <a class="landing-button" href="/pricing/?lang=es&checkout_plan=early&utm_source=seo&utm_medium=es_landing&utm_campaign=quitar_fondo_fotos_producto_lote_sticky_founder#pricing-account-title" data-preserve-utm>Fundador 15 EUR/mes</a>
+      </div>
+    </aside>
     <script src="/landing-track.js?v=20260703-attribution"></script>
+    <script>
+      (function () {
+        var bar = document.querySelector(".bulk-sticky-conversion");
+        if (!bar) return;
+
+        var mobileQuery = window.matchMedia("(max-width: 760px)");
+        var updateVisibility = function () {
+          if (!mobileQuery.matches) {
+            bar.classList.add("is-visible");
+            return;
+          }
+
+          var heroActions = document.querySelector(".landing-hero .landing-actions");
+          var revealPoint = 220;
+          if (heroActions) {
+            var rect = heroActions.getBoundingClientRect();
+            revealPoint = rect.bottom + window.scrollY + 40;
+          }
+
+          bar.classList.toggle("is-visible", window.scrollY > revealPoint);
+        };
+
+        updateVisibility();
+        window.addEventListener("scroll", updateVisibility, { passive: true });
+        window.addEventListener("resize", updateVisibility);
+        if (mobileQuery.addEventListener) {
+          mobileQuery.addEventListener("change", updateVisibility);
+        } else {
+          mobileQuery.addListener(updateVisibility);
+        }
+      })();
+    </script>
   </body>
 </html>
