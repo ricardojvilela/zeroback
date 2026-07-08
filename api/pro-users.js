@@ -102,6 +102,8 @@ const internalAttributionSources = new Set([
   "pro_trial",
   "batchcutout.com",
   "www.batchcutout.com",
+  "resend_inbound",
+  "support_email",
   "hero",
   "pricing",
   "pricing_page",

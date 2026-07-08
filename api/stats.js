@@ -119,6 +119,8 @@ function classifySource(event, detail) {
     "pro_trial",
     "batchcutout.com",
     "www.batchcutout.com",
+    "resend_inbound",
+    "support_email",
     "hero",
     "pricing",
     "pricing_page",
@@ -143,7 +145,8 @@ function classifySource(event, detail) {
   const medium = asCleanText(detail.utm_medium || detail.medium || detail.last_medium || detail.first_medium, 80).toLowerCase();
   const campaign = asCleanText(event.campaign || detail.utm_campaign || detail.campaign || detail.last_campaign || detail.first_campaign, 200);
   const referrer = asCleanText(detail.referrer || "", 500);
-  const referrerHost = hostnameFrom(referrer);
+  const rawReferrerHost = hostnameFrom(referrer);
+  const referrerHost = internalSources.has(rawReferrerHost) ? "" : rawReferrerHost;
   const raw = [source, campaign, referrerHost].filter(Boolean).join(" ").toLowerCase();
   const hasAdClickId = Boolean(
     detail.gclid || detail.gbraid || detail.wbraid ||
