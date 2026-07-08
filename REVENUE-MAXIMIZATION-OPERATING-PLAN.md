@@ -1,6 +1,6 @@
 # BatchCutout - revenue maximization operating plan
 
-Updated: 2026-07-07
+Updated: 2026-07-08
 
 ## Objective
 
@@ -190,3 +190,4 @@ Interpretation:
 - `/admin` now includes a daily operating brief comparing today with yesterday and recommending the next action: generate traffic, adjust conversion, recover checkout, contact leads, observe, or increase acquisition.
 - `/admin` daily stats now use the Europe/Lisbon day boundary instead of UTC, so the daily revenue brief matches Ricardo's operating day.
 - Free users who try to upload more images than the free batch allows now see a batch-limit email capture inside the Pro prompt, tracked as `tool_limit_prompt` and surfaced in `/admin` as "Leads limite lote".
+- The highest-volume `/bulk-background-remover/` landing now has a compact sticky action bar for the 2-image free test and founder checkout, tracked through existing SEO CTA events, to improve its recent 25-view / 2-click / 0-pricing-click baseline without increasing ad spend.

@@ -86,10 +86,10 @@
       }
     </script>
 
-    <link rel="stylesheet" href="../styles.css?v=20260629-account-contrast" />
+    <link rel="stylesheet" href="../styles.css?v=20260708-bulk-sticky-cta" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
-  <body class="landing-page">
+  <body class="landing-page bulk-landing-page">
     <main class="landing-shell">
       <nav class="landing-nav" aria-label="BatchCutout">
         <a class="landing-logo" href="/">
@@ -237,6 +237,45 @@
         </div>
       </section>
     </main>
+    <aside class="bulk-sticky-conversion" aria-label="Ação rápida para lote de produto">
+      <p><strong>Lote real para tratar?</strong><span>Teste 2 fotos ou ative 100 por lote.</span></p>
+      <div>
+        <a class="landing-secondary" href="/?utm_source=seo&utm_medium=landing&utm_campaign=bulk_background_remover_sticky_free#tool" data-preserve-utm>Testar 2 grátis</a>
+        <a class="landing-button" href="/pricing/?checkout_plan=early&utm_source=seo&utm_medium=landing&utm_campaign=bulk_background_remover_sticky_founder#pricing-account-title" data-preserve-utm>Fundador 15 EUR/mês</a>
+      </div>
+    </aside>
     <script src="/landing-track.js?v=20260703-attribution"></script>
+    <script>
+      (function () {
+        var bar = document.querySelector(".bulk-sticky-conversion");
+        if (!bar) return;
+
+        var mobileQuery = window.matchMedia("(max-width: 760px)");
+        var updateVisibility = function () {
+          if (!mobileQuery.matches) {
+            bar.classList.add("is-visible");
+            return;
+          }
+
+          var heroActions = document.querySelector(".landing-hero-actions");
+          var revealPoint = 220;
+          if (heroActions) {
+            var rect = heroActions.getBoundingClientRect();
+            revealPoint = rect.bottom + window.scrollY + 40;
+          }
+
+          bar.classList.toggle("is-visible", window.scrollY > revealPoint);
+        };
+
+        updateVisibility();
+        window.addEventListener("scroll", updateVisibility, { passive: true });
+        window.addEventListener("resize", updateVisibility);
+        if (mobileQuery.addEventListener) {
+          mobileQuery.addEventListener("change", updateVisibility);
+        } else {
+          mobileQuery.addListener(updateVisibility);
+        }
+      })();
+    </script>
   </body>
 </html>

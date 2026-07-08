@@ -2084,6 +2084,59 @@ progress::-moz-progress-bar {
   color: var(--charcoal);
 }
 
+.bulk-landing-page {
+  padding-bottom: 86px;
+}
+
+.bulk-sticky-conversion {
+  position: fixed;
+  right: max(18px, calc((100vw - 1180px) / 2));
+  bottom: 16px;
+  left: max(18px, calc((100vw - 1180px) / 2));
+  z-index: 18;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  border: 1px solid rgba(26, 39, 57, 0.14);
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 16px 44px rgba(26, 39, 57, 0.18);
+  backdrop-filter: blur(14px);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.bulk-sticky-conversion p {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  margin: 0;
+}
+
+.bulk-sticky-conversion strong {
+  color: var(--charcoal);
+  font-size: 0.9rem;
+}
+
+.bulk-sticky-conversion span {
+  color: #52606d;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.bulk-sticky-conversion div {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.bulk-sticky-conversion .landing-button,
+.bulk-sticky-conversion .landing-secondary {
+  min-height: 40px;
+  white-space: nowrap;
+}
+
 .landing-visual {
   overflow: hidden;
   border: 1px solid var(--line);
@@ -3780,6 +3833,43 @@ progress::-moz-progress-bar {
   .landing-actions {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .bulk-landing-page {
+    padding-bottom: 126px;
+  }
+
+  .bulk-sticky-conversion {
+    right: 12px;
+    bottom: 10px;
+    left: 12px;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 10px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(calc(100% + 18px));
+  }
+
+  .bulk-sticky-conversion.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .bulk-sticky-conversion div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .bulk-sticky-conversion .landing-button,
+  .bulk-sticky-conversion .landing-secondary {
+    width: 100%;
+    min-height: 42px;
+    white-space: normal;
+    text-align: center;
+    font-size: 0.82rem;
   }
 
   .partner-copy-row {
