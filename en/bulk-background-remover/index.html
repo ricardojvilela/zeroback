@@ -85,10 +85,10 @@
         ]
       }
     </script>
-    <link rel="stylesheet" href="../../styles.css?v=20260629-growth" />
+    <link rel="stylesheet" href="../../styles.css?v=20260708-bulk-intent-strip" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
-  <body class="landing-page">
+  <body class="landing-page bulk-landing-page">
     <main class="landing-shell">
       <nav class="landing-nav" aria-label="BatchCutout">
         <a class="landing-logo" href="/en/bulk-background-remover/">
@@ -116,6 +116,30 @@
         <figure class="landing-visual">
           <img src="../../assets/product-before-after-v5.png" alt="Before and after product photo background removal" />
         </figure>
+      </section>
+
+      <section class="bulk-intent-strip" aria-labelledby="bulk-intent-title">
+        <div>
+          <p class="section-kicker">Choose your flow</p>
+          <h2 id="bulk-intent-title">What are you preparing now?</h2>
+        </div>
+        <div class="bulk-intent-grid">
+          <article>
+            <strong>I just want to validate quality</strong>
+            <p>Test 2 real images with no account and no card.</p>
+            <a class="landing-secondary" href="/?lang=en&utm_source=seo&utm_medium=en_landing&utm_campaign=en_bulk_background_remover_intent_validate#tool" data-preserve-utm>Test 2 free</a>
+          </article>
+          <article class="is-featured">
+            <strong>I have a real product batch</strong>
+            <p>Activate 100 images per batch for catalogs, marketplaces, or ecommerce updates.</p>
+            <a class="landing-button" href="/pricing/?lang=en&checkout_plan=early&utm_source=seo&utm_medium=en_landing&utm_campaign=en_bulk_background_remover_intent_founder#pricing-account-title" data-preserve-utm>Activate founder EUR 15/month</a>
+          </article>
+          <article>
+            <strong>I do this every month</strong>
+            <p>Use up to 2,000 images/month and one ZIP export to keep product work organized.</p>
+            <a class="landing-secondary" href="/pricing/?lang=en&checkout_plan=annual&utm_source=seo&utm_medium=en_landing&utm_campaign=en_bulk_background_remover_intent_annual#pricing-account-title" data-preserve-utm>View annual Pro</a>
+          </article>
+        </div>
       </section>
 
       <section class="landing-metrics" aria-label="BatchCutout Pro limits">
@@ -167,6 +191,45 @@
         </div>
       </section>
     </main>
+    <aside class="bulk-sticky-conversion" aria-label="Quick action for product batches">
+      <p><strong>Real batch to process?</strong><span>Test 2 photos or activate 100 per batch.</span></p>
+      <div>
+        <a class="landing-secondary" href="/?lang=en&utm_source=seo&utm_medium=en_landing&utm_campaign=en_bulk_background_remover_sticky_free#tool" data-preserve-utm>Test 2 free</a>
+        <a class="landing-button" href="/pricing/?lang=en&checkout_plan=early&utm_source=seo&utm_medium=en_landing&utm_campaign=en_bulk_background_remover_sticky_founder#pricing-account-title" data-preserve-utm>Founder EUR 15/month</a>
+      </div>
+    </aside>
     <script src="/landing-track.js?v=20260703-attribution"></script>
+    <script>
+      (function () {
+        var bar = document.querySelector(".bulk-sticky-conversion");
+        if (!bar) return;
+
+        var mobileQuery = window.matchMedia("(max-width: 760px)");
+        var updateVisibility = function () {
+          if (!mobileQuery.matches) {
+            bar.classList.add("is-visible");
+            return;
+          }
+
+          var heroActions = document.querySelector(".landing-hero .landing-actions");
+          var revealPoint = 220;
+          if (heroActions) {
+            var rect = heroActions.getBoundingClientRect();
+            revealPoint = rect.bottom + window.scrollY + 40;
+          }
+
+          bar.classList.toggle("is-visible", window.scrollY > revealPoint);
+        };
+
+        updateVisibility();
+        window.addEventListener("scroll", updateVisibility, { passive: true });
+        window.addEventListener("resize", updateVisibility);
+        if (mobileQuery.addEventListener) {
+          mobileQuery.addEventListener("change", updateVisibility);
+        } else {
+          mobileQuery.addListener(updateVisibility);
+        }
+      })();
+    </script>
   </body>
 </html>
