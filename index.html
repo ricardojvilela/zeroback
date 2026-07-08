@@ -522,6 +522,25 @@
             <button type="button" data-checkout-plan="monthly" data-i18n="billingMonthly">Pro mensal - 19 EUR/mês</button>
             <button type="button" data-checkout-plan="annual" data-i18n="billingAnnual">Pro anual - 190 EUR/ano</button>
           </form>
+          <div class="pro-limit-lead hidden" id="proLimitLeadBlock">
+            <p data-i18n="proLimitLeadText">
+              Ainda a avaliar? Receba o link e checklist para voltar ao lote quando estiver pronto.
+            </p>
+            <form class="pro-limit-email-form" id="proLimitEmailForm" novalidate>
+              <input
+                id="proLimitEmail"
+                type="email"
+                autocomplete="email"
+                required
+                aria-label="O seu email"
+                data-i18n-aria="leadCapturePlaceholder"
+                placeholder="O seu email"
+                data-i18n-placeholder="leadCapturePlaceholder"
+              />
+              <button type="submit" data-i18n="proLimitLeadSubmit">Receber link do lote</button>
+            </form>
+            <p class="pro-limit-email-message" id="proLimitEmailMessage" aria-live="polite"></p>
+          </div>
           <p class="pro-message" id="proInlineMessage" aria-live="polite"></p>
           <div class="pro-note" id="proInlineSuccessCard" hidden>
             <strong data-i18n="proInlineSuccessTitle">Pagamento seguro</strong>
@@ -625,7 +644,7 @@
       </section>
     </main>
 
-    <script type="module" src="./script.js?v=20260707-email-confirmation-metric"></script>
+    <script type="module" src="./script.js?v=20260708-limit-lead-capture"></script>
   </body>
 </html>
 

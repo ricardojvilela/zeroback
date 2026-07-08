@@ -1449,6 +1449,67 @@ h2 {
   background: var(--blue-strong);
 }
 
+.pro-limit-lead {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+  border: 1px solid rgba(26, 39, 57, 0.12);
+  border-radius: 8px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.pro-limit-lead p {
+  margin: 0;
+  max-width: none;
+  font-size: 0.86rem;
+  font-weight: 750;
+}
+
+.pro-limit-email-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.pro-limit-email-form input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid rgba(38, 70, 216, 0.18);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: #ffffff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.pro-limit-email-form input:focus {
+  outline: 2px solid rgba(38, 70, 216, 0.16);
+  border-color: rgba(38, 70, 216, 0.38);
+}
+
+.pro-limit-email-form button {
+  min-height: 42px;
+  border: 1px solid rgba(38, 70, 216, 0.2);
+  background: #ffffff;
+  color: var(--blue-strong);
+  font-size: 0.88rem;
+  font-weight: 900;
+}
+
+.pro-limit-email-form button:hover:not(:disabled) {
+  background: #eef2ff;
+  color: var(--blue-strong);
+}
+
+.pro-limit-email-message {
+  min-height: 18px;
+  margin: -2px 0 0;
+  color: var(--accent-strong);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
 .honeypot-field {
   position: absolute;
   left: -9999px;
@@ -3657,6 +3718,7 @@ progress::-moz-progress-bar {
   .result-ready-email-form,
   .post-download-email-form,
   .lead-capture-form,
+  .pro-limit-email-form,
   .pro-plan-contrast,
   .pro-form {
     grid-template-columns: 1fr;

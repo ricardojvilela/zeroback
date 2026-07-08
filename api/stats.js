@@ -113,6 +113,7 @@ function emptyDay(date) {
     accountLoginFailures: 0,
     leadCaptures: 0,
     resultReadyLeadCaptures: 0,
+    limitPromptLeadCaptures: 0,
     leadAutorepliesSent: 0,
     leadAutorepliesFailed: 0,
     proWelcomeEmailsSent: 0,
@@ -272,6 +273,7 @@ function emptySourceRow(source) {
     accountLoginFailures: 0,
     leadCaptures: 0,
     resultReadyLeadCaptures: 0,
+    limitPromptLeadCaptures: 0,
     leadAutorepliesSent: 0,
     leadAutorepliesFailed: 0,
     proWelcomeEmailsSent: 0,
@@ -711,6 +713,10 @@ export default async function handler(request, response) {
           if (["result_ready", "result_ready_inline", "result_ready_sticky"].includes(detail.capture_source || detail.source)) {
             row.resultReadyLeadCaptures += 1;
             sourceRow.resultReadyLeadCaptures += 1;
+          }
+          if ((detail.capture_source || detail.source) === "tool_limit_prompt") {
+            row.limitPromptLeadCaptures += 1;
+            sourceRow.limitPromptLeadCaptures += 1;
           }
           break;
         case "lead_capture_autoreply_sent":

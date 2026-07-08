@@ -189,3 +189,4 @@ Interpretation:
 - Internal interface labels such as `result_ready_sticky`, `result_ready_inline`, `account_panel`, `checkout_plan`, stale `pro_trial`, self-referrals and support/email plumbing sources are excluded from acquisition-source attribution, so admin revenue/lead reporting falls back to the real first/last traffic source.
 - `/admin` now includes a daily operating brief comparing today with yesterday and recommending the next action: generate traffic, adjust conversion, recover checkout, contact leads, observe, or increase acquisition.
 - `/admin` daily stats now use the Europe/Lisbon day boundary instead of UTC, so the daily revenue brief matches Ricardo's operating day.
+- Free users who try to upload more images than the free batch allows now see a batch-limit email capture inside the Pro prompt, tracked as `tool_limit_prompt` and surfaced in `/admin` as "Leads limite lote".

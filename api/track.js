@@ -61,8 +61,8 @@ const allowedEvents = new Set([
 ]);
 
 const allowedEmailDomains = new Set(["batchcutout.com"]);
-const leadAutoreplySources = new Set(["post_download", "post_download_inline", "result_ready", "result_ready_inline", "result_ready_sticky"]);
-const leadAutoreplyDownloadTypes = new Set(["png", "zip", "png_available", "zip_available"]);
+const leadAutoreplySources = new Set(["post_download", "post_download_inline", "result_ready", "result_ready_inline", "result_ready_sticky", "tool_limit_prompt"]);
+const leadAutoreplyDownloadTypes = new Set(["png", "zip", "png_available", "zip_available", "batch_limit"]);
 const leadAutoreplyWindowMs = 30 * 24 * 60 * 60 * 1000;
 
 const corsHeaders = {

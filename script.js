@@ -52,6 +52,10 @@ const proInterestTitle = document.querySelector("#pro-interest-title");
 const proInterestLead = document.querySelector("[data-i18n='proInlineLead']");
 const proInterestBenefits = document.querySelector(".pro-benefits");
 const proInlineForm = document.querySelector("#proInlineForm");
+const proLimitLeadBlock = document.querySelector("#proLimitLeadBlock");
+const proLimitEmailForm = document.querySelector("#proLimitEmailForm");
+const proLimitEmail = document.querySelector("#proLimitEmail");
+const proLimitEmailMessage = document.querySelector("#proLimitEmailMessage");
 const proInlineMessage = document.querySelector("#proInlineMessage");
 const proInlineSuccessCard = document.querySelector("#proInlineSuccessCard");
 const accountPanel = document.querySelector("#accountPanel");
@@ -158,6 +162,7 @@ let hasStartedRequestedCheckout = false;
 let hasTrackedRequestedCheckoutLoginRequired = false;
 let hasTrackedResultReadyEmailShown = false;
 let hasTrackedResultReadyStickyShown = false;
+let hasTrackedProLimitLeadShown = false;
 let lastTrackedAccountCheckoutPanelPlan = "";
 let hasTrackedAccountFormInteraction = false;
 
@@ -222,6 +227,8 @@ const baseTranslation = {
   proInlineTitleBatchLimit: "Selecionou {total} imagens. O fundador desbloqueia o lote completo.",
   proInlineLeadBatchLimit: "No teste grátis entram {accepted}. Com Pro processa até 100 imagens por lote e 2.000 por mês, com ZIP pronto para loja.",
   proInlineBenefitsBatchLimit: "Se este é um lote real para catálogo ou marketplace, comece pelo plano fundador: 15 EUR/mês e cancele quando quiser.",
+  proLimitLeadText: "Ainda a avaliar? Receba o link da ferramenta, checklist de preparação e o plano fundador para voltar a este lote sem perder o contexto.",
+  proLimitLeadSubmit: "Receber link do lote",
   proPlanContrastLabel: "Comparação entre grátis e Pro",
   proFreeLabel: "Grátis",
   proFreeLimit: "2 imagens por lote",
@@ -423,6 +430,8 @@ const translations = {
     proInlineTitleBatchLimit: "You selected {total} images. Founder unlocks the full batch.",
     proInlineLeadBatchLimit: "The free test adds {accepted}. Pro processes up to 100 images per batch and 2,000 per month, with store-ready ZIP export.",
     proInlineBenefitsBatchLimit: "If this is a real catalog or marketplace batch, start with the founder plan: EUR 15/month and cancel anytime.",
+    proLimitLeadText: "Still evaluating? Get the tool link, prep checklist, and founder plan so you can return to this batch without losing context.",
+    proLimitLeadSubmit: "Get batch link",
     proPlanContrastLabel: "Free versus Pro comparison",
     proFreeLabel: "Free",
     proFreeLimit: "2 images per batch",
@@ -1076,6 +1085,8 @@ const translatedAddons = {
     resultReadyStickyText: "¿Tienes más fotos? Pro desbloquea 100 imágenes por lote por 15 EUR/mes.",
     resultReadyStickyProCta: "Activar fundador",
     resultReadyStickySaveCta: "Recibir enlace",
+    proLimitLeadText: "¿Todavía estás evaluando? Recibe el enlace, el checklist y el plan fundador para volver a este lote sin perder contexto.",
+    proLimitLeadSubmit: "Recibir enlace del lote",
     privacyLink: "Privacidad y términos",
     statusTooManyFiles: "Se añadieron {accepted} de {total} imágenes. Para procesar lotes mayores de una vez, elige Pro.",
     statusNoSupportedFiles: "No se encontró ningún archivo de imagen compatible.",
@@ -2178,6 +2189,7 @@ function syncPaidAccessUi() {
     resultReadyEmailForm?.classList.add("hidden");
     postDownloadNextPanel?.classList.add("hidden");
     proInterestPanel?.classList.add("hidden");
+    proLimitLeadBlock?.classList.add("hidden");
     leadCapturePanel?.classList.add("hidden");
     if (brandCta) brandCta.textContent = t("brandCtaPro", paidParams);
     if (brandLead) brandLead.textContent = t("leadPro", paidParams);
@@ -3212,6 +3224,38 @@ function updateProPromptCopy() {
   proInterestTitle.textContent = t(batchLimitPrompt ? "proInlineTitleBatchLimit" : "proInlineTitle", copyParams);
   proInterestLead.textContent = t(batchLimitPrompt ? "proInlineLeadBatchLimit" : "proInlineLead", copyParams);
   proInterestBenefits.textContent = t(batchLimitPrompt ? "proInlineBenefitsBatchLimit" : "proInlineBenefits", copyParams);
+  updateProLimitLeadBlock(batchLimitPrompt, copyParams);
+}
+
+function updateProLimitLeadBlock(batchLimitPrompt, copyParams = {}) {
+  if (!proLimitLeadBlock) return;
+
+  const hasLeadContact = Boolean(currentAccount?.email || getCapturedLeadEmail());
+  const shouldShow = batchLimitPrompt && !canUsePaidAccess() && !hasLeadContact;
+  proLimitLeadBlock.classList.toggle("hidden", !shouldShow);
+
+  if (!shouldShow) {
+    hasTrackedProLimitLeadShown = false;
+    if (proLimitEmailMessage) proLimitEmailMessage.textContent = "";
+    return;
+  }
+
+  if (proLimitEmail && !proLimitEmail.value.trim()) {
+    proLimitEmail.value = accountEmail?.value.trim() || "";
+  }
+
+  if (!hasTrackedProLimitLeadShown) {
+    hasTrackedProLimitLeadShown = true;
+    trackEvent("lead_capture_shown", {
+      downloadType: "batch_limit",
+      count: Number(copyParams.total || activeProPromptParams.attempted || 0) || 0,
+      source: "tool_limit_prompt",
+      capture_source: "tool_limit_prompt",
+      accepted: Number(copyParams.accepted || activeProPromptParams.accepted || 0) || 0,
+      rejected: Number(copyParams.rejected || activeProPromptParams.rejected || 0) || 0,
+      has_account: Boolean(currentAccount?.email),
+    });
+  }
 }
 
 function showProPrompt(reason = "post_download", options = {}) {
@@ -3348,6 +3392,7 @@ function recordLeadCapture(email, { downloadType = "unknown", count = 0, source 
   resultReadySaveLinkCta?.classList.add("hidden");
   resultReadyEmailForm?.classList.add("hidden");
   postDownloadEmailForm?.classList.add("hidden");
+  proLimitEmailForm?.classList.add("hidden");
   setGoogleUserData(email);
   trackEvent("lead_capture_submitted", {
     email,
@@ -3467,6 +3512,40 @@ function handlePostDownloadEmailSubmit(event) {
   disableFormControls(postDownloadEmailForm);
 }
 
+function handleProLimitEmailSubmit(event) {
+  event.preventDefault();
+  if (!proLimitEmail || !proLimitEmailForm) return;
+
+  const email = normalizeEmail(proLimitEmail.value);
+  const count = Number(activeProPromptParams.attempted || activeProPromptParams.total || activeProPromptParams.selected || items.length || 0) || 0;
+  const accepted = Number(activeProPromptParams.accepted || 0) || 0;
+  const rejected = Number(activeProPromptParams.rejected || Math.max(count - accepted, 0)) || 0;
+
+  if (!isValidEmail(email)) {
+    if (proLimitEmailMessage) proLimitEmailMessage.textContent = t("leadCaptureInvalid");
+    trackEvent("lead_capture_invalid", {
+      downloadType: "batch_limit",
+      count,
+      source: "tool_limit_prompt",
+      capture_source: "tool_limit_prompt",
+      accepted,
+      rejected,
+    });
+    proLimitEmail.focus();
+    return;
+  }
+
+  recordLeadCapture(email, {
+    downloadType: "batch_limit",
+    count,
+    source: "tool_limit_prompt",
+    captureSource: "tool_limit_prompt",
+  });
+
+  if (proLimitEmailMessage) proLimitEmailMessage.textContent = t("leadCaptureSuccess");
+  disableFormControls(proLimitEmailForm);
+}
+
 function dismissLeadCapture() {
   localStorage.setItem(leadCaptureDismissedStorageKey, new Date().toISOString());
   trackEvent("lead_capture_dismissed", {
@@ -3575,6 +3654,7 @@ resultReadyStickyLead?.addEventListener("click", () => focusResultReadyLeadCaptu
 postDownloadSaveLinkCta?.addEventListener("click", focusPostDownloadLeadCapture);
 resultReadyEmailForm?.addEventListener("submit", handleResultReadyEmailSubmit);
 postDownloadEmailForm?.addEventListener("submit", handlePostDownloadEmailSubmit);
+proLimitEmailForm?.addEventListener("submit", handleProLimitEmailSubmit);
 proInlineForm?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-checkout-plan]");
   if (!button) return;
