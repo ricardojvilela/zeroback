@@ -779,24 +779,34 @@ h2 {
 
 .actions {
   display: grid;
-  grid-template-columns: minmax(180px, 1.4fr) 1fr 1fr;
+  grid-template-columns: minmax(160px, 1.25fr) minmax(110px, 0.85fr) minmax(110px, 0.85fr) minmax(150px, 1fr);
   margin-top: 18px;
 }
 
-.actions button:first-child {
+.actions #processButton {
   background: var(--blue);
 }
 
-.actions button:first-child:hover:not(:disabled) {
+.actions #processButton:hover:not(:disabled) {
   background: var(--blue-strong);
 }
 
-.actions button:last-child {
+.actions #zipButton {
   background: var(--charcoal);
 }
 
-.actions button:last-child:hover:not(:disabled) {
+.actions #zipButton:hover:not(:disabled) {
   background: #0c1117;
+}
+
+.actions-founder-button {
+  border: 1px solid rgba(15, 139, 124, 0.24);
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.actions-founder-button:hover:not(:disabled) {
+  background: var(--accent-strong);
 }
 
 .result-ready-upgrade {

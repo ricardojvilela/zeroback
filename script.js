@@ -15,6 +15,7 @@ const proSubscriberPromoBlocks = document.querySelectorAll("[data-pro-subscriber
 const processButton = document.querySelector("#processButton");
 const pngButton = document.querySelector("#pngButton");
 const zipButton = document.querySelector("#zipButton");
+const actionsFounderCta = document.querySelector("#actionsFounderCta");
 const downloadReadyHint = document.querySelector("#downloadReadyHint");
 const clearButton = document.querySelector("#clearButton");
 const imageGrid = document.querySelector("#imageGrid");
@@ -247,6 +248,7 @@ const baseTranslation = {
   resultReadyKicker: "Resultado pronto",
   resultReadyTitle: "Quer repetir isto em lotes maiores?",
   downloadReadyHint: "Se o recorte ficou bom, o plano fundador transforma este teste em produção: até 100 imagens por lote, 2.000 por mês e ZIP pronto para loja.",
+  actionsFounderCta: "Ativar Pro 100 fotos",
   zipProCta: "Criar conta e ativar fundador - 15 EUR/mês",
   resultReadySaveLinkCta: "Receber link e checklist",
   resultReadyMicrocopy: "Sem fidelização. Pagamento seguro por Stripe.",
@@ -513,6 +515,7 @@ const translations = {
     resultReadyKicker: "Result ready",
     resultReadyTitle: "Want to repeat this for larger batches?",
     downloadReadyHint: "If the cutout looks good, the founder plan turns this test into production: up to 100 images per batch, 2,000 per month, and a store-ready ZIP.",
+    actionsFounderCta: "Start Pro for 100 photos",
     zipProCta: "Create account and start founder plan - EUR 15/month",
     resultReadySaveLinkCta: "Get link and checklist",
     resultReadyMicrocopy: "No lock-in. Secure Stripe payment.",
@@ -1077,6 +1080,7 @@ const translatedAddons = {
     resultReadyKicker: "Resultado listo",
     resultReadyTitle: "¿Quieres repetir esto en lotes mayores?",
     downloadReadyHint: "Si el recorte quedó bien, el plan fundador convierte esta prueba en producción: hasta 100 imágenes por lote, 2.000 al mes y ZIP listo para tienda.",
+    actionsFounderCta: "Activar Pro 100 fotos",
     zipProCta: "Crear cuenta y activar fundador - 15 EUR/mes",
     resultReadySaveLinkCta: "Recibir enlace y checklist",
     resultReadyMicrocopy: "Sin permanencia. Pago seguro por Stripe.",
@@ -2845,6 +2849,7 @@ function updateControls() {
   processButton.disabled = !hasItems || !hasPendingItems || running;
   pngButton.disabled = !singleReady || running;
   zipButton.disabled = !allReady || running;
+  actionsFounderCta?.classList.toggle("hidden", paidAccess || !downloadReady || running);
   clearButton.disabled = !hasItems || running;
   const hasLeadContact = Boolean(currentAccount?.email || getCapturedLeadEmail());
   const readyCount = items.filter((item) => item.outputBlob).length;
@@ -3589,6 +3594,19 @@ fileInput.addEventListener("change", (event) => addFiles(event.target.files));
 processButton.addEventListener("click", processImages);
 pngButton.addEventListener("click", downloadSinglePng);
 zipButton.addEventListener("click", downloadZip);
+actionsFounderCta?.addEventListener("click", () => {
+  const readyCount = items.filter((item) => item.outputBlob).length;
+  const detail = {
+    reason: "actions_result_ready",
+    downloadType: readyCount > 1 ? "zip_available" : "png_available",
+    count: readyCount,
+    totalInQueue: items.length,
+    free_limit: maxFilesPerBatch,
+  };
+  trackEvent("post_download_founder_clicked", detail);
+  trackEvent("tool_pro_clicked", detail);
+  startCheckout("early", actionsFounderCta);
+});
 clearButton.addEventListener("click", clearAll);
 proPromptButton.addEventListener("click", () => showProInterest("status_limit_cta"));
 statusVolumeContact?.addEventListener("click", () => {

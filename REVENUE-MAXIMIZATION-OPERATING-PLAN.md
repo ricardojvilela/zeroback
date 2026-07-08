@@ -191,3 +191,4 @@ Interpretation:
 - `/admin` daily stats now use the Europe/Lisbon day boundary instead of UTC, so the daily revenue brief matches Ricardo's operating day.
 - Free users who try to upload more images than the free batch allows now see a batch-limit email capture inside the Pro prompt, tracked as `tool_limit_prompt` and surfaced in `/admin` as "Leads limite lote".
 - The highest-volume `/bulk-background-remover/` landing now has a compact sticky action bar for the 2-image free test and founder checkout, tracked through existing SEO CTA events, to improve its recent 25-view / 2-click / 0-pricing-click baseline without increasing ad spend.
+- The main tool now shows a direct founder-plan action beside the download buttons as soon as a free result is ready, keeping the free download open while putting the 100-image Pro upgrade at the highest-intent moment in the workflow.
