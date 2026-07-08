@@ -375,6 +375,87 @@
         line-height: 1;
       }
 
+      .daily-brief {
+        margin-bottom: 16px;
+      }
+
+      .daily-brief-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+        gap: 14px;
+        align-items: stretch;
+      }
+
+      .daily-brief-card,
+      .daily-metric {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: #fbfdff;
+      }
+
+      .daily-brief-card {
+        display: grid;
+        align-content: start;
+        gap: 10px;
+        padding: 16px;
+      }
+
+      .daily-brief-card h3 {
+        margin: 0;
+        font-size: 20px;
+        line-height: 1.18;
+      }
+
+      .daily-brief-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 750;
+        line-height: 1.45;
+      }
+
+      .daily-brief-card .daily-action {
+        border-left: 3px solid var(--accent);
+        padding-left: 10px;
+        color: var(--dark);
+        font-weight: 900;
+      }
+
+      .daily-metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .daily-metric {
+        min-height: 94px;
+        padding: 12px;
+      }
+
+      .daily-metric span,
+      .daily-metric em {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        font-style: normal;
+        font-weight: 900;
+      }
+
+      .daily-metric strong {
+        display: block;
+        margin: 8px 0 6px;
+        font-size: 24px;
+        line-height: 1;
+      }
+
+      .daily-metric em.is-up {
+        color: var(--accent);
+      }
+
+      .daily-metric em.is-down {
+        color: var(--danger);
+      }
+
       .panel {
         padding: 20px;
       }
@@ -516,7 +597,9 @@
         }
 
         .metrics-grid,
-        .live-grid {
+        .live-grid,
+        .daily-brief-layout,
+        .daily-metrics {
           grid-template-columns: repeat(2, minmax(0, 1fr));
         }
       }
@@ -529,7 +612,9 @@
         }
 
         .metrics-grid,
-        .live-grid {
+        .live-grid,
+        .daily-brief-layout,
+        .daily-metrics {
           grid-template-columns: 1fr;
         }
 
@@ -598,6 +683,65 @@
           <span>MRR pago renovável</span>
           <strong id="dashboardMrr">0 EUR</strong>
         </article>
+      </section>
+
+      <section class="panel daily-brief" aria-label="Rotina diária de rentabilidade">
+        <div class="panel-head">
+          <div>
+            <h2>Rotina diária</h2>
+            <p class="note" id="dailyBriefDate">Hoje vs ontem. A carregar decisão operacional...</p>
+          </div>
+          <span class="pill muted" id="dailyBriefDecision">A carregar</span>
+        </div>
+        <div class="daily-brief-layout">
+          <article class="daily-brief-card">
+            <h3 id="dailyBriefTitle">A carregar análise do dia...</h3>
+            <p id="dailyBriefSummary">Assim que os eventos forem carregados, este bloco mostra o que mudou desde ontem.</p>
+            <p class="daily-action" id="dailyBriefAction">Ação: atualizar dados.</p>
+          </article>
+          <div class="daily-metrics" aria-label="Hoje comparado com ontem">
+            <article class="daily-metric">
+              <span>Visitantes</span>
+              <strong id="dailyVisitors">0</strong>
+              <em id="dailyVisitorsDelta">igual a ontem</em>
+            </article>
+            <article class="daily-metric">
+              <span>Uploads</span>
+              <strong id="dailyUploads">0</strong>
+              <em id="dailyUploadsDelta">igual a ontem</em>
+            </article>
+            <article class="daily-metric">
+              <span>Downloads</span>
+              <strong id="dailyDownloads">0</strong>
+              <em id="dailyDownloadsDelta">igual a ontem</em>
+            </article>
+            <article class="daily-metric">
+              <span>Resultado pronto</span>
+              <strong id="dailyResultReady">0</strong>
+              <em id="dailyResultReadyDelta">igual a ontem</em>
+            </article>
+            <article class="daily-metric">
+              <span>Intenção Pro</span>
+              <strong id="dailyIntent">0</strong>
+              <em id="dailyIntentDelta">igual a ontem</em>
+            </article>
+            <article class="daily-metric">
+              <span>Leads</span>
+              <strong id="dailyLeads">0</strong>
+              <em id="dailyLeadsDelta">igual a ontem</em>
+            </article>
+            <article class="daily-metric">
+              <span>Sessões Stripe</span>
+              <strong id="dailyStripe">0</strong>
+              <em id="dailyStripeDelta">igual a ontem</em>
+            </article>
+            <article class="daily-metric">
+              <span>Receita</span>
+              <strong id="dailyRevenue">0 EUR</strong>
+              <em id="dailyRevenueDelta">igual a ontem</em>
+            </article>
+          </div>
+        </div>
       </section>
 
       <section class="panel live-panel" aria-label="Operação BatchCutout">
@@ -1372,6 +1516,199 @@
         return (Number(numerator || 0) || 0) / total;
       }
 
+      function isoDateOffset(daysBack = 0) {
+        const date = new Date();
+        date.setUTCDate(date.getUTCDate() - daysBack);
+        return date.toISOString().slice(0, 10);
+      }
+
+      function rowForDate(rows = [], date) {
+        return rows.find((row) => row.date === date) || { date };
+      }
+
+      function rowValue(row, key) {
+        return Number(row?.[key] || 0) || 0;
+      }
+
+      function dailyIntentValue(row = {}) {
+        return rowValue(row, "proClicks") +
+          rowValue(row, "pricingCtaClicks") +
+          rowValue(row, "leadCaptures") +
+          rowValue(row, "postDownloadSaveLinkClicks") +
+          rowValue(row, "resultReadyStickySaveLinkClicks") +
+          rowValue(row, "checkoutStarts") +
+          rowValue(row, "checkoutSessionsCreated");
+      }
+
+      function setDailyDelta(id, current, previous, { currency = false } = {}) {
+        const element = document.querySelector(id);
+        if (!element) return;
+        const delta = (Number(current || 0) || 0) - (Number(previous || 0) || 0);
+        element.classList.remove("is-up", "is-down");
+        if (delta > 0) {
+          element.classList.add("is-up");
+          element.textContent = `+${currency ? formatCurrency(delta) : delta} vs ontem`;
+        } else if (delta < 0) {
+          element.classList.add("is-down");
+          element.textContent = `${currency ? formatCurrency(delta) : delta} vs ontem`;
+        } else {
+          element.textContent = "igual a ontem";
+        }
+      }
+
+      function setDailyMetric(valueId, deltaId, todayValue, yesterdayValue, { currency = false } = {}) {
+        const valueElement = document.querySelector(valueId);
+        if (valueElement) valueElement.textContent = currency ? formatCurrency(todayValue || 0) : todayValue || 0;
+        setDailyDelta(deltaId, todayValue, yesterdayValue, { currency });
+      }
+
+      function pluralPt(count, singular, plural) {
+        return `${count} ${count === 1 ? singular : plural}`;
+      }
+
+      function dailyDecision(today = {}, yesterday = {}, sourceBreakdown = []) {
+        const visitors = rowValue(today, "visitors");
+        const uploads = rowValue(today, "uploadsStarted");
+        const downloads = rowValue(today, "downloads");
+        const resultReady = rowValue(today, "downloadReadyShown");
+        const leads = rowValue(today, "leadCaptures");
+        const intent = dailyIntentValue(today);
+        const checkoutSessions = rowValue(today, "checkoutSessionsCreated");
+        const paid = rowValue(today, "paidSubscriptions");
+        const revenue = rowValue(today, "revenue");
+        const stickyShown = rowValue(today, "resultReadyStickyShown");
+        const stickyDecisions = rowValue(today, "resultReadyStickyFounderClicks") + rowValue(today, "resultReadyStickySaveLinkClicks");
+        const visitorDelta = visitors - rowValue(yesterday, "visitors");
+        const topSource = sourceBreakdown.find((row) => row.visitors > 0)?.source || "sem origem dominante";
+        const summary = `Hoje: ${pluralPt(visitors, "visitante", "visitantes")} (${visitorDelta >= 0 ? "+" : ""}${visitorDelta} vs ontem), ${pluralPt(uploads, "upload", "uploads")}, ${pluralPt(downloads, "download", "downloads")}, ${pluralPt(intent, "sinal Pro/lead", "sinais Pro/lead")} e ${pluralPt(checkoutSessions, "sessão Stripe", "sessões Stripe")}. Origem mais forte dos últimos 14 dias: ${sourceLabel(topSource)}.`;
+
+        if (paid > 0 || revenue > 0) {
+          return {
+            label: "Aumentar",
+            className: "success",
+            title: "Houve receita nova hoje.",
+            summary,
+            action: "Ação: identificar a origem da venda no painel e aumentar aquisição nesse canal sem mexer ainda na oferta.",
+          };
+        }
+
+        if (checkoutSessions > 0) {
+          return {
+            label: "Recuperar checkout",
+            className: "warning",
+            title: "Há checkout aberto, mas ainda sem pagamento.",
+            summary,
+            action: "Ação: acompanhar recoveries e confirmar se o comprador voltou do Stripe ou precisa de contacto manual.",
+          };
+        }
+
+        if (leads > 0) {
+          return {
+            label: "Contactar leads",
+            className: "success",
+            title: "Há leads captados para transformar em conversa.",
+            summary,
+            action: "Ação: responder/acompanhar leads hoje com foco em lote real, volume e ativação do fundador.",
+          };
+        }
+
+        if (visitors < 5 && uploads === 0) {
+          return {
+            label: "Gerar tráfego",
+            className: "warning",
+            title: "A amostra de hoje ainda é demasiado baixa.",
+            summary,
+            action: "Ação: fazer prospeção direta ou distribuição em canais já preparados antes de tirar conclusões sobre conversão.",
+          };
+        }
+
+        if (uploads > 0 && downloads === 0) {
+          return {
+            label: "Ver uso",
+            className: "danger",
+            title: "Há uploads, mas ainda não há downloads.",
+            summary,
+            action: "Ação: verificar se o processamento, velocidade ou clareza dos botões de download estão a travar o utilizador.",
+          };
+        }
+
+        if (stickyShown >= 3 && stickyDecisions === 0) {
+          return {
+            label: "Testar barra",
+            className: "warning",
+            title: "A barra pós-resultado aparece, mas não gera decisão.",
+            summary,
+            action: "Ação: testar texto/oferta da barra antes de aumentar tráfego pago.",
+          };
+        }
+
+        if (downloads >= 3 && intent === 0) {
+          return {
+            label: "Ajustar conversão",
+            className: "warning",
+            title: "Há downloads, mas não há intenção Pro ou lead.",
+            summary,
+            action: "Ação: rever CTA pós-resultado e proposta do fundador no momento imediatamente antes/depois do download.",
+          };
+        }
+
+        if (intent > 0 && checkoutSessions === 0) {
+          return {
+            label: "Ver checkout",
+            className: "danger",
+            title: "Há intenção comercial, mas não há sessão Stripe.",
+            summary,
+            action: "Ação: testar o caminho conta/login/Stripe e confirmar se os cliques chegam à criação de sessão.",
+          };
+        }
+
+        if (resultReady > 0 || downloads > 0) {
+          return {
+            label: "Observar",
+            className: "muted",
+            title: "Há uso real, mas ainda sem sinal comercial forte.",
+            summary,
+            action: "Ação: manter a instrumentação e aguardar mais volume hoje antes de mexer na oferta.",
+          };
+        }
+
+        return {
+          label: "Monitorizar",
+          className: "muted",
+          title: "Sem movimento comercial suficiente hoje.",
+          summary,
+          action: "Ação: manter prospeção e voltar a avaliar quando houver uploads ou cliques Pro.",
+        };
+      }
+
+      function renderDailyBrief(data = {}) {
+        const rows = Array.isArray(data.rows) ? data.rows : [];
+        const todayDate = isoDateOffset(0);
+        const yesterdayDate = isoDateOffset(1);
+        const today = rowForDate(rows, todayDate);
+        const yesterday = rowForDate(rows, yesterdayDate);
+        const decision = dailyDecision(today, yesterday, data.sourceBreakdown || []);
+        const badge = document.querySelector("#dailyBriefDecision");
+
+        document.querySelector("#dailyBriefDate").textContent = `Hoje (${todayDate}) vs ontem (${yesterdayDate}). Atualiza automaticamente com os eventos do painel.`;
+        if (badge) {
+          badge.className = `pill ${decision.className || "muted"}`;
+          badge.textContent = decision.label;
+        }
+        document.querySelector("#dailyBriefTitle").textContent = decision.title;
+        document.querySelector("#dailyBriefSummary").textContent = decision.summary;
+        document.querySelector("#dailyBriefAction").textContent = decision.action;
+
+        setDailyMetric("#dailyVisitors", "#dailyVisitorsDelta", rowValue(today, "visitors"), rowValue(yesterday, "visitors"));
+        setDailyMetric("#dailyUploads", "#dailyUploadsDelta", rowValue(today, "uploadsStarted"), rowValue(yesterday, "uploadsStarted"));
+        setDailyMetric("#dailyDownloads", "#dailyDownloadsDelta", rowValue(today, "downloads"), rowValue(yesterday, "downloads"));
+        setDailyMetric("#dailyResultReady", "#dailyResultReadyDelta", rowValue(today, "downloadReadyShown"), rowValue(yesterday, "downloadReadyShown"));
+        setDailyMetric("#dailyIntent", "#dailyIntentDelta", dailyIntentValue(today), dailyIntentValue(yesterday));
+        setDailyMetric("#dailyLeads", "#dailyLeadsDelta", rowValue(today, "leadCaptures"), rowValue(yesterday, "leadCaptures"));
+        setDailyMetric("#dailyStripe", "#dailyStripeDelta", rowValue(today, "checkoutSessionsCreated"), rowValue(yesterday, "checkoutSessionsCreated"));
+        setDailyMetric("#dailyRevenue", "#dailyRevenueDelta", rowValue(today, "revenue"), rowValue(yesterday, "revenue"), { currency: true });
+      }
+
       function funnelDiagnosis(totals = {}) {
         const uploads = Number(totals.uploadsStarted || 0) || 0;
         const downloads = Number(totals.downloads || 0) || 0;
@@ -1818,6 +2155,7 @@
 
       function renderLiveStats(data) {
         const totals = data.totals || {};
+        renderDailyBrief(data);
         document.querySelector("#dashboardVisitors").textContent = totals.visitors || 0;
         document.querySelector("#dashboardUploads").textContent = totals.uploadsStarted || 0;
         document.querySelector("#liveVisitors").textContent = totals.visitors || 0;
