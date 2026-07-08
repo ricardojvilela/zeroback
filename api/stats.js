@@ -75,6 +75,7 @@ function emptyDay(date) {
     postDownloadNextShown: 0,
     postDownloadFounderClicks: 0,
     postDownloadSaveLinkClicks: 0,
+    resultActionFounderClicks: 0,
     resultReadyStickyShown: 0,
     resultReadyStickyFounderClicks: 0,
     resultReadyStickySaveLinkClicks: 0,
@@ -235,6 +236,7 @@ function emptySourceRow(source) {
     postDownloadNextShown: 0,
     postDownloadFounderClicks: 0,
     postDownloadSaveLinkClicks: 0,
+    resultActionFounderClicks: 0,
     resultReadyStickyShown: 0,
     resultReadyStickyFounderClicks: 0,
     resultReadyStickySaveLinkClicks: 0,
@@ -571,6 +573,10 @@ export default async function handler(request, response) {
           if (detail.reason === "result_ready_sticky") {
             row.resultReadyStickyFounderClicks += 1;
             sourceRow.resultReadyStickyFounderClicks += 1;
+          }
+          if (detail.reason === "actions_result_ready") {
+            row.resultActionFounderClicks += 1;
+            sourceRow.resultActionFounderClicks += 1;
           }
           break;
         case "post_download_save_link_clicked":
