@@ -1516,10 +1516,35 @@
         return (Number(numerator || 0) || 0) / total;
       }
 
-      function isoDateOffset(daysBack = 0) {
-        const date = new Date();
-        date.setUTCDate(date.getUTCDate() - daysBack);
+      function dateKeyOffsetFrom(baseDateKey, daysBack = 0) {
+        const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(baseDateKey || ""));
+        if (!match) return "";
+        const date = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]) - daysBack, 12, 0, 0));
         return date.toISOString().slice(0, 10);
+      }
+
+      function localDateKey(timeZone = "Europe/Lisbon") {
+        const date = new Date();
+        try {
+          const parts = new Intl.DateTimeFormat("en-CA", {
+            timeZone,
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+          }).formatToParts(date);
+          const partValue = (type) => parts.find((part) => part.type === type)?.value || "";
+          const year = partValue("year");
+          const month = partValue("month");
+          const day = partValue("day");
+          if (year && month && day) return `${year}-${month}-${day}`;
+        } catch {
+          return date.toISOString().slice(0, 10);
+        }
+        return date.toISOString().slice(0, 10);
+      }
+
+      function isoDateOffset(daysBack = 0, timeZone = "Europe/Lisbon") {
+        return dateKeyOffsetFrom(localDateKey(timeZone), daysBack);
       }
 
       function rowForDate(rows = [], date) {
@@ -1683,14 +1708,15 @@
 
       function renderDailyBrief(data = {}) {
         const rows = Array.isArray(data.rows) ? data.rows : [];
-        const todayDate = isoDateOffset(0);
-        const yesterdayDate = isoDateOffset(1);
+        const timeZone = data.timeZone || "Europe/Lisbon";
+        const todayDate = data.today || isoDateOffset(0, timeZone);
+        const yesterdayDate = dateKeyOffsetFrom(todayDate, 1) || isoDateOffset(1, timeZone);
         const today = rowForDate(rows, todayDate);
         const yesterday = rowForDate(rows, yesterdayDate);
         const decision = dailyDecision(today, yesterday, data.sourceBreakdown || []);
         const badge = document.querySelector("#dailyBriefDecision");
 
-        document.querySelector("#dailyBriefDate").textContent = `Hoje (${todayDate}) vs ontem (${yesterdayDate}). Atualiza automaticamente com os eventos do painel.`;
+        document.querySelector("#dailyBriefDate").textContent = `Hoje (${todayDate}, ${timeZone}) vs ontem (${yesterdayDate}). Atualiza automaticamente com os eventos do painel.`;
         if (badge) {
           badge.className = `pill ${decision.className || "muted"}`;
           badge.textContent = decision.label;
@@ -3080,7 +3106,7 @@
 
         liveStatus.textContent = "A carregar atividade...";
         try {
-          const response = await fetch("/api/stats?days=14", {
+          const response = await fetch("/api/stats?days=14&timezone=Europe%2FLisbon", {
             headers: {
               Accept: "application/json",
               Authorization: `Bearer ${token}`,

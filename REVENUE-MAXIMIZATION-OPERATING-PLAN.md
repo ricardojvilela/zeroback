@@ -188,3 +188,4 @@ Interpretation:
 - Result-ready sticky impressions, founder clicks and link/checklist clicks are now reported separately in `/admin`, and sticky link requests are eligible for the automatic lead autoreply.
 - Internal interface labels such as `result_ready_sticky`, `result_ready_inline`, `account_panel`, `checkout_plan`, stale `pro_trial`, self-referrals and support/email plumbing sources are excluded from acquisition-source attribution, so admin revenue/lead reporting falls back to the real first/last traffic source.
 - `/admin` now includes a daily operating brief comparing today with yesterday and recommending the next action: generate traffic, adjust conversion, recover checkout, contact leads, observe, or increase acquisition.
+- `/admin` daily stats now use the Europe/Lisbon day boundary instead of UTC, so the daily revenue brief matches Ricardo's operating day.

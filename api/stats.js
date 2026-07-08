@@ -6,6 +6,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
 
+const defaultStatsTimeZone = "Europe/Lisbon";
+
 function sendJson(response, status, data) {
   for (const [key, value] of Object.entries(corsHeaders)) {
     response.setHeader(key, value);
@@ -14,11 +16,43 @@ function sendJson(response, status, data) {
   response.status(status).json(data);
 }
 
-function toIsoDate(value) {
+function toLocalDate(value, timeZone = defaultStatsTimeZone) {
   if (!value) return null;
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return null;
+  try {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).formatToParts(date);
+    const partValue = (type) => parts.find((part) => part.type === type)?.value || "";
+    const year = partValue("year");
+    const month = partValue("month");
+    const day = partValue("day");
+    if (year && month && day) return `${year}-${month}-${day}`;
+  } catch {
+    return date.toISOString().slice(0, 10);
+  }
   return date.toISOString().slice(0, 10);
+}
+
+function dateKeyOffset(dateKey, daysBack = 0) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(dateKey || ""));
+  if (!match) return null;
+  const date = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]) - daysBack, 12, 0, 0));
+  return date.toISOString().slice(0, 10);
+}
+
+function statsTimeZoneFrom(request) {
+  const requested = asCleanText(request.query.timezone || request.query.tz || defaultStatsTimeZone, 80) || defaultStatsTimeZone;
+  try {
+    new Intl.DateTimeFormat("en-CA", { timeZone: requested }).format(new Date());
+    return requested;
+  } catch {
+    return defaultStatsTimeZone;
+  }
 }
 
 function emptyDay(date) {
@@ -338,8 +372,11 @@ export default async function handler(request, response) {
   }
 
   const days = Math.min(Math.max(Number(request.query.days || 14), 1), 60);
-  const since = new Date(Date.now() - (days - 1) * 24 * 60 * 60 * 1000);
-  since.setHours(0, 0, 0, 0);
+  const timeZone = statsTimeZoneFrom(request);
+  const today = toLocalDate(new Date(), timeZone);
+  const startDate = dateKeyOffset(today, days - 1) || today;
+  const since = new Date(Date.now() - (days + 1) * 24 * 60 * 60 * 1000);
+  since.setUTCHours(0, 0, 0, 0);
   const query = new URLSearchParams({
     select: "event_name,visitor_id,value,detail,source,campaign,page_path,page_location,occurred_at",
     occurred_at: `gte.${since.toISOString()}`,
@@ -382,10 +419,13 @@ export default async function handler(request, response) {
     const visitorsBySource = new Map();
     const byLandingPage = new Map();
     const visitorsByLandingPage = new Map();
+    let eventCount = 0;
 
     for (const event of events) {
-      const date = toIsoDate(event.occurred_at);
+      const date = toLocalDate(event.occurred_at, timeZone);
       if (!date) continue;
+      if (date < startDate || date > today) continue;
+      eventCount += 1;
 
       if (!byDay.has(date)) byDay.set(date, emptyDay(date));
       if (!visitorsByDay.has(date)) visitorsByDay.set(date, new Set());
@@ -758,7 +798,11 @@ export default async function handler(request, response) {
     return sendJson(response, 200, {
       ok: true,
       days,
-      eventCount: events.length,
+      timeZone,
+      today,
+      startDate,
+      eventCount,
+      fetchedEventCount: events.length,
       rows,
       totals,
       sourceBreakdown,
