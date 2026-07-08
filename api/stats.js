@@ -115,6 +115,7 @@ function emptyDay(date) {
     leadCaptures: 0,
     resultReadyLeadCaptures: 0,
     limitPromptLeadCaptures: 0,
+    checkoutPromptLeadCaptures: 0,
     leadAutorepliesSent: 0,
     leadAutorepliesFailed: 0,
     proWelcomeEmailsSent: 0,
@@ -151,6 +152,7 @@ function classifySource(event, detail) {
     "result_ready_inline",
     "result_ready_sticky",
     "account_panel",
+    "checkout_account_prompt",
     "checkout_plan",
     "pro_trial",
     "batchcutout.com",
@@ -276,6 +278,7 @@ function emptySourceRow(source) {
     leadCaptures: 0,
     resultReadyLeadCaptures: 0,
     limitPromptLeadCaptures: 0,
+    checkoutPromptLeadCaptures: 0,
     leadAutorepliesSent: 0,
     leadAutorepliesFailed: 0,
     proWelcomeEmailsSent: 0,
@@ -723,6 +726,10 @@ export default async function handler(request, response) {
           if ((detail.capture_source || detail.source) === "tool_limit_prompt") {
             row.limitPromptLeadCaptures += 1;
             sourceRow.limitPromptLeadCaptures += 1;
+          }
+          if ((detail.capture_source || detail.source) === "checkout_account_prompt") {
+            row.checkoutPromptLeadCaptures += 1;
+            sourceRow.checkoutPromptLeadCaptures += 1;
           }
           break;
         case "lead_capture_autoreply_sent":

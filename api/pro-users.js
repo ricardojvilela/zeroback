@@ -98,6 +98,7 @@ const internalAttributionSources = new Set([
   "result_ready_inline",
   "result_ready_sticky",
   "account_panel",
+  "checkout_account_prompt",
   "checkout_plan",
   "pro_trial",
   "batchcutout.com",

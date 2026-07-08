@@ -193,3 +193,4 @@ Interpretation:
 - The highest-volume `/bulk-background-remover/` landing now has a compact sticky action bar for the 2-image free test and founder checkout, tracked through existing SEO CTA events, to improve its recent 25-view / 2-click / 0-pricing-click baseline without increasing ad spend.
 - The main tool now shows a direct founder-plan action beside the download buttons as soon as a free result is ready, keeping the free download open while putting the 100-image Pro upgrade at the highest-intent moment in the workflow.
 - `/admin` now separates clicks on that result-actions founder CTA as "Fundador ações resultado", so the newest high-intent upgrade position can be evaluated independently from older post-download and sticky CTAs.
+- The account step shown after a Pro click now offers a low-friction "continue later" email capture for users not ready to create an account, with autoresponder support and `/admin` reporting as "Leads conta checkout".

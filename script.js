@@ -74,6 +74,7 @@ const accountPassword = document.querySelector("#accountPassword");
 const accountPasswordToggle = document.querySelector("#accountPasswordToggle");
 const accountSubmit = document.querySelector("#accountSubmit");
 const accountCreate = document.querySelector("#accountCreate");
+const accountCheckoutLink = document.querySelector("#accountCheckoutLink");
 const accountActions = document.querySelector("#accountActions");
 const accountRefresh = document.querySelector("#accountRefresh");
 const accountLogout = document.querySelector("#accountLogout");
@@ -294,6 +295,9 @@ const baseTranslation = {
   accountCreate: "Criar conta e continuar",
   accountCreateCheckout: "Criar conta e continuar para pagamento",
   accountCreateSending: "A criar conta...",
+  accountCheckoutLink: "Receber link para continuar depois",
+  accountCheckoutLinkSuccess: "Link do plano guardado. Deve receber o email para voltar ao BatchCutout dentro de instantes.",
+  accountCheckoutLinkInvalid: "Introduza o email para receber o link do plano.",
   accountRefresh: "Atualizar conta",
   accountLogout: "Sair",
   billingEarly: "Plano fundador - 15 EUR/mês (melhor entrada)",
@@ -479,6 +483,9 @@ const translations = {
     accountCreate: "Create account and continue",
     accountCreateCheckout: "Create account and continue to payment",
     accountCreateSending: "Creating account...",
+    accountCheckoutLink: "Get link to continue later",
+    accountCheckoutLinkSuccess: "Plan link saved. You should receive the email to return to BatchCutout shortly.",
+    accountCheckoutLinkInvalid: "Enter your email to receive the plan link.",
     accountRefresh: "Refresh account",
     accountLogout: "Sign out",
     billingEarly: "Founder plan - EUR 15/month (best start)",
@@ -1045,6 +1052,9 @@ const translatedAddons = {
     accountCreate: "Crear cuenta y continuar",
     accountCreateCheckout: "Crear cuenta y continuar al pago",
     accountCreateSending: "Creando cuenta...",
+    accountCheckoutLink: "Recibir enlace para continuar después",
+    accountCheckoutLinkSuccess: "Enlace del plan guardado. Deberías recibir el email para volver a BatchCutout en unos instantes.",
+    accountCheckoutLinkInvalid: "Introduce tu email para recibir el enlace del plan.",
     accountRefresh: "Actualizar cuenta",
     accountLogout: "Salir",
     billingEarly: "Plan fundador - 15 EUR/mes (mejor entrada)",
@@ -2223,6 +2233,7 @@ function updateAccountUi() {
     accountCheckoutGuide?.classList.add("hidden");
     prefillAccountEmail();
     accountForm?.classList.remove("hidden");
+    accountCheckoutLink?.classList.add("hidden");
     accountActions?.classList.add("hidden");
     billingActions?.classList.add("hidden");
     billingPortal?.classList.add("hidden");
@@ -2240,6 +2251,7 @@ function updateAccountUi() {
 
     accountPanel.classList.toggle("has-pending-checkout", Boolean(waitingPlanName));
     accountCheckoutGuide?.classList.toggle("hidden", !waitingPlanName);
+    accountCheckoutLink?.classList.toggle("hidden", !waitingPlanName || Boolean(getCapturedLeadEmail()));
     if (waitingPlanName) trackAccountCheckoutPanelShown(waitingPlan);
     accountBadge.textContent = waitingPlanName ? t("accountBadgeCheckout") : t("accountBadgeGuest");
     accountStatus.textContent = waitingPlanName
@@ -2273,6 +2285,7 @@ function updateAccountUi() {
   accountStatus.textContent = email ? `${email} - ${statusTextValue}` : statusTextValue;
   accountPanel.classList.remove("has-pending-checkout");
   accountCheckoutGuide?.classList.add("hidden");
+  accountCheckoutLink?.classList.add("hidden");
   accountForm?.classList.add("hidden");
   accountActions?.classList.remove("hidden");
   billingActions?.classList.toggle("hidden", Boolean(access.canUsePro));
@@ -2497,6 +2510,32 @@ async function handleAccountCreate(event) {
     accountCreate.disabled = false;
     syncAccountAuthButtons();
   }
+}
+
+function handleAccountCheckoutLinkCapture() {
+  const waitingPlan = checkoutPlanWaitingForAuth() || defaultCheckoutPlan;
+  const email = normalizeEmail(accountEmail?.value || "");
+
+  if (!isValidEmail(email)) {
+    trackEvent("lead_capture_invalid", {
+      downloadType: "checkout_plan",
+      source: "checkout_account_prompt",
+      capture_source: "checkout_account_prompt",
+      checkout_plan: waitingPlan,
+    });
+    setAccountMessage("accountCheckoutLinkInvalid");
+    accountEmail?.focus();
+    return;
+  }
+
+  rememberAccountEmail(email);
+  recordLeadCapture(email, {
+    downloadType: "checkout_plan",
+    source: "checkout_account_prompt",
+    captureSource: "checkout_account_prompt",
+  });
+  updateAccountUi();
+  setAccountMessage("accountCheckoutLinkSuccess");
 }
 
 async function handleAccountLogout() {
@@ -3684,6 +3723,7 @@ accountForm?.addEventListener("invalid", handleAccountFormInvalid, true);
 accountForm?.addEventListener("submit", handleAccountCreate);
 accountPasswordToggle?.addEventListener("click", () => togglePasswordVisibility(accountPassword, accountPasswordToggle));
 accountSubmit?.addEventListener("click", handleAccountLogin);
+accountCheckoutLink?.addEventListener("click", handleAccountCheckoutLinkCapture);
 accountRefresh?.addEventListener("click", refreshAccount);
 accountLogout?.addEventListener("click", handleAccountLogout);
 billingActions?.addEventListener("click", (event) => {

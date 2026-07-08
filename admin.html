@@ -984,6 +984,10 @@
             <strong id="liveLimitPromptLeadCaptures">0</strong>
           </article>
           <article class="live-card">
+            <span>Leads conta checkout</span>
+            <strong id="liveCheckoutPromptLeadCaptures">0</strong>
+          </article>
+          <article class="live-card">
             <span>Auto email lead</span>
             <strong id="liveLeadAutoreplies">0</strong>
           </article>
@@ -1757,6 +1761,8 @@
         const planClicks = Number(totals.proClicks || 0) + Number(totals.pricingCtaClicks || 0);
         const checkoutSessions = Number(totals.checkoutSessionsCreated || 0) || 0;
         const checkoutStarts = Number(totals.checkoutStarts || 0) || 0;
+        const checkoutLoginRequired = Number(totals.checkoutLoginRequired || 0) || 0;
+        const checkoutPromptLeads = Number(totals.checkoutPromptLeadCaptures || 0) || 0;
         const checkoutSessionFailures = Number(totals.checkoutSessionFailures || 0) || 0;
         const checkoutCancelledReturns = Number(totals.checkoutCancelledReturns || 0) || 0;
         const checkoutLinkEmails = Number(totals.checkoutLinkEmailsSent || 0) || 0;
@@ -1792,6 +1798,10 @@
 
         if (limitAttempts >= 3 && limitPromptLeads === 0 && checkoutSessions === 0) {
           return "Gargalo principal: há utilizadores a tentar carregar lotes acima do grátis, mas ainda não deixam email nesse bloqueio. Prioridade: medir o novo campo de email no aviso de limite antes de aumentar tráfego.";
+        }
+
+        if (checkoutLoginRequired >= 2 && checkoutPromptLeads === 0 && checkoutSessions === 0) {
+          return "Gargalo principal: há intenção Pro antes da conta, mas ainda não há emails capturados nesse passo. Prioridade: medir o link de continuação do plano no painel de conta.";
         }
 
         if (downloads >= 10 && resultUpgradeClicks === 0 && leadCaptures === 0) {
@@ -2275,6 +2285,7 @@
         document.querySelector("#liveLeadCaptures").textContent = totals.leadCaptures || 0;
         document.querySelector("#liveResultReadyLeadCaptures").textContent = totals.resultReadyLeadCaptures || 0;
         document.querySelector("#liveLimitPromptLeadCaptures").textContent = totals.limitPromptLeadCaptures || 0;
+        document.querySelector("#liveCheckoutPromptLeadCaptures").textContent = totals.checkoutPromptLeadCaptures || 0;
         document.querySelector("#liveLeadAutoreplies").textContent = totals.leadAutorepliesSent || 0;
         document.querySelector("#liveLeadAutoreplyRate").textContent = formatPercent(conversionRate(
           totals.leadAutorepliesSent,
