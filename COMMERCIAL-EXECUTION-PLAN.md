@@ -192,6 +192,13 @@ Decision rules:
 - Updated `/admin` to show contacts sent today separately from total contacted prospects.
 - No new emails were sent automatically from this update.
 
+## Executed growth work - July 8 follow-ups
+
+- Checked `support@batchcutout.com` before sending: 2 historical inbound emails, 0 unresolved.
+- Sent 13 follow-ups through `support@batchcutout.com` from `OUTREACH-FOLLOWUP-2026-07-08.md`.
+- Updated the prospect CSV with `sent_2026-07-08_followup`, `watch_replies`, blank follow-up dates and Resend IDs.
+- Do not send more direct outreach on 2026-07-08.
+
 ## Executed growth work - demo video
 
 - Added horizontal and vertical silent demo videos under `assets/video/`.

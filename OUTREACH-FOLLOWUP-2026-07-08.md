@@ -10,6 +10,12 @@ Safety check completed: 2026-07-08
 - Already followed up: 0.
 - Status: ready to send after explicit final confirmation for this commercial email batch.
 
+Sent: 2026-07-08
+
+- 13/13 follow-ups sent through `support@batchcutout.com`.
+- CSV updated with `sent_2026-07-08_followup`, `watch_replies`, blank follow-up date and Resend IDs.
+- No further follow-up should be sent to this batch unless a prospect replies positively and needs manual handling.
+
 Do not send before checking `support@batchcutout.com` in `/admin` for replies, opt-outs or unresolved support messages. Send only to prospects with no reply since the first contact.
 
 This is the proof-page batch originally sent on 2026-07-02. Keep the day inside the 10 to 15 email warm-up cap.
