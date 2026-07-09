@@ -2,12 +2,32 @@
 
 Prepared: 2026-07-09
 
-Safety check pending: 2026-07-09
+Safety check completed: 2026-07-09
 
 - Do not send before checking `support@batchcutout.com` in `/admin` for negative replies, opt-outs or unresolved support messages.
-- Send only after explicit final confirmation for this commercial email batch.
+- `support@batchcutout.com`: 2 historical inbound emails, 0 unresolved, 2 resolved.
+- CSV cross-check: 10/10 recipients found as ready, 0 already sent, 0 blocked.
 - Keep this as the only new direct outreach batch for 2026-07-09.
-- Status: ready to send after support check and final confirmation.
+- Status: sent after explicit final confirmation for this commercial email batch.
+
+Sent: 2026-07-09
+
+- 10/10 emails sent through `support@batchcutout.com`.
+- CSV updated with `sent_2026-07-09`, `follow_up_if_no_reply`, follow-up date `2026-07-14` and Resend IDs.
+- Do not send more direct outreach on 2026-07-09.
+
+Resend IDs:
+
+- KO Jewellery: `c4a8b9bd-51bb-42f4-9219-ac74370bd780`
+- Algovita Candle Co: `dc602df2-357a-439a-b018-4d29369fa6c2`
+- Mooliano: `af40bdc0-123b-4f59-a0c0-b1670baa2f4f`
+- Batch Atelier: `3881d85d-3466-4126-a273-53ff7093c868`
+- Active Essentials: `91ee3a30-3805-4a2e-97e3-cafd66c19e13`
+- Phoenixware Ceramics: `ed56402a-8612-4613-9c71-455206c54f69`
+- Flotsam and Jetsam Goods: `87253ee9-50a6-4bbd-853b-1a8542e08deb`
+- On a Wick and a Prayer: `c4d7edef-9a66-4b81-8317-e50b81e66cce`
+- Soy Light Candle Co: `231f18e6-1a81-4e16-82de-8e3aa838b467`
+- Rare Rares: `2675e1eb-43c2-40ff-9c9a-e556f1facc54`
 
 This is a selected high-score batch from the ready prospect queue. It has 10 recipients, inside the 10 to 15 email warm-up cap.
 
