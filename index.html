@@ -109,6 +109,20 @@
               },
               {
                 "@type": "Offer",
+                "name": "Pack 100 imagens",
+                "price": "5",
+                "priceCurrency": "EUR",
+                "url": "https://batchcutout.com/pricing/?checkout_plan=pack100#pricing-account-title"
+              },
+              {
+                "@type": "Offer",
+                "name": "Pack 250 imagens",
+                "price": "9",
+                "priceCurrency": "EUR",
+                "url": "https://batchcutout.com/pricing/?checkout_plan=pack250#pricing-account-title"
+              },
+              {
+                "@type": "Offer",
                 "name": "Plano fundador",
                 "price": "15",
                 "priceCurrency": "EUR",
@@ -225,22 +239,22 @@
             <em data-i18n="freeTestStepThreeText">Até 100 imagens por lote.</em>
           </span>
         </div>
-        <a class="brand-pro-link" href="./pricing/?checkout_plan=early#pricing-account-title" data-i18n="brandProLink" data-pricing-link>Precisa de mais volume? Ver planos Pro</a>
+        <a class="brand-pro-link" href="./pricing/?checkout_plan=pack100#pricing-account-title" data-i18n="brandProLink" data-pricing-link>Precisa de mais volume? Pack desde 5 EUR</a>
         <section class="account-panel" id="accountPanel" aria-labelledby="accountTitle">
           <div class="account-panel-head">
-            <p class="section-kicker" id="accountTitle" data-i18n="accountKicker">Acesso Pro</p>
+            <p class="section-kicker" id="accountTitle" data-i18n="accountKicker">Acesso pago</p>
             <span class="account-badge" id="accountBadge" data-i18n="accountBadgeGuest">Sem sessão</span>
           </div>
           <p class="account-status" id="accountStatus" data-i18n="accountStatusGuest">
-            Crie conta para ativar Pro ou entre para gerir o seu acesso.
+            Crie conta para ativar acesso pago ou entre para gerir o seu acesso.
           </p>
-          <div class="account-checkout-guide hidden" id="accountCheckoutGuide" aria-label="Passos para ativar Pro" data-i18n-aria="accountCheckoutGuideLabel">
+          <div class="account-checkout-guide hidden" id="accountCheckoutGuide" aria-label="Passos para ativar acesso pago" data-i18n-aria="accountCheckoutGuideLabel">
             <span><strong>1</strong><em data-i18n="accountCheckoutGuideAccount">Crie conta ou entre</em></span>
             <span><strong>2</strong><em data-i18n="accountCheckoutGuideStripe">Pagamento Stripe</em></span>
-            <span><strong>3</strong><em data-i18n="accountCheckoutGuideActive">Pro ativo automaticamente</em></span>
+            <span><strong>3</strong><em data-i18n="accountCheckoutGuideActive">Acesso ativo automaticamente</em></span>
           </div>
-          <div class="account-checkout-proof hidden" id="accountCheckoutProof" aria-label="Resumo do plano Pro" data-i18n-aria="accountCheckoutProofLabel">
-            <span data-i18n="accountCheckoutProofPrice">Plano fundador: 15 EUR/mês</span>
+          <div class="account-checkout-proof hidden" id="accountCheckoutProof" aria-label="Resumo da opção paga" data-i18n-aria="accountCheckoutProofLabel">
+            <span data-i18n="accountCheckoutProofPrice">Pack desde 5 EUR ou Pro recorrente</span>
             <span data-i18n="accountCheckoutProofBatch">100 imagens por lote</span>
             <span data-i18n="accountCheckoutProofStripe">Pagamento só no Stripe</span>
           </div>
@@ -292,9 +306,9 @@
           <div class="account-actions hidden" id="accountActions">
             <button type="button" class="ghost-button small" id="accountRefresh" data-i18n="accountRefresh">Atualizar conta</button>
             <div class="billing-actions" id="billingActions">
-              <button type="button" data-checkout-plan="pack100" data-i18n="billingPack100">Pack 100 imagens - 5 EUR</button>
+              <button type="button" data-checkout-plan="pack100" data-i18n="billingPack100">Pack 100 imagens - 5 EUR (melhor entrada)</button>
               <button type="button" data-checkout-plan="pack250" data-i18n="billingPack250">Pack 250 imagens - 9 EUR</button>
-              <button type="button" data-checkout-plan="early" data-i18n="billingEarly">Plano fundador - 15 EUR/mês (melhor entrada)</button>
+              <button type="button" data-checkout-plan="early" data-i18n="billingEarly">Plano fundador - 15 EUR/mês (recorrente)</button>
               <button type="button" data-checkout-plan="monthly" data-i18n="billingMonthly">Pro mensal - 19 EUR/mês</button>
               <button type="button" data-checkout-plan="annual" data-i18n="billingAnnual">Pro anual - 190 EUR/ano</button>
             </div>
@@ -451,7 +465,7 @@
         <div class="status-panel" aria-live="polite">
           <span id="statusText">A aguardar fotos</span>
           <button class="status-pro-button hidden" id="proPromptButton" type="button" data-i18n="proLimitCta">
-            Ver planos Pro
+            Ver Pack 100
           </button>
           <a
             class="status-volume-button hidden"
@@ -488,7 +502,7 @@
             <p class="section-kicker" data-i18n="leadCaptureKicker">Link e checklist</p>
             <h2 id="lead-capture-title" data-i18n="leadCaptureTitle">Quer guardar este fluxo para voltar depois?</h2>
             <p data-i18n="leadCaptureText">
-              Deixe o email e enviamos o link da ferramenta, um checklist curto para preparar fotos de produto e a opção Pro se precisar de volume.
+              Deixe o email e enviamos o link da ferramenta, um checklist curto para preparar fotos de produto e a opção Pack 100 se precisar de volume.
             </p>
           </div>
           <form class="lead-capture-form" id="leadCaptureForm" novalidate>
@@ -511,16 +525,16 @@
 
         <section class="pro-interest hidden" id="proInterestPanel" aria-labelledby="pro-interest-title">
           <div>
-            <p class="section-kicker" data-i18n="proInlineKicker">BatchCutout Pro</p>
-            <h2 id="pro-interest-title" data-i18n="proInlineTitle">Desbloqueie até 100 imagens por lote</h2>
-            <p data-i18n="proInlineLead">Acabou de ver o resultado. Se precisa repetir isto em catálogo, variantes ou marketplace, escolha Pro.</p>
+            <p class="section-kicker" data-i18n="proInlineKicker">Pack 100</p>
+            <h2 id="pro-interest-title" data-i18n="proInlineTitle">Continue com 100 créditos por 5 EUR</h2>
+            <p data-i18n="proInlineLead">Acabou de ver o resultado. Se precisa repetir isto num lote real, comece sem subscrição.</p>
             <p class="pro-benefits" data-i18n="proInlineBenefits">
-              Pro mensal 19 EUR/mês. Plano fundador 15 EUR/mês. Anual 190 EUR/ano.
+              Pack 100: compra única, até 100 imagens por lote e ZIP. Pro fica para produção recorrente.
             </p>
-            <div class="pro-plan-contrast" data-i18n-aria="proPlanContrastLabel" aria-label="Comparação entre grátis e Pro">
+            <div class="pro-plan-contrast" data-i18n-aria="proPlanContrastLabel" aria-label="Comparação entre grátis e acesso pago">
               <span><strong data-i18n="proFreeLabel">Grátis</strong><em data-i18n="proFreeLimit">2 imagens por lote</em></span>
-              <span><strong data-i18n="proBatchLabel">Pro</strong><em data-i18n="proBatchLimit">100 imagens por lote</em></span>
-              <span><strong data-i18n="proMonthlyLabel">Mensal</strong><em data-i18n="proMonthlyLimit">2.000 imagens por mês</em></span>
+              <span><strong data-i18n="proBatchLabel">Pack</strong><em data-i18n="proBatchLimit">100 imagens por lote</em></span>
+              <span><strong data-i18n="proMonthlyLabel">Recorrente</strong><em data-i18n="proMonthlyLimit">2.000 imagens por mês</em></span>
               <span><strong data-i18n="proCancelLabel">Controlo</strong><em data-i18n="proCancelText">Cancele quando quiser</em></span>
             </div>
           </div>
@@ -529,15 +543,15 @@
             id="proInlineForm"
             novalidate
           >
-            <button type="button" data-checkout-plan="pack100" data-i18n="billingPack100">Pack 100 imagens - 5 EUR</button>
+            <button type="button" data-checkout-plan="pack100" data-i18n="billingPack100">Pack 100 imagens - 5 EUR (melhor entrada)</button>
             <button type="button" data-checkout-plan="pack250" data-i18n="billingPack250">Pack 250 imagens - 9 EUR</button>
-            <button type="button" data-checkout-plan="early" data-i18n="billingEarly">Plano fundador - 15 EUR/mês (melhor entrada)</button>
+            <button type="button" data-checkout-plan="early" data-i18n="billingEarly">Plano fundador - 15 EUR/mês (recorrente)</button>
             <button type="button" data-checkout-plan="monthly" data-i18n="billingMonthly">Pro mensal - 19 EUR/mês</button>
             <button type="button" data-checkout-plan="annual" data-i18n="billingAnnual">Pro anual - 190 EUR/ano</button>
           </form>
           <div class="pro-limit-lead hidden" id="proLimitLeadBlock">
             <p data-i18n="proLimitLeadText">
-              Ainda a avaliar? Receba o link e checklist para voltar ao lote quando estiver pronto.
+              Ainda a avaliar? Receba o link e checklist para voltar ao lote quando estiver pronto, com o Pack 100 como primeira opção paga.
             </p>
             <form class="pro-limit-email-form" id="proLimitEmailForm" novalidate>
               <input
@@ -569,11 +583,11 @@
             Alguns formatos podem depender do suporte do navegador.
           </p>
             <p data-i18n="batchLimitNote">
-            Grátis até 2 imagens por lote. Para mais volume, escolha o Pro.
+            Grátis até 2 imagens por lote. Para mais volume, comece pelo Pack 100.
           </p>
         </div>
         <button class="inline-pro-cta" id="inlineProCta" type="button" data-i18n="inlineProCta">
-          Quer desbloquear até 100 imagens por lote? Ver planos Pro
+          Quer desbloquear até 100 imagens por lote? Ver Pack 100
         </button>
 
         <section class="faq-section" aria-labelledby="faq-title">
@@ -657,7 +671,7 @@
       </section>
     </main>
 
-    <script type="module" src="./script.js?v=20260709-pack-entry-cta"></script>
+    <script type="module" src="./script.js?v=20260709-pack-pro-prompt"></script>
   </body>
 </html>
 
