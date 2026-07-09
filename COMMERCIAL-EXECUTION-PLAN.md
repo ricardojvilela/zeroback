@@ -47,11 +47,13 @@ Best audiences:
 Current public offer:
 
 - Free: 2 images per batch
+- One-time pack: 100 image credits for 5 EUR
+- One-time pack: 250 image credits for 9 EUR
 - Founder plan: 15 EUR/month
 - Pro monthly: 19 EUR/month
 - Pro annual: 190 EUR/year
 
-Do not add more paid plans until at least 20 paying customers exist.
+Do not add more subscription tiers until at least 20 paying customers exist.
 
 Future upsell:
 
@@ -266,6 +268,16 @@ Decision rules:
 - Aligned single-offer English SEO structured data with the current founder entry price of 15 EUR/month.
 - Kept monthly and annual alternatives available on the pricing page.
 - Added `/en/` as an English ecommerce resource hub and linked it from the homepage so English SEO pages are no longer isolated behind the sitemap only.
+
+## Executed growth work - one-time pack offer
+
+- Added one-time paid image packs as a lower-friction bridge from free usage to Pro without changing the 15 EUR/month founder price.
+- Public packs:
+  - 100 image credits for 5 EUR.
+  - 250 image credits for 9 EUR.
+- Packs are paid through Stripe Checkout, credited automatically to the logged-in account and do not renew.
+- Active pack accounts keep functional tool UI focused on processing, while still being able to buy another pack or move to Pro.
+- `/admin` now tracks pack checkout sessions, pack purchases and pack revenue separately from renewable MRR.
 
 ## First revenue targets
 

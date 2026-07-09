@@ -97,6 +97,9 @@ function emptyDay(date) {
     checkoutLinkEmailClicks: 0,
     checkoutLinkEmailFailures: 0,
     paidSubscriptions: 0,
+    packCheckoutSessions: 0,
+    packPurchases: 0,
+    packRevenue: 0,
     revenue: 0,
     paymentFailures: 0,
     paymentFailureValue: 0,
@@ -260,6 +263,9 @@ function emptySourceRow(source) {
     checkoutLinkEmailClicks: 0,
     checkoutLinkEmailFailures: 0,
     paidSubscriptions: 0,
+    packCheckoutSessions: 0,
+    packPurchases: 0,
+    packRevenue: 0,
     revenue: 0,
     paymentFailures: 0,
     paymentFailureValue: 0,
@@ -648,6 +654,12 @@ export default async function handler(request, response) {
           row.checkoutSessionsCreated += 1;
           sourceRow.checkoutSessionsCreated += 1;
           break;
+        case "pack_checkout_session_created":
+          row.checkoutSessionsCreated += 1;
+          row.packCheckoutSessions += 1;
+          sourceRow.checkoutSessionsCreated += 1;
+          sourceRow.packCheckoutSessions += 1;
+          break;
         case "pro_checkout_session_failed":
           row.checkoutSessionFailures += 1;
           sourceRow.checkoutSessionFailures += 1;
@@ -667,6 +679,14 @@ export default async function handler(request, response) {
         case "pro_subscription_paid":
           row.paidSubscriptions += 1;
           sourceRow.paidSubscriptions += 1;
+          row.revenue += Number(event.value || 0) || 0;
+          sourceRow.revenue += Number(event.value || 0) || 0;
+          break;
+        case "pack_purchase_paid":
+          row.packPurchases += 1;
+          sourceRow.packPurchases += 1;
+          row.packRevenue += Number(event.value || 0) || 0;
+          sourceRow.packRevenue += Number(event.value || 0) || 0;
           row.revenue += Number(event.value || 0) || 0;
           sourceRow.revenue += Number(event.value || 0) || 0;
           break;

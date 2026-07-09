@@ -89,7 +89,7 @@ const requestedLimit = Number(pageParams.get("limit"));
 const requestedCheckoutPlan = pageParams.get("checkout_plan");
 const checkoutStatus = pageParams.get("checkout");
 const checkoutSessionId = pageParams.get("session_id");
-const checkoutPlans = new Set(["monthly", "annual", "early"]);
+const checkoutPlans = new Set(["monthly", "annual", "early", "pack100", "pack250"]);
 const defaultCheckoutPlan = "early";
 let maxFilesPerBatch = [2, 3, 5, 10, 20].includes(requestedLimit)
   ? requestedLimit
@@ -142,6 +142,7 @@ const serverEventNames = new Set([
   "pro_checkout_login_required",
   "pro_checkout_started",
   "pro_purchase_conversion_sent",
+  "pack_purchase_conversion_sent",
   "lead_capture_shown",
   "lead_capture_submitted",
   "lead_capture_dismissed",
@@ -245,7 +246,7 @@ const baseTranslation = {
   proInlineButton: "Comprar Pro",
   proInlineSuccess: "A abrir pagamento Pro.",
   proInlineSuccessTitle: "Pagamento seguro",
-  proInlineSuccessDetail: "Depois do pagamento, o acesso Pro é ativado automaticamente na conta.",
+  proInlineSuccessDetail: "Depois do pagamento, o acesso escolhido é ativado automaticamente na conta.",
   proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
   resultReadyKicker: "Resultado pronto",
   resultReadyTitle: "Quer repetir isto em lotes maiores?",
@@ -266,28 +267,33 @@ const baseTranslation = {
   cookieText: "Usamos medição simples para perceber visitas e adesões Pro. Pode aceitar ou continuar sem medição.",
   cookieAccept: "Aceitar medição",
   cookieDecline: "Continuar sem medição",
-  accountKicker: "Acesso Pro",
+  accountKicker: "Acesso pago",
   accountBadgeGuest: "Sem sessão",
   accountBadgeCheckout: "Plano escolhido",
   accountBadgeFree: "Grátis",
   accountBadgePro: "Pro",
-  accountStatusGuest: "Crie uma conta grátis para ligar o Pro ao seu email, ou entre para gerir o acesso.",
+  accountBadgePack: "Pack",
+  accountStatusGuest: "Crie uma conta grátis para ligar o acesso pago ao seu email, ou entre para gerir o acesso.",
   accountStatusCheckoutPending: "Plano escolhido: {plan}. Crie uma conta grátis com email e password; depois abrimos o Stripe para pagar.",
-  accountCheckoutGuideLabel: "Passos para ativar Pro",
+  accountCheckoutGuideLabel: "Passos para ativar acesso",
   accountCheckoutGuideAccount: "Crie conta ou entre",
   accountCheckoutGuideStripe: "Pagamento Stripe",
-  accountCheckoutGuideActive: "Pro ativo automaticamente",
-  accountCheckoutProofLabel: "Resumo do plano Pro",
-  accountCheckoutProofPrice: "Plano fundador: 15 EUR/mês",
+  accountCheckoutGuideActive: "Acesso ativo automaticamente",
+  accountCheckoutProofLabel: "Resumo da opção paga",
+  accountCheckoutProofPrice: "Pack desde 5 EUR ou fundador: 15 EUR/mês",
   accountCheckoutProofBatch: "100 imagens por lote",
   accountCheckoutProofStripe: "Pagamento só no Stripe",
   accountStatusLoading: "A verificar a sua conta...",
   accountStatusFree: "Conta gratuita. O Pro ativa até 100 imagens por lote e 2.000 imagens por mês.",
   accountStatusPro: "Conta Pro ativa. Até {batchLimit} imagens por lote e {monthlyRemaining} de {monthlyLimit} disponíveis este mês.",
+  accountStatusPack: "Pack ativo. Pode processar até {batchLimit} imagens por lote; restam {monthlyRemaining} de {monthlyLimit} créditos.",
   accountUsageTitle: "Utilização mensal",
+  accountUsageTitlePack: "Créditos do pack",
   accountUsageCount: "{used} de {limit} imagens usadas",
+  accountUsageCountPack: "{remaining} de {limit} créditos restantes",
   accountUsageReset: "O limite mensal renova em {date}.",
   accountUsageResetUnknown: "O limite mensal renova no início do próximo mês.",
+  accountUsageResetPack: "Os créditos do pack não renovam automaticamente.",
   accountStatusConfigMissing: "Login Pro ainda não configurado neste ambiente.",
   accountEmailPlaceholder: "O seu email",
   accountPasswordPlaceholder: "A sua password (mín. 6 caracteres)",
@@ -305,6 +311,8 @@ const baseTranslation = {
   accountCheckoutLinkInvalid: "Introduza o email para receber o link do plano.",
   accountRefresh: "Atualizar conta",
   accountLogout: "Sair",
+  billingPack100: "Pack 100 imagens - 5 EUR",
+  billingPack250: "Pack 250 imagens - 9 EUR",
   billingEarly: "Plano fundador - 15 EUR/mês (melhor entrada)",
   billingMonthly: "Pro mensal - 19 EUR/mês",
   billingAnnual: "Pro anual - 190 EUR/ano (poupe 38 EUR)",
@@ -312,6 +320,7 @@ const baseTranslation = {
   billingCheckoutStarting: "A abrir pagamento...",
   billingPortalStarting: "A abrir gestão de pagamento...",
   billingCheckoutSuccess: "Pagamento recebido. A ativação Pro pode demorar alguns segundos.",
+  billingCheckoutSuccessPack: "Pagamento recebido. Os créditos do pack podem demorar alguns segundos a aparecer.",
   billingCheckoutCancelled: "Pagamento cancelado. Pode tentar novamente quando quiser.",
   billingLoginRequired: "Crie uma conta grátis ou entre. Só depois abrimos o Stripe para pagar o plano escolhido.",
   billingCheckoutError: "Não foi possível abrir o pagamento agora.",
@@ -322,13 +331,14 @@ const baseTranslation = {
   accountConfirmationResent: "Este email ainda precisa de confirmação. Reenviámos o link; confirme o email e volte a esta página para continuar para pagamento.",
   accountExistingLoginReady: "Conta existente encontrada. A entrar e continuar para o pagamento...",
   accountExistingLoginError: "Este email já tem conta. Use Entrar com a password correta para continuar.",
-  accountSignupReady: "Conta criada. A abrir o pagamento Pro escolhido...",
-  accountSignupReadyNoPlan: "Conta criada. Escolha o plano Pro quando quiser ativar os limites pagos.",
+  accountSignupReady: "Conta criada. A abrir o pagamento escolhido...",
+  accountSignupReadyNoPlan: "Conta criada. Escolha pack ou Pro quando quiser ativar limites pagos.",
   accountLoggedOut: "Sessão terminada.",
   accountAuthError: "Não foi possível entrar. Confirme a password ou crie conta se ainda não tiver.",
   accountSignupError: "Não foi possível criar a conta. Se este email já existir, use Entrar.",
   accountReserveError: "A sua conta não permite este lote neste momento.",
   accountMonthlyLimitReached: "A sua conta Pro atingiu o limite mensal de {monthlyLimit} imagens.",
+  accountPackCreditsDepleted: "Este pack não tem créditos suficientes para esse lote.",
   volumeContactCta: "Falar sobre volume maior",
   volumeContactEmailSubject: "BatchCutout - preciso de mais volume",
   volumeContactEmailBody: "Olá,\n\nPreciso de avaliar mais volume para a minha conta BatchCutout Pro.\n\nMotivo: {reason}\nEmail da conta: {email}\nLimite por lote atual: {batchLimit} imagens\nLimite mensal atual: {monthlyLimit} imagens\nImagens restantes este mês: {monthlyRemaining}\n\nFonte: {source}\n\nObrigado.",
@@ -336,6 +346,11 @@ const baseTranslation = {
   volumeReasonBatch: "limite por lote atingido",
   volumeReasonGeneral: "pedido de mais volume",
   statusTooManyFilesPro: "O seu acesso atual permite até {limit} imagens por lote.",
+  brandCtaPack: "Pack ativo: até {limit} imagens por lote",
+  leadPack: "Tem {monthlyRemaining} créditos disponíveis no seu pack. Pode descarregar PNGs transparentes ou ZIP para lotes de produto.",
+  proLimitBadgePack: "Pack ativo",
+  dropzoneHelperPack: "Arraste ou selecione imagens para usar os créditos do pack.",
+  batchLimitNotePack: "Pack ativo: até {limit} imagens por lote e {monthlyRemaining} créditos restantes.",
 };
 
 const languageNames = {
@@ -456,30 +471,35 @@ const translations = {
     proInlineButton: "Buy Pro",
     proInlineSuccess: "Opening Pro payment.",
     proInlineSuccessTitle: "Secure payment",
-    proInlineSuccessDetail: "After payment, Pro access is activated automatically on your account.",
+    proInlineSuccessDetail: "After payment, the selected access is activated automatically on your account.",
     proInlineError: "We could not submit automatically. Opening an email draft instead.",
-    accountKicker: "Pro access",
+    accountKicker: "Paid access",
     accountBadgeGuest: "No session",
     accountBadgeCheckout: "Plan selected",
     accountBadgeFree: "Free",
     accountBadgePro: "Pro",
-    accountStatusGuest: "Create a free account to connect Pro to your email, or sign in to manage access.",
+    accountBadgePack: "Pack",
+    accountStatusGuest: "Create a free account to connect paid access to your email, or sign in to manage access.",
     accountStatusCheckoutPending: "Selected plan: {plan}. Create a free account with email and password; then we open Stripe for payment.",
-    accountCheckoutGuideLabel: "Steps to activate Pro",
+    accountCheckoutGuideLabel: "Steps to activate access",
     accountCheckoutGuideAccount: "Create account or sign in",
     accountCheckoutGuideStripe: "Stripe payment",
-    accountCheckoutGuideActive: "Pro activates automatically",
-    accountCheckoutProofLabel: "Pro plan summary",
-    accountCheckoutProofPrice: "Founder plan: EUR 15/month",
+    accountCheckoutGuideActive: "Access activates automatically",
+    accountCheckoutProofLabel: "Paid option summary",
+    accountCheckoutProofPrice: "Pack from EUR 5 or founder: EUR 15/month",
     accountCheckoutProofBatch: "100 images per batch",
     accountCheckoutProofStripe: "Payment only on Stripe",
     accountStatusLoading: "Checking your account...",
     accountStatusFree: "Free account. Pro unlocks up to 100 images per batch and 2,000 images per month.",
     accountStatusPro: "Pro account active. Up to {batchLimit} images per batch and {monthlyRemaining} of {monthlyLimit} available this month.",
+    accountStatusPack: "Pack active. Process up to {batchLimit} images per batch; {monthlyRemaining} of {monthlyLimit} credits remain.",
     accountUsageTitle: "Monthly usage",
+    accountUsageTitlePack: "Pack credits",
     accountUsageCount: "{used} of {limit} images used",
+    accountUsageCountPack: "{remaining} of {limit} credits remaining",
     accountUsageReset: "Monthly limit resets on {date}.",
     accountUsageResetUnknown: "Monthly limit resets at the start of next month.",
+    accountUsageResetPack: "Pack credits do not renew automatically.",
     accountStatusConfigMissing: "Pro login is not configured in this environment yet.",
     accountEmailPlaceholder: "Your email",
     accountPasswordPlaceholder: "Your password (min. 6 characters)",
@@ -497,6 +517,8 @@ const translations = {
     accountCheckoutLinkInvalid: "Enter your email to receive the plan link.",
     accountRefresh: "Refresh account",
     accountLogout: "Sign out",
+    billingPack100: "100 image pack - EUR 5",
+    billingPack250: "250 image pack - EUR 9",
     billingEarly: "Founder plan - EUR 15/month (best start)",
     billingMonthly: "Pro monthly - EUR 19/month",
     billingAnnual: "Pro annual - EUR 190/year (save EUR 38)",
@@ -504,6 +526,7 @@ const translations = {
     billingCheckoutStarting: "Opening payment...",
     billingPortalStarting: "Opening billing...",
     billingCheckoutSuccess: "Payment received. Pro activation can take a few seconds.",
+    billingCheckoutSuccessPack: "Payment received. Pack credits can take a few seconds to appear.",
     billingCheckoutCancelled: "Payment cancelled. You can try again whenever you want.",
     billingLoginRequired: "Create a free account or sign in. Only then do we open Stripe for the selected plan.",
     billingCheckoutError: "We could not open payment right now.",
@@ -514,13 +537,14 @@ const translations = {
     accountConfirmationResent: "This email still needs confirmation. We resent the link; confirm your email and return to this page to continue to payment.",
     accountExistingLoginReady: "Existing account found. Signing in and continuing to payment...",
     accountExistingLoginError: "This email already has an account. Use Sign in with the correct password to continue.",
-    accountSignupReady: "Account created. Opening the Pro payment you chose...",
-    accountSignupReadyNoPlan: "Account created. Choose a Pro plan whenever you want to activate paid limits.",
+    accountSignupReady: "Account created. Opening the payment you chose...",
+    accountSignupReadyNoPlan: "Account created. Choose a pack or Pro whenever you want to activate paid limits.",
     accountLoggedOut: "Signed out.",
     accountAuthError: "We could not sign you in. Check the password or create an account if you do not have one yet.",
     accountSignupError: "We could not create the account. If this email already exists, use Sign in.",
     accountReserveError: "Your account does not allow this batch right now.",
     accountMonthlyLimitReached: "Your Pro account reached the monthly limit of {monthlyLimit} images.",
+    accountPackCreditsDepleted: "This pack does not have enough credits for that batch.",
     volumeContactCta: "Talk about higher volume",
     volumeContactEmailSubject: "BatchCutout - I need more volume",
     volumeContactEmailBody: "Hi,\n\nI need to evaluate more volume for my BatchCutout Pro account.\n\nReason: {reason}\nAccount email: {email}\nCurrent batch limit: {batchLimit} images\nCurrent monthly limit: {monthlyLimit} images\nImages remaining this month: {monthlyRemaining}\n\nSource: {source}\n\nThanks.",
@@ -528,6 +552,11 @@ const translations = {
     volumeReasonBatch: "batch limit reached",
     volumeReasonGeneral: "higher volume request",
     statusTooManyFilesPro: "Your current access allows up to {limit} images per batch.",
+    brandCtaPack: "Pack active: up to {limit} images per batch",
+    leadPack: "You have {monthlyRemaining} pack credits available. Download transparent PNGs or ZIP files for product batches.",
+    proLimitBadgePack: "Pack active",
+    dropzoneHelperPack: "Drag or select images to use your pack credits.",
+    batchLimitNotePack: "Pack active: up to {limit} images per batch and {monthlyRemaining} credits remaining.",
     resultReadyKicker: "Result ready",
     resultReadyTitle: "Want to repeat this for larger batches?",
     downloadReadyHint: "If the cutout looks good, the founder plan turns this test into production: up to 100 images per batch, 2,000 per month, and a store-ready ZIP.",
@@ -1031,28 +1060,34 @@ const translatedAddons = {
     proInlineTitleBatchLimit: "Seleccionaste {total} imágenes. El fundador desbloquea el lote completo.",
     proInlineLeadBatchLimit: "En la prueba gratis entran {accepted}. Con Pro procesas hasta 100 imágenes por lote y 2.000 al mes, con ZIP listo para tienda.",
     proInlineBenefitsBatchLimit: "Si este es un lote real para catálogo o marketplace, empieza con el plan fundador: 15 EUR/mes y cancela cuando quieras.",
-    accountKicker: "Acceso Pro",
+    proInlineSuccessDetail: "Después del pago, el acceso elegido se activa automáticamente en la cuenta.",
+    accountKicker: "Acceso de pago",
     accountBadgeGuest: "Sin sesión",
     accountBadgeCheckout: "Plan elegido",
     accountBadgeFree: "Gratis",
     accountBadgePro: "Pro",
-    accountStatusGuest: "Crea una cuenta gratis para conectar Pro con tu email, o entra para gestionar el acceso.",
+    accountBadgePack: "Pack",
+    accountStatusGuest: "Crea una cuenta gratis para conectar el acceso de pago con tu email, o entra para gestionar el acceso.",
     accountStatusCheckoutPending: "Plan elegido: {plan}. Crea una cuenta gratis con email y contraseña; después abrimos Stripe para pagar.",
     accountUsageTitle: "Uso mensual",
+    accountUsageTitlePack: "Créditos del pack",
     accountUsageCount: "{used} de {limit} imágenes usadas",
+    accountUsageCountPack: "{remaining} de {limit} créditos restantes",
     accountUsageReset: "El límite mensual se renueva el {date}.",
     accountUsageResetUnknown: "El límite mensual se renueva al inicio del próximo mes.",
-    accountCheckoutGuideLabel: "Pasos para activar Pro",
+    accountUsageResetPack: "Los créditos del pack no se renuevan automáticamente.",
+    accountCheckoutGuideLabel: "Pasos para activar acceso",
     accountCheckoutGuideAccount: "Crea cuenta o entra",
     accountCheckoutGuideStripe: "Pago Stripe",
-    accountCheckoutGuideActive: "Pro se activa automáticamente",
-    accountCheckoutProofLabel: "Resumen del plan Pro",
-    accountCheckoutProofPrice: "Plan fundador: 15 EUR/mes",
+    accountCheckoutGuideActive: "Acceso activo automáticamente",
+    accountCheckoutProofLabel: "Resumen de la opción de pago",
+    accountCheckoutProofPrice: "Pack desde 5 EUR o fundador: 15 EUR/mes",
     accountCheckoutProofBatch: "100 imágenes por lote",
     accountCheckoutProofStripe: "Pago solo en Stripe",
     accountStatusLoading: "Verificando tu cuenta...",
     accountStatusFree: "Cuenta gratuita. Pro activa hasta 100 imágenes por lote y 2.000 imágenes al mes.",
     accountStatusPro: "Cuenta Pro activa. Hasta {batchLimit} imágenes por lote y {monthlyRemaining} de {monthlyLimit} disponibles este mes.",
+    accountStatusPack: "Pack activo. Puedes procesar hasta {batchLimit} imágenes por lote; quedan {monthlyRemaining} de {monthlyLimit} créditos.",
     accountStatusConfigMissing: "El login Pro todavía no está configurado en este entorno.",
     accountEmailPlaceholder: "Tu email",
     accountAuthNote: "Después de crear la cuenta, abrimos Stripe automáticamente. No hay pago en este paso; tus imágenes siguen en el navegador.",
@@ -1070,6 +1105,8 @@ const translatedAddons = {
     accountCheckoutLinkInvalid: "Introduce tu email para recibir el enlace del plan.",
     accountRefresh: "Actualizar cuenta",
     accountLogout: "Salir",
+    billingPack100: "Pack 100 imágenes - 5 EUR",
+    billingPack250: "Pack 250 imágenes - 9 EUR",
     billingEarly: "Plan fundador - 15 EUR/mes (mejor entrada)",
     billingMonthly: "Pro mensual - 19 EUR/mes",
     billingAnnual: "Pro anual - 190 EUR/año (ahorra 38 EUR)",
@@ -1077,6 +1114,7 @@ const translatedAddons = {
     billingCheckoutStarting: "Abriendo pago...",
     billingPortalStarting: "Abriendo gestión de pago...",
     billingCheckoutSuccess: "Pago recibido. La activación Pro puede tardar unos segundos.",
+    billingCheckoutSuccessPack: "Pago recibido. Los créditos del pack pueden tardar unos segundos en aparecer.",
     billingCheckoutCancelled: "Pago cancelado. Puedes intentarlo de nuevo cuando quieras.",
     billingLoginRequired: "Crea una cuenta gratis o entra. Solo después abrimos Stripe para pagar el plan elegido.",
     billingCheckoutError: "No se pudo abrir el pago ahora.",
@@ -1087,13 +1125,14 @@ const translatedAddons = {
     accountConfirmationResent: "Este email todavía necesita confirmación. Reenviamos el enlace; confirma el email y vuelve a esta página para continuar al pago.",
     accountExistingLoginReady: "Cuenta existente encontrada. Entrando y continuando al pago...",
     accountExistingLoginError: "Este email ya tiene cuenta. Usa Entrar con la contraseña correcta para continuar.",
-    accountSignupReady: "Cuenta creada. Abriendo el pago Pro elegido...",
-    accountSignupReadyNoPlan: "Cuenta creada. Elige un plan Pro cuando quieras activar los límites de pago.",
+    accountSignupReady: "Cuenta creada. Abriendo el pago elegido...",
+    accountSignupReadyNoPlan: "Cuenta creada. Elige pack o Pro cuando quieras activar límites de pago.",
     accountLoggedOut: "Sesión cerrada.",
     accountAuthError: "No se pudo iniciar sesión. Confirma la contraseña o crea una cuenta si todavía no tienes una.",
     accountSignupError: "No se pudo crear la cuenta. Si este email ya existe, usa Entrar.",
     accountReserveError: "Tu cuenta no permite este lote ahora mismo.",
     accountMonthlyLimitReached: "Tu cuenta Pro alcanzó el límite mensual de {monthlyLimit} imágenes.",
+    accountPackCreditsDepleted: "Este pack no tiene créditos suficientes para ese lote.",
     volumeContactCta: "Hablar sobre más volumen",
     volumeContactEmailSubject: "BatchCutout - necesito más volumen",
     volumeContactEmailBody: "Hola,\n\nNecesito evaluar más volumen para mi cuenta BatchCutout Pro.\n\nMotivo: {reason}\nEmail de la cuenta: {email}\nLímite actual por lote: {batchLimit} imágenes\nLímite mensual actual: {monthlyLimit} imágenes\nImágenes restantes este mes: {monthlyRemaining}\n\nFuente: {source}\n\nGracias.",
@@ -1120,6 +1159,11 @@ const translatedAddons = {
     statusEngineLoading: "Cargando el motor de eliminación. La primera vez puede tardar más.",
     statusError: "no se pudo procesar. Prueba JPG, PNG o WebP.",
     statusTooManyFilesPro: "Tu acceso actual permite hasta {limit} imágenes por lote.",
+    brandCtaPack: "Pack activo: hasta {limit} imágenes por lote",
+    leadPack: "Tienes {monthlyRemaining} créditos disponibles en tu pack. Descarga PNGs transparentes o ZIPs para lotes de producto.",
+    proLimitBadgePack: "Pack activo",
+    dropzoneHelperPack: "Arrastra o selecciona imágenes para usar los créditos del pack.",
+    batchLimitNotePack: "Pack activo: hasta {limit} imágenes por lote y {monthlyRemaining} créditos restantes.",
     removeImage: "Eliminar imagen",
   },
   fr: {
@@ -1650,10 +1694,23 @@ function hasTrackedPaidSession(sessionId) {
 function checkoutValueForPlan(plan = "monthly") {
   if (plan === "annual") return 190;
   if (plan === "early") return 15;
+  if (plan === "pack100") return 5;
+  if (plan === "pack250") return 9;
   return 19;
 }
 
 function googleCommerceItem(plan = "monthly") {
+  if (plan === "pack100" || plan === "pack250") {
+    const images = plan === "pack250" ? 250 : 100;
+    return {
+      item_id: `batchcutout_${plan}`,
+      item_name: `BatchCutout Pack ${images}`,
+      item_category: "one_time_pack",
+      price: checkoutValueForPlan(plan),
+      quantity: 1,
+    };
+  }
+
   return {
     item_id: `batchcutout_pro_${plan}`,
     item_name: plan === "annual" ? "BatchCutout Pro Annual" : plan === "early" ? "BatchCutout Founder" : "BatchCutout Pro Monthly",
@@ -1800,6 +1857,7 @@ function trackPaidSubscriptionConversion(details = {}) {
   if (!sessionId || hasTrackedPaidSession(sessionId)) return;
 
   const plan = details.checkoutPlan || details.plan || "monthly";
+  const purchaseType = details.purchaseType || (plan === "pack100" || plan === "pack250" ? "pack" : "subscription");
   const amount = Number(details.amount || 0) || checkoutValueForPlan(plan);
   const currency = String(details.currency || "EUR").toUpperCase();
   const customerEmail = details.customerEmail || currentAccount?.email || "";
@@ -1817,8 +1875,9 @@ function trackPaidSubscriptionConversion(details = {}) {
     currency,
     transaction_id: sessionId,
   });
-  trackEvent("pro_purchase_conversion_sent", {
+  trackEvent(purchaseType === "pack" ? "pack_purchase_conversion_sent" : "pro_purchase_conversion_sent", {
     plan,
+    purchase_type: purchaseType,
     value: amount,
     currency,
     stripe_session_id: sessionId,
@@ -2112,13 +2171,21 @@ function updateAccountUsageUi(access = {}) {
   const monthlyLimit = Number(access.monthlyLimit || 0) || defaultProMonthlyLimit;
   const monthlyUsed = Math.max(Number(access.monthlyUsed || 0) || 0, 0);
   const boundedUsed = Math.min(monthlyUsed, monthlyLimit);
+  const remaining = Math.max(monthlyLimit - boundedUsed, 0);
   const percent = monthlyLimit > 0 ? Math.min(Math.round((boundedUsed / monthlyLimit) * 100), 100) : 0;
   const resetDate = formatAccountDate(access.periodEnd);
+  const isPack = Boolean(access.isCreditPack);
 
   accountUsage.classList.remove("hidden");
-  accountUsageCount.textContent = t("accountUsageCount", { used: boundedUsed, limit: monthlyLimit });
+  const usageTitle = accountUsage.querySelector("[data-i18n='accountUsageTitle']");
+  if (usageTitle) usageTitle.textContent = t(isPack ? "accountUsageTitlePack" : "accountUsageTitle");
+  accountUsageCount.textContent = isPack
+    ? t("accountUsageCountPack", { remaining, limit: monthlyLimit })
+    : t("accountUsageCount", { used: boundedUsed, limit: monthlyLimit });
   accountUsageBar.style.width = `${percent}%`;
-  accountUsageReset.textContent = resetDate
+  accountUsageReset.textContent = isPack
+    ? t("accountUsageResetPack")
+    : resetDate
     ? t("accountUsageReset", { date: resetDate })
     : t("accountUsageResetUnknown");
 }
@@ -2199,6 +2266,7 @@ function syncBatchLimit() {
 function syncPaidAccessUi() {
   const paidAccess = canUsePaidAccess();
   const paidParams = getPaidAccessParams();
+  const packAccess = Boolean(currentAccount?.access?.isCreditPack);
 
   document.body.classList.toggle("account-pro-active", paidAccess);
   brandProLink?.classList.toggle("hidden", paidAccess);
@@ -2218,11 +2286,11 @@ function syncPaidAccessUi() {
     proInterestPanel?.classList.add("hidden");
     proLimitLeadBlock?.classList.add("hidden");
     leadCapturePanel?.classList.add("hidden");
-    if (brandCta) brandCta.textContent = t("brandCtaPro", paidParams);
-    if (brandLead) brandLead.textContent = t("leadPro", paidParams);
-    if (dropzoneBadge) dropzoneBadge.textContent = t("proLimitBadge", paidParams);
-    if (dropzoneHelper) dropzoneHelper.textContent = t("dropzoneHelperPro", paidParams);
-    if (batchLimitNote) batchLimitNote.textContent = t("batchLimitNotePro", paidParams);
+    if (brandCta) brandCta.textContent = t(packAccess ? "brandCtaPack" : "brandCtaPro", paidParams);
+    if (brandLead) brandLead.textContent = t(packAccess ? "leadPack" : "leadPro", paidParams);
+    if (dropzoneBadge) dropzoneBadge.textContent = t(packAccess ? "proLimitBadgePack" : "proLimitBadge", paidParams);
+    if (dropzoneHelper) dropzoneHelper.textContent = t(packAccess ? "dropzoneHelperPack" : "dropzoneHelperPro", paidParams);
+    if (batchLimitNote) batchLimitNote.textContent = t(packAccess ? "batchLimitNotePack" : "batchLimitNotePro", paidParams);
     return;
   }
 
@@ -2286,8 +2354,9 @@ function updateAccountUi() {
 
   const { access = {}, email = "" } = currentAccount;
   setGoogleUserData(email);
-  const statusKey = access.canUsePro ? "accountStatusPro" : "accountStatusFree";
-  const badgeKey = access.canUsePro ? "accountBadgePro" : "accountBadgeFree";
+  const isPack = Boolean(access.isCreditPack);
+  const statusKey = access.canUsePro ? (isPack ? "accountStatusPack" : "accountStatusPro") : "accountStatusFree";
+  const badgeKey = access.canUsePro ? (isPack ? "accountBadgePack" : "accountBadgePro") : "accountBadgeFree";
   const statusTextValue = access.canUsePro
     ? t(statusKey, {
         batchLimit: access.batchLimit || defaultProBatchLimit,
@@ -2304,8 +2373,8 @@ function updateAccountUi() {
   accountCheckoutLink?.classList.add("hidden");
   accountForm?.classList.add("hidden");
   accountActions?.classList.remove("hidden");
-  billingActions?.classList.toggle("hidden", Boolean(access.canUsePro));
-  billingPortal?.classList.toggle("hidden", !access.canUsePro || !currentAccount?.billing?.hasStripeCustomer);
+  billingActions?.classList.toggle("hidden", access.accessType === "pro");
+  billingPortal?.classList.toggle("hidden", access.accessType !== "pro" || !currentAccount?.billing?.hasStripeCustomer);
   updateAccountUsageUi(access);
   syncPaidAccessUi();
   updateControls();
@@ -2591,6 +2660,8 @@ function handleAccountFormInvalid() {
 }
 
 function checkoutPlanLabelKey(plan) {
+  if (plan === "pack100") return "billingPack100";
+  if (plan === "pack250") return "billingPack250";
   if (plan === "annual") return "billingAnnual";
   if (plan === "early") return "billingEarly";
   return "billingMonthly";
@@ -2778,10 +2849,14 @@ async function fetchCheckoutConversionDetails() {
 
 async function showCheckoutReturnMessage() {
   if (checkoutStatus === "success") {
-    setAccountMessage("billingCheckoutSuccess");
     const checkoutDetails = await syncCheckoutReturnSession();
+    const isPackCheckout = checkoutDetails?.purchaseType === "pack" || checkoutDetails?.checkoutPlan === "pack100" || checkoutDetails?.checkoutPlan === "pack250";
+    setAccountMessage(isPackCheckout ? "billingCheckoutSuccessPack" : "billingCheckoutSuccess");
     await refreshAccount();
     const conversionDetails = checkoutDetails?.synced ? checkoutDetails : await fetchCheckoutConversionDetails();
+    if (!isPackCheckout && (conversionDetails?.purchaseType === "pack" || conversionDetails?.checkoutPlan === "pack100" || conversionDetails?.checkoutPlan === "pack250")) {
+      setAccountMessage("billingCheckoutSuccessPack");
+    }
     if (conversionDetails?.synced || conversionDetails?.paid) {
       trackPaidSubscriptionConversion(conversionDetails);
     }
@@ -2801,7 +2876,7 @@ async function maybeStartRequestedCheckout() {
     setAccountMessage("billingLoginRequired");
     return;
   }
-  if (currentAccount.access?.canUsePro) {
+  if (currentAccount.access?.canUsePro && !currentAccount.access?.isCreditPack) {
     clearPendingCheckoutPlan();
     return;
   }
@@ -3117,7 +3192,11 @@ async function processImages() {
         });
       }
       setStatus(
-        reservation.error === "monthly_limit_reached" ? "accountMonthlyLimitReached" : "accountReserveError",
+        reservation.error === "monthly_limit_reached"
+          ? "accountMonthlyLimitReached"
+          : reservation.error === "pack_credits_depleted"
+            ? "accountPackCreditsDepleted"
+            : "accountReserveError",
         0,
         { monthlyLimit },
       );

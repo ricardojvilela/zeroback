@@ -5,7 +5,7 @@ import {
   readRequestBody,
   sendJson,
 } from "./_pro.js";
-import { getStripeClient, updateProfileFromSubscription } from "./_stripe.js";
+import { applyPackPurchaseFromSession, getPackOffer, getStripeClient, updateProfileFromSubscription } from "./_stripe.js";
 
 async function getSessionSubscription(stripe, sessionId) {
   const session = await stripe.checkout.sessions.retrieve(sessionId, {
@@ -65,6 +65,27 @@ function checkoutConversionPayload(session, subscription) {
   };
 }
 
+function packConversionPayload(session) {
+  const metadata = session?.metadata || {};
+  const pack = getPackOffer(metadata.batchcutout_price_plan);
+  const amountCents = Number(session?.amount_total || 0) || pack?.amountCents || 0;
+
+  return {
+    ok: true,
+    paid: true,
+    synced: false,
+    sessionId: session.id,
+    subscriptionId: "",
+    purchaseType: "pack",
+    amountCents,
+    amount: Math.round(amountCents) / 100,
+    currency: asText(session.currency || pack?.currency || "eur", 20).toUpperCase(),
+    checkoutPlan: asText(metadata.batchcutout_price_plan || "pack100", 80),
+    priceId: "",
+    packImages: Number(pack?.images || metadata.batchcutout_pack_images || 0) || 0,
+  };
+}
+
 function asText(value, maxLength = 500) {
   if (value === null || value === undefined) return "";
   return String(value).slice(0, maxLength);
@@ -94,6 +115,9 @@ export default async function handler(request, response) {
   if (!accessToken) {
     try {
       const { session, subscription } = await getSessionSubscription(stripe, sessionId);
+      if (session.mode === "payment" && session.payment_status === "paid" && session.metadata?.batchcutout_purchase_type === "pack") {
+        return sendJson(response, 200, packConversionPayload(session));
+      }
       if (session.mode !== "subscription" || session.payment_status !== "paid" || !subscription) {
         return sendJson(response, 409, { ok: false, error: "checkout_not_paid" });
       }
@@ -122,6 +146,36 @@ export default async function handler(request, response) {
     const { session, subscription } = await getSessionSubscription(stripe, sessionId);
     if (session.client_reference_id !== user.id) {
       return sendJson(response, 403, { ok: false, error: "checkout_session_user_mismatch" });
+    }
+
+    if (session.mode === "payment" && session.metadata?.batchcutout_purchase_type === "pack") {
+      if (session.payment_status !== "paid") {
+        return sendJson(response, 409, { ok: false, error: "checkout_not_paid" });
+      }
+
+      const result = await applyPackPurchaseFromSession(settings, session);
+      const amountCents = Number(session.amount_total || 0) || result.pack.amountCents;
+      return sendJson(response, 200, {
+        ok: true,
+        synced: true,
+        credited: result.credited,
+        alreadyStored: result.alreadyStored,
+        sessionId: session.id,
+        subscriptionId: "",
+        customerId: typeof session.customer === "string" ? session.customer : session.customer?.id || "",
+        customerEmail: asText(session.customer_details?.email || user.email || ""),
+        amountCents,
+        amount: Math.round(amountCents) / 100,
+        currency: asText(session.currency || result.pack.currency || "eur", 20).toUpperCase(),
+        checkoutPlan: result.pack.plan,
+        purchaseType: "pack",
+        packImages: result.pack.images,
+        priceId: "",
+        plan: result.profile.plan,
+        planStatus: result.profile.plan_status,
+        batchLimit: result.profile.batch_limit,
+        monthlyLimit: result.profile.monthly_image_limit,
+      });
     }
 
     if (!subscription) {

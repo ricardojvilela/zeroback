@@ -8,10 +8,10 @@ import {
 } from "./_pro.js";
 import {
   attachStripeCustomerToProfile,
+  getCheckoutOffering,
   getPlanLabel,
   getSiteUrl,
   getStripeClient,
-  getStripePriceId,
 } from "./_stripe.js";
 import { Resend } from "resend";
 
@@ -62,6 +62,8 @@ const checkoutLinkEmailDefaultTimeoutMs = 1500;
 function checkoutValueForPlan(plan) {
   if (plan === "annual") return 190;
   if (plan === "early") return 15;
+  if (plan === "pack100") return 5;
+  if (plan === "pack250") return 9;
   return 19;
 }
 
@@ -137,15 +139,21 @@ function checkoutLanguage(attribution) {
 
 function checkoutPlanText(plan, language) {
   if (language === "pt") {
+    if (plan === "pack100") return "Pack 100 imagens - 5 EUR";
+    if (plan === "pack250") return "Pack 250 imagens - 9 EUR";
     if (plan === "annual") return "Pro anual - 190 EUR/ano";
     if (plan === "early") return "Plano fundador - 15 EUR/mes";
     return "Pro mensal - 19 EUR/mes";
   }
   if (language === "es") {
+    if (plan === "pack100") return "Pack 100 imagenes - 5 EUR";
+    if (plan === "pack250") return "Pack 250 imagenes - 9 EUR";
     if (plan === "annual") return "Pro anual - 190 EUR/año";
     if (plan === "early") return "Plan fundador - 15 EUR/mes";
     return "Pro mensual - 19 EUR/mes";
   }
+  if (plan === "pack100") return "100 image pack - EUR 5";
+  if (plan === "pack250") return "250 image pack - EUR 9";
   if (plan === "annual") return "Annual Pro - EUR 190/year";
   if (plan === "early") return "Founder plan - EUR 15/month";
   return "Monthly Pro - EUR 19/month";
@@ -157,18 +165,28 @@ function checkoutContinueUrl(session) {
 
 function checkoutLinkCopy({ language, plan, sessionUrl }) {
   const planText = checkoutPlanText(plan, language);
+  const isPack = plan === "pack100" || plan === "pack250";
+  const packImages = plan === "pack250" ? "250" : "100";
   if (language === "pt") {
     return {
-      subject: "Link seguro para concluir o BatchCutout Pro",
-      title: "Concluir BatchCutout Pro",
-      intro: "Abriu o pagamento do BatchCutout Pro. Se a aba do Stripe fechar ou quiser continuar noutro dispositivo, use este link seguro:",
+      subject: isPack ? "Link seguro para concluir o pack BatchCutout" : "Link seguro para concluir o BatchCutout Pro",
+      title: isPack ? "Concluir pack BatchCutout" : "Concluir BatchCutout Pro",
+      intro: isPack
+        ? "Abriu o pagamento de um pack BatchCutout. Se a aba do Stripe fechar ou quiser continuar noutro dispositivo, use este link seguro:"
+        : "Abriu o pagamento do BatchCutout Pro. Se a aba do Stripe fechar ou quiser continuar noutro dispositivo, use este link seguro:",
       cta: "Concluir pagamento",
       planLine: `Plano: ${planText}`,
-      benefits: [
-        "Ate 100 imagens por lote",
-        "Ate 2.000 imagens por mes",
-        "PNG transparente e ZIP organizado para produto",
-      ],
+      benefits: isPack
+        ? [
+            `${packImages} creditos de imagem`,
+            "Compra unica, sem subscricao",
+            "Ate 100 imagens por lote",
+          ]
+        : [
+            "Ate 100 imagens por lote",
+            "Ate 2.000 imagens por mes",
+            "PNG transparente e ZIP organizado para produto",
+          ],
       note: "O botao retoma a mesma sessao segura do Stripe. Se ja concluiu o pagamento, pode ignorar este email.",
       support: "Se alguma coisa bloquear a ativacao, responda a este email.",
       thanks: "Obrigado,\nNexaFlow Labs",
@@ -177,16 +195,24 @@ function checkoutLinkCopy({ language, plan, sessionUrl }) {
   }
   if (language === "es") {
     return {
-      subject: "Tu enlace seguro para completar BatchCutout Pro",
-      title: "Completar BatchCutout Pro",
-      intro: "Abriste el checkout de BatchCutout Pro. Si la pestaña de Stripe se cierra o quieres continuar en otro dispositivo, usa este enlace seguro:",
+      subject: isPack ? "Tu enlace seguro para completar el pack BatchCutout" : "Tu enlace seguro para completar BatchCutout Pro",
+      title: isPack ? "Completar pack BatchCutout" : "Completar BatchCutout Pro",
+      intro: isPack
+        ? "Abriste el checkout de un pack BatchCutout. Si la pestaña de Stripe se cierra o quieres continuar en otro dispositivo, usa este enlace seguro:"
+        : "Abriste el checkout de BatchCutout Pro. Si la pestaña de Stripe se cierra o quieres continuar en otro dispositivo, usa este enlace seguro:",
       cta: "Completar pago",
       planLine: `Plan: ${planText}`,
-      benefits: [
-        "Hasta 100 imagenes por lote",
-        "Hasta 2.000 imagenes al mes",
-        "PNG transparente y ZIP organizado para trabajo de producto",
-      ],
+      benefits: isPack
+        ? [
+            `${packImages} creditos de imagen`,
+            "Compra unica, sin suscripcion",
+            "Hasta 100 imagenes por lote",
+          ]
+        : [
+            "Hasta 100 imagenes por lote",
+            "Hasta 2.000 imagenes al mes",
+            "PNG transparente y ZIP organizado para trabajo de producto",
+          ],
       note: "El boton retoma la misma sesion segura de Stripe. Si ya completaste el pago, puedes ignorar este email.",
       support: "Si algo bloquea la activacion, responde a este email.",
       thanks: "Gracias,\nNexaFlow Labs",
@@ -194,16 +220,24 @@ function checkoutLinkCopy({ language, plan, sessionUrl }) {
     };
   }
   return {
-    subject: "Your secure BatchCutout Pro checkout link",
-    title: "Complete BatchCutout Pro",
-    intro: "You opened BatchCutout Pro checkout. If the Stripe tab closes or you want to continue on another device, use this secure link:",
+    subject: isPack ? "Your secure BatchCutout pack checkout link" : "Your secure BatchCutout Pro checkout link",
+    title: isPack ? "Complete BatchCutout pack" : "Complete BatchCutout Pro",
+    intro: isPack
+      ? "You opened BatchCutout pack checkout. If the Stripe tab closes or you want to continue on another device, use this secure link:"
+      : "You opened BatchCutout Pro checkout. If the Stripe tab closes or you want to continue on another device, use this secure link:",
     cta: "Complete payment",
     planLine: `Plan: ${planText}`,
-    benefits: [
-      "Up to 100 images per batch",
-      "Up to 2,000 images per month",
-      "Transparent PNG and organized ZIP export for product work",
-    ],
+    benefits: isPack
+      ? [
+          `${packImages} image credits`,
+          "One-time purchase, no subscription",
+          "Up to 100 images per batch",
+        ]
+      : [
+          "Up to 100 images per batch",
+          "Up to 2,000 images per month",
+          "Transparent PNG and organized ZIP export for product work",
+        ],
     note: "The button resumes the same secure Stripe session. If you already completed payment, you can ignore this email.",
     support: "If anything blocks activation, reply to this email.",
     thanks: "Thanks,\nNexaFlow Labs",
@@ -286,7 +320,7 @@ function redirect(response, location) {
 function checkoutSessionPlan(session) {
   const metadata = session?.metadata || {};
   const plan = String(metadata.batchcutout_price_plan || metadata.price_plan || "monthly").toLowerCase();
-  return ["early", "monthly", "annual"].includes(plan) ? plan : "monthly";
+  return ["early", "monthly", "annual", "pack100", "pack250"].includes(plan) ? plan : "monthly";
 }
 
 async function recordCheckoutLinkClick(settings, session) {
@@ -380,7 +414,7 @@ async function hasRecentCheckoutLinkEmail(settings, email) {
   return Array.isArray(rows) && rows.length > 0;
 }
 
-async function recordCheckoutSessionCreated(settings, { user, profile, session, plan, attribution }) {
+async function recordCheckoutSessionCreated(settings, { user, profile, session, plan, attribution, offerKind = "subscription" }) {
   const detail = {
     ...attribution,
     stripe_session_id: session.id || "",
@@ -388,9 +422,10 @@ async function recordCheckoutSessionCreated(settings, { user, profile, session, 
     supabase_user_id: user.id || "",
     plan,
     price_plan: plan,
+    purchase_type: offerKind,
   };
   const row = {
-    event_name: "pro_checkout_session_created",
+    event_name: offerKind === "pack" ? "pack_checkout_session_created" : "pro_checkout_session_created",
     event_category: "commercial_intent",
     event_label: plan,
     page_path: metadataString(attribution.page_path, 500),
@@ -578,6 +613,7 @@ export default async function handler(request, response) {
   let profile = null;
   let plan = "monthly";
   let attribution = {};
+  let offering = null;
 
   try {
     user = await getSupabaseUser(settings, accessToken);
@@ -586,11 +622,10 @@ export default async function handler(request, response) {
     }
 
     const body = await readRequestBody(request);
-    const selectedPrice = getStripePriceId(body?.plan);
-    plan = selectedPrice.plan;
-    const priceId = selectedPrice.priceId;
+    offering = getCheckoutOffering(body?.plan);
+    plan = offering.plan;
     attribution = sanitizeAttribution(body?.attribution);
-    if (!priceId) {
+    if (offering.kind === "subscription" && !offering.priceId) {
       try {
         await recordCheckoutSessionFailed(settings, {
           user,
@@ -613,7 +648,7 @@ export default async function handler(request, response) {
         email: user.email || undefined,
         metadata: {
           supabase_user_id: user.id,
-          batchcutout_plan: "pro",
+          batchcutout_plan: offering.kind === "pack" ? "pack" : "pro",
         },
       });
       customerId = customer.id;
@@ -625,30 +660,46 @@ export default async function handler(request, response) {
     const checkoutReturnLangParam = checkoutReturnLanguage === "pt" ? "" : `lang=${encodeURIComponent(checkoutReturnLanguage)}&`;
     const metadata = {
       supabase_user_id: user.id,
-      batchcutout_plan: "pro",
+      batchcutout_plan: offering.kind === "pack" ? "pack" : "pro",
+      batchcutout_purchase_type: offering.kind,
       batchcutout_price_plan: plan,
+      batchcutout_pack_images: offering.kind === "pack" ? String(offering.images) : "",
       ...attribution,
     };
-    const session = await stripe.checkout.sessions.create({
-      mode: "subscription",
+    const commonSession = {
       customer: customerId,
       client_reference_id: user.id,
-      line_items: [{ price: priceId, quantity: 1 }],
       allow_promotion_codes: true,
       success_url: `${siteUrl}/?${checkoutReturnLangParam}checkout=success&session_id={CHECKOUT_SESSION_ID}#accountTitle`,
       cancel_url: `${siteUrl}/pricing/?${checkoutReturnLangParam}checkout=cancelled&checkout_plan=${encodeURIComponent(plan)}#pricing-account-title`,
-      subscription_data: {
-        metadata,
-      },
       metadata,
       customer_update: {
         name: "auto",
         address: "auto",
       },
-    });
+    };
+    const session = await stripe.checkout.sessions.create(
+      offering.kind === "pack"
+        ? {
+            ...commonSession,
+            mode: "payment",
+            line_items: [{ price_data: offering.priceData, quantity: 1 }],
+            payment_intent_data: {
+              metadata,
+            },
+          }
+        : {
+            ...commonSession,
+            mode: "subscription",
+            line_items: [{ price: offering.priceId, quantity: 1 }],
+            subscription_data: {
+              metadata,
+            },
+          },
+    );
 
     try {
-      await recordCheckoutSessionCreated(settings, { user, profile, session, plan, attribution });
+      await recordCheckoutSessionCreated(settings, { user, profile, session, plan, attribution, offerKind: offering.kind });
     } catch {
       // Checkout must not fail because analytics storage failed.
     }
@@ -665,6 +716,8 @@ export default async function handler(request, response) {
       ok: true,
       url: session.url,
       plan,
+      kind: offering.kind,
+      images: offering.kind === "pack" ? offering.images : 0,
       label: getPlanLabel(plan),
       customerId: profile.stripe_customer_id || customerId,
     });

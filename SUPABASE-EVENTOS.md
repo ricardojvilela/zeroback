@@ -115,6 +115,17 @@ Receita:
 - Criado pelo browser depois de `/api/sync-checkout-session` confirmar uma sessao Stripe paga no regresso do checkout.
 - Serve para auditar o envio da conversao paga para Google Ads/GA4 e alimentar o sinal `paid_customer`.
 - `detail.conversion_configured` deve estar `true` em producao.
+- `pack_checkout_session_created`
+- Criado pela API de checkout quando uma sessao Stripe de pack avulso e criada.
+- `detail.purchase_type` fica `pack` e `detail.plan` indica `pack100` ou `pack250`.
+- `pack_purchase_paid`
+- Criado pelo webhook Stripe ou pela sincronizacao de regresso do checkout quando um
+  pack avulso pago e atribuido a uma conta.
+- `event_label` guarda o `checkout.session.id`; `value` guarda o valor pago em euros.
+- `detail.pack_images` e `detail.credits_added` indicam os creditos atribuídos.
+- `pack_purchase_conversion_sent`
+- Criado pelo browser depois de `/api/sync-checkout-session` confirmar um pack pago
+  no regresso do checkout.
 
 Suporte:
 
@@ -162,9 +173,10 @@ select
   count(*) filter (where event_name in ('tool_download_png', 'tool_download_zip')) as downloads,
   count(*) filter (where event_name = 'tool_pro_clicked') as cliques_pro,
   count(*) filter (where event_name = 'pro_checkout_started') as checkouts,
-  count(*) filter (where event_name = 'pro_purchase_conversion_sent') as conversoes_ads_enviadas,
+  count(*) filter (where event_name in ('pro_purchase_conversion_sent', 'pack_purchase_conversion_sent')) as conversoes_ads_enviadas,
   count(*) filter (where event_name = 'pro_subscription_paid') as subscricoes_pagas,
-  sum(value) filter (where event_name = 'pro_subscription_paid') as receita
+  count(*) filter (where event_name = 'pack_purchase_paid') as packs_pagos,
+  sum(value) filter (where event_name in ('pro_subscription_paid', 'pack_purchase_paid')) as receita
 from public.batchcutout_events
 group by 1
 order by 1 desc;

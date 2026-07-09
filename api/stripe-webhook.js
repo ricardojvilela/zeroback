@@ -1,5 +1,5 @@
 import { getSupabaseSettings } from "./_pro.js";
-import { getStripeClient, updateProfileFromSubscription } from "./_stripe.js";
+import { applyPackPurchaseFromSession, getStripeClient, updateProfileFromSubscription } from "./_stripe.js";
 import { Resend } from "resend";
 
 const attributionKeys = [
@@ -542,18 +542,26 @@ async function handleStripeEvent(event) {
   try {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object;
-      const subscription = await getSubscriptionFromCheckout(stripe, session);
-      if (subscription) {
-        const profile = await updateProfileFromSubscription(settings, subscription, session.client_reference_id);
+      if (session.mode === "payment" && session.metadata?.batchcutout_purchase_type === "pack") {
         try {
-          await storePaidSubscriptionEvent(settings, event, session, subscription);
+          await applyPackPurchaseFromSession(settings, session, event);
         } catch (error) {
-          console.error("BatchCutout paid subscription event failed", error);
+          console.error("BatchCutout pack purchase activation failed", error);
         }
-        try {
-          await sendProWelcomeEmail(settings, event, session, subscription, profile);
-        } catch (error) {
-          console.error("BatchCutout pro welcome email failed", error);
+      } else {
+        const subscription = await getSubscriptionFromCheckout(stripe, session);
+        if (subscription) {
+          const profile = await updateProfileFromSubscription(settings, subscription, session.client_reference_id);
+          try {
+            await storePaidSubscriptionEvent(settings, event, session, subscription);
+          } catch (error) {
+            console.error("BatchCutout paid subscription event failed", error);
+          }
+          try {
+            await sendProWelcomeEmail(settings, event, session, subscription, profile);
+          } catch (error) {
+            console.error("BatchCutout pro welcome email failed", error);
+          }
         }
       }
     }

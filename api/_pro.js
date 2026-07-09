@@ -221,7 +221,7 @@ export function normalizeProfile(row, user) {
   const planStatus = String(row?.plan_status || "active");
   const monthlyLimit = Number(row?.monthly_image_limit || 0) || 0;
   const monthlyUsed = Number(row?.monthly_images_used || 0) || 0;
-  const batchLimit = Number(row?.batch_limit || (plan === "pro" ? 100 : 2)) || 2;
+  const batchLimit = Number(row?.batch_limit || (plan === "pro" || plan === "pack" ? 100 : 2)) || 2;
   const period = calendarPeriodFor(new Date());
 
   return {
@@ -243,7 +243,8 @@ export function normalizeProfile(row, user) {
 }
 
 export function canUsePro(profile) {
-  return profile.plan === "pro" && ["active", "manual"].includes(profile.plan_status);
+  if (profile.plan === "pro" && ["active", "manual"].includes(profile.plan_status)) return true;
+  return profile.plan === "pack" && profile.plan_status === "active";
 }
 
 export async function loadOrCreateProfile(settings, user) {
@@ -272,6 +273,10 @@ export async function loadOrCreateProfile(settings, user) {
 }
 
 export async function rollMonthlyWindowIfNeeded(settings, profile, user) {
+  if (profile.plan === "pack") {
+    return profile;
+  }
+
   const currentEnd = profile.current_period_end ? new Date(profile.current_period_end) : null;
   const now = new Date();
 
@@ -295,6 +300,12 @@ export async function rollMonthlyWindowIfNeeded(settings, profile, user) {
 
 export function serializeAccount(profile, user) {
   const paidAccess = canUsePro(profile);
+  const packAccess = profile.plan === "pack" && profile.plan_status === "active";
+  const accessType = profile.plan === "pro" && ["active", "manual"].includes(profile.plan_status)
+    ? "pro"
+    : packAccess
+      ? "pack"
+      : "free";
   const monthlyLimit = Number(profile.monthly_image_limit || 0) || 0;
   const monthlyUsed = Number(profile.monthly_images_used || 0) || 0;
   const monthlyRemaining = Math.max(monthlyLimit - monthlyUsed, 0);
@@ -305,11 +316,14 @@ export function serializeAccount(profile, user) {
     access: {
       plan: profile.plan,
       planStatus: profile.plan_status,
+      accessType,
+      isCreditPack: accessType === "pack",
       canUsePro: paidAccess,
       batchLimit: paidAccess ? Number(profile.batch_limit || 100) || 100 : 2,
       monthlyLimit,
       monthlyUsed,
       monthlyRemaining,
+      creditsRemaining: accessType === "pack" ? monthlyRemaining : 0,
       periodStart: profile.current_period_start || null,
       periodEnd: profile.current_period_end || null,
     },

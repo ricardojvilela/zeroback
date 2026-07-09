@@ -190,6 +190,12 @@ Criar no Stripe um produto `BatchCutout Pro` com estes Prices:
 - Pro mensal: `19 EUR` por mes
 - Pro anual: `190 EUR` por ano
 
+Os packs avulsos usam Stripe Checkout em modo `payment` com `price_data` gerado
+pela API, por isso nao precisam de Price ID na Vercel:
+
+- Pack 100 imagens: `5 EUR`, compra unica
+- Pack 250 imagens: `9 EUR`, compra unica
+
 Adicionar na Vercel:
 
 - `STRIPE_SECRET_KEY`
@@ -232,14 +238,17 @@ Depois de adicionar as variáveis na Vercel, fazer novo deploy para publicar:
 
 ### 7. Comportamento atual
 - Free: 2 imagens por lote
+- Pack 100: 100 creditos de imagem, 100 imagens por lote, compra unica
+- Pack 250: 250 creditos de imagem, 100 imagens por lote, compra unica
 - Pro: 100 imagens por lote
 - Pro: 2000 imagens por mês
 - Plano fundador: 15 EUR/mês
 - Pro Mensal: 19 EUR/mês
 - Pro Anual: 190 EUR/ano
 - O site reserva o consumo antes de começar a processar
+- Packs nao renovam mensalmente; os creditos acabam quando forem consumidos
 - O login é por email e password via Supabase
 - Novas contas precisam de confirmar o email antes do primeiro login
 - O pagamento é feito por Stripe Checkout
-- O webhook Stripe ativa/remove acesso Pro automaticamente
+- O webhook Stripe ativa/remove acesso Pro automaticamente e credita packs pagos
 - O painel `/admin` permite listar contas e mudar entre `Free`, `Pro` e `Reset uso`

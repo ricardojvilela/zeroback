@@ -927,6 +927,18 @@
             <strong id="livePaidSubscriptions">0</strong>
           </article>
           <article class="live-card">
+            <span>Sessões pack</span>
+            <strong id="livePackCheckoutSessions">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Packs pagos</span>
+            <strong id="livePackPurchases">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Receita packs</span>
+            <strong id="livePackRevenue">0 EUR</strong>
+          </article>
+          <article class="live-card">
             <span>Stripe para pago</span>
             <strong id="liveStripePaidRate">0%</strong>
           </article>
@@ -1792,6 +1804,8 @@
         const checkoutLinkEmailClicks = Number(totals.checkoutLinkEmailClicks || 0) || 0;
         const checkoutLinkEmailFailures = Number(totals.checkoutLinkEmailFailures || 0) || 0;
         const paidSubscriptions = Number(totals.paidSubscriptions || 0) || 0;
+        const packPurchases = Number(totals.packPurchases || 0) || 0;
+        const paidPurchases = paidSubscriptions + packPurchases;
         const accountPanelViews = Number(totals.accountCheckoutPanelViews || 0) || 0;
         const accountFormInteractions = Number(totals.accountFormInteractions || 0) || 0;
         const accountValidationFailures = Number(totals.accountValidationFailures || 0) || 0;
@@ -1867,20 +1881,22 @@
           return "Gargalo principal: existe interesse em Pro, mas nenhuma sessão Stripe criada. Prioridade: rever fluxo conta/login/checkout e erros de criação de sessão.";
         }
 
-        if (checkoutCancelledReturns >= 2 && paidSubscriptions === 0) {
+        if (checkoutCancelledReturns >= 2 && paidPurchases === 0) {
           return "Gargalo principal: compradores voltam do Stripe com pagamento cancelado. Prioridade: rever objeções na página de preços, segurança percebida e recuperação pós-cancelamento.";
         }
 
-        if (checkoutSessions >= 3 && paidSubscriptions === 0) {
-          return "Gargalo principal: o checkout abre, mas não converte em pagamento. Prioridade: rever confiança, preço, retorno ao site e emails de recuperação.";
+        if (checkoutSessions >= 3 && paidPurchases === 0) {
+          return "Gargalo principal: o checkout abre, mas não converte em pagamento. Prioridade: rever confiança, preço, retorno ao site, packs de entrada e emails de recuperação.";
         }
 
         if (uploads >= 10 && conversionRate(downloads, uploads) < 0.45) {
           return "Gargalo principal: muitos uploads não chegam a download. Prioridade: rever velocidade, qualidade do recorte e clareza dos botões de descarga.";
         }
 
-        if (paidSubscriptions > 0) {
-          return "Sinal positivo: já há pagamentos atribuídos no funil. Prioridade: identificar origem, repetir o canal e proteger retenção.";
+        if (paidPurchases > 0) {
+          return packPurchases > 0 && paidSubscriptions === 0
+            ? "Sinal positivo: já há compra avulsa atribuída no funil. Prioridade: identificar origem e criar ponte para Pro quando os créditos acabarem."
+            : "Sinal positivo: já há pagamentos atribuídos no funil. Prioridade: identificar origem, repetir o canal e proteger retenção.";
         }
 
         return "Diagnóstico: ainda falta volume suficiente para escolher um único gargalo. Continue a observar uploads, downloads, cliques Pro e sessões Stripe.";
@@ -2285,8 +2301,11 @@
         document.querySelector("#liveCheckoutLinkEmailClicks").textContent = totals.checkoutLinkEmailClicks || 0;
         document.querySelector("#liveCheckoutLinkEmailFailures").textContent = totals.checkoutLinkEmailFailures || 0;
         document.querySelector("#livePaidSubscriptions").textContent = totals.paidSubscriptions || 0;
+        document.querySelector("#livePackCheckoutSessions").textContent = totals.packCheckoutSessions || 0;
+        document.querySelector("#livePackPurchases").textContent = totals.packPurchases || 0;
+        document.querySelector("#livePackRevenue").textContent = formatCurrency(totals.packRevenue || 0);
         document.querySelector("#liveStripePaidRate").textContent = formatPercent(conversionRate(
-          totals.paidSubscriptions,
+          (totals.paidSubscriptions || 0) + (totals.packPurchases || 0),
           totals.checkoutSessionsCreated,
         ));
         document.querySelector("#liveRevenue").textContent = formatCurrency(totals.revenue || 0);

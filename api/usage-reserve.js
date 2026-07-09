@@ -59,9 +59,10 @@ export default async function handler(request, response) {
     if (monthlyUsed + count > monthlyLimit) {
       return sendJson(response, 409, {
         ok: false,
-        error: "monthly_limit_reached",
+        error: profile.plan === "pack" ? "pack_credits_depleted" : "monthly_limit_reached",
         monthlyLimit,
         monthlyUsed,
+        creditsRemaining: Math.max(monthlyLimit - monthlyUsed, 0),
       });
     }
 

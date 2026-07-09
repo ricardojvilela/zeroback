@@ -518,6 +518,17 @@ h2 {
   background: rgba(81, 215, 198, 0.2);
 }
 
+.billing-actions button[data-checkout-plan^="pack"] {
+  border-color: rgba(117, 168, 255, 0.38);
+  background: rgba(117, 168, 255, 0.16);
+  color: #ffffff;
+}
+
+.billing-actions button[data-checkout-plan^="pack"]:hover:not(:disabled) {
+  border-color: rgba(117, 168, 255, 0.6);
+  background: rgba(117, 168, 255, 0.24);
+}
+
 .billing-actions button[data-checkout-plan="early"] {
   border-color: rgba(81, 215, 198, 0.68);
   background: #ffffff;
@@ -1441,6 +1452,18 @@ h2 {
   border: 1px solid rgba(15, 139, 124, 0.35);
   background: linear-gradient(135deg, var(--accent), var(--blue));
   box-shadow: 0 12px 30px rgba(15, 139, 124, 0.2);
+}
+
+.pro-checkout-actions button[data-checkout-plan^="pack"] {
+  border: 1px solid rgba(38, 70, 216, 0.24);
+  background: rgba(38, 70, 216, 0.08);
+  color: var(--blue-strong);
+}
+
+.pro-checkout-actions button[data-checkout-plan^="pack"]:hover:not(:disabled) {
+  border-color: rgba(38, 70, 216, 0.38);
+  background: rgba(38, 70, 216, 0.13);
+  color: var(--blue-strong);
 }
 
 .pro-checkout-actions button[data-checkout-plan="early"]:hover:not(:disabled) {
@@ -3340,6 +3363,18 @@ progress::-moz-progress-bar {
   outline: 3px solid rgba(15, 139, 124, 0.24);
   outline-offset: 2px;
   box-shadow: 0 0 0 1px rgba(15, 139, 124, 0.28), 0 12px 30px rgba(15, 139, 124, 0.14);
+}
+
+.pricing-plan-actions button[data-pricing-checkout-plan^="pack"] {
+  border-color: rgba(38, 70, 216, 0.24);
+  background: rgba(38, 70, 216, 0.07);
+  color: var(--blue-strong);
+}
+
+.pricing-plan-actions button[data-pricing-checkout-plan^="pack"]:hover:not(:disabled) {
+  border-color: rgba(38, 70, 216, 0.38);
+  background: rgba(38, 70, 216, 0.12);
+  color: var(--blue-strong);
 }
 
 .pricing-plan-actions button[data-pricing-checkout-plan="early"] {

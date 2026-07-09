@@ -1,6 +1,6 @@
 # BatchCutout - revenue maximization operating plan
 
-Updated: 2026-07-08
+Updated: 2026-07-09
 
 ## Objective
 
@@ -12,6 +12,7 @@ Maximize renewable revenue from BatchCutout with autonomous daily execution acro
 - manual prospecting and follow-up;
 - partner/directories distribution;
 - accurate MRR and subscription hygiene.
+- one-time pack revenue as a low-friction bridge to Pro.
 
 Ask Ricardo only when an action needs account approval, spend changes, legal/business judgment, or access that is not available from the project.
 
@@ -34,6 +35,8 @@ Live 14-day funnel snapshot on 2026-07-03:
 - Manual/direct outreach sent: 69 prospects.
 - Demo outreach batch sent on 2026-07-02: 13 prospects.
 - Current real renewable MRR after internal cleanup: 0 EUR.
+- One-time packs were added on 2026-07-09 to test whether free users will pay a
+  smaller first amount before committing to a subscription.
 
 Interpretation:
 
@@ -50,6 +53,7 @@ Interpretation:
 4. Keep Google Ads spend focused on queries that produce uploads/downloads.
 5. Add low-cost directory and partner loops once the conversion path is clean.
 6. Keep internal/test subscriptions out of MRR.
+7. Treat pack purchases as first revenue, then convert repeat pack buyers to Pro.
 
 ## Operating rules
 
