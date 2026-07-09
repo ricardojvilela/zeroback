@@ -37,6 +37,9 @@ Live 14-day funnel snapshot on 2026-07-03:
 - Current real renewable MRR after internal cleanup: 0 EUR.
 - One-time packs were added on 2026-07-09 to test whether free users will pay a
   smaller first amount before committing to a subscription.
+- The highest-intent result-ready and post-download CTAs now point first to the
+  100 image pack at 5 EUR, while still keeping the founder subscription path for
+  recurring production.
 
 Interpretation:
 

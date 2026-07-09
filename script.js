@@ -208,13 +208,13 @@ const baseTranslation = {
   postDownloadThanks: "Obrigado. A sua resposta ajuda-nos a melhorar a ferramenta.",
   postDownloadNextKicker: "Próximo lote",
   postDownloadNextTitle: "Resultado descarregado. Quer repetir isto em mais produtos?",
-  postDownloadNextText: "Se o resultado ficou bom, transforme este teste em produção: plano fundador por 15 EUR/mês, lotes até 100 imagens e 2.000 imagens por mês. Se ainda está a avaliar, receba o link e um checklist curto por email.",
+  postDownloadNextText: "Se o resultado ficou bom, compre o Pack 100 por 5 EUR para tratar um lote real sem subscrição. Se passar a produzir todos os meses, o fundador continua disponível por 15 EUR/mês.",
   postDownloadChecklistLink: "Link direto para voltar à ferramenta",
   postDownloadChecklistPrep: "Checklist para fotos com melhor recorte",
-  postDownloadChecklistPlan: "Resumo do plano fundador se precisar de volume",
-  postDownloadFounderCta: "Criar conta e ativar fundador - 15 EUR/mês",
+  postDownloadChecklistPlan: "Resumo do Pack 100 e do plano fundador se precisar de volume",
+  postDownloadFounderCta: "Comprar Pack 100 - 5 EUR",
   postDownloadSaveLinkCta: "Receber link e checklist",
-  postDownloadNextNote: "Sem cartão no teste grátis. Pagamento seguro por Stripe quando escolher Pro.",
+  postDownloadNextNote: "Sem cartão no teste grátis. Pack único ou Pro pagos por Stripe quando quiser aumentar o lote.",
   leadCaptureKicker: "Link e checklist",
   leadCaptureTitle: "Quer guardar este fluxo para voltar depois?",
   leadCaptureText: "Deixe o email e enviamos o link da ferramenta, um checklist curto para preparar fotos de produto e a opção Pro se precisar de volume.",
@@ -250,15 +250,15 @@ const baseTranslation = {
   proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
   resultReadyKicker: "Resultado pronto",
   resultReadyTitle: "Quer repetir isto em lotes maiores?",
-  downloadReadyHint: "Se o recorte ficou bom, o plano fundador transforma este teste em produção: até 100 imagens por lote, 2.000 por mês e ZIP pronto para loja.",
-  actionsFounderCta: "Ativar Pro 100 fotos",
-  zipProCta: "Criar conta e ativar fundador - 15 EUR/mês",
+  downloadReadyHint: "Se o recorte ficou bom, o Pack 100 transforma este teste num lote real sem subscrição. Para produção recorrente, o fundador mantém 2.000 imagens por mês.",
+  actionsFounderCta: "Comprar Pack 100 - 5 EUR",
+  zipProCta: "Comprar Pack 100 - 5 EUR",
   resultReadySaveLinkCta: "Receber link e checklist",
-  resultReadyMicrocopy: "Sem fidelização. Pagamento seguro por Stripe.",
+  resultReadyMicrocopy: "Compra única disponível. Pagamento seguro por Stripe.",
   resultReadyStickyLabel: "Opções depois do resultado pronto",
   resultReadyStickyKicker: "Resultado pronto",
-  resultReadyStickyText: "Tem mais fotos para tratar? Pro desbloqueia 100 imagens por lote por 15 EUR/mês.",
-  resultReadyStickyProCta: "Ativar fundador",
+  resultReadyStickyText: "Tem mais fotos para tratar? O Pack 100 desbloqueia um lote real por 5 EUR.",
+  resultReadyStickyProCta: "Comprar Pack 100",
   resultReadyStickySaveCta: "Receber link",
   benefitsLabel: "Vantagens do serviço",
   benefitPng: "PNG transparente",
@@ -430,13 +430,13 @@ const translations = {
     postDownloadThanks: "Thanks. This helps us improve the tool.",
     postDownloadNextKicker: "Next batch",
     postDownloadNextTitle: "Result downloaded. Want to repeat this for more products?",
-    postDownloadNextText: "If the result looks good, turn this test into production: founder plan at EUR 15/month, batches up to 100 images, and 2,000 images per month. If you are still evaluating, get the link and a short checklist by email.",
+    postDownloadNextText: "If the result looks good, buy the 100 image pack for EUR 5 to process a real batch without a subscription. If this becomes recurring work, the founder plan remains available at EUR 15/month.",
     postDownloadChecklistLink: "Direct link back to the tool",
     postDownloadChecklistPrep: "Checklist for cleaner product-photo cutouts",
-    postDownloadChecklistPlan: "Founder plan summary if you need volume",
-    postDownloadFounderCta: "Create account and start founder plan - EUR 15/month",
+    postDownloadChecklistPlan: "100 image pack and founder plan summary if you need volume",
+    postDownloadFounderCta: "Buy 100 image pack - EUR 5",
     postDownloadSaveLinkCta: "Get link and checklist",
-    postDownloadNextNote: "No card for the free test. Secure Stripe payment when you choose Pro.",
+    postDownloadNextNote: "No card for the free test. One-time pack or Pro payment happens securely through Stripe when you increase the batch.",
     leadCaptureKicker: "Link and checklist",
     leadCaptureTitle: "Want to save this workflow for later?",
     leadCaptureText: "Leave your email and we will send the tool link, a short product-photo checklist, and the Pro option if you need volume.",
@@ -559,15 +559,15 @@ const translations = {
     batchLimitNotePack: "Pack active: up to {limit} images per batch and {monthlyRemaining} credits remaining.",
     resultReadyKicker: "Result ready",
     resultReadyTitle: "Want to repeat this for larger batches?",
-    downloadReadyHint: "If the cutout looks good, the founder plan turns this test into production: up to 100 images per batch, 2,000 per month, and a store-ready ZIP.",
-    actionsFounderCta: "Start Pro for 100 photos",
-    zipProCta: "Create account and start founder plan - EUR 15/month",
+    downloadReadyHint: "If the cutout looks good, the 100 image pack turns this test into a real batch without a subscription. For recurring production, founder keeps 2,000 images per month.",
+    actionsFounderCta: "Buy 100 image pack - EUR 5",
+    zipProCta: "Buy 100 image pack - EUR 5",
     resultReadySaveLinkCta: "Get link and checklist",
-    resultReadyMicrocopy: "No lock-in. Secure Stripe payment.",
+    resultReadyMicrocopy: "One-time purchase available. Secure Stripe payment.",
     resultReadyStickyLabel: "Options after the result is ready",
     resultReadyStickyKicker: "Result ready",
-    resultReadyStickyText: "Have more photos to process? Pro unlocks 100 images per batch for EUR 15/month.",
-    resultReadyStickyProCta: "Start founder plan",
+    resultReadyStickyText: "Have more photos to process? The 100 image pack unlocks a real batch for EUR 5.",
+    resultReadyStickyProCta: "Buy 100 pack",
     resultReadyStickySaveCta: "Get link",
     eyebrow: "Bulk background removal",
     title: "BatchCutout",
@@ -1047,13 +1047,13 @@ const translatedAddons = {
     postDownloadThanks: "Gracias. Tu respuesta nos ayuda a mejorar la herramienta.",
     postDownloadNextKicker: "Siguiente lote",
     postDownloadNextTitle: "Resultado descargado. ¿Quieres repetir esto en más productos?",
-    postDownloadNextText: "Si el resultado quedó bien, convierte esta prueba en producción: plan fundador por 15 EUR/mes, lotes de hasta 100 imágenes y 2.000 imágenes al mes. Si aún estás evaluando, recibe el enlace y un checklist corto por email.",
+    postDownloadNextText: "Si el resultado quedó bien, compra el Pack 100 por 5 EUR para procesar un lote real sin suscripción. Si pasa a ser trabajo recurrente, el fundador sigue disponible por 15 EUR/mes.",
     postDownloadChecklistLink: "Enlace directo para volver a la herramienta",
     postDownloadChecklistPrep: "Checklist para mejores recortes de producto",
-    postDownloadChecklistPlan: "Resumen del plan fundador si necesitas volumen",
-    postDownloadFounderCta: "Crear cuenta y activar fundador - 15 EUR/mes",
+    postDownloadChecklistPlan: "Resumen del Pack 100 y del plan fundador si necesitas volumen",
+    postDownloadFounderCta: "Comprar Pack 100 - 5 EUR",
     postDownloadSaveLinkCta: "Recibir enlace y checklist",
-    postDownloadNextNote: "Sin tarjeta en la prueba gratis. Pago seguro por Stripe cuando elijas Pro.",
+    postDownloadNextNote: "Sin tarjeta en la prueba gratis. Pack único o Pro se pagan por Stripe cuando quieras aumentar el lote.",
     proInlineTitle: "Convierte esta prueba en producción por 15 EUR/mes",
     proInlineLead: "Ya viste el resultado con fotos reales. El plan fundador desbloquea lotes de hasta 100 imágenes para catálogos, variantes y marketplaces.",
     proInlineBenefits: "Plan fundador 15 EUR/mes. Pro mensual 19 EUR/mes. Anual 190 EUR/año, ahorra 38 EUR frente al mensual.",
@@ -1141,15 +1141,15 @@ const translatedAddons = {
     volumeReasonGeneral: "solicitud de más volumen",
     resultReadyKicker: "Resultado listo",
     resultReadyTitle: "¿Quieres repetir esto en lotes mayores?",
-    downloadReadyHint: "Si el recorte quedó bien, el plan fundador convierte esta prueba en producción: hasta 100 imágenes por lote, 2.000 al mes y ZIP listo para tienda.",
-    actionsFounderCta: "Activar Pro 100 fotos",
-    zipProCta: "Crear cuenta y activar fundador - 15 EUR/mes",
+    downloadReadyHint: "Si el recorte quedó bien, el Pack 100 convierte esta prueba en un lote real sin suscripción. Para producción recurrente, fundador mantiene 2.000 imágenes al mes.",
+    actionsFounderCta: "Comprar Pack 100 - 5 EUR",
+    zipProCta: "Comprar Pack 100 - 5 EUR",
     resultReadySaveLinkCta: "Recibir enlace y checklist",
-    resultReadyMicrocopy: "Sin permanencia. Pago seguro por Stripe.",
+    resultReadyMicrocopy: "Compra única disponible. Pago seguro por Stripe.",
     resultReadyStickyLabel: "Opciones después del resultado listo",
     resultReadyStickyKicker: "Resultado listo",
-    resultReadyStickyText: "¿Tienes más fotos? Pro desbloquea 100 imágenes por lote por 15 EUR/mes.",
-    resultReadyStickyProCta: "Activar fundador",
+    resultReadyStickyText: "¿Tienes más fotos? El Pack 100 desbloquea un lote real por 5 EUR.",
+    resultReadyStickyProCta: "Comprar Pack 100",
     resultReadyStickySaveCta: "Recibir enlace",
     proLimitLeadText: "¿Todavía estás evaluando? Recibe el enlace, el checklist y el plan fundador para volver a este lote sin perder contexto.",
     proLimitLeadSubmit: "Recibir enlace del lote",
@@ -1310,10 +1310,10 @@ const proTranslations = {
     proInlineError: "Não foi possível enviar automaticamente. Vamos abrir uma mensagem de email.",
     resultReadyKicker: "Resultado pronto",
     resultReadyTitle: "Quer repetir isto em lotes maiores?",
-    downloadReadyHint: "Se o recorte ficou bom, o plano fundador transforma este teste em produção: até 100 imagens por lote, 2.000 por mês e ZIP pronto para loja.",
-    zipProCta: "Criar conta e ativar fundador - 15 EUR/mês",
+    downloadReadyHint: "Se o recorte ficou bom, o Pack 100 transforma este teste num lote real sem subscrição. Para produção recorrente, o fundador mantém 2.000 imagens por mês.",
+    zipProCta: "Comprar Pack 100 - 5 EUR",
     resultReadySaveLinkCta: "Receber link e checklist",
-    resultReadyMicrocopy: "Sem fidelização. Pagamento seguro por Stripe.",
+    resultReadyMicrocopy: "Compra única disponível. Pagamento seguro por Stripe.",
     emptyTitle: "Os seus PNGs transparentes aparecem aqui",
     emptyState: "Depois pode descarregar uma imagem ou exportar tudo em ZIP.",
     demoLabel: "Exemplo antes e depois",
@@ -1370,10 +1370,10 @@ const proTranslations = {
     proInlineError: "We could not submit automatically. Opening an email draft instead.",
     resultReadyKicker: "Result ready",
     resultReadyTitle: "Want to repeat this for larger batches?",
-    downloadReadyHint: "If the cutout looks good, the founder plan turns this test into production: up to 100 images per batch, 2,000 per month, and a store-ready ZIP.",
-    zipProCta: "Create account and start founder plan - EUR 15/month",
+    downloadReadyHint: "If the cutout looks good, the 100 image pack turns this test into a real batch without a subscription. For recurring production, founder keeps 2,000 images per month.",
+    zipProCta: "Buy 100 image pack - EUR 5",
     resultReadySaveLinkCta: "Get link and checklist",
-    resultReadyMicrocopy: "No lock-in. Secure Stripe payment.",
+    resultReadyMicrocopy: "One-time purchase available. Secure Stripe payment.",
     emptyTitle: "Your transparent PNGs appear here",
     emptyState: "Then download one image or export everything as a ZIP.",
     demoLabel: "Before and after example",
@@ -2757,8 +2757,9 @@ async function startCheckout(plan = defaultCheckoutPlan, triggerButton = null) {
     trackEvent("pro_checkout_started", {
       plan: selectedPlan,
       label: data.label || selectedPlan,
-      value: selectedPlan === "annual" ? 190 : selectedPlan === "early" ? 15 : 19,
+      value: checkoutValueForPlan(selectedPlan),
       currency: "EUR",
+      purchase_type: selectedPlan === "pack100" || selectedPlan === "pack250" ? "pack" : "subscription",
     });
     setKnownGoogleUserData();
     trackBeginCheckout(selectedPlan, "app");
@@ -3731,7 +3732,9 @@ zipButton.addEventListener("click", downloadZip);
 actionsFounderCta?.addEventListener("click", () => {
   const readyCount = items.filter((item) => item.outputBlob).length;
   const detail = {
-    reason: "actions_result_ready",
+    reason: "actions_result_ready_pack",
+    plan: "pack100",
+    purchase_type: "pack",
     downloadType: readyCount > 1 ? "zip_available" : "png_available",
     count: readyCount,
     totalInQueue: items.length,
@@ -3739,7 +3742,7 @@ actionsFounderCta?.addEventListener("click", () => {
   };
   trackEvent("post_download_founder_clicked", detail);
   trackEvent("tool_pro_clicked", detail);
-  startCheckout("early", actionsFounderCta);
+  startCheckout("pack100", actionsFounderCta);
 });
 clearButton.addEventListener("click", clearAll);
 proPromptButton.addEventListener("click", () => showProInterest("status_limit_cta"));
@@ -3764,7 +3767,9 @@ inlineProCta.addEventListener("click", () => showProInterest("inline_pro_cta"));
 zipProCta?.addEventListener("click", () => {
   const readyCount = items.filter((item) => item.outputBlob).length;
   const detail = {
-    reason: "download_ready_founder",
+    reason: "download_ready_pack",
+    plan: "pack100",
+    purchase_type: "pack",
     downloadType: readyCount > 1 ? "zip_available" : "png_available",
     count: readyCount,
     totalInQueue: items.length,
@@ -3772,12 +3777,14 @@ zipProCta?.addEventListener("click", () => {
   };
   trackEvent("post_download_founder_clicked", detail);
   trackEvent("tool_pro_clicked", detail);
-  startCheckout("early", zipProCta);
+  startCheckout("pack100", zipProCta);
 });
 resultReadyStickyPro?.addEventListener("click", () => {
   const readyCount = items.filter((item) => item.outputBlob).length;
   const detail = {
     reason: "result_ready_sticky",
+    plan: "pack100",
+    purchase_type: "pack",
     downloadType: readyCount > 1 ? "zip_available" : "png_available",
     count: readyCount,
     totalInQueue: items.length,
@@ -3785,13 +3792,15 @@ resultReadyStickyPro?.addEventListener("click", () => {
   };
   trackEvent("post_download_founder_clicked", detail);
   trackEvent("tool_pro_clicked", detail);
-  startCheckout("early", resultReadyStickyPro);
+  startCheckout("pack100", resultReadyStickyPro);
 });
 postDownloadFounderCta?.addEventListener("click", () => {
   const downloadType = postDownloadNextPanel?.dataset.downloadType || "unknown";
   const count = Number(postDownloadNextPanel?.dataset.downloadCount || 0) || 0;
   const detail = {
-    reason: "post_download_next_founder",
+    reason: "post_download_next_pack",
+    plan: "pack100",
+    purchase_type: "pack",
     downloadType,
     count,
     totalInQueue: items.length,
@@ -3799,7 +3808,7 @@ postDownloadFounderCta?.addEventListener("click", () => {
   };
   trackEvent("post_download_founder_clicked", detail);
   trackEvent("tool_pro_clicked", detail);
-  startCheckout("early", postDownloadFounderCta);
+  startCheckout("pack100", postDownloadFounderCta);
 });
 resultReadySaveLinkCta?.addEventListener("click", () => focusResultReadyLeadCapture());
 resultReadyStickyLead?.addEventListener("click", () => focusResultReadyLeadCapture("result_ready_sticky"));

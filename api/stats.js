@@ -583,7 +583,7 @@ export default async function handler(request, response) {
             row.resultReadyStickyFounderClicks += 1;
             sourceRow.resultReadyStickyFounderClicks += 1;
           }
-          if (detail.reason === "actions_result_ready") {
+          if (detail.reason === "actions_result_ready" || detail.reason === "actions_result_ready_pack") {
             row.resultActionFounderClicks += 1;
             sourceRow.resultActionFounderClicks += 1;
           }

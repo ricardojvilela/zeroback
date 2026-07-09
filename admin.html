@@ -823,11 +823,11 @@
             <strong id="livePostDownloadNext">0</strong>
           </article>
           <article class="live-card">
-            <span>Fundador pós-download</span>
+            <span>CTA pago pós-download</span>
             <strong id="livePostDownloadFounder">0</strong>
           </article>
           <article class="live-card">
-            <span>Fundador ações resultado</span>
+            <span>CTA pago ações resultado</span>
             <strong id="liveResultActionFounder">0</strong>
           </article>
           <article class="live-card">
@@ -843,7 +843,7 @@
             <strong id="liveResultReadyStickyShown">0</strong>
           </article>
           <article class="live-card">
-            <span>Fundador barra</span>
+            <span>CTA pago barra</span>
             <strong id="liveResultReadyStickyFounder">0</strong>
           </article>
           <article class="live-card">
@@ -1680,7 +1680,7 @@
             className: "success",
             title: "Há leads captados para transformar em conversa.",
             summary,
-            action: "Ação: responder/acompanhar leads hoje com foco em lote real, volume e ativação do fundador.",
+            action: "Ação: responder/acompanhar leads hoje com foco em lote real, Pack 100 e plano fundador quando houver recorrência.",
           };
         }
 
@@ -1720,7 +1720,7 @@
             className: "warning",
             title: "Há downloads, mas não há intenção Pro ou lead.",
             summary,
-            action: "Ação: rever CTA pós-resultado e proposta do fundador no momento imediatamente antes/depois do download.",
+            action: "Ação: rever CTA pós-resultado e proposta de Pack 100 no momento imediatamente antes/depois do download.",
           };
         }
 
@@ -1842,7 +1842,7 @@
         }
 
         if (downloads >= 10 && resultUpgradeClicks === 0 && leadCaptures === 0) {
-          return "Gargalo principal: os utilizadores chegam ao download, mas ainda não clicam no plano fundador nem deixam email. Prioridade: reforçar o bloco de resultado pronto e medir se gera cliques nos próximos dados.";
+          return "Gargalo principal: os utilizadores chegam ao download, mas ainda não clicam no Pack 100 nem deixam email. Prioridade: reforçar o bloco de resultado pronto e medir se gera cliques nos próximos dados.";
         }
 
         if (resultReady >= 10 && resultActionFounderClicks === 0 && checkoutSessions === 0) {
@@ -1850,7 +1850,7 @@
         }
 
         if (stickyShown >= 10 && stickyDecisions === 0) {
-          return "Gargalo principal: a barra fixa pós-resultado aparece, mas ainda não gera cliques no fundador nem pedidos de link. Prioridade: testar texto/oferta da barra antes de aumentar tráfego pago.";
+          return "Gargalo principal: a barra fixa pós-resultado aparece, mas ainda não gera cliques no Pack 100 nem pedidos de link. Prioridade: testar texto/oferta da barra antes de aumentar tráfego pago.";
         }
 
         if (resultReady >= 10 && conversionRate(resultUpgradeClicks, resultReady) < 0.06) {
