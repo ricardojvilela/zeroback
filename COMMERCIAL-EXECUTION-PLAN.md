@@ -214,6 +214,12 @@ Decision rules:
 - Updated the CSV with `sent_2026-07-09`, follow-up date `2026-07-14` and Resend IDs.
 - Do not send more direct outreach on 2026-07-09.
 
+## Executed growth work - support reply workflow
+
+- Added quick reply templates to the `/admin` support mailbox for interested prospects, pricing/limits, privacy/payment, fit qualification, opt-out and free response handling.
+- Templates point interested replies to the 2-image free test first and then to the founder checkout, keeping support responses aligned with the current commercial funnel.
+- No extra outreach was sent from this update.
+
 ## Executed growth work - demo video
 
 - Added horizontal and vertical silent demo videos under `assets/video/`.

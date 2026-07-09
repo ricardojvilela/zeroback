@@ -555,9 +555,32 @@
         border-radius: 8px;
         padding: 9px 10px;
         background: #fff;
-        color: var(--text);
+        color: var(--ink);
         font: inherit;
         font-weight: 800;
+      }
+
+      .support-actions {
+        display: grid;
+        min-width: 210px;
+        gap: 8px;
+      }
+
+      .support-template-select {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 9px 10px;
+        background: #fff;
+        color: var(--ink);
+        font: inherit;
+        font-weight: 800;
+      }
+
+      .support-action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
       }
 
       th,
@@ -2640,6 +2663,20 @@
         return /^re:/i.test(value) ? value : `Re: ${value || "BatchCutout support"}`;
       }
 
+      function supportReplyTemplate(kind) {
+        const toolUrl = "https://batchcutout.com/?lang=en&utm_source=support_email&utm_medium=reply&utm_campaign=support_reply#tool";
+        const pricingUrl = "https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=support_email&utm_medium=reply&utm_campaign=support_reply#pricing-account-title";
+        const templates = {
+          positive: `Hi,\n\nThanks for replying.\n\nThe fastest way to check if BatchCutout fits your product photos is to test 2 representative images here:\n${toolUrl}\n\nNo account or card is needed for the free test. If the result works for your catalog, the founder plan unlocks up to 100 images per batch and 2,000 images per month:\n${pricingUrl}\n\nIf anything blocks the test, reply here and I will help.\n\nThanks,\nRicardo\nNexaFlow Labs`,
+          price: `Hi,\n\nThanks for asking.\n\nThe current founder plan is 15 EUR/month and includes:\n\n- Up to 100 images per batch\n- Up to 2,000 images per month\n- Transparent PNG export\n- One ZIP download for batches\n\nYou can test 2 images free before paying:\n${toolUrl}\n\nFounder plan:\n${pricingUrl}\n\nThanks,\nRicardo\nNexaFlow Labs`,
+          privacy: `Hi,\n\nThanks for asking.\n\nBatchCutout is built for a simple product-photo workflow: upload images, remove backgrounds, review the result, then download transparent PNGs or one ZIP.\n\nThe free test does not require a card. Payments, if you choose Pro, are handled through Stripe.\n\nYou can test 2 images here:\n${toolUrl}\n\nThanks,\nRicardo\nNexaFlow Labs`,
+          fit: `Hi,\n\nThanks for replying.\n\nBatchCutout is most useful when you regularly prepare product photos for listings, marketplaces, supplier images or catalog updates. It is focused on repeat cutouts, transparent PNGs and ZIP export, not full design editing.\n\nYou can test 2 images free here:\n${toolUrl}\n\nIf the result fits your workflow, the founder plan is here:\n${pricingUrl}\n\nThanks,\nRicardo\nNexaFlow Labs`,
+          optout: `Hi,\n\nThanks for letting me know.\n\nI will not contact you again about BatchCutout.\n\nRegards,\nRicardo\nNexaFlow Labs`,
+          default: "Hi,\n\nThanks for contacting BatchCutout.\n\n",
+        };
+        return templates[kind] || templates.default;
+      }
+
       function renderSupportMailbox(data) {
         const summary = data.summary || {};
         document.querySelector("#supportTotal").textContent = summary.total || 0;
@@ -2653,7 +2690,7 @@
               const fromEmail = String(message.from || "").match(/[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9.-]+\.[a-z]{2,}/i)?.[0] || "";
               const statusLabel = message.replied ? "Respondido" : message.resolved ? "Resolvido" : "Por responder";
               const statusClass = message.closed ? "success" : "warning";
-              const replyButton = fromEmail
+              const replyButton = fromEmail && !message.closed
                 ? `<button
                     class="secondary"
                     type="button"
@@ -2671,6 +2708,19 @@
                     data-support-action="resolve"
                     data-support-email-id="${escapeHtml(message.emailId || "")}"
                   >Resolver</button>`;
+              const supportActions = fromEmail && !message.closed
+                ? `<div class="support-actions">
+                    <select class="support-template-select" data-support-template aria-label="Template de resposta">
+                      <option value="positive">Interessado / testar</option>
+                      <option value="price">Preço e limites</option>
+                      <option value="privacy">Privacidade / pagamento</option>
+                      <option value="fit">Quando faz sentido</option>
+                      <option value="optout">Não contactar</option>
+                      <option value="default">Resposta livre</option>
+                    </select>
+                    <div class="support-action-buttons">${replyButton}${resolveButton}</div>
+                  </div>`
+                : `<div class="table-actions">${resolveButton}</div>`;
               return `
                 <tr>
                   <td>${message.receivedAt ? new Date(message.receivedAt).toLocaleString("pt-PT") : "-"}</td>
@@ -2678,7 +2728,7 @@
                   <td>${escapeHtml(message.subject || "-")}</td>
                   <td>${escapeHtml(message.preview || "-")}${message.hasAttachments ? `<span class="muted-small">${message.attachmentCount} anexo(s)</span>` : ""}</td>
                   <td><span class="pill ${statusClass}">${statusLabel}</span></td>
-                  <td><div class="table-actions">${replyButton}${resolveButton}</div></td>
+                  <td>${supportActions}</td>
                 </tr>
               `;
             }).join("")
@@ -3330,7 +3380,8 @@
         const subject = button.dataset.supportSubject;
         if (!to || !subject) return;
 
-        const text = prompt(`Resposta para ${to}`, "Hi,\n\nThanks for contacting BatchCutout.\n\n");
+        const selectedTemplate = button.closest(".support-actions")?.querySelector("[data-support-template]")?.value || "default";
+        const text = prompt(`Resposta para ${to}`, supportReplyTemplate(selectedTemplate));
         if (!text || !text.trim()) return;
         if (!confirm(`Enviar resposta de support@batchcutout.com para ${to}?`)) return;
 
