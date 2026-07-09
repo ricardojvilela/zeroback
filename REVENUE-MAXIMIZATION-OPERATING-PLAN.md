@@ -208,3 +208,4 @@ Interpretation:
 - `/admin` support replies now include ready templates for interested prospects, pricing/limits, privacy/payment, fit qualification and opt-outs, reducing response time when outreach replies arrive and keeping warm leads pointed to the free test plus founder checkout path.
 - Lead autoreplies, manual recovery templates, support replies and outreach copy now lead with the 5 EUR Pack 100 as the first paid step, keeping Pro as the recurring-volume option instead of the first ask.
 - The main app's over-limit and inline upgrade prompts now also lead with Pack 100, and the homepage pricing link/default visible paid prompt opens the pack checkout instead of the founder subscription.
+- The pricing page now leads with Pack 100 across hero, recommended plan, calculator and default checkout selection, while founder/Pro is positioned as the recurring-production option.
