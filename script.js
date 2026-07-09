@@ -65,6 +65,9 @@ const accountBadge = document.querySelector("#accountBadge");
 const accountStatus = document.querySelector("#accountStatus");
 const accountCheckoutGuide = document.querySelector("#accountCheckoutGuide");
 const accountCheckoutProof = document.querySelector("#accountCheckoutProof");
+const accountCheckoutProofPrice = document.querySelector("[data-account-proof='price']");
+const accountCheckoutProofVolume = document.querySelector("[data-account-proof='volume']");
+const accountCheckoutProofTerms = document.querySelector("[data-account-proof='terms']");
 const accountUsage = document.querySelector("#accountUsage");
 const accountUsageCount = document.querySelector("#accountUsageCount");
 const accountUsageBar = document.querySelector("#accountUsageBar");
@@ -277,6 +280,8 @@ const baseTranslation = {
   accountBadgePack: "Pack",
   accountStatusGuest: "Crie uma conta grátis para ligar o acesso pago ao seu email, ou entre para gerir o acesso.",
   accountStatusCheckoutPending: "Plano escolhido: {plan}. Crie uma conta grátis com email e password; depois abrimos o Stripe para pagar.",
+  accountStatusCheckoutPendingPack: "{plan}: compra única, sem subscrição. Crie conta para guardar os créditos no seu email; depois abrimos o Stripe.",
+  accountStatusCheckoutPendingSubscription: "{plan}: acesso recorrente para produção mensal. Crie conta para ligar a subscrição ao seu email; depois abrimos o Stripe.",
   accountCheckoutGuideLabel: "Passos para ativar acesso",
   accountCheckoutGuideAccount: "Crie conta ou entre",
   accountCheckoutGuideStripe: "Pagamento Stripe",
@@ -285,6 +290,12 @@ const baseTranslation = {
   accountCheckoutProofPrice: "Pack desde 5 EUR ou Pro recorrente",
   accountCheckoutProofBatch: "100 imagens por lote",
   accountCheckoutProofStripe: "Pagamento só no Stripe",
+  accountCheckoutProofPackPrice: "Compra única: {plan}",
+  accountCheckoutProofPackVolume: "{credits} créditos de imagem incluídos",
+  accountCheckoutProofPackTerms: "Sem renovação automática. Paga uma vez no Stripe.",
+  accountCheckoutProofSubscriptionPrice: "Subscrição: {plan}",
+  accountCheckoutProofSubscriptionVolume: "Até 100 imagens por lote e 2.000 por mês",
+  accountCheckoutProofSubscriptionTerms: "Gestão e cancelamento pelo portal Stripe.",
   accountStatusLoading: "A verificar a sua conta...",
   accountStatusFree: "Conta gratuita. O Pack 100 ativa lotes até 100 imagens; Pro fica para volume mensal.",
   accountStatusPro: "Conta Pro ativa. Até {batchLimit} imagens por lote e {monthlyRemaining} de {monthlyLimit} disponíveis este mês.",
@@ -484,6 +495,8 @@ const translations = {
     accountBadgePack: "Pack",
     accountStatusGuest: "Create a free account to connect paid access to your email, or sign in to manage access.",
     accountStatusCheckoutPending: "Selected plan: {plan}. Create a free account with email and password; then we open Stripe for payment.",
+    accountStatusCheckoutPendingPack: "{plan}: one-time purchase, no subscription. Create an account to save the credits to your email; then we open Stripe.",
+    accountStatusCheckoutPendingSubscription: "{plan}: recurring access for monthly production. Create an account to connect the subscription to your email; then we open Stripe.",
     accountCheckoutGuideLabel: "Steps to activate access",
     accountCheckoutGuideAccount: "Create account or sign in",
     accountCheckoutGuideStripe: "Stripe payment",
@@ -492,6 +505,12 @@ const translations = {
     accountCheckoutProofPrice: "Pack from EUR 5 or recurring Pro",
     accountCheckoutProofBatch: "100 images per batch",
     accountCheckoutProofStripe: "Payment only on Stripe",
+    accountCheckoutProofPackPrice: "One-time purchase: {plan}",
+    accountCheckoutProofPackVolume: "{credits} image credits included",
+    accountCheckoutProofPackTerms: "No automatic renewal. Pay once on Stripe.",
+    accountCheckoutProofSubscriptionPrice: "Subscription: {plan}",
+    accountCheckoutProofSubscriptionVolume: "Up to 100 images per batch and 2,000/month",
+    accountCheckoutProofSubscriptionTerms: "Manage and cancel through the Stripe portal.",
     accountStatusLoading: "Checking your account...",
     accountStatusFree: "Free account. Pack 100 activates batches up to 100 images; Pro is there for monthly volume.",
     accountStatusPro: "Pro account active. Up to {batchLimit} images per batch and {monthlyRemaining} of {monthlyLimit} available this month.",
@@ -1074,6 +1093,8 @@ const translatedAddons = {
     accountBadgePack: "Pack",
     accountStatusGuest: "Crea una cuenta gratis para conectar el acceso de pago con tu email, o entra para gestionar el acceso.",
     accountStatusCheckoutPending: "Plan elegido: {plan}. Crea una cuenta gratis con email y contraseña; después abrimos Stripe para pagar.",
+    accountStatusCheckoutPendingPack: "{plan}: compra única, sin suscripción. Crea una cuenta para guardar los créditos en tu email; después abrimos Stripe.",
+    accountStatusCheckoutPendingSubscription: "{plan}: acceso recurrente para producción mensual. Crea una cuenta para conectar la suscripción a tu email; después abrimos Stripe.",
     accountUsageTitle: "Uso mensual",
     accountUsageTitlePack: "Créditos del pack",
     accountUsageCount: "{used} de {limit} imágenes usadas",
@@ -1089,6 +1110,12 @@ const translatedAddons = {
     accountCheckoutProofPrice: "Pack desde 5 EUR o Pro recurrente",
     accountCheckoutProofBatch: "100 imágenes por lote",
     accountCheckoutProofStripe: "Pago solo en Stripe",
+    accountCheckoutProofPackPrice: "Compra única: {plan}",
+    accountCheckoutProofPackVolume: "{credits} créditos de imagen incluidos",
+    accountCheckoutProofPackTerms: "Sin renovación automática. Pagas una vez en Stripe.",
+    accountCheckoutProofSubscriptionPrice: "Suscripción: {plan}",
+    accountCheckoutProofSubscriptionVolume: "Hasta 100 imágenes por lote y 2.000 al mes",
+    accountCheckoutProofSubscriptionTerms: "Gestión y cancelación desde el portal de Stripe.",
     accountStatusLoading: "Verificando tu cuenta...",
     accountStatusFree: "Cuenta gratuita. Pack 100 activa lotes de hasta 100 imagenes; Pro queda para volumen mensual.",
     accountStatusPro: "Cuenta Pro activa. Hasta {batchLimit} imágenes por lote y {monthlyRemaining} de {monthlyLimit} disponibles este mes.",
@@ -2200,6 +2227,37 @@ function checkoutPlanDisplayName(plan) {
   return t(checkoutPlanLabelKey(plan));
 }
 
+function checkoutPlanIsPack(plan) {
+  return plan === "pack100" || plan === "pack250";
+}
+
+function checkoutPlanCredits(plan) {
+  if (plan === "pack250") return 250;
+  if (plan === "pack100") return 100;
+  return 0;
+}
+
+function updateAccountCheckoutProof(plan = "", planName = "") {
+  if (!accountCheckoutProofPrice || !accountCheckoutProofVolume || !accountCheckoutProofTerms) return;
+  if (!checkoutPlans.has(plan || "") || !planName) {
+    accountCheckoutProofPrice.textContent = t("accountCheckoutProofPrice");
+    accountCheckoutProofVolume.textContent = t("accountCheckoutProofBatch");
+    accountCheckoutProofTerms.textContent = t("accountCheckoutProofStripe");
+    return;
+  }
+
+  if (checkoutPlanIsPack(plan)) {
+    accountCheckoutProofPrice.textContent = t("accountCheckoutProofPackPrice", { plan: planName });
+    accountCheckoutProofVolume.textContent = t("accountCheckoutProofPackVolume", { credits: checkoutPlanCredits(plan) });
+    accountCheckoutProofTerms.textContent = t("accountCheckoutProofPackTerms");
+    return;
+  }
+
+  accountCheckoutProofPrice.textContent = t("accountCheckoutProofSubscriptionPrice", { plan: planName });
+  accountCheckoutProofVolume.textContent = t("accountCheckoutProofSubscriptionVolume");
+  accountCheckoutProofTerms.textContent = t("accountCheckoutProofSubscriptionTerms");
+}
+
 function syncAccountAuthButtons() {
   const waitingPlan = checkoutPlanWaitingForAuth();
   const createKey = waitingPlan ? "accountCreateCheckout" : "accountCreate";
@@ -2318,6 +2376,7 @@ function updateAccountUi() {
     accountPanel.classList.remove("has-pending-checkout");
     accountCheckoutGuide?.classList.add("hidden");
     accountCheckoutProof?.classList.add("hidden");
+    updateAccountCheckoutProof();
     prefillAccountEmail();
     accountForm?.classList.remove("hidden");
     accountCheckoutLink?.classList.add("hidden");
@@ -2335,15 +2394,19 @@ function updateAccountUi() {
   if (!currentAccount) {
     const waitingPlan = checkoutPlanWaitingForAuth();
     const waitingPlanName = checkoutPlanDisplayName(waitingPlan);
+    const waitingStatusKey = checkoutPlanIsPack(waitingPlan)
+      ? "accountStatusCheckoutPendingPack"
+      : "accountStatusCheckoutPendingSubscription";
 
     accountPanel.classList.toggle("has-pending-checkout", Boolean(waitingPlanName));
     accountCheckoutGuide?.classList.toggle("hidden", !waitingPlanName);
     accountCheckoutProof?.classList.toggle("hidden", !waitingPlanName);
+    updateAccountCheckoutProof(waitingPlan, waitingPlanName);
     accountCheckoutLink?.classList.toggle("hidden", !waitingPlanName || Boolean(getCapturedLeadEmail()));
     if (waitingPlanName) trackAccountCheckoutPanelShown(waitingPlan);
     accountBadge.textContent = waitingPlanName ? t("accountBadgeCheckout") : t("accountBadgeGuest");
     accountStatus.textContent = waitingPlanName
-      ? t("accountStatusCheckoutPending", { plan: waitingPlanName })
+      ? t(waitingStatusKey, { plan: waitingPlanName })
       : t("accountStatusGuest");
     prefillAccountEmail();
     accountForm?.classList.remove("hidden");
@@ -2375,6 +2438,7 @@ function updateAccountUi() {
   accountPanel.classList.remove("has-pending-checkout");
   accountCheckoutGuide?.classList.add("hidden");
   accountCheckoutProof?.classList.add("hidden");
+  updateAccountCheckoutProof();
   accountCheckoutLink?.classList.add("hidden");
   accountForm?.classList.add("hidden");
   accountActions?.classList.remove("hidden");

@@ -411,6 +411,11 @@
             Use o seu email para criar conta ou entrar. Depois abrimos o Stripe Checkout automaticamente.
           </p>
           <p class="pricing-selected-plan" id="pricingSelectedPlan" aria-live="polite"></p>
+          <div class="pricing-selected-proof" id="pricingSelectedProof" aria-label="Resumo do plano selecionado" data-i18n-aria="selectedProofLabel">
+            <span data-pricing-proof="price">Compra única: Pack 100 imagens - 5 EUR</span>
+            <span data-pricing-proof="volume">100 créditos de imagem incluídos</span>
+            <span data-pricing-proof="terms">Sem renovação automática. Paga uma vez no Stripe.</span>
+          </div>
           <form class="pricing-auth-form" id="pricingAccountForm" novalidate>
             <input
               id="pricingAccountEmail"
@@ -594,11 +599,20 @@
           checkoutBadgePack: "Pack ativo",
           checkoutStatusGuest: "Use o seu email para criar uma conta grátis. Se já tiver conta, entre e abrimos o Stripe Checkout.",
           checkoutStatusSelected: "Plano escolhido: {plan}. Crie uma conta grátis; depois abrimos o Stripe para pagar.",
+          checkoutStatusSelectedPack: "{plan}: compra única, sem subscrição. Crie conta para guardar os créditos no seu email; depois abrimos o Stripe.",
+          checkoutStatusSelectedSubscription: "{plan}: acesso recorrente para produção mensal. Crie conta para ligar a subscrição ao seu email; depois abrimos o Stripe.",
           checkoutStatusReady: "Conta validada. Escolha o plano para abrir o pagamento seguro no Stripe.",
           checkoutStatusPro: "Esta conta já tem Pro ativo. Volte à ferramenta para processar até {batchLimit} imagens por lote.",
           checkoutStatusPack: "Esta conta tem um pack ativo. Restam {remaining} créditos e pode comprar outro pack ou passar para Pro.",
           checkoutStatusChoosePlan: "Plano selecionado. Crie uma conta grátis para abrir o pagamento ou entre se já tiver conta.",
           selectedPlanPrefix: "Plano selecionado",
+          selectedProofLabel: "Resumo do plano selecionado",
+          selectedProofPackPrice: "Compra única: {plan}",
+          selectedProofPackVolume: "{credits} créditos de imagem incluídos",
+          selectedProofPackTerms: "Sem renovação automática. Paga uma vez no Stripe.",
+          selectedProofSubscriptionPrice: "Subscrição: {plan}",
+          selectedProofSubscriptionVolume: "Até 100 imagens por lote e 2.000 por mês",
+          selectedProofSubscriptionTerms: "Gestão e cancelamento pelo portal Stripe.",
           checkoutEmailPlaceholder: "O seu email",
           checkoutPasswordPlaceholder: "Password (mín. 6 caracteres)",
           passwordShow: "Mostrar",
@@ -751,11 +765,20 @@
           checkoutBadgePack: "Pack active",
           checkoutStatusGuest: "Use your email to create a free account. If you already have one, sign in and we open Stripe Checkout.",
           checkoutStatusSelected: "Selected plan: {plan}. Create a free account; then we open Stripe for payment.",
+          checkoutStatusSelectedPack: "{plan}: one-time purchase, no subscription. Create an account to save the credits to your email; then we open Stripe.",
+          checkoutStatusSelectedSubscription: "{plan}: recurring access for monthly production. Create an account to connect the subscription to your email; then we open Stripe.",
           checkoutStatusReady: "Account verified. Choose a plan to open secure Stripe payment.",
           checkoutStatusPro: "This account already has Pro active. Return to the tool to process up to {batchLimit} images per batch.",
           checkoutStatusPack: "This account has an active pack. {remaining} credits remain; you can buy another pack or move to Pro.",
           checkoutStatusChoosePlan: "Plan selected. Create a free account to open payment, or sign in if you already have one.",
           selectedPlanPrefix: "Selected plan",
+          selectedProofLabel: "Selected plan summary",
+          selectedProofPackPrice: "One-time purchase: {plan}",
+          selectedProofPackVolume: "{credits} image credits included",
+          selectedProofPackTerms: "No automatic renewal. Pay once on Stripe.",
+          selectedProofSubscriptionPrice: "Subscription: {plan}",
+          selectedProofSubscriptionVolume: "Up to 100 images per batch and 2,000/month",
+          selectedProofSubscriptionTerms: "Manage and cancel through the Stripe portal.",
           checkoutEmailPlaceholder: "Your email",
           checkoutPasswordPlaceholder: "Password (min. 6 characters)",
           passwordShow: "Show",
@@ -908,11 +931,20 @@
           checkoutBadgePack: "Pack activo",
           checkoutStatusGuest: "Usa tu email para crear una cuenta gratis. Si ya tienes una, entra y abrimos Stripe Checkout.",
           checkoutStatusSelected: "Plan elegido: {plan}. Crea una cuenta gratis; después abrimos Stripe para pagar.",
+          checkoutStatusSelectedPack: "{plan}: compra única, sin suscripción. Crea una cuenta para guardar los créditos en tu email; después abrimos Stripe.",
+          checkoutStatusSelectedSubscription: "{plan}: acceso recurrente para producción mensual. Crea una cuenta para conectar la suscripción a tu email; después abrimos Stripe.",
           checkoutStatusReady: "Cuenta validada. Elige el plan para abrir el pago seguro en Stripe.",
           checkoutStatusPro: "Esta cuenta ya tiene Pro activo. Vuelve a la herramienta para procesar hasta {batchLimit} imágenes por lote.",
           checkoutStatusPack: "Esta cuenta tiene un pack activo. Quedan {remaining} créditos; puedes comprar otro pack o pasar a Pro.",
           checkoutStatusChoosePlan: "Plan seleccionado. Crea una cuenta gratis para abrir el pago o entra si ya tienes una.",
           selectedPlanPrefix: "Plan seleccionado",
+          selectedProofLabel: "Resumen del plan seleccionado",
+          selectedProofPackPrice: "Compra única: {plan}",
+          selectedProofPackVolume: "{credits} créditos de imagen incluidos",
+          selectedProofPackTerms: "Sin renovación automática. Pagas una vez en Stripe.",
+          selectedProofSubscriptionPrice: "Suscripción: {plan}",
+          selectedProofSubscriptionVolume: "Hasta 100 imágenes por lote y 2.000 al mes",
+          selectedProofSubscriptionTerms: "Gestión y cancelación desde el portal de Stripe.",
           checkoutEmailPlaceholder: "Tu email",
           checkoutPasswordPlaceholder: "Contraseña (mín. 6 caracteres)",
           passwordShow: "Mostrar",
@@ -1397,6 +1429,10 @@
       const pricingAccountStatus = document.querySelector("#pricingAccountStatus");
       const pricingAccountBadge = document.querySelector("#pricingAccountBadge");
       const pricingSelectedPlan = document.querySelector("#pricingSelectedPlan");
+      const pricingSelectedProof = document.querySelector("#pricingSelectedProof");
+      const pricingSelectedProofPrice = document.querySelector("[data-pricing-proof='price']");
+      const pricingSelectedProofVolume = document.querySelector("[data-pricing-proof='volume']");
+      const pricingSelectedProofTerms = document.querySelector("[data-pricing-proof='terms']");
       const pricingCheckoutActions = document.querySelector("#pricingCheckoutActions");
       const pricingHeroActions = document.querySelector(".pricing-copy .landing-actions");
       const pricingFreeTestNote = document.querySelector(".pricing-free-test-note");
@@ -1718,6 +1754,38 @@
         return 19;
       }
 
+      function pricingPlanIsPack(plan) {
+        return plan === "pack100" || plan === "pack250";
+      }
+
+      function pricingPlanCredits(plan) {
+        if (plan === "pack250") return 250;
+        if (plan === "pack100") return 100;
+        return 0;
+      }
+
+      function pricingSelectedStatusKey(plan) {
+        return pricingPlanIsPack(plan) ? "checkoutStatusSelectedPack" : "checkoutStatusSelectedSubscription";
+      }
+
+      function updatePricingSelectedProof() {
+        if (!pricingSelectedProof || !pricingSelectedProofPrice || !pricingSelectedProofVolume || !pricingSelectedProofTerms) return;
+        const selectedLabel = pricingPlanLabel(selectedPricingPlan);
+        pricingSelectedProof.classList.toggle("is-pack", pricingPlanIsPack(selectedPricingPlan));
+        pricingSelectedProof.classList.toggle("is-subscription", !pricingPlanIsPack(selectedPricingPlan));
+
+        if (pricingPlanIsPack(selectedPricingPlan)) {
+          pricingSelectedProofPrice.textContent = pricingText("selectedProofPackPrice", { plan: selectedLabel });
+          pricingSelectedProofVolume.textContent = pricingText("selectedProofPackVolume", { credits: pricingPlanCredits(selectedPricingPlan) });
+          pricingSelectedProofTerms.textContent = pricingText("selectedProofPackTerms");
+          return;
+        }
+
+        pricingSelectedProofPrice.textContent = pricingText("selectedProofSubscriptionPrice", { plan: selectedLabel });
+        pricingSelectedProofVolume.textContent = pricingText("selectedProofSubscriptionVolume");
+        pricingSelectedProofTerms.textContent = pricingText("selectedProofSubscriptionTerms");
+      }
+
       function pricingEmailRedirectUrl(plan = selectedPricingPlan) {
         const selectedPlan = pricingCheckoutPlans.has(plan) ? plan : defaultPricingPlan;
         const url = new URL(`${window.location.pathname}${window.location.search}`, window.location.origin);
@@ -1761,6 +1829,7 @@
         if (pricingSelectedPlan) {
           pricingSelectedPlan.textContent = `${pricingText("selectedPlanPrefix")}: ${selectedLabel}`;
         }
+        updatePricingSelectedProof();
 
         for (const button of pricingCheckoutActions?.querySelectorAll("[data-pricing-checkout-plan]") || []) {
           const isSelected = button.dataset.pricingCheckoutPlan === selectedPricingPlan;
@@ -1844,7 +1913,7 @@
           setPricingStatus("checkoutStatusReady");
         } else {
           trackPricingCheckoutPanelShown(selectedPricingPlan);
-          setPricingStatus("checkoutStatusSelected", false, { plan: selectedLabel });
+          setPricingStatus(pricingSelectedStatusKey(selectedPricingPlan), false, { plan: selectedLabel });
         }
       }
 
@@ -1887,7 +1956,7 @@
         const accessToken = await currentPricingAccessToken();
         if (!accessToken) {
           trackPricingCheckoutEvent("pro_checkout_login_required", { plan: selectedPlan, source: "pricing_page" });
-          setPricingStatus("checkoutStatusSelected", false, { plan: pricingPlanLabel(selectedPlan) });
+          setPricingStatus(pricingSelectedStatusKey(selectedPlan), false, { plan: pricingPlanLabel(selectedPlan) });
           updatePricingAccountUi();
           pricingEmail?.focus();
           return;
@@ -2105,7 +2174,7 @@
               await startPricingCheckout(selectedPricingPlan);
             }
           } else {
-            setPricingStatus("checkoutStatusSelected", false, { plan: pricingPlanLabel(selectedPricingPlan) });
+            setPricingStatus(pricingSelectedStatusKey(selectedPricingPlan), false, { plan: pricingPlanLabel(selectedPricingPlan) });
           }
         }
       }
