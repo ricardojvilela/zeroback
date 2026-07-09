@@ -209,3 +209,4 @@ Interpretation:
 - Lead autoreplies, manual recovery templates, support replies and outreach copy now lead with the 5 EUR Pack 100 as the first paid step, keeping Pro as the recurring-volume option instead of the first ask.
 - The main app's over-limit and inline upgrade prompts now also lead with Pack 100, and the homepage pricing link/default visible paid prompt opens the pack checkout instead of the founder subscription.
 - The pricing page now leads with Pack 100 across hero, recommended plan, calculator and default checkout selection, while founder/Pro is positioned as the recurring-production option.
+- Core PT/EN/ES acquisition landings now send the first paid intent to Pack 100 instead of founder checkout, aligning SEO and Ads traffic with the current low-friction purchase path.
