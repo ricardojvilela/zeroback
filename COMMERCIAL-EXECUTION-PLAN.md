@@ -199,6 +199,13 @@ Decision rules:
 - Updated the prospect CSV with `sent_2026-07-08_followup`, `watch_replies`, blank follow-up dates and Resend IDs.
 - Do not send more direct outreach on 2026-07-08.
 
+## Prepared growth work - July 10 follow-ups
+
+- Prepared `OUTREACH-FOLLOWUP-2026-07-10.md` for the 5 proof-page prospects originally contacted on 2026-07-06.
+- No emails were sent from this preparation.
+- Before sending, check `support@batchcutout.com` for replies, negative responses or opt-outs.
+- After sending, update the CSV with `sent_2026-07-10_followup`, `watch_replies`, blank follow-up dates and Resend IDs.
+
 ## Executed growth work - demo video
 
 - Added horizontal and vertical silent demo videos under `assets/video/`.
