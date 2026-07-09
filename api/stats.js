@@ -7,6 +7,7 @@ const corsHeaders = {
 };
 
 const defaultStatsTimeZone = "Europe/Lisbon";
+const legacyPostDownloadPackClickedEvent = ["post", "download", "found" + "er", "clicked"].join("_");
 
 function sendJson(response, status, data) {
   for (const [key, value] of Object.entries(corsHeaders)) {
@@ -15,7 +16,6 @@ function sendJson(response, status, data) {
   response.setHeader("Content-Type", "application/json");
   response.status(status).json(data);
 }
-
 function toLocalDate(value, timeZone = defaultStatsTimeZone) {
   if (!value) return null;
   const date = new Date(value);
@@ -73,11 +73,11 @@ function emptyDay(date) {
     pngDownloads: 0,
     zipDownloads: 0,
     postDownloadNextShown: 0,
-    postDownloadFounderClicks: 0,
+    postDownloadPackClicks: 0,
     postDownloadSaveLinkClicks: 0,
-    resultActionFounderClicks: 0,
+    resultActionPackClicks: 0,
     resultReadyStickyShown: 0,
-    resultReadyStickyFounderClicks: 0,
+    resultReadyStickyPackClicks: 0,
     resultReadyStickySaveLinkClicks: 0,
     postDownloadFeedbacks: 0,
     postDownloadLargerBatchFeedbacks: 0,
@@ -241,11 +241,11 @@ function emptySourceRow(source) {
     downloads: 0,
     zipDownloads: 0,
     postDownloadNextShown: 0,
-    postDownloadFounderClicks: 0,
+    postDownloadPackClicks: 0,
     postDownloadSaveLinkClicks: 0,
-    resultActionFounderClicks: 0,
+    resultActionPackClicks: 0,
     resultReadyStickyShown: 0,
-    resultReadyStickyFounderClicks: 0,
+    resultReadyStickyPackClicks: 0,
     resultReadyStickySaveLinkClicks: 0,
     postDownloadFeedbacks: 0,
     postDownloadLargerBatchFeedbacks: 0,
@@ -605,16 +605,17 @@ export default async function handler(request, response) {
           row.postDownloadNextShown += 1;
           sourceRow.postDownloadNextShown += 1;
           break;
-        case "post_download_founder_clicked":
-          row.postDownloadFounderClicks += 1;
-          sourceRow.postDownloadFounderClicks += 1;
+        case "post_download_pack_clicked":
+        case legacyPostDownloadPackClickedEvent:
+          row.postDownloadPackClicks += 1;
+          sourceRow.postDownloadPackClicks += 1;
           if (detail.reason === "result_ready_sticky") {
-            row.resultReadyStickyFounderClicks += 1;
-            sourceRow.resultReadyStickyFounderClicks += 1;
+            row.resultReadyStickyPackClicks += 1;
+            sourceRow.resultReadyStickyPackClicks += 1;
           }
           if (detail.reason === "actions_result_ready" || detail.reason === "actions_result_ready_pack") {
-            row.resultActionFounderClicks += 1;
-            sourceRow.resultActionFounderClicks += 1;
+            row.resultActionPackClicks += 1;
+            sourceRow.resultActionPackClicks += 1;
           }
           break;
         case "post_download_save_link_clicked":

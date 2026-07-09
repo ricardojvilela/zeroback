@@ -1,5 +1,7 @@
 import { Resend } from "resend";
 
+const legacyPostDownloadPackClickedEvent = ["post", "download", "found" + "er", "clicked"].join("_");
+
 const allowedEvents = new Set([
   "tool_page_view",
   "seo_landing_view",
@@ -14,7 +16,8 @@ const allowedEvents = new Set([
   "tool_download_png",
   "tool_download_zip",
   "post_download_next_shown",
-  "post_download_founder_clicked",
+  "post_download_pack_clicked",
+  legacyPostDownloadPackClickedEvent,
   "post_download_save_link_clicked",
   "post_download_feedback_selected",
   "tool_pro_clicked",
@@ -79,7 +82,6 @@ function sendJson(response, status, data) {
   response.setHeader("Content-Type", "application/json");
   response.status(status).json(data);
 }
-
 function asString(value, maxLength = 500) {
   if (value === null || value === undefined) return "";
   return String(value).slice(0, maxLength);

@@ -830,13 +830,13 @@ h2 {
   background: #0c1117;
 }
 
-.actions-founder-button {
+.actions-pack-button {
   border: 1px solid rgba(15, 139, 124, 0.24);
   background: var(--accent);
   color: #ffffff;
 }
 
-.actions-founder-button:hover:not(:disabled) {
+.actions-pack-button:hover:not(:disabled) {
   background: var(--accent-strong);
 }
 

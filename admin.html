@@ -824,15 +824,15 @@
           </article>
           <article class="live-card">
             <span>CTA pago pós-download</span>
-            <strong id="livePostDownloadFounder">0</strong>
+            <strong id="livePostDownloadPack">0</strong>
           </article>
           <article class="live-card">
             <span>CTA pago ações resultado</span>
-            <strong id="liveResultActionFounder">0</strong>
+            <strong id="liveResultActionPack">0</strong>
           </article>
           <article class="live-card">
             <span>Taxa pós-download</span>
-            <strong id="livePostDownloadFounderRate">0%</strong>
+            <strong id="livePostDownloadPackRate">0%</strong>
           </article>
           <article class="live-card">
             <span>Guardar link</span>
@@ -844,7 +844,7 @@
           </article>
           <article class="live-card">
             <span>CTA pago barra</span>
-            <strong id="liveResultReadyStickyFounder">0</strong>
+            <strong id="liveResultReadyStickyPack">0</strong>
           </article>
           <article class="live-card">
             <span>Link barra</span>
@@ -1692,7 +1692,7 @@
         const paid = rowValue(today, "paidSubscriptions") + rowValue(today, "packPurchases");
         const revenue = rowValue(today, "revenue");
         const stickyShown = rowValue(today, "resultReadyStickyShown");
-        const stickyDecisions = rowValue(today, "resultReadyStickyFounderClicks") + rowValue(today, "resultReadyStickySaveLinkClicks");
+        const stickyDecisions = rowValue(today, "resultReadyStickyPackClicks") + rowValue(today, "resultReadyStickySaveLinkClicks");
         const visitorDelta = visitors - rowValue(yesterday, "visitors");
         const topSource = sourceBreakdown.find((row) => row.visitors > 0)?.source || "sem origem dominante";
         const summary = `Hoje: ${pluralPt(visitors, "visitante", "visitantes")} (${visitorDelta >= 0 ? "+" : ""}${visitorDelta} vs ontem), ${pluralPt(uploads, "upload", "uploads")}, ${pluralPt(downloads, "download", "downloads")}, ${pluralPt(intent, "sinal pago/lead", "sinais pagos/leads")} e ${pluralPt(checkoutSessions, "sessão Stripe", "sessões Stripe")}. Origem mais forte dos últimos 14 dias: ${sourceLabel(topSource)}.`;
@@ -1830,12 +1830,12 @@
         const downloads = Number(totals.downloads || 0) || 0;
         const resultReady = Number(totals.downloadReadyShown || 0) || 0;
         const limitAttempts = Number(totals.limitAttempts || 0) || 0;
-        const resultUpgradeClicks = Number(totals.postDownloadFounderClicks || 0) || 0;
+        const resultUpgradeClicks = Number(totals.postDownloadPackClicks || 0) || 0;
         const packCtaClicks = Number(totals.packCtaClicks || 0) || 0;
         const packIntentClicks = resultUpgradeClicks + packCtaClicks;
-        const resultActionFounderClicks = Number(totals.resultActionFounderClicks || 0) || 0;
+        const resultActionPackClicks = Number(totals.resultActionPackClicks || 0) || 0;
         const stickyShown = Number(totals.resultReadyStickyShown || 0) || 0;
-        const stickyDecisions = (Number(totals.resultReadyStickyFounderClicks || 0) || 0) + (Number(totals.resultReadyStickySaveLinkClicks || 0) || 0);
+        const stickyDecisions = (Number(totals.resultReadyStickyPackClicks || 0) || 0) + (Number(totals.resultReadyStickySaveLinkClicks || 0) || 0);
         const leadCaptures = Number(totals.leadCaptures || 0) || 0;
         const limitPromptLeads = Number(totals.limitPromptLeadCaptures || 0) || 0;
         const planClicks = Number(totals.proClicks || 0) + Number(totals.pricingCtaClicks || 0);
@@ -1899,7 +1899,7 @@
           return "Gargalo principal: os utilizadores chegam ao download, mas ainda não clicam no Pack 100 nem deixam email. Prioridade: reforçar o bloco de resultado pronto e medir se gera cliques nos próximos dados.";
         }
 
-        if (resultReady >= 10 && resultActionFounderClicks === 0 && checkoutSessions === 0) {
+        if (resultReady >= 10 && resultActionPackClicks === 0 && checkoutSessions === 0) {
           return "Gargalo principal: há resultados prontos, mas o CTA Pack 100 junto aos botões de download ainda não gerou cliques. Prioridade: observar esta nova posição antes de mexer em tráfego ou preço.";
         }
 
@@ -1958,7 +1958,7 @@
 
       function packFunnelRecommendation(totals = {}) {
         const resultReady = Number(totals.downloadReadyShown || 0) || 0;
-        const packToolClicks = Number(totals.postDownloadFounderClicks || 0) || 0;
+        const packToolClicks = Number(totals.postDownloadPackClicks || 0) || 0;
         const packPricingClicks = Number(totals.packCtaClicks || 0) || 0;
         const packClicks = packToolClicks + packPricingClicks;
         const packSessions = Number(totals.packCheckoutSessions || 0) || 0;
@@ -2345,18 +2345,18 @@
           totals.directoryLaunchPageViews,
         ));
         document.querySelector("#livePostDownloadNext").textContent = totals.postDownloadNextShown || 0;
-        document.querySelector("#livePostDownloadFounder").textContent = totals.postDownloadFounderClicks || 0;
-        document.querySelector("#liveResultActionFounder").textContent = totals.resultActionFounderClicks || 0;
-        document.querySelector("#livePostDownloadFounderRate").textContent = formatPercent(conversionRate(
-          totals.postDownloadFounderClicks,
+        document.querySelector("#livePostDownloadPack").textContent = totals.postDownloadPackClicks || 0;
+        document.querySelector("#liveResultActionPack").textContent = totals.resultActionPackClicks || 0;
+        document.querySelector("#livePostDownloadPackRate").textContent = formatPercent(conversionRate(
+          totals.postDownloadPackClicks,
           totals.postDownloadNextShown,
         ));
         document.querySelector("#livePostDownloadSaveLink").textContent = totals.postDownloadSaveLinkClicks || 0;
         document.querySelector("#liveResultReadyStickyShown").textContent = totals.resultReadyStickyShown || 0;
-        document.querySelector("#liveResultReadyStickyFounder").textContent = totals.resultReadyStickyFounderClicks || 0;
+        document.querySelector("#liveResultReadyStickyPack").textContent = totals.resultReadyStickyPackClicks || 0;
         document.querySelector("#liveResultReadyStickySaveLink").textContent = totals.resultReadyStickySaveLinkClicks || 0;
         document.querySelector("#liveResultReadyStickyRate").textContent = formatPercent(conversionRate(
-          (totals.resultReadyStickyFounderClicks || 0) + (totals.resultReadyStickySaveLinkClicks || 0),
+          (totals.resultReadyStickyPackClicks || 0) + (totals.resultReadyStickySaveLinkClicks || 0),
           totals.resultReadyStickyShown,
         ));
         document.querySelector("#livePostDownloadFeedbacks").textContent = totals.postDownloadFeedbacks || 0;
@@ -2388,7 +2388,7 @@
           totals.checkoutSessionsCreated,
         ));
         document.querySelector("#liveRevenue").textContent = formatCurrency(totals.revenue || 0);
-        const packToolClicks = Number(totals.postDownloadFounderClicks || 0) || 0;
+        const packToolClicks = Number(totals.postDownloadPackClicks || 0) || 0;
         const packPricingClicks = Number(totals.packCtaClicks || 0) || 0;
         const packClicks = packToolClicks + packPricingClicks;
         document.querySelector("#packFunnelResultReady").textContent = totals.downloadReadyShown || 0;

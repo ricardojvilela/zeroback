@@ -15,7 +15,7 @@ const proSubscriberPromoBlocks = document.querySelectorAll("[data-pro-subscriber
 const processButton = document.querySelector("#processButton");
 const pngButton = document.querySelector("#pngButton");
 const zipButton = document.querySelector("#zipButton");
-const actionsFounderCta = document.querySelector("#actionsFounderCta");
+const actionsPackCta = document.querySelector("#actionsPackCta");
 const downloadReadyHint = document.querySelector("#downloadReadyHint");
 const clearButton = document.querySelector("#clearButton");
 const imageGrid = document.querySelector("#imageGrid");
@@ -35,7 +35,7 @@ const resultReadyStickyLead = document.querySelector("#resultReadyStickyLead");
 const progressBar = document.querySelector("#progressBar");
 const countText = document.querySelector("#countText");
 const postDownloadNextPanel = document.querySelector("#postDownloadNextPanel");
-const postDownloadFounderCta = document.querySelector("#postDownloadFounderCta");
+const postDownloadPackCta = document.querySelector("#postDownloadPackCta");
 const postDownloadSaveLinkCta = document.querySelector("#postDownloadSaveLinkCta");
 const postDownloadEmailForm = document.querySelector("#postDownloadEmailForm");
 const postDownloadEmail = document.querySelector("#postDownloadEmail");
@@ -128,7 +128,7 @@ const serverEventNames = new Set([
   "tool_download_png",
   "tool_download_zip",
   "post_download_next_shown",
-  "post_download_founder_clicked",
+  "post_download_pack_clicked",
   "post_download_save_link_clicked",
   "post_download_feedback_selected",
   "tool_pro_clicked",
@@ -212,7 +212,7 @@ const baseTranslation = {
   postDownloadChecklistLink: "Link direto para voltar à ferramenta",
   postDownloadChecklistPrep: "Checklist para fotos com melhor recorte",
   postDownloadChecklistPlan: "Resumo do Pack 100 e do Pro se precisar de volume recorrente",
-  postDownloadFounderCta: "Comprar Pack 100 - 5 EUR",
+  postDownloadPackCta: "Comprar Pack 100 - 5 EUR",
   postDownloadSaveLinkCta: "Receber link e checklist",
   postDownloadNextNote: "Sem cartão no teste grátis. Pack único ou Pro pagos por Stripe quando quiser aumentar o lote.",
   leadCaptureKicker: "Link e checklist",
@@ -251,7 +251,7 @@ const baseTranslation = {
   resultReadyKicker: "Resultado pronto",
   resultReadyTitle: "Quer repetir isto em lotes maiores?",
   downloadReadyHint: "Se o recorte ficou bom, o Pack 100 transforma este teste num lote real sem subscrição. Para produção recorrente, escolha Pro mensal.",
-  actionsFounderCta: "Comprar Pack 100 - 5 EUR",
+  actionsPackCta: "Comprar Pack 100 - 5 EUR",
   zipProCta: "Comprar Pack 100 - 5 EUR",
   resultReadySaveLinkCta: "Receber link e checklist",
   resultReadyMicrocopy: "Compra única disponível. Pagamento seguro por Stripe.",
@@ -434,7 +434,7 @@ const translations = {
     postDownloadChecklistLink: "Direct link back to the tool",
     postDownloadChecklistPrep: "Checklist for cleaner product-photo cutouts",
     postDownloadChecklistPlan: "100 image pack and Pro summary if you need recurring volume",
-    postDownloadFounderCta: "Buy 100 image pack - EUR 5",
+    postDownloadPackCta: "Buy 100 image pack - EUR 5",
     postDownloadSaveLinkCta: "Get link and checklist",
     postDownloadNextNote: "No card for the free test. One-time pack or Pro payment happens securely through Stripe when you increase the batch.",
     leadCaptureKicker: "Link and checklist",
@@ -560,7 +560,7 @@ const translations = {
     resultReadyKicker: "Result ready",
     resultReadyTitle: "Want to repeat this for larger batches?",
     downloadReadyHint: "If the cutout looks good, the 100 image pack turns this test into a real batch without a subscription. For recurring production, choose monthly Pro.",
-    actionsFounderCta: "Buy 100 image pack - EUR 5",
+    actionsPackCta: "Buy 100 image pack - EUR 5",
     zipProCta: "Buy 100 image pack - EUR 5",
     resultReadySaveLinkCta: "Get link and checklist",
     resultReadyMicrocopy: "One-time purchase available. Secure Stripe payment.",
@@ -1051,7 +1051,7 @@ const translatedAddons = {
     postDownloadChecklistLink: "Enlace directo para volver a la herramienta",
     postDownloadChecklistPrep: "Checklist para mejores recortes de producto",
     postDownloadChecklistPlan: "Resumen del Pack 100 y de Pro si necesitas volumen recurrente",
-    postDownloadFounderCta: "Comprar Pack 100 - 5 EUR",
+    postDownloadPackCta: "Comprar Pack 100 - 5 EUR",
     postDownloadSaveLinkCta: "Recibir enlace y checklist",
     postDownloadNextNote: "Sin tarjeta en la prueba gratis. Pack único o Pro se pagan por Stripe cuando quieras aumentar el lote.",
     proInlineKicker: "Pack 100",
@@ -1143,7 +1143,7 @@ const translatedAddons = {
     resultReadyKicker: "Resultado listo",
     resultReadyTitle: "¿Quieres repetir esto en lotes mayores?",
     downloadReadyHint: "Si el recorte quedó bien, el Pack 100 convierte esta prueba en un lote real sin suscripción. Para producción recurrente, elige Pro mensual.",
-    actionsFounderCta: "Comprar Pack 100 - 5 EUR",
+    actionsPackCta: "Comprar Pack 100 - 5 EUR",
     zipProCta: "Comprar Pack 100 - 5 EUR",
     resultReadySaveLinkCta: "Recibir enlace y checklist",
     resultReadyMicrocopy: "Compra única disponible. Pago seguro por Stripe.",
@@ -2981,7 +2981,7 @@ function updateControls() {
   processButton.disabled = !hasItems || !hasPendingItems || running;
   pngButton.disabled = !singleReady || running;
   zipButton.disabled = !allReady || running;
-  actionsFounderCta?.classList.toggle("hidden", paidAccess || !downloadReady || running);
+  actionsPackCta?.classList.toggle("hidden", paidAccess || !downloadReady || running);
   clearButton.disabled = !hasItems || running;
   const hasLeadContact = Boolean(currentAccount?.email || getCapturedLeadEmail());
   const readyCount = items.filter((item) => item.outputBlob).length;
@@ -3730,7 +3730,7 @@ fileInput.addEventListener("change", (event) => addFiles(event.target.files));
 processButton.addEventListener("click", processImages);
 pngButton.addEventListener("click", downloadSinglePng);
 zipButton.addEventListener("click", downloadZip);
-actionsFounderCta?.addEventListener("click", () => {
+actionsPackCta?.addEventListener("click", () => {
   const readyCount = items.filter((item) => item.outputBlob).length;
   const detail = {
     reason: "actions_result_ready_pack",
@@ -3741,9 +3741,9 @@ actionsFounderCta?.addEventListener("click", () => {
     totalInQueue: items.length,
     free_limit: maxFilesPerBatch,
   };
-  trackEvent("post_download_founder_clicked", detail);
+  trackEvent("post_download_pack_clicked", detail);
   trackEvent("tool_pro_clicked", detail);
-  startCheckout("pack100", actionsFounderCta);
+  startCheckout("pack100", actionsPackCta);
 });
 clearButton.addEventListener("click", clearAll);
 proPromptButton.addEventListener("click", () => showProInterest("status_limit_cta"));
@@ -3776,7 +3776,7 @@ zipProCta?.addEventListener("click", () => {
     totalInQueue: items.length,
     free_limit: maxFilesPerBatch,
   };
-  trackEvent("post_download_founder_clicked", detail);
+  trackEvent("post_download_pack_clicked", detail);
   trackEvent("tool_pro_clicked", detail);
   startCheckout("pack100", zipProCta);
 });
@@ -3791,11 +3791,11 @@ resultReadyStickyPro?.addEventListener("click", () => {
     totalInQueue: items.length,
     free_limit: maxFilesPerBatch,
   };
-  trackEvent("post_download_founder_clicked", detail);
+  trackEvent("post_download_pack_clicked", detail);
   trackEvent("tool_pro_clicked", detail);
   startCheckout("pack100", resultReadyStickyPro);
 });
-postDownloadFounderCta?.addEventListener("click", () => {
+postDownloadPackCta?.addEventListener("click", () => {
   const downloadType = postDownloadNextPanel?.dataset.downloadType || "unknown";
   const count = Number(postDownloadNextPanel?.dataset.downloadCount || 0) || 0;
   const detail = {
@@ -3807,9 +3807,9 @@ postDownloadFounderCta?.addEventListener("click", () => {
     totalInQueue: items.length,
     free_limit: maxFilesPerBatch,
   };
-  trackEvent("post_download_founder_clicked", detail);
+  trackEvent("post_download_pack_clicked", detail);
   trackEvent("tool_pro_clicked", detail);
-  startCheckout("pack100", postDownloadFounderCta);
+  startCheckout("pack100", postDownloadPackCta);
 });
 resultReadySaveLinkCta?.addEventListener("click", () => focusResultReadyLeadCapture());
 resultReadyStickyLead?.addEventListener("click", () => focusResultReadyLeadCapture("result_ready_sticky"));
