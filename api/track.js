@@ -147,12 +147,12 @@ function leadAutoreplyCopy(language) {
       subject: "O seu link e checklist BatchCutout",
       greeting: "Ola,",
       toolUrl: "https://batchcutout.com/?utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply#tool",
-      pricingUrl: "https://batchcutout.com/pricing/?checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply#pricing-account-title",
+      pricingUrl: "https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply#pricing-account-title",
       intro: "Aqui fica o link para voltar ao BatchCutout e tratar fotos de produto.",
       checklistLine: "Checklist rapido para preparar o proximo lote:",
-      proLine: "Se precisar de repetir este fluxo em catálogo, variantes ou marketplace, o Pro desbloqueia:",
+      proLine: "Se quiser continuar sem subscricao, o Pack 100 e a forma mais simples de validar o fluxo:",
       cta: "Abrir BatchCutout",
-      pricingCta: "Ver planos Pro",
+      pricingCta: "Comprar Pack 100 - 5 EUR",
       optOut: "Se isto não for útil, responda \"remover\" e não enviaremos acompanhamento.",
       thanks: "Obrigado,\nNexaFlow Labs",
       checklistBullets: [
@@ -160,7 +160,7 @@ function leadAutoreplyCopy(language) {
         "Evite sombras muito fortes ou fundos com cores iguais ao produto.",
         "Depois do recorte, descarregue PNG para uma imagem ou ZIP para vários produtos.",
       ],
-      bullets: ["100 imagens por lote", "2.000 imagens por mês", "PNG transparente e ZIP"],
+      bullets: ["100 creditos de imagem numa compra unica", "Ate 100 imagens por lote", "PNG transparente e ZIP"],
     };
   }
 
@@ -169,12 +169,12 @@ function leadAutoreplyCopy(language) {
       subject: "Tu enlace y checklist de BatchCutout",
       greeting: "Hola,",
       toolUrl: "https://batchcutout.com/?lang=es&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply#tool",
-      pricingUrl: "https://batchcutout.com/pricing/?lang=es&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply#pricing-account-title",
+      pricingUrl: "https://batchcutout.com/pricing/?lang=es&checkout_plan=pack100&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply#pricing-account-title",
       intro: "Aqui tienes el enlace para volver a BatchCutout y preparar fotos de producto.",
       checklistLine: "Checklist rapido para tu proximo lote:",
-      proLine: "Si necesitas repetir este flujo para catalogos, variantes o marketplaces, Pro desbloquea:",
+      proLine: "Si quieres continuar sin suscripcion, el Pack 100 es la forma mas sencilla de validar el flujo:",
       cta: "Abrir BatchCutout",
-      pricingCta: "Ver planes Pro",
+      pricingCta: "Comprar Pack 100 - 5 EUR",
       optOut: "Si esto no te resulta util, responde \"remover\" y no enviaremos seguimiento de producto.",
       thanks: "Gracias,\nNexaFlow Labs",
       checklistBullets: [
@@ -182,7 +182,7 @@ function leadAutoreplyCopy(language) {
         "Evita sombras muy fuertes o fondos con colores demasiado parecidos al producto.",
         "Despues del recorte, descarga PNG para una imagen o ZIP para varios productos.",
       ],
-      bullets: ["100 imagenes por lote", "2.000 imagenes al mes", "PNG transparente y ZIP"],
+      bullets: ["100 creditos de imagen en una compra unica", "Hasta 100 imagenes por lote", "PNG transparente y ZIP"],
     };
   }
 
@@ -190,12 +190,12 @@ function leadAutoreplyCopy(language) {
     subject: "Your BatchCutout link and checklist",
     greeting: "Hi,",
     toolUrl: "https://batchcutout.com/?lang=en&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply#tool",
-    pricingUrl: "https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply#pricing-account-title",
+    pricingUrl: "https://batchcutout.com/pricing/?lang=en&checkout_plan=pack100&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_autoreply#pricing-account-title",
     intro: "Here is the link to come back to BatchCutout and process product photos.",
     checklistLine: "Quick checklist for your next batch:",
-    proLine: "If you need to repeat this workflow for catalogs, variants, or marketplace listings, Pro unlocks:",
+    proLine: "If you want to continue without a subscription, Pack 100 is the simplest way to validate the workflow:",
     cta: "Open BatchCutout",
-    pricingCta: "See Pro plans",
+    pricingCta: "Buy Pack 100 - 5 EUR",
     optOut: "If this is not useful, reply \"unsubscribe\" and we will not send product follow-ups.",
     thanks: "Thanks,\nNexaFlow Labs",
     checklistBullets: [
@@ -203,7 +203,7 @@ function leadAutoreplyCopy(language) {
       "Avoid very strong shadows or backgrounds with colors too close to the product.",
       "After cutout, download PNG for one image or ZIP for multiple products.",
     ],
-    bullets: ["100 images per batch", "2,000 images per month", "Transparent PNG and ZIP export"],
+    bullets: ["100 image credits in one purchase", "Up to 100 images per batch", "Transparent PNG and ZIP export"],
   };
 }
 
