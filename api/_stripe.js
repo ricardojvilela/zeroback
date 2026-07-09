@@ -106,7 +106,7 @@ export function getCheckoutOffering(plan) {
 
 export function getPlanLabel(plan) {
   if (plan === "annual") return "Pro Annual";
-  if (plan === "early") return "Pro Early Adopter";
+  if (plan === "early") return "Pro Recurring Campaign";
   if (plan === "pack100") return "Pack 100 imagens";
   if (plan === "pack250") return "Pack 250 imagens";
   return "Pro Monthly";

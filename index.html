@@ -123,7 +123,7 @@
               },
               {
                 "@type": "Offer",
-                "name": "Plano fundador",
+                "name": "Pro recorrente campanha",
                 "price": "15",
                 "priceCurrency": "EUR",
                 "url": "https://batchcutout.com/pricing/?checkout_plan=early#pricing-account-title"
@@ -188,7 +188,7 @@
         ]
       }
     </script>
-    <link rel="stylesheet" href="./styles.css?v=20260709-one-time-packs" />
+    <link rel="stylesheet" href="./styles.css?v=20260709-pack-funnel" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
   <body>
@@ -235,8 +235,8 @@
             <em data-i18n="freeTestStepTwoText">Confirme a qualidade com fotos reais.</em>
           </span>
           <span>
-            <strong data-i18n="freeTestStepThreeTitle">3. Passe a Pro se precisar de volume</strong>
-            <em data-i18n="freeTestStepThreeText">Até 100 imagens por lote.</em>
+            <strong data-i18n="freeTestStepThreeTitle">3. Use Pack se precisar de volume</strong>
+            <em data-i18n="freeTestStepThreeText">Compra única a partir de 5 EUR.</em>
           </span>
         </div>
         <a class="brand-pro-link" href="./pricing/?checkout_plan=pack100#pricing-account-title" data-i18n="brandProLink" data-pricing-link>Precisa de mais volume? Pack desde 5 EUR</a>
@@ -284,7 +284,7 @@
                 autocomplete="new-password"
                 required
                 minlength="6"
-                placeholder="A sua password (mín. 6 caracteres)"
+                placeholder="Password (mín. 6 caracteres)"
                 data-i18n-placeholder="accountPasswordPlaceholder"
               />
               <button
@@ -308,7 +308,7 @@
             <div class="billing-actions" id="billingActions">
               <button type="button" data-checkout-plan="pack100" data-i18n="billingPack100">Pack 100 imagens - 5 EUR (melhor entrada)</button>
               <button type="button" data-checkout-plan="pack250" data-i18n="billingPack250">Pack 250 imagens - 9 EUR</button>
-              <button type="button" data-checkout-plan="early" data-i18n="billingEarly">Plano fundador - 15 EUR/mês (recorrente)</button>
+              <button type="button" data-checkout-plan="early" data-i18n="billingEarly">Pro recorrente - 15 EUR/mês (campanha)</button>
               <button type="button" data-checkout-plan="monthly" data-i18n="billingMonthly">Pro mensal - 19 EUR/mês</button>
               <button type="button" data-checkout-plan="annual" data-i18n="billingAnnual">Pro anual - 190 EUR/ano</button>
             </div>
@@ -357,7 +357,7 @@
           <span class="dropzone-icon" aria-hidden="true">+</span>
           <span class="dropzone-title" data-i18n="selectPhotos">Arraste ou selecione várias fotos</span>
           <span class="dropzone-meta" data-i18n="fileTypes">JPG, PNG ou WebP em lote</span>
-          <span class="dropzone-helper" data-i18n="dropzoneHelper">Teste com 2 imagens grátis. O Pro é só para quem precisa de lotes maiores.</span>
+          <span class="dropzone-helper" data-i18n="dropzoneHelper">Teste com 2 imagens grátis. O Pack 100 é para quem precisa de um lote real.</span>
         </label>
 
         <section class="results tool-results" data-i18n-aria="resultsLabel" aria-label="Fotos processadas">
@@ -391,7 +391,7 @@
             <p class="section-kicker" data-i18n="resultReadyKicker">Resultado pronto</p>
             <h2 id="result-ready-upgrade-title" data-i18n="resultReadyTitle">Quer repetir isto em lotes maiores?</h2>
             <p data-i18n="downloadReadyHint">
-              Se o recorte ficou bom, o Pack 100 transforma este teste num lote real sem subscrição. Para produção recorrente, o fundador mantém 2.000 imagens por mês.
+              Se o recorte ficou bom, o Pack 100 transforma este teste num lote real sem subscrição. Para produção recorrente, escolha Pro mensal.
             </p>
           </div>
           <div class="result-ready-upgrade-actions">
@@ -434,12 +434,12 @@
             <h2 id="post-download-next-title" data-i18n="postDownloadNextTitle">Resultado descarregado. Quer repetir isto em mais produtos?</h2>
             <p data-i18n="postDownloadNextText">
               Se o resultado ficou bom, compre o Pack 100 por 5 EUR para tratar um lote real sem subscrição.
-              Se passar a produzir todos os meses, o fundador continua disponível por 15 EUR/mês.
+              Se isto passar a ser mensal, escolha Pro recorrente.
             </p>
             <ul class="post-download-checklist">
               <li data-i18n="postDownloadChecklistLink">Link direto para voltar à ferramenta</li>
               <li data-i18n="postDownloadChecklistPrep">Checklist para fotos com melhor recorte</li>
-              <li data-i18n="postDownloadChecklistPlan">Resumo do Pack 100 e do plano fundador se precisar de volume</li>
+              <li data-i18n="postDownloadChecklistPlan">Resumo do Pack 100 e do Pro se precisar de volume recorrente</li>
             </ul>
           </div>
           <div class="post-download-next-actions">
@@ -545,7 +545,7 @@
           >
             <button type="button" data-checkout-plan="pack100" data-i18n="billingPack100">Pack 100 imagens - 5 EUR (melhor entrada)</button>
             <button type="button" data-checkout-plan="pack250" data-i18n="billingPack250">Pack 250 imagens - 9 EUR</button>
-            <button type="button" data-checkout-plan="early" data-i18n="billingEarly">Plano fundador - 15 EUR/mês (recorrente)</button>
+            <button type="button" data-checkout-plan="early" data-i18n="billingEarly">Pro recorrente - 15 EUR/mês (campanha)</button>
             <button type="button" data-checkout-plan="monthly" data-i18n="billingMonthly">Pro mensal - 19 EUR/mês</button>
             <button type="button" data-checkout-plan="annual" data-i18n="billingAnnual">Pro anual - 190 EUR/ano</button>
           </form>

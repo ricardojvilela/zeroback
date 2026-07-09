@@ -142,20 +142,20 @@ function checkoutPlanText(plan, language) {
     if (plan === "pack100") return "Pack 100 imagens - 5 EUR";
     if (plan === "pack250") return "Pack 250 imagens - 9 EUR";
     if (plan === "annual") return "Pro anual - 190 EUR/ano";
-    if (plan === "early") return "Plano fundador - 15 EUR/mes";
+    if (plan === "early") return "Pro recorrente - 15 EUR/mes";
     return "Pro mensal - 19 EUR/mes";
   }
   if (language === "es") {
     if (plan === "pack100") return "Pack 100 imagenes - 5 EUR";
     if (plan === "pack250") return "Pack 250 imagenes - 9 EUR";
     if (plan === "annual") return "Pro anual - 190 EUR/año";
-    if (plan === "early") return "Plan fundador - 15 EUR/mes";
+    if (plan === "early") return "Pro recurrente - 15 EUR/mes";
     return "Pro mensual - 19 EUR/mes";
   }
   if (plan === "pack100") return "100 image pack - EUR 5";
   if (plan === "pack250") return "250 image pack - EUR 9";
   if (plan === "annual") return "Annual Pro - EUR 190/year";
-  if (plan === "early") return "Founder plan - EUR 15/month";
+  if (plan === "early") return "Recurring Pro - EUR 15/month";
   return "Monthly Pro - EUR 19/month";
 }
 

@@ -744,7 +744,7 @@
               <em id="dailyResultReadyDelta">igual a ontem</em>
             </article>
             <article class="daily-metric">
-              <span>Intenção Pro</span>
+              <span>Intenção paga</span>
               <strong id="dailyIntent">0</strong>
               <em id="dailyIntentDelta">igual a ontem</em>
             </article>
@@ -871,7 +871,7 @@
             <strong id="liveProofCtaClicks">0</strong>
           </article>
           <article class="live-card">
-            <span>Cliques em planos</span>
+            <span>Cliques pagos</span>
             <strong id="liveProClicks">0</strong>
           </article>
           <article class="live-card">
@@ -1064,6 +1064,49 @@
           </article>
         </div>
         <p class="funnel-diagnosis" id="liveFunnelDiagnosis">A carregar diagnóstico do funil...</p>
+        <section class="source-live-block" aria-label="Funil Pack 100">
+          <div class="panel-head compact">
+            <div>
+              <h3>Funil Pack 100</h3>
+              <p class="note">Leitura rápida da passagem do teste grátis para a primeira compra avulsa.</p>
+            </div>
+          </div>
+          <div class="live-grid">
+            <article class="live-card">
+              <span>Resultados prontos</span>
+              <strong id="packFunnelResultReady">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Cliques Pack</span>
+              <strong id="packFunnelPackClicks">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Sessões Stripe Pack</span>
+              <strong id="packFunnelPackSessions">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Compras Pack</span>
+              <strong id="packFunnelPackPurchases">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Resultado → clique</span>
+              <strong id="packFunnelResultToClickRate">0%</strong>
+            </article>
+            <article class="live-card">
+              <span>Clique → Stripe</span>
+              <strong id="packFunnelClickToStripeRate">0%</strong>
+            </article>
+            <article class="live-card">
+              <span>Stripe → pago</span>
+              <strong id="packFunnelStripeToPaidRate">0%</strong>
+            </article>
+            <article class="live-card">
+              <span>Receita Pack</span>
+              <strong id="packFunnelRevenue">0 EUR</strong>
+            </article>
+          </div>
+          <p class="live-status" id="packFunnelAction">A carregar recomendação Pack 100...</p>
+        </section>
         <p class="live-status" id="liveStatus">A carregar atividade...</p>
         <section class="source-live-block" aria-label="Subscrições Stripe">
           <div class="panel-head compact">
@@ -1646,13 +1689,13 @@
         const leads = rowValue(today, "leadCaptures");
         const intent = dailyIntentValue(today);
         const checkoutSessions = rowValue(today, "checkoutSessionsCreated");
-        const paid = rowValue(today, "paidSubscriptions");
+        const paid = rowValue(today, "paidSubscriptions") + rowValue(today, "packPurchases");
         const revenue = rowValue(today, "revenue");
         const stickyShown = rowValue(today, "resultReadyStickyShown");
         const stickyDecisions = rowValue(today, "resultReadyStickyFounderClicks") + rowValue(today, "resultReadyStickySaveLinkClicks");
         const visitorDelta = visitors - rowValue(yesterday, "visitors");
         const topSource = sourceBreakdown.find((row) => row.visitors > 0)?.source || "sem origem dominante";
-        const summary = `Hoje: ${pluralPt(visitors, "visitante", "visitantes")} (${visitorDelta >= 0 ? "+" : ""}${visitorDelta} vs ontem), ${pluralPt(uploads, "upload", "uploads")}, ${pluralPt(downloads, "download", "downloads")}, ${pluralPt(intent, "sinal Pro/lead", "sinais Pro/lead")} e ${pluralPt(checkoutSessions, "sessão Stripe", "sessões Stripe")}. Origem mais forte dos últimos 14 dias: ${sourceLabel(topSource)}.`;
+        const summary = `Hoje: ${pluralPt(visitors, "visitante", "visitantes")} (${visitorDelta >= 0 ? "+" : ""}${visitorDelta} vs ontem), ${pluralPt(uploads, "upload", "uploads")}, ${pluralPt(downloads, "download", "downloads")}, ${pluralPt(intent, "sinal pago/lead", "sinais pagos/leads")} e ${pluralPt(checkoutSessions, "sessão Stripe", "sessões Stripe")}. Origem mais forte dos últimos 14 dias: ${sourceLabel(topSource)}.`;
 
         if (paid > 0 || revenue > 0) {
           return {
@@ -1680,7 +1723,7 @@
             className: "success",
             title: "Há leads captados para transformar em conversa.",
             summary,
-            action: "Ação: responder/acompanhar leads hoje com foco em lote real, Pack 100 e plano fundador quando houver recorrência.",
+            action: "Ação: responder/acompanhar leads hoje com foco em lote real, Pack 100 e Pro recorrente quando houver recorrência.",
           };
         }
 
@@ -1788,6 +1831,8 @@
         const resultReady = Number(totals.downloadReadyShown || 0) || 0;
         const limitAttempts = Number(totals.limitAttempts || 0) || 0;
         const resultUpgradeClicks = Number(totals.postDownloadFounderClicks || 0) || 0;
+        const packCtaClicks = Number(totals.packCtaClicks || 0) || 0;
+        const packIntentClicks = resultUpgradeClicks + packCtaClicks;
         const resultActionFounderClicks = Number(totals.resultActionFounderClicks || 0) || 0;
         const stickyShown = Number(totals.resultReadyStickyShown || 0) || 0;
         const stickyDecisions = (Number(totals.resultReadyStickyFounderClicks || 0) || 0) + (Number(totals.resultReadyStickySaveLinkClicks || 0) || 0);
@@ -1805,6 +1850,7 @@
         const checkoutLinkEmailFailures = Number(totals.checkoutLinkEmailFailures || 0) || 0;
         const paidSubscriptions = Number(totals.paidSubscriptions || 0) || 0;
         const packPurchases = Number(totals.packPurchases || 0) || 0;
+        const packCheckoutSessions = Number(totals.packCheckoutSessions || 0) || 0;
         const paidPurchases = paidSubscriptions + packPurchases;
         const accountPanelViews = Number(totals.accountCheckoutPanelViews || 0) || 0;
         const accountFormInteractions = Number(totals.accountFormInteractions || 0) || 0;
@@ -1838,7 +1884,15 @@
         }
 
         if (checkoutLoginRequired >= 2 && checkoutPromptLeads === 0 && checkoutSessions === 0) {
-          return "Gargalo principal: há intenção Pro antes da conta, mas ainda não há emails capturados nesse passo. Prioridade: medir o link de continuação do plano no painel de conta.";
+          return "Gargalo principal: há intenção paga antes da conta, mas ainda não há emails capturados nesse passo. Prioridade: medir o link de continuação do plano no painel de conta.";
+        }
+
+        if (packIntentClicks >= 3 && packCheckoutSessions === 0) {
+          return "Gargalo principal: há cliques no Pack 100, mas ainda nenhuma sessão Stripe Pack. Prioridade: rever conta/login/checkout para o Pack 100 antes de mexer no preço.";
+        }
+
+        if (packCheckoutSessions >= 2 && packPurchases === 0) {
+          return "Gargalo principal: o Pack 100 chega ao Stripe, mas ainda não fecha pagamento. Prioridade: recuperar checkouts, reforçar confiança no pricing e observar cancelamentos.";
         }
 
         if (downloads >= 10 && resultUpgradeClicks === 0 && leadCaptures === 0) {
@@ -1846,7 +1900,7 @@
         }
 
         if (resultReady >= 10 && resultActionFounderClicks === 0 && checkoutSessions === 0) {
-          return "Gargalo principal: há resultados prontos, mas o CTA Pro junto aos botões de download ainda não gerou cliques. Prioridade: observar esta nova posição antes de mexer em tráfego ou preço.";
+          return "Gargalo principal: há resultados prontos, mas o CTA Pack 100 junto aos botões de download ainda não gerou cliques. Prioridade: observar esta nova posição antes de mexer em tráfego ou preço.";
         }
 
         if (stickyShown >= 10 && stickyDecisions === 0) {
@@ -1854,7 +1908,7 @@
         }
 
         if (resultReady >= 10 && conversionRate(resultUpgradeClicks, resultReady) < 0.06) {
-          return "Gargalo principal: há resultados prontos, mas poucos cliques no upgrade. Prioridade: testar copy/CTA pós-resultado antes de aumentar orçamento.";
+          return "Gargalo principal: há resultados prontos, mas poucos cliques no Pack 100. Prioridade: testar copy/CTA pós-resultado antes de aumentar orçamento.";
         }
 
         if (emailConfirmations > 0 && checkoutSessions === 0) {
@@ -1878,7 +1932,7 @@
         }
 
         if (planClicks >= 3 && checkoutSessions === 0) {
-          return "Gargalo principal: existe interesse em Pro, mas nenhuma sessão Stripe criada. Prioridade: rever fluxo conta/login/checkout e erros de criação de sessão.";
+          return "Gargalo principal: existe interesse pago, mas nenhuma sessão Stripe criada. Prioridade: rever fluxo conta/login/checkout e erros de criação de sessão.";
         }
 
         if (checkoutCancelledReturns >= 2 && paidPurchases === 0) {
@@ -1899,7 +1953,30 @@
             : "Sinal positivo: já há pagamentos atribuídos no funil. Prioridade: identificar origem, repetir o canal e proteger retenção.";
         }
 
-        return "Diagnóstico: ainda falta volume suficiente para escolher um único gargalo. Continue a observar uploads, downloads, cliques Pro e sessões Stripe.";
+        return "Diagnóstico: ainda falta volume suficiente para escolher um único gargalo. Continue a observar uploads, downloads, cliques Pack/Pro e sessões Stripe.";
+      }
+
+      function packFunnelRecommendation(totals = {}) {
+        const resultReady = Number(totals.downloadReadyShown || 0) || 0;
+        const packToolClicks = Number(totals.postDownloadFounderClicks || 0) || 0;
+        const packPricingClicks = Number(totals.packCtaClicks || 0) || 0;
+        const packClicks = packToolClicks + packPricingClicks;
+        const packSessions = Number(totals.packCheckoutSessions || 0) || 0;
+        const packPurchases = Number(totals.packPurchases || 0) || 0;
+
+        if (packPurchases > 0) {
+          return "Pack 100 já converteu. Próximo passo: identificar origem da compra e repetir esse canal com mais tráfego qualificado.";
+        }
+        if (packSessions > 0) {
+          return "Há sessões Stripe Pack sem compra. Próximo passo: acompanhar cancelamentos e emails de continuação de checkout.";
+        }
+        if (packClicks > 0) {
+          return "Há cliques Pack sem sessão Stripe Pack. Próximo passo: testar conta/login/Stripe com foco no Pack 100.";
+        }
+        if (resultReady > 0) {
+          return "Há resultados prontos sem clique Pack. Próximo passo: continuar a testar a oferta pós-resultado e a barra fixa.";
+        }
+        return "Ainda falta uso suficiente para medir o Pack 100. Próximo passo: gerar tráfego qualificado para chegar a resultados prontos.";
       }
 
       function formatDate(value) {
@@ -2172,7 +2249,7 @@
 
       function outreachCampaign(prospect) {
         const key = outreachTemplateKey(prospect).replace(/^email_/, "");
-        return key === "store_owner" ? "founder_first_customers" : key;
+        return key === "store_owner" ? "pack100_first_customers" : key;
       }
 
       function outreachEmailCopy(prospect) {
@@ -2311,6 +2388,27 @@
           totals.checkoutSessionsCreated,
         ));
         document.querySelector("#liveRevenue").textContent = formatCurrency(totals.revenue || 0);
+        const packToolClicks = Number(totals.postDownloadFounderClicks || 0) || 0;
+        const packPricingClicks = Number(totals.packCtaClicks || 0) || 0;
+        const packClicks = packToolClicks + packPricingClicks;
+        document.querySelector("#packFunnelResultReady").textContent = totals.downloadReadyShown || 0;
+        document.querySelector("#packFunnelPackClicks").textContent = packClicks;
+        document.querySelector("#packFunnelPackSessions").textContent = totals.packCheckoutSessions || 0;
+        document.querySelector("#packFunnelPackPurchases").textContent = totals.packPurchases || 0;
+        document.querySelector("#packFunnelResultToClickRate").textContent = formatPercent(conversionRate(
+          packClicks,
+          totals.downloadReadyShown,
+        ));
+        document.querySelector("#packFunnelClickToStripeRate").textContent = formatPercent(conversionRate(
+          totals.packCheckoutSessions,
+          packClicks,
+        ));
+        document.querySelector("#packFunnelStripeToPaidRate").textContent = formatPercent(conversionRate(
+          totals.packPurchases,
+          totals.packCheckoutSessions,
+        ));
+        document.querySelector("#packFunnelRevenue").textContent = formatCurrency(totals.packRevenue || 0);
+        document.querySelector("#packFunnelAction").textContent = packFunnelRecommendation(totals);
         document.querySelector("#livePaymentFailures").textContent = totals.paymentFailures || 0;
         document.querySelector("#livePaymentFailureValue").textContent = formatCurrency(totals.paymentFailureValue || 0);
         document.querySelector("#liveSubscriptionCancelScheduled").textContent = totals.subscriptionCancelScheduled || 0;
@@ -2690,7 +2788,7 @@
         const proUrl = "https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=support_email&utm_medium=reply&utm_campaign=support_reply#pricing-account-title";
         const templates = {
           positive: `Hi,\n\nThanks for replying.\n\nThe fastest way to check if BatchCutout fits your product photos is to test 2 representative images here:\n${toolUrl}\n\nNo account or card is needed for the free test. If the result works for your catalog, you can start with Pack 100: 100 image credits, one purchase, no subscription:\n${packUrl}\n\nIf you need this every month, Pro includes 2,000 images/month:\n${proUrl}\n\nIf anything blocks the test, reply here and I will help.\n\nThanks,\nRicardo\nNexaFlow Labs`,
-          price: `Hi,\n\nThanks for asking.\n\nThere are two paid options:\n\n- Pack 100: 5 EUR one-time, 100 image credits, no subscription\n- Pro founder plan: 15 EUR/month, up to 2,000 images/month\n\nBoth include up to 100 images per batch, transparent PNG export and one ZIP download for batches.\n\nYou can test 2 images free before paying:\n${toolUrl}\n\nPack 100:\n${packUrl}\n\nPro founder plan:\n${proUrl}\n\nThanks,\nRicardo\nNexaFlow Labs`,
+          price: `Hi,\n\nThanks for asking.\n\nThere are two paid options:\n\n- Pack 100: 5 EUR one-time, 100 image credits, no subscription\n- Recurring Pro campaign: 15 EUR/month, up to 2,000 images/month\n\nBoth include up to 100 images per batch, transparent PNG export and one ZIP download for batches.\n\nYou can test 2 images free before paying:\n${toolUrl}\n\nPack 100:\n${packUrl}\n\nRecurring Pro:\n${proUrl}\n\nThanks,\nRicardo\nNexaFlow Labs`,
           privacy: `Hi,\n\nThanks for asking.\n\nBatchCutout is built for a simple product-photo workflow: upload images, remove backgrounds, review the result, then download transparent PNGs or one ZIP.\n\nThe free test does not require a card. Payments, if you choose a paid option, are handled through Stripe.\n\nYou can test 2 images here:\n${toolUrl}\n\nThanks,\nRicardo\nNexaFlow Labs`,
           fit: `Hi,\n\nThanks for replying.\n\nBatchCutout is most useful when you regularly prepare product photos for listings, marketplaces, supplier images or catalog updates. It is focused on repeat cutouts, transparent PNGs and ZIP export, not full design editing.\n\nYou can test 2 images free here:\n${toolUrl}\n\nIf the result fits your workflow, start with Pack 100 here:\n${packUrl}\n\nThanks,\nRicardo\nNexaFlow Labs`,
           optout: `Hi,\n\nThanks for letting me know.\n\nI will not contact you again about BatchCutout.\n\nRegards,\nRicardo\nNexaFlow Labs`,

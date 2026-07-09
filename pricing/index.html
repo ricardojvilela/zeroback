@@ -107,7 +107,7 @@
             },
             {
               "@type": "Offer",
-              "name": "Plano fundador",
+              "name": "Pro recorrente campanha",
               "availability": "https://schema.org/InStock",
               "priceCurrency": "EUR",
               "price": "15",
@@ -173,7 +173,7 @@
         ]
       }
     </script>
-    <link rel="stylesheet" href="../styles.css?v=20260709-one-time-packs" />
+    <link rel="stylesheet" href="../styles.css?v=20260709-pack-funnel" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
   <body class="landing-page pro-page">
@@ -214,7 +214,7 @@
           </p>
           <div class="landing-actions">
             <a class="landing-button" href="/pricing/?checkout_plan=pack100&utm_source=pricing&utm_medium=hero&utm_campaign=pack100_entry#pricing-account-title" data-i18n="primaryCta" data-pricing-locale-link>Pack 100 imagens - 5 EUR</a>
-            <a class="landing-secondary" href="/pricing/?checkout_plan=early&utm_source=pricing&utm_medium=hero&utm_campaign=founder_recurring#pricing-account-title" data-i18n="secondaryCta" data-pricing-locale-link>
+            <a class="landing-secondary" href="/pricing/?checkout_plan=early&utm_source=pricing&utm_medium=hero&utm_campaign=recurring_pro_campaign#pricing-account-title" data-i18n="secondaryCta" data-pricing-locale-link>
               Pro recorrente - 15 EUR/mês
             </a>
           </div>
@@ -396,7 +396,7 @@
           </p>
           <ul class="pro-form-points">
             <li data-i18n="formPointPack">Packs únicos: 100 imagens por 5 EUR ou 250 por 9 EUR.</li>
-            <li data-i18n="formPointPayment">Plano fundador: 15 EUR/mês para produção recorrente.</li>
+            <li data-i18n="formPointPayment">Pro recorrente em campanha: 15 EUR/mês para produção recorrente.</li>
             <li data-i18n="formPointReply">Mensal: 19 EUR/mês.</li>
             <li data-i18n="formPointPriority">Anual: 190 EUR/ano (poupe 38 EUR face ao mensal).</li>
           </ul>
@@ -427,7 +427,7 @@
                 autocomplete="new-password"
                 required
                 minlength="6"
-                placeholder="A sua password (mín. 6 caracteres)"
+                placeholder="Password (mín. 6 caracteres)"
                 data-i18n-placeholder="checkoutPasswordPlaceholder"
               />
               <button
@@ -450,7 +450,7 @@
           <div class="pricing-plan-actions" id="pricingCheckoutActions">
             <button type="button" class="landing-button" data-pricing-checkout-plan="pack100" data-i18n="pack100PlanCta">Pack 100 imagens - 5 EUR (melhor entrada)</button>
             <button type="button" class="landing-secondary" data-pricing-checkout-plan="pack250" data-i18n="pack250PlanCta">Pack 250 imagens - 9 EUR</button>
-            <button type="button" class="landing-secondary" data-pricing-checkout-plan="early" data-i18n="earlyPlanCta">Plano fundador - 15 EUR/mês (recorrente)</button>
+            <button type="button" class="landing-secondary" data-pricing-checkout-plan="early" data-i18n="earlyPlanCta">Pro recorrente - 15 EUR/mês (campanha)</button>
             <button type="button" class="landing-secondary" data-pricing-checkout-plan="monthly" data-i18n="monthlyPlanCta">Pro mensal - 19 EUR/mês</button>
             <button type="button" class="landing-secondary" data-pricing-checkout-plan="annual" data-i18n="annualPlanCta">Pro anual - 190 EUR/ano (poupe 38 EUR)</button>
           </div>
@@ -582,7 +582,7 @@
           formTitle: "Escolha o plano para começar",
           formLead: "O pagamento é feito por Stripe Checkout. Comece com um pack único ou escolha Pro para produção recorrente.",
           formPointPack: "Packs únicos: 100 imagens por 5 EUR ou 250 por 9 EUR.",
-          formPointPayment: "Plano fundador: 15 EUR/mês para produção recorrente.",
+          formPointPayment: "Pro recorrente em campanha: 15 EUR/mês para produção recorrente.",
           formPointReply: "Mensal: 19 EUR/mês.",
           formPointPriority: "Anual: 190 EUR/ano (poupe 38 EUR face ao mensal).",
           checkoutKicker: "Checkout direto",
@@ -600,7 +600,7 @@
           checkoutStatusChoosePlan: "Plano selecionado. Crie uma conta grátis para abrir o pagamento ou entre se já tiver conta.",
           selectedPlanPrefix: "Plano selecionado",
           checkoutEmailPlaceholder: "O seu email",
-          checkoutPasswordPlaceholder: "A sua password (mín. 6 caracteres)",
+          checkoutPasswordPlaceholder: "Password (mín. 6 caracteres)",
           passwordShow: "Mostrar",
           passwordHide: "Ocultar",
           checkoutAuthNote: "Não há pagamento neste passo. A conta só liga o Stripe ao acesso correto; as imagens continuam no browser.",
@@ -626,7 +626,7 @@
           checkoutResumeCta: "Retomar pagamento",
           pack100PlanCta: "Pack 100 imagens - 5 EUR (melhor entrada)",
           pack250PlanCta: "Pack 250 imagens - 9 EUR",
-          earlyPlanCta: "Plano fundador - 15 EUR/mês (recorrente)",
+          earlyPlanCta: "Pro recorrente - 15 EUR/mês (campanha)",
           monthlyPlanCta: "Pro mensal - 19 EUR/mês",
           annualPlanCta: "Pro anual - 190 EUR/ano (poupe 38 EUR)",
           companyPlaceholder: "Loja ou empresa",
@@ -739,7 +739,7 @@
           formTitle: "Choose a plan to start",
           formLead: "Payment runs through Stripe Checkout. Start with a one-time pack or choose Pro for recurring production.",
           formPointPack: "One-time packs: 100 images for EUR 5 or 250 for EUR 9.",
-          formPointPayment: "Founder plan: EUR 15/month for recurring production.",
+          formPointPayment: "Campaign recurring Pro: EUR 15/month for recurring production.",
           formPointReply: "Monthly: EUR 19/month.",
           formPointPriority: "Annual: EUR 190/year (save EUR 38 vs monthly).",
           checkoutKicker: "Direct checkout",
@@ -757,7 +757,7 @@
           checkoutStatusChoosePlan: "Plan selected. Create a free account to open payment, or sign in if you already have one.",
           selectedPlanPrefix: "Selected plan",
           checkoutEmailPlaceholder: "Your email",
-          checkoutPasswordPlaceholder: "Your password (min. 6 characters)",
+          checkoutPasswordPlaceholder: "Password (min. 6 characters)",
           passwordShow: "Show",
           passwordHide: "Hide",
           checkoutAuthNote: "No payment happens at this step. The account only connects Stripe to the correct access; your images stay in the browser.",
@@ -783,7 +783,7 @@
           checkoutResumeCta: "Resume payment",
           pack100PlanCta: "100 image pack - EUR 5 (best start)",
           pack250PlanCta: "250 image pack - EUR 9",
-          earlyPlanCta: "Founder plan - EUR 15/month (recurring)",
+          earlyPlanCta: "Recurring Pro - EUR 15/month (campaign)",
           monthlyPlanCta: "Pro monthly - EUR 19/month",
           annualPlanCta: "Pro annual - EUR 190/year (save EUR 38)",
           companyPlaceholder: "Store or company",
@@ -896,7 +896,7 @@
           formTitle: "Elige el plan para empezar",
           formLead: "El pago se realiza por Stripe Checkout. Empieza con un pack unico o elige Pro para produccion recurrente.",
           formPointPack: "Packs únicos: 100 imágenes por 5 EUR o 250 por 9 EUR.",
-          formPointPayment: "Plan fundador: 15 EUR/mes para produccion recurrente.",
+          formPointPayment: "Pro recurrente en campaña: 15 EUR/mes para produccion recurrente.",
           formPointReply: "Mensual: 19 EUR/mes.",
           formPointPriority: "Anual: 190 EUR/año (ahorra 38 EUR frente al mensual).",
           checkoutKicker: "Checkout directo",
@@ -914,7 +914,7 @@
           checkoutStatusChoosePlan: "Plan seleccionado. Crea una cuenta gratis para abrir el pago o entra si ya tienes una.",
           selectedPlanPrefix: "Plan seleccionado",
           checkoutEmailPlaceholder: "Tu email",
-          checkoutPasswordPlaceholder: "Tu contraseña (mín. 6 caracteres)",
+          checkoutPasswordPlaceholder: "Contraseña (mín. 6 caracteres)",
           passwordShow: "Mostrar",
           passwordHide: "Ocultar",
           checkoutAuthNote: "No hay pago en este paso. La cuenta solo conecta Stripe con el acceso correcto; tus imágenes siguen en el navegador.",
@@ -940,7 +940,7 @@
           checkoutResumeCta: "Retomar pago",
           pack100PlanCta: "Pack 100 imagenes - 5 EUR (mejor entrada)",
           pack250PlanCta: "Pack 250 imágenes - 9 EUR",
-          earlyPlanCta: "Plan fundador - 15 EUR/mes (recurrente)",
+          earlyPlanCta: "Pro recurrente - 15 EUR/mes (campaña)",
           monthlyPlanCta: "Pro mensual - 19 EUR/mes",
           annualPlanCta: "Pro anual - 190 EUR/año (ahorra 38 EUR)",
           companyPlaceholder: "Tienda o empresa",
@@ -1747,7 +1747,7 @@
                 : plan === "annual"
                   ? "BatchCutout Pro Annual"
                   : plan === "early"
-                    ? "BatchCutout Founder"
+                    ? "BatchCutout Pro Campaign"
                     : "BatchCutout Pro Monthly",
             item_category: plan === "pack100" || plan === "pack250" ? "one_time_pack" : "subscription",
             price: pricingPlanValue(plan),

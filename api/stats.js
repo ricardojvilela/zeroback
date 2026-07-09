@@ -85,6 +85,8 @@ function emptyDay(date) {
     proofCtaClicks: 0,
     proClicks: 0,
     pricingCtaClicks: 0,
+    packCtaClicks: 0,
+    subscriptionCtaClicks: 0,
     highVolumeContacts: 0,
     monthlyLimitReached: 0,
     checkoutLoginRequired: 0,
@@ -251,6 +253,8 @@ function emptySourceRow(source) {
     proofCtaClicks: 0,
     proClicks: 0,
     pricingCtaClicks: 0,
+    packCtaClicks: 0,
+    subscriptionCtaClicks: 0,
     highVolumeContacts: 0,
     monthlyLimitReached: 0,
     checkoutLoginRequired: 0,
@@ -328,6 +332,10 @@ function emptyLandingPageRow(pagePath) {
     ctaRate: 0,
     pricingRate: 0,
   };
+}
+
+function isPackCheckoutPlan(plan) {
+  return ["pack100", "pack250"].includes(String(plan || "").toLowerCase());
 }
 
 function verifyAdminToken(request) {
@@ -503,6 +511,13 @@ export default async function handler(request, response) {
           if (detail.target === "pricing") {
             row.pricingCtaClicks += 1;
             sourceRow.pricingCtaClicks += 1;
+            if (isPackCheckoutPlan(detail.checkout_plan || detail.plan || detail.price_plan)) {
+              row.packCtaClicks += 1;
+              sourceRow.packCtaClicks += 1;
+            } else {
+              row.subscriptionCtaClicks += 1;
+              sourceRow.subscriptionCtaClicks += 1;
+            }
           } else if (detail.target === "tool") {
             row.proClicks += 1;
             sourceRow.proClicks += 1;
@@ -520,6 +535,13 @@ export default async function handler(request, response) {
           if (detail.target === "pricing") {
             row.pricingCtaClicks += 1;
             sourceRow.pricingCtaClicks += 1;
+            if (isPackCheckoutPlan(detail.checkout_plan || detail.plan || detail.price_plan)) {
+              row.packCtaClicks += 1;
+              sourceRow.packCtaClicks += 1;
+            } else {
+              row.subscriptionCtaClicks += 1;
+              sourceRow.subscriptionCtaClicks += 1;
+            }
           } else if (detail.target === "tool") {
             row.proClicks += 1;
             sourceRow.proClicks += 1;
@@ -537,6 +559,13 @@ export default async function handler(request, response) {
           if (detail.target === "pricing") {
             row.pricingCtaClicks += 1;
             sourceRow.pricingCtaClicks += 1;
+            if (isPackCheckoutPlan(detail.checkout_plan || detail.plan || detail.price_plan)) {
+              row.packCtaClicks += 1;
+              sourceRow.packCtaClicks += 1;
+            } else {
+              row.subscriptionCtaClicks += 1;
+              sourceRow.subscriptionCtaClicks += 1;
+            }
           }
           break;
         case "pro_page_view":
@@ -617,6 +646,13 @@ export default async function handler(request, response) {
         case "pro_cta_clicked":
           row.pricingCtaClicks += 1;
           sourceRow.pricingCtaClicks += 1;
+          if (isPackCheckoutPlan(detail.checkout_plan || detail.plan || detail.price_plan)) {
+            row.packCtaClicks += 1;
+            sourceRow.packCtaClicks += 1;
+          } else {
+            row.subscriptionCtaClicks += 1;
+            sourceRow.subscriptionCtaClicks += 1;
+          }
           break;
         case "high_volume_contact_clicked":
           row.highVolumeContacts += 1;

@@ -454,6 +454,7 @@ h2 {
   position: absolute;
   top: 50%;
   right: 8px;
+  max-width: 76px;
   min-height: 30px;
   transform: translateY(-50%);
   border: 1px solid rgba(255, 255, 255, 0.22);
@@ -463,6 +464,7 @@ h2 {
   color: #ffffff;
   font-size: 0.74rem;
   font-weight: 900;
+  white-space: nowrap;
 }
 
 .password-toggle:hover:not(:disabled) {
@@ -3300,6 +3302,10 @@ progress::-moz-progress-bar {
   background: #ffffff;
   color: var(--charcoal);
   font: inherit;
+}
+
+.pricing-auth-form .password-field input {
+  padding-right: 96px;
 }
 
 .pricing-auth-form input:focus {
