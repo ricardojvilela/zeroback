@@ -53,6 +53,7 @@ const proInterestTitle = document.querySelector("#pro-interest-title");
 const proInterestLead = document.querySelector("[data-i18n='proInlineLead']");
 const proInterestBenefits = document.querySelector(".pro-benefits");
 const proInlineForm = document.querySelector("#proInlineForm");
+const proAllPlansLink = document.querySelector(".pro-all-plans-link");
 const proLimitLeadBlock = document.querySelector("#proLimitLeadBlock");
 const proLimitEmailForm = document.querySelector("#proLimitEmailForm");
 const proLimitEmail = document.querySelector("#proLimitEmail");
@@ -228,6 +229,7 @@ const baseTranslation = {
   proInlineTitle: "Continue com 100 créditos por 5 EUR",
   proInlineLead: "Já viu o resultado com fotos reais. Se precisa repetir isto num lote real, o Pack 100 é uma compra única sem subscrição.",
   proInlineBenefits: "Pack 100: 5 EUR, 100 créditos de imagem, até 100 imagens por lote e ZIP. Pro fica para produção recorrente.",
+  comparePlansCta: "Comparar todos os planos",
   proInlineTitleBatchLimit: "Selecionou {total} imagens. O Pack 100 desbloqueia um lote real.",
   proInlineLeadBatchLimit: "No teste grátis entram {accepted}. Com Pack 100 processa até 100 imagens por lote, com PNG transparente e ZIP pronto para loja.",
   proInlineBenefitsBatchLimit: "Se este é um lote real para catálogo ou marketplace, comece com 100 créditos por 5 EUR. Pro fica disponível se isto passar a ser mensal.",
@@ -453,6 +455,7 @@ const translations = {
     proInlineTitle: "Continue with 100 credits for EUR 5",
     proInlineLead: "You have seen the result with real photos. If you need to repeat this on a real batch, Pack 100 is a one-time purchase without a subscription.",
     proInlineBenefits: "Pack 100: EUR 5, 100 image credits, up to 100 images per batch and ZIP export. Pro is there for recurring production.",
+    comparePlansCta: "Compare all plans",
     proInlineTitleBatchLimit: "You selected {total} images. Pack 100 unlocks a real batch.",
     proInlineLeadBatchLimit: "The free test adds {accepted}. With Pack 100 you can process up to 100 images per batch, with transparent PNGs and store-ready ZIP export.",
     proInlineBenefitsBatchLimit: "If this is a real catalog or marketplace batch, start with 100 credits for EUR 5. Pro remains available if this becomes monthly work.",
@@ -1058,6 +1061,7 @@ const translatedAddons = {
     proInlineTitle: "Continua con 100 creditos por 5 EUR",
     proInlineLead: "Ya viste el resultado con fotos reales. Si necesitas repetir esto en un lote real, Pack 100 es una compra unica sin suscripcion.",
     proInlineBenefits: "Pack 100: 5 EUR, 100 creditos de imagen, hasta 100 imagenes por lote y ZIP. Pro queda para produccion recurrente.",
+    comparePlansCta: "Comparar todos los planes",
     proInlineTitleBatchLimit: "Seleccionaste {total} imagenes. Pack 100 desbloquea un lote real.",
     proInlineLeadBatchLimit: "En la prueba gratis entran {accepted}. Con Pack 100 procesas hasta 100 imagenes por lote, con PNG transparente y ZIP listo para tienda.",
     proInlineBenefitsBatchLimit: "Si este es un lote real para catalogo o marketplace, empieza con 100 creditos por 5 EUR. Pro sigue disponible si pasa a ser trabajo mensual.",
@@ -3415,6 +3419,7 @@ function showProPrompt(reason = "post_download", options = {}) {
   activeProPromptParams = options.params || {};
   if (proInlineMessage) proInlineMessage.textContent = "";
   if (proInlineSuccessCard) proInlineSuccessCard.hidden = true;
+  if (proAllPlansLink) proAllPlansLink.href = pricingLinkHref("pack100");
   updateProPromptCopy();
 
   if (wasHidden) {

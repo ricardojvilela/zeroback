@@ -543,12 +543,15 @@
             id="proInlineForm"
             novalidate
           >
-            <button type="button" data-checkout-plan="pack100" data-i18n="billingPack100">Pack 100 imagens - 5 EUR (melhor entrada)</button>
-            <button type="button" data-checkout-plan="pack250" data-i18n="billingPack250">Pack 250 imagens - 9 EUR</button>
-            <button type="button" data-checkout-plan="early" data-i18n="billingEarly">Pro recorrente - 15 EUR/mês (campanha)</button>
-            <button type="button" data-checkout-plan="monthly" data-i18n="billingMonthly">Pro mensal - 19 EUR/mês</button>
-            <button type="button" data-checkout-plan="annual" data-i18n="billingAnnual">Pro anual - 190 EUR/ano</button>
+            <button type="button" data-checkout-plan="pack100" data-inline-option="primary" data-i18n="billingPack100">Pack 100 imagens - 5 EUR (melhor entrada)</button>
+            <button type="button" data-checkout-plan="early" data-inline-option="secondary" data-i18n="billingEarly">Pro recorrente - 15 EUR/mês (campanha)</button>
+            <button type="button" data-checkout-plan="pack250" data-inline-option="full" data-i18n="billingPack250" hidden>Pack 250 imagens - 9 EUR</button>
+            <button type="button" data-checkout-plan="monthly" data-inline-option="full" data-i18n="billingMonthly" hidden>Pro mensal - 19 EUR/mês</button>
+            <button type="button" data-checkout-plan="annual" data-inline-option="full" data-i18n="billingAnnual" hidden>Pro anual - 190 EUR/ano</button>
           </form>
+          <a class="pro-all-plans-link" href="./pricing/?checkout_plan=pack100#pricing-account-title" data-pricing-link data-i18n="comparePlansCta">
+            Comparar todos os planos
+          </a>
           <div class="pro-limit-lead hidden" id="proLimitLeadBlock">
             <p data-i18n="proLimitLeadText">
               Ainda a avaliar? Receba o link e checklist para voltar ao lote quando estiver pronto, com o Pack 100 como primeira opção paga.

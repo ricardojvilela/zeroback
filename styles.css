@@ -1450,26 +1450,41 @@ h2 {
   padding-bottom: 8px;
 }
 
+.pro-checkout-actions button[data-checkout-plan="pack100"] {
+  border: 1px solid rgba(38, 70, 216, 0.32);
+  background: var(--blue);
+  color: #ffffff;
+  box-shadow: 0 12px 30px rgba(38, 70, 216, 0.18);
+}
+
+.pro-checkout-actions button[data-checkout-plan="pack100"]:hover:not(:disabled) {
+  border-color: rgba(38, 70, 216, 0.42);
+  background: var(--blue-strong);
+  color: #ffffff;
+}
+
 .pro-checkout-actions button[data-checkout-plan="early"] {
-  border: 1px solid rgba(15, 139, 124, 0.35);
-  background: linear-gradient(135deg, var(--accent), var(--blue));
-  box-shadow: 0 12px 30px rgba(15, 139, 124, 0.2);
-}
-
-.pro-checkout-actions button[data-checkout-plan^="pack"] {
-  border: 1px solid rgba(38, 70, 216, 0.24);
-  background: rgba(38, 70, 216, 0.08);
-  color: var(--blue-strong);
-}
-
-.pro-checkout-actions button[data-checkout-plan^="pack"]:hover:not(:disabled) {
-  border-color: rgba(38, 70, 216, 0.38);
-  background: rgba(38, 70, 216, 0.13);
-  color: var(--blue-strong);
+  border: 1px solid rgba(15, 139, 124, 0.3);
+  background: #ffffff;
+  color: var(--accent-strong);
 }
 
 .pro-checkout-actions button[data-checkout-plan="early"]:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--accent-strong), var(--blue-strong));
+  background: rgba(15, 139, 124, 0.08);
+  color: var(--accent-strong);
+}
+
+.pro-all-plans-link {
+  justify-self: start;
+  margin-top: 8px;
+  color: var(--blue-strong);
+  font-size: 0.88rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.pro-all-plans-link:hover {
+  text-decoration: underline;
 }
 
 .pro-form button {
