@@ -27,7 +27,7 @@ Core positioning:
 - Images are processed in the user's browser and are not uploaded to BatchCutout servers.
 - Free plan: test with 2 images per batch.
 - Pro: up to 100 images per batch and 2,000 images per month.
-- Current paid plans: founder plan EUR 15/month, monthly Pro EUR 19/month, annual Pro EUR 190/year.
+- Current paid options: Pack 100 EUR 5 one-time for 100 image credits, monthly Pro EUR 19/month, annual Pro EUR 190/year.
 
 Useful pages:
 - https://batchcutout.com/es/

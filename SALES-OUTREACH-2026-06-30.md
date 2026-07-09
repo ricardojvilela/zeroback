@@ -27,9 +27,9 @@ Send manually first. Track replies in this file or in a sheet before automating.
 
 ## Primary offer
 
-Founder offer:
+First paid offer:
 
-- 15 EUR/month
+- Pack 100: 5 EUR one-time for 100 image credits
 - 100 images per batch
 - 2,000 images per month
 - transparent PNG and ZIP export
@@ -37,7 +37,7 @@ Founder offer:
 
 Link:
 
-https://batchcutout.com/pricing/?checkout_plan=early&utm_source=manual_outreach&utm_medium=email&utm_campaign=founder_first_customers#pricing-account-title
+https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=manual_outreach&utm_medium=email&utm_campaign=pack100_first_customers#pricing-account-title
 
 ## Email template - direct store owner
 
@@ -51,16 +51,17 @@ I found your store and noticed you have product photos that likely need repeat e
 
 We built BatchCutout for small ecommerce teams that need to remove backgrounds from product photos in batches, export transparent PNGs, and download everything as one ZIP.
 
-The current founder plan is 15 EUR/month and includes:
+After the free test, Pack 100 is the simplest paid option:
 
-- 100 images per batch
-- 2,000 images per month
+- 100 image credits
+- one-time 5 EUR payment
 - PNG and ZIP export
+- no subscription needed
 
 You can try it here:
-https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=founder_first_customers#tool
+https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=pack100_first_customers#tool
 
-You can test 2 images free in the browser, no account or card needed. If you need larger batches after testing, Pro unlocks up to 100 images per batch and 2,000 images per month.
+You can test 2 images free in the browser, no account or card needed. If you need a larger batch after testing, Pack 100 gives you 100 image credits for 5 EUR with no subscription.
 
 Thanks,
 Ricardo
@@ -80,8 +81,8 @@ We built BatchCutout as a simple batch background remover for product photo work
 
 It may be useful when you need to process many simple product shots before final editing or client delivery.
 
-Founder plan:
-https://batchcutout.com/pricing/?checkout_plan=early&utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach#pricing-account-title
+Pack 100:
+https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach#pricing-account-title
 
 You can test 2 images free here, no card needed:
 https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_outreach#tool
@@ -92,7 +93,7 @@ NexaFlow Labs
 
 ## Contact form template
 
-Hi, I found your store and thought BatchCutout might help with repeat product-photo work. It removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP. You can test 2 images free, no account or card needed: https://batchcutout.com/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=founder_first_customers#tool Founder plan is 15 EUR/month for 100 images per batch and 2,000/month. - Ricardo, NexaFlow Labs
+Hi, I found your store and thought BatchCutout might help with repeat product-photo work. It removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP. You can test 2 images free, no account or card needed: https://batchcutout.com/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=pack100_first_customers#tool Pack 100 is 5 EUR for 100 image credits with no subscription. - Ricardo, NexaFlow Labs
 
 ## Today target list
 
@@ -251,9 +252,9 @@ Hi,
 Quick follow-up. BatchCutout is useful if you regularly prepare product photos for listings and want transparent PNGs or ZIP export without editing one by one.
 
 You can test it free with 2 images:
-https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=founder_first_customers_followup#tool
+https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=pack100_first_customers_followup#tool
 
-No account or card is needed for the free test. If you need larger batches after testing, Pro unlocks up to 100 images per batch and 2,000 images per month.
+No account or card is needed for the free test. If you need a larger batch after testing, Pack 100 gives you 100 image credits for 5 EUR with no subscription.
 
 Thanks,
 Ricardo

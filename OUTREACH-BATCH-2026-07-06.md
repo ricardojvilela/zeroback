@@ -35,7 +35,7 @@ https://batchcutout.com/en/customer-results/?utm_source=manual_outreach&utm_medi
 You can test 2 images free here, no account or card needed:
 https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=handmade_home#tool
 
-If you need larger batches after testing, Pro unlocks up to 100 images per batch and 2,000 images per month. The current founder plan is 15 EUR/month.
+If you need a larger batch after testing, Pack 100 gives you 100 image credits for 5 EUR with no subscription. Pro is available later if this becomes recurring monthly work.
 
 If this is not relevant, reply "no thanks" and I will not contact you again.
 
@@ -65,7 +65,7 @@ https://batchcutout.com/en/customer-results/?utm_source=manual_outreach&utm_medi
 You can test 2 images free here, no account or card needed:
 https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=handmade_home#tool
 
-If you need larger batches after testing, Pro unlocks up to 100 images per batch and 2,000 images per month. The current founder plan is 15 EUR/month.
+If you need a larger batch after testing, Pack 100 gives you 100 image credits for 5 EUR with no subscription.
 
 If this is not relevant, reply "no thanks" and I will not contact you again.
 
@@ -95,7 +95,7 @@ https://batchcutout.com/en/customer-results/?utm_source=manual_outreach&utm_medi
 You can test 2 images free here, no account or card needed:
 https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=handmade_home#tool
 
-If you need larger batches after testing, Pro unlocks up to 100 images per batch and 2,000 images per month. The current founder plan is 15 EUR/month.
+If you need a larger batch after testing, Pack 100 gives you 100 image credits for 5 EUR with no subscription.
 
 If this is not relevant, reply "no thanks" and I will not contact you again.
 
@@ -125,7 +125,7 @@ https://batchcutout.com/en/customer-results/?utm_source=manual_outreach&utm_medi
 You can test 2 images free here, no account or card needed:
 https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=custom_gifts#tool
 
-If you need larger batches after testing, Pro unlocks up to 100 images per batch and 2,000 images per month. The current founder plan is 15 EUR/month.
+If you need a larger batch after testing, Pack 100 gives you 100 image credits for 5 EUR with no subscription.
 
 If this is not relevant, reply "no thanks" and I will not contact you again.
 
@@ -155,7 +155,7 @@ https://batchcutout.com/en/customer-results/?utm_source=manual_outreach&utm_medi
 You can test 2 images free here, no account or card needed:
 https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=custom_gifts#tool
 
-If you need larger batches after testing, Pro unlocks up to 100 images per batch and 2,000 images per month. The current founder plan is 15 EUR/month.
+If you need a larger batch after testing, Pack 100 gives you 100 image credits for 5 EUR with no subscription.
 
 If this is not relevant, reply "no thanks" and I will not contact you again.
 

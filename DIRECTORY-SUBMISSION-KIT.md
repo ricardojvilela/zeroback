@@ -1,6 +1,6 @@
 # BatchCutout - directory submission kit
 
-Updated: 2026-07-05
+Updated: 2026-07-09
 
 Use this kit for Product Hunt, Uneed, BetaList, SaaSHub, Indie Hackers and AI/ecommerce tool directories.
 
@@ -20,12 +20,12 @@ BatchCutout removes backgrounds from product photos in batches and exports trans
 Long description:
 BatchCutout is a focused browser-based background remover for ecommerce sellers and small catalog teams. Upload product photos, remove backgrounds in batches, review the result, then download transparent PNGs or one ZIP.
 
-The free plan lets users test 2 images without a card. Pro unlocks 100 images per batch, 2,000 images per month, PNG export and ZIP export.
+The free plan lets users test 2 images without a card. Pack 100 is the first paid step at EUR 5 for 100 image credits, with Pro available for recurring monthly volume.
 
 Images are processed in the user's browser and are not uploaded to BatchCutout servers.
 
 Current offer:
-Test 2 images free with no card. Founder plan starts at EUR 15/month for 100 images per batch and 2,000 images per month.
+Test 2 images free with no card. Pack 100 costs EUR 5 as a one-time purchase for 100 image credits. Pro is available for recurring monthly production.
 
 Company:
 NexaFlow Labs
@@ -63,11 +63,11 @@ Secondary links:
 
 | Platform | Pricing | Proof page | Partner page |
 | --- | --- | --- | --- |
-| Product Hunt | `https://batchcutout.com/pricing/?checkout_plan=early&utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch#pricing-account-title` | `https://batchcutout.com/en/customer-results/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch` | `https://batchcutout.com/partners/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch` |
-| Uneed | `https://batchcutout.com/pricing/?checkout_plan=early&utm_source=uneed&utm_medium=directory&utm_campaign=directory_launch#pricing-account-title` | `https://batchcutout.com/en/customer-results/?utm_source=uneed&utm_medium=directory&utm_campaign=directory_launch` | `https://batchcutout.com/partners/?utm_source=uneed&utm_medium=directory&utm_campaign=directory_launch` |
-| BetaList | `https://batchcutout.com/pricing/?checkout_plan=early&utm_source=betalist&utm_medium=directory&utm_campaign=directory_launch#pricing-account-title` | `https://batchcutout.com/en/customer-results/?utm_source=betalist&utm_medium=directory&utm_campaign=directory_launch` | `https://batchcutout.com/partners/?utm_source=betalist&utm_medium=directory&utm_campaign=directory_launch` |
-| SaaSHub | `https://batchcutout.com/pricing/?checkout_plan=early&utm_source=saashub&utm_medium=directory&utm_campaign=directory_launch#pricing-account-title` | `https://batchcutout.com/en/customer-results/?utm_source=saashub&utm_medium=directory&utm_campaign=directory_launch` | `https://batchcutout.com/partners/?utm_source=saashub&utm_medium=directory&utm_campaign=directory_launch` |
-| Indie Hackers | `https://batchcutout.com/pricing/?checkout_plan=early&utm_source=indie_hackers&utm_medium=community&utm_campaign=directory_launch#pricing-account-title` | `https://batchcutout.com/en/customer-results/?utm_source=indie_hackers&utm_medium=community&utm_campaign=directory_launch` | `https://batchcutout.com/partners/?utm_source=indie_hackers&utm_medium=community&utm_campaign=directory_launch` |
+| Product Hunt | `https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch#pricing-account-title` | `https://batchcutout.com/en/customer-results/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch` | `https://batchcutout.com/partners/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch` |
+| Uneed | `https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=uneed&utm_medium=directory&utm_campaign=directory_launch#pricing-account-title` | `https://batchcutout.com/en/customer-results/?utm_source=uneed&utm_medium=directory&utm_campaign=directory_launch` | `https://batchcutout.com/partners/?utm_source=uneed&utm_medium=directory&utm_campaign=directory_launch` |
+| BetaList | `https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=betalist&utm_medium=directory&utm_campaign=directory_launch#pricing-account-title` | `https://batchcutout.com/en/customer-results/?utm_source=betalist&utm_medium=directory&utm_campaign=directory_launch` | `https://batchcutout.com/partners/?utm_source=betalist&utm_medium=directory&utm_campaign=directory_launch` |
+| SaaSHub | `https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=saashub&utm_medium=directory&utm_campaign=directory_launch#pricing-account-title` | `https://batchcutout.com/en/customer-results/?utm_source=saashub&utm_medium=directory&utm_campaign=directory_launch` | `https://batchcutout.com/partners/?utm_source=saashub&utm_medium=directory&utm_campaign=directory_launch` |
+| Indie Hackers | `https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=indie_hackers&utm_medium=community&utm_campaign=directory_launch#pricing-account-title` | `https://batchcutout.com/en/customer-results/?utm_source=indie_hackers&utm_medium=community&utm_campaign=directory_launch` | `https://batchcutout.com/partners/?utm_source=indie_hackers&utm_medium=community&utm_campaign=directory_launch` |
 
 Use the platform-specific row whenever a directory allows extra pricing, proof or partner links. Avoid generic `utm_source=directory` links because they hide the acquisition source in `/admin`.
 
@@ -99,7 +99,7 @@ Primary link:
 https://batchcutout.com/launch/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch
 
 Pricing link:
-https://batchcutout.com/pricing/?checkout_plan=early&utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch#pricing-account-title
+https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch#pricing-account-title
 
 ### Uneed
 
@@ -150,7 +150,7 @@ The workflow is intentionally narrow:
 - export transparent PNGs;
 - download one organized ZIP.
 
-The free plan lets you test 2 images without a card. Pro is for larger catalog work: 100 images per batch and 2,000 images per month.
+The free plan lets you test 2 images without a card. Pack 100 is the first paid step: EUR 5 for 100 image credits. Pro is available for recurring catalog work.
 
 Images are processed locally in the browser and are not uploaded to BatchCutout servers.
 
@@ -166,7 +166,7 @@ I have been working on BatchCutout, a simple tool for ecommerce sellers who need
 
 It is not a full design suite. The workflow is focused on product-photo cutouts: upload, remove background, review, export transparent PNGs or one ZIP.
 
-Free users can test 2 images without a card. Pro unlocks 100 images per batch and 2,000 images per month.
+Free users can test 2 images without a card. Pack 100 unlocks 100 image credits for EUR 5, with Pro available for recurring monthly production.
 
 I am looking for feedback from sellers, VAs, product photographers and small agencies who prepare repeated catalog or marketplace photos.
 
@@ -182,7 +182,7 @@ If someone asks why not use a full design suite:
 BatchCutout is intentionally narrower. It is for repeated ecommerce cutouts: upload a batch, remove backgrounds, export PNGs or one ZIP.
 
 If someone asks about pricing:
-You can test 2 images free with no card. The founder plan is EUR 15/month and unlocks 100 images per batch plus 2,000 images per month.
+You can test 2 images free with no card. Pack 100 is EUR 5 as a one-time purchase for 100 image credits. Pro is available for recurring monthly production.
 
 If someone asks who it is for:
 The best fit is Shopify, WooCommerce, Etsy, eBay and Amazon sellers, plus assistants or small agencies preparing repeated product batches.
@@ -202,7 +202,7 @@ BatchCutout helps ecommerce teams turn repeated product photos into transparent 
 
 - Submit one directory at a time with its own UTM link.
 - Check the live page after submission.
-- Monitor `/admin` for visitors, uploads, downloads, Pro clicks and checkout starts.
+- Monitor `/admin` for visitors, uploads, downloads, Pack 100 clicks and checkout starts.
 - Reply manually to comments and questions.
 - Do not raise Google Ads spend because of directory traffic alone.
 - If directory traffic produces uploads but no checkout starts, review the post-download CTA and pricing page first.

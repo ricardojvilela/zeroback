@@ -15,8 +15,8 @@ Goal: generate referrals from people who already work around ecommerce product p
 BatchCutout is a focused utility for repeat product-photo cutouts:
 
 - 2-image free test, no card.
-- Pro supports 100 images per batch.
-- 2,000 images per month.
+- Pack 100 gives 100 image credits for one real batch.
+- Pro is available for recurring monthly volume.
 - Transparent PNG and ZIP export.
 
 Do not position it as a replacement for professional editing, photography, or design services. Position it as a batch utility for repetitive cutout work.
@@ -47,7 +47,7 @@ https://batchcutout.com/?utm_source=partner_referral&utm_medium=partner&utm_camp
 Pricing link:
 
 ```text
-https://batchcutout.com/pricing/?checkout_plan=early&utm_source=partner_referral&utm_medium=partner&utm_campaign=partner_[name]#pricing-account-title
+https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=partner_referral&utm_medium=partner&utm_campaign=partner_[name]#pricing-account-title
 ```
 
 Partner page:
@@ -92,7 +92,7 @@ Use private Stripe promotion codes only when:
 - the partner can bring repeated relevant traffic;
 - the code is tied to a named partner;
 - redemption is limited;
-- the discount does not undercut the founder plan as the default offer.
+- the discount does not undercut Pack 100 as the default first paid offer.
 
 Suggested first private code if needed:
 

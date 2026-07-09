@@ -1,6 +1,6 @@
 # BatchCutout - Google Ads assets to apply
 
-Use these assets with the existing Search campaign. Keep the current prices unchanged.
+Use these assets with the existing Search campaign. Lead with Pack 100 as the first paid step and keep recurring Pro as the higher-volume option.
 
 ## Final URLs
 
@@ -14,7 +14,7 @@ Etsy:
 https://batchcutout.com/en/etsy-product-photo-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=etsy_background_remover&utm_content=search
 
 Pricing:
-https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=google_ads&utm_medium=cpc&utm_campaign=pro_pricing&utm_content=search#pricing-account-title
+https://batchcutout.com/pricing/?lang=en&checkout_plan=pack100&utm_source=google_ads&utm_medium=cpc&utm_campaign=pack100_pricing&utm_content=search#pricing-account-title
 
 Long-tail SEO/search pages:
 
@@ -61,7 +61,7 @@ Spanish product background remover:
 https://batchcutout.com/es/quitar-fondo-fotos-producto-lote/?utm_source=google_ads&utm_medium=cpc&utm_campaign=spanish_product_background_remover&utm_content=search
 
 Spanish pricing:
-https://batchcutout.com/pricing/?lang=es&checkout_plan=early&utm_source=google_ads&utm_medium=cpc&utm_campaign=spanish_pro_pricing&utm_content=search#pricing-account-title
+https://batchcutout.com/pricing/?lang=es&checkout_plan=pack100&utm_source=google_ads&utm_medium=cpc&utm_campaign=spanish_pack100_pricing&utm_content=search#pricing-account-title
 
 ## Sitelinks
 
@@ -80,20 +80,20 @@ Description 1: Clean listing images
 Description 2: Useful for shop updates
 URL: https://batchcutout.com/en/etsy-product-photo-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_etsy
 
-Plans
-Description 1: Pro from EUR 15/month
-Description 2: Up to 100 images per batch
-URL: https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_pricing#pricing-account-title
+Pack 100
+Description 1: 100 images for EUR 5
+Description 2: One-time purchase
+URL: https://batchcutout.com/pricing/?lang=en&checkout_plan=pack100&utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_pack100#pricing-account-title
 
 ES Fotos Producto
 Description 1: Quita fondos en lote
 Description 2: Exporta PNGs o ZIP
 URL: https://batchcutout.com/es/quitar-fondo-fotos-producto-lote/?utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_es_product
 
-ES Plan Fundador
-Description 1: Pro desde 15 EUR/mes
-Description 2: Hasta 100 imagenes por lote
-URL: https://batchcutout.com/pricing/?lang=es&checkout_plan=early&utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_es_pricing#pricing-account-title
+ES Pack 100
+Description 1: 100 imagenes por 5 EUR
+Description 2: Compra unica
+URL: https://batchcutout.com/pricing/?lang=es&checkout_plan=pack100&utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_es_pack100#pricing-account-title
 
 ## Callouts
 
@@ -104,8 +104,8 @@ URL: https://batchcutout.com/pricing/?lang=es&checkout_plan=early&utm_source=goo
 - Ecommerce workflow
 - Ideal for catalogs
 - Useful for marketplaces
-- Up to 100 images per batch
-- Up to 2,000 images per month
+- Pack 100 available
+- Pro for recurring volume
 
 ## Structured snippets
 

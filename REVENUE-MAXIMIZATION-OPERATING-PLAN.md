@@ -211,3 +211,4 @@ Interpretation:
 - The pricing page now leads with Pack 100 across hero, recommended plan, calculator and default checkout selection, while founder/Pro is positioned as the recurring-production option.
 - Core PT/EN/ES acquisition landings now send the first paid intent to Pack 100 instead of founder checkout, aligning SEO and Ads traffic with the current low-friction purchase path.
 - Long-tail PT/EN/ES SEO, platform, alternative, proof and launch pages now also send first paid intent to Pack 100, keeping Pro/founder copy only for recurring monthly production.
+- Reusable recovery emails, directory kit, Google Ads docs/import files, partner links, prospecting templates and LLM discovery now also lead with Pack 100, preventing future outreach or campaign imports from reverting to the old founder-first pitch.

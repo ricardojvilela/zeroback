@@ -58,21 +58,21 @@ Manual outreach must use the domain sender:
 Timing: 2 to 4 hours after account creation if no `pro_checkout_started`.
 
 Subject:
-Finish setting up BatchCutout Pro
+Finish your BatchCutout batch setup
 
 Email:
 Hi,
 
-You created a BatchCutout account but did not choose a Pro plan yet.
+You created a BatchCutout account but did not choose a paid option yet.
 
-If you are preparing product photos in batches, Pro unlocks:
+If you are preparing product photos in batches, Pack 100 gives you:
 
-- Up to 100 images per batch
-- Up to 2,000 images per month
+- 100 image credits
+- One-time payment, no subscription
 - ZIP export for product workflows
 
-Choose the current founder plan here:
-https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=account_no_checkout#pricing-account-title
+Buy Pack 100 here:
+https://batchcutout.com/pricing/?lang=en&checkout_plan=pack100&utm_source=email&utm_medium=recovery&utm_campaign=account_no_checkout#pricing-account-title
 
 Thanks,
 NexaFlow Labs
@@ -90,16 +90,16 @@ Need help activating BatchCutout Pro?
 Email:
 Hi,
 
-It looks like you opened BatchCutout Pro checkout but did not complete payment.
+It looks like you opened BatchCutout checkout but did not complete payment.
 
-If anything blocked you, reply to this email and we will help. The current Pro offer keeps the same limits:
+If anything blocked you, reply to this email and we will help. The simplest paid option is:
 
-- 100 images per batch
-- 2,000 images per month
-- Monthly, founder, and annual billing options
+- Pack 100: EUR 5 one-time purchase
+- 100 image credits
+- Transparent PNG and ZIP export
 
 Continue checkout:
-https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=checkout_not_paid#pricing-account-title
+https://batchcutout.com/pricing/?lang=en&checkout_plan=pack100&utm_source=email&utm_medium=recovery&utm_campaign=checkout_not_paid#pricing-account-title
 
 Thanks,
 NexaFlow Labs
@@ -112,21 +112,21 @@ If you do not want product follow-up emails, reply with "unsubscribe".
 Timing: 24 to 48 hours after download if the user has an email and no Pro checkout.
 
 Subject:
-Batch product photos faster with Pro
+Batch product photos faster with Pack 100
 
 Email:
 Hi,
 
-You used BatchCutout to export product images. If you need to repeat that workflow with larger batches, Pro removes the 2-image batch limit.
+You used BatchCutout to export product images. If you need to repeat that workflow with a real batch, Pack 100 removes the 2-image free limit.
 
-Pro includes:
+Pack 100 includes:
 
-- 100 images per batch
-- 2,000 images per month
+- 100 image credits
+- One-time payment, no subscription
 - Transparent PNG and ZIP export
 
-See plans:
-https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=download_no_pro#pricing-account-title
+Buy Pack 100:
+https://batchcutout.com/pricing/?lang=en&checkout_plan=pack100&utm_source=email&utm_medium=recovery&utm_campaign=download_no_pro#pricing-account-title
 
 Thanks,
 NexaFlow Labs
@@ -177,14 +177,14 @@ Quick checklist for your next batch:
 - Avoid very strong shadows or backgrounds with colors too close to the product
 - Download PNG for one image or ZIP for multiple products
 
-If you need larger batches, the founder plan includes:
+If you need a larger batch, Pack 100 includes:
 
-- 100 images per batch
-- 2,000 images per month
+- 100 image credits
+- One-time payment, no subscription
 - Transparent PNG and ZIP export
 
-Founder plan:
-https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#pricing-account-title
+Pack 100:
+https://batchcutout.com/pricing/?lang=en&checkout_plan=pack100&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#pricing-account-title
 
 If this is not useful, reply "unsubscribe" and we will not send product follow-ups.
 
@@ -194,21 +194,21 @@ NexaFlow Labs
 ## PT variant - account created, no checkout
 
 Subject:
-Conclua a ativacao do BatchCutout Pro
+Conclua a preparacao do seu lote BatchCutout
 
 Email:
 Ola,
 
-Criou uma conta BatchCutout, mas ainda nao escolheu um plano Pro.
+Criou uma conta BatchCutout, mas ainda nao escolheu uma opcao paga.
 
-Se esta a preparar fotos de produto em lote, o Pro desbloqueia:
+Se esta a preparar fotos de produto em lote, o Pack 100 da-lhe:
 
-- Ate 100 imagens por lote
-- Ate 2.000 imagens por mes
+- 100 creditos de imagem
+- Pagamento unico, sem subscricao
 - Exportacao ZIP para fluxos de ecommerce
 
-Escolha o plano fundador aqui:
-https://batchcutout.com/pricing/?checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=account_no_checkout#pricing-account-title
+Compre o Pack 100 aqui:
+https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=email&utm_medium=recovery&utm_campaign=account_no_checkout#pricing-account-title
 
 Obrigado,
 NexaFlow Labs
@@ -219,21 +219,21 @@ Se nao quiser receber emails de acompanhamento do produto, responda com "remover
 ## PT variant - checkout started, no paid subscription
 
 Subject:
-Precisa de ajuda a ativar o BatchCutout Pro?
+Precisa de ajuda a concluir o pagamento?
 
 Email:
 Ola,
 
-Abriu o checkout do BatchCutout Pro, mas o pagamento nao ficou concluido.
+Abriu o checkout do BatchCutout, mas o pagamento nao ficou concluido.
 
-Se alguma coisa bloqueou o processo, responda a este email e ajudamos. O plano Pro inclui:
+Se alguma coisa bloqueou o processo, responda a este email e ajudamos. A opcao paga mais simples e:
 
-- Ate 100 imagens por lote
-- Ate 2.000 imagens por mes
+- Pack 100: 5 EUR em compra unica
+- 100 creditos de imagem
 - PNG transparente e ZIP para fluxos de ecommerce
 
 Continuar:
-https://batchcutout.com/pricing/?checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=checkout_not_paid#pricing-account-title
+https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=email&utm_medium=recovery&utm_campaign=checkout_not_paid#pricing-account-title
 
 Obrigado,
 NexaFlow Labs
@@ -249,16 +249,16 @@ Trate lotes de fotos de produto mais depressa
 Email:
 Ola,
 
-Usou o BatchCutout para exportar imagens. Se precisa de repetir esse fluxo com mais fotos, o Pro remove o limite de 2 imagens por lote.
+Usou o BatchCutout para exportar imagens. Se precisa de repetir esse fluxo com mais fotos, o Pack 100 remove o limite gratuito de 2 imagens.
 
-O Pro inclui:
+O Pack 100 inclui:
 
-- 100 imagens por lote
-- 2.000 imagens por mes
+- 100 creditos de imagem
+- Pagamento unico, sem subscricao
 - Exportacao em PNG transparente e ZIP
 
-Ver planos:
-https://batchcutout.com/pricing/?checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=download_no_pro#pricing-account-title
+Comprar Pack 100:
+https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=email&utm_medium=recovery&utm_campaign=download_no_pro#pricing-account-title
 
 Obrigado,
 NexaFlow Labs
@@ -305,14 +305,14 @@ Checklist rapido para o proximo lote:
 - Evite sombras muito fortes ou fundos com cores iguais ao produto
 - Descarregue PNG para uma imagem ou ZIP para varios produtos
 
-Se precisar de lotes maiores, o plano fundador inclui:
+Se precisar de um lote maior, o Pack 100 inclui:
 
-- 100 imagens por lote
-- 2.000 imagens por mes
+- 100 creditos de imagem
+- Pagamento unico, sem subscricao
 - PNG transparente e exportacao ZIP
 
-Plano fundador:
-https://batchcutout.com/pricing/?checkout_plan=early&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#pricing-account-title
+Pack 100:
+https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=email&utm_medium=recovery&utm_campaign=lead_capture_followup#pricing-account-title
 
 Se nao quiser receber emails de acompanhamento, responda com "remover".
 

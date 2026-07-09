@@ -29,7 +29,7 @@ Primary URL:
 https://batchcutout.com/launch/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch
 
 Pricing URL:
-https://batchcutout.com/pricing/?checkout_plan=early&utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch#pricing-account-title
+https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch#pricing-account-title
 
 Partner/proof URL:
 https://batchcutout.com/en/customer-results/?utm_source=product_hunt&utm_medium=launch&utm_campaign=directory_launch
@@ -49,7 +49,7 @@ The product is browser-based: images are processed locally in the browser, not u
 Current limits:
 
 - 2 images free for testing.
-- Pro supports 100 images per batch.
+- Pack 100 covers one 100-image batch.
 - 2,000 images per month.
 - PNG and ZIP export.
 

@@ -37,7 +37,7 @@ Quick follow-up. BatchCutout is useful if you regularly prepare product or catal
 You can test it free with 2 images:
 https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=handmade_home_followup#tool
 
-No account or card is needed for the free test. If you need larger batches after testing, Pro unlocks up to 100 images per batch and 2,000 images per month. The current founder plan is 15 EUR/month.
+No account or card is needed for the free test. If you need a larger batch after testing, Pack 100 gives you 100 image credits for 5 EUR with no subscription.
 
 If this is not relevant, reply "no thanks" and I will not contact you again.
 

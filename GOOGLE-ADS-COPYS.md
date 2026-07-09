@@ -2,14 +2,14 @@
 
 ## Objetivo
 
-Gerar subscrições Pro com procura direta por remoção de fundo em lote para ecommerce.
+Gerar primeiras compras Pack 100 e, depois, converter utilizadores recorrentes para Pro.
 
 Métrica principal:
 
 - Custo por conta criada
 - Custo por checkout iniciado
-- Custo por subscrição paga
-- MRR renovável
+- Custo por compra Pack 100
+- Custo por subscrição paga recorrente
 
 ## Orçamento inicial
 
@@ -31,7 +31,7 @@ Etsy:
 https://batchcutout.com/en/etsy-product-photo-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=etsy_background_remover&utm_content=search
 
 Pricing:
-https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=google_ads&utm_medium=cpc&utm_campaign=pro_pricing&utm_content=search#pricing-account-title
+https://batchcutout.com/pricing/?lang=en&checkout_plan=pack100&utm_source=google_ads&utm_medium=cpc&utm_campaign=pack100_pricing&utm_content=search#pricing-account-title
 
 ## Campaign 1: Bulk background remover
 
@@ -66,14 +66,14 @@ https://batchcutout.com/en/bulk-background-remover/?utm_source=google_ads&utm_me
 - Transparent PNG Batch
 - Process Up To 100 Images
 - Try 2 Images Free
-- Pro From EUR 15/Month
+- 100 Images For EUR 5
 - Batch Photo Cutouts
 
 ### Descriptions
 
 - Remove backgrounds from product photos in batch. Export transparent PNGs or one organized ZIP.
 - Built for ecommerce teams, catalogs and marketplace sellers with many product photos.
-- Try 2 images free, then use Pro for batches up to 100 images and 2,000 images per month.
+- Try 2 images free, then buy Pack 100 for one real product batch.
 - Prepare cleaner product images for listings, stores, ads and catalogs without editing one by one.
 
 ## Campaign 2: Shopify product photos
@@ -105,14 +105,14 @@ https://batchcutout.com/en/remove-background-for-shopify/?utm_source=google_ads&
 - Upload, Cut Out, Export
 - Up To 100 Images Per Batch
 - Try 2 Images Free
-- Pro From EUR 15/Month
+- 100 Images For EUR 5
 
 ### Descriptions
 
 - Prepare Shopify product photos faster. Remove backgrounds in batch and export transparent PNGs.
 - Clean product images before uploading to Shopify collections, product pages, ads and catalog updates.
 - BatchCutout helps Shopify stores process multiple product photos without editing one by one.
-- Use Pro for up to 100 images per batch and 2,000 images per month.
+- Buy Pack 100 for one real product batch. Use Pro only for recurring monthly volume.
 
 ## Campaign 3: Etsy product photos
 
@@ -143,14 +143,14 @@ https://batchcutout.com/en/etsy-product-photo-background-remover/?utm_source=goo
 - Prepare Etsy Listings
 - Export PNGs Or ZIP
 - Try 2 Images Free
-- Pro From EUR 15/Month
+- 100 Images For EUR 5
 
 ### Descriptions
 
 - Remove backgrounds from Etsy product photos and export transparent PNGs for listings and shop updates.
 - Prepare cleaner Etsy listing photos in batch instead of editing each image manually.
 - Useful for bundles, mockups, thumbnails, ads and seasonal Etsy updates.
-- Try 2 images free. Use Pro for up to 100 images per batch.
+- Try 2 images free. Buy Pack 100 for one real product batch.
 
 ## Sitelinks
 
@@ -163,8 +163,8 @@ https://batchcutout.com/en/remove-background-for-shopify/?utm_source=google_ads&
 Etsy Photos:
 https://batchcutout.com/en/etsy-product-photo-background-remover/?utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_etsy
 
-Plans:
-https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_pricing#pricing-account-title
+Pack 100:
+https://batchcutout.com/pricing/?lang=en&checkout_plan=pack100&utm_source=google_ads&utm_medium=cpc&utm_campaign=sitelink_pack100#pricing-account-title
 
 ## Callouts
 
@@ -175,8 +175,8 @@ https://batchcutout.com/pricing/?lang=en&checkout_plan=early&utm_source=google_a
 - Ecommerce workflow
 - Ideal for catalogs
 - Useful for marketplaces
-- Up to 100 images per batch
-- Up to 2,000 images per month
+- Pack 100 available
+- Pro for recurring volume
 
 ## Structured snippets
 
@@ -232,6 +232,6 @@ Depois de 14 dias:
 
 - Pausar termos com custo e sem uploads.
 - Duplicar orçamento apenas em campanhas com downloads e cliques em planos.
-- Se houver contas criadas mas sem checkout, testar CTA direto para plano fundador.
+- Se houver contas criadas mas sem checkout, testar CTA direto para Pack 100.
 - Se houver muitos uploads e poucos cliques em Pro, reforçar CTA pós-download.
 - Se houver checkouts e poucos pagamentos, rever fricção de login/criação de conta.
