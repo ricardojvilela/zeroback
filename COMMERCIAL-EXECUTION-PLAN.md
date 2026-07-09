@@ -206,6 +206,13 @@ Decision rules:
 - Before sending, check `support@batchcutout.com` for replies, negative responses or opt-outs.
 - After sending, update the CSV with `sent_2026-07-10_followup`, `watch_replies`, blank follow-up dates and Resend IDs.
 
+## Prepared growth work - July 9 prospect batch
+
+- Prepared `OUTREACH-BATCH-2026-07-09.md` with 10 high-score ready prospects across jewellery, candles, skincare and handmade home decor.
+- No emails were sent from this preparation.
+- Before sending, check `support@batchcutout.com` for unresolved replies or opt-outs.
+- If sent, update the CSV with `sent_2026-07-09`, follow-up date `2026-07-14` and Resend IDs.
+
 ## Executed growth work - demo video
 
 - Added horizontal and vertical silent demo videos under `assets/video/`.
