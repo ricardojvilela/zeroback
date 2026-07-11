@@ -323,9 +323,13 @@ async function sendLeadAutoreply(settings, tableName, detail, row) {
   }
   if (detail.consent !== true) return { sent: false, skipped: true, reason: "no_consent" };
   if (!leadAutoreplySources.has(String(detail.source || ""))) return { sent: false, skipped: true, reason: "not_post_download" };
-  if ((Number(detail.count || 0) || 0) <= 0) return { sent: false, skipped: true, reason: "missing_download_count" };
-  if (!leadAutoreplyDownloadTypes.has(String(detail.downloadType || ""))) {
+  const downloadType = String(detail.downloadType || "");
+  const downloadCount = Number(detail.count || 0) || 0;
+  if (!leadAutoreplyDownloadTypes.has(downloadType)) {
     return { sent: false, skipped: true, reason: "unknown_download_type" };
+  }
+  if (downloadType !== "checkout_plan" && downloadCount <= 0) {
+    return { sent: false, skipped: true, reason: "missing_download_count" };
   }
 
   const to = normalizeEmail(detail.email);

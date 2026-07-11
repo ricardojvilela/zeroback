@@ -3394,6 +3394,11 @@ progress::-moz-progress-bar {
   text-align: center;
 }
 
+.pricing-auth-actions .pricing-link-capture {
+  grid-column: 1 / -1;
+  min-height: 42px;
+}
+
 .pricing-plan-actions {
   display: grid;
   gap: 10px;

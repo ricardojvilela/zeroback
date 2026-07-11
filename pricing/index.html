@@ -173,7 +173,7 @@
         ]
       }
     </script>
-    <link rel="stylesheet" href="../styles.css?v=20260709-pack-funnel" />
+    <link rel="stylesheet" href="../styles.css?v=20260711-checkout-recovery" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
   <body class="landing-page pro-page">
@@ -450,6 +450,7 @@
             <div class="pricing-auth-actions">
               <button type="submit" class="landing-button" id="pricingCreateButton" data-i18n="checkoutCreate">Criar conta e continuar</button>
               <button type="button" class="landing-secondary" id="pricingLoginButton" data-i18n="checkoutLogin">Entrar e continuar</button>
+              <button type="button" class="landing-secondary pricing-link-capture" id="pricingCheckoutLinkButton" data-i18n="checkoutLinkButton">Receber link para continuar depois</button>
             </div>
           </form>
           <div class="pricing-plan-actions" id="pricingCheckoutActions">
@@ -621,6 +622,11 @@
           checkoutLogin: "Entrar e continuar",
           checkoutCreate: "Criar conta e continuar",
           checkoutCreatePayment: "Criar conta e continuar para pagamento",
+          checkoutLinkButton: "Receber link para continuar depois",
+          checkoutLinkInvalid: "Introduza um email válido para receber o link do Pack 100.",
+          checkoutLinkSending: "A enviar link...",
+          checkoutLinkSent: "Link enviado. Verifique o email para voltar ao Pack 100 quando quiser.",
+          checkoutLinkError: "Não foi possível enviar o link agora. Pode criar conta ou entrar para continuar.",
           checkoutLoggingIn: "A entrar...",
           checkoutCreating: "A criar conta...",
           checkoutOpening: "A abrir Stripe...",
@@ -787,6 +793,11 @@
           checkoutLogin: "Sign in and continue",
           checkoutCreate: "Create account and continue",
           checkoutCreatePayment: "Create account and continue to payment",
+          checkoutLinkButton: "Get link to continue later",
+          checkoutLinkInvalid: "Enter a valid email to receive the Pack 100 link.",
+          checkoutLinkSending: "Sending link...",
+          checkoutLinkSent: "Link sent. Check your email to return to Pack 100 when ready.",
+          checkoutLinkError: "We could not send the link right now. You can create an account or sign in to continue.",
           checkoutLoggingIn: "Signing in...",
           checkoutCreating: "Creating account...",
           checkoutOpening: "Opening Stripe...",
@@ -953,6 +964,11 @@
           checkoutLogin: "Entrar y continuar",
           checkoutCreate: "Crear cuenta y continuar",
           checkoutCreatePayment: "Crear cuenta y continuar al pago",
+          checkoutLinkButton: "Recibir enlace para continuar después",
+          checkoutLinkInvalid: "Introduce un email válido para recibir el enlace del Pack 100.",
+          checkoutLinkSending: "Enviando enlace...",
+          checkoutLinkSent: "Enlace enviado. Revisa tu email para volver al Pack 100 cuando quieras.",
+          checkoutLinkError: "No se pudo enviar el enlace ahora. Puedes crear cuenta o entrar para continuar.",
           checkoutLoggingIn: "Entrando...",
           checkoutCreating: "Creando cuenta...",
           checkoutOpening: "Abriendo Stripe...",
@@ -1425,6 +1441,7 @@
       const pricingPasswordToggle = document.querySelector("#pricingPasswordToggle");
       const pricingLoginButton = document.querySelector("#pricingLoginButton");
       const pricingCreateButton = document.querySelector("#pricingCreateButton");
+      const pricingCheckoutLinkButton = document.querySelector("#pricingCheckoutLinkButton");
       const pricingCheckoutPanel = document.querySelector(".pricing-checkout-panel");
       const pricingAccountStatus = document.querySelector("#pricingAccountStatus");
       const pricingAccountBadge = document.querySelector("#pricingAccountBadge");
@@ -1489,6 +1506,9 @@
         }
         if (pricingLoginButton && !pricingLoginButton.disabled) {
           pricingLoginButton.textContent = pricingText("checkoutLogin");
+        }
+        if (pricingCheckoutLinkButton && !pricingCheckoutLinkButton.disabled) {
+          pricingCheckoutLinkButton.textContent = pricingText("checkoutLinkButton");
         }
       }
 
@@ -1736,6 +1756,45 @@
           body: payload,
           keepalive: true,
         }).catch(() => {});
+      }
+
+      async function handlePricingCheckoutLinkCapture() {
+        if (!pricingEmail || !pricingCheckoutLinkButton) return;
+        const email = normalizePricingEmail(pricingEmail.value);
+        if (!email) {
+          setPricingStatus("checkoutLinkInvalid");
+          trackPricingCheckoutEvent("lead_capture_invalid", {
+            source: "checkout_account_prompt",
+            capture_source: "checkout_account_prompt",
+            downloadType: "checkout_plan",
+            plan: selectedPricingPlan,
+          });
+          pricingEmail.focus();
+          return;
+        }
+
+        rememberPricingEmail(email);
+        pricingCheckoutLinkButton.disabled = true;
+        pricingCheckoutLinkButton.textContent = pricingText("checkoutLinkSending");
+        try {
+          trackPricingCheckoutEvent("lead_capture_submitted", {
+            email,
+            consent: true,
+            source: "checkout_account_prompt",
+            capture_source: "checkout_account_prompt",
+            downloadType: "checkout_plan",
+            count: 1,
+            plan: selectedPricingPlan,
+            price_plan: selectedPricingPlan,
+            has_requested_checkout: true,
+          });
+          setPricingStatus("checkoutLinkSent");
+        } catch {
+          setPricingStatus("checkoutLinkError");
+        } finally {
+          pricingCheckoutLinkButton.disabled = false;
+          syncPricingAuthButtons();
+        }
       }
 
       function pricingPlanLabel(plan) {
@@ -2185,6 +2244,7 @@
       pricingAuthForm?.addEventListener("submit", handlePricingCreateAccount);
       pricingPasswordToggle?.addEventListener("click", togglePricingPasswordVisibility);
       pricingLoginButton?.addEventListener("click", handlePricingLogin);
+      pricingCheckoutLinkButton?.addEventListener("click", handlePricingCheckoutLinkCapture);
       languageSelect?.addEventListener("change", updatePricingAccountUi);
       pricingCheckoutActions?.addEventListener("click", (event) => {
         const button = event.target.closest("[data-pricing-checkout-plan]");

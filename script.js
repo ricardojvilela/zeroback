@@ -2685,6 +2685,7 @@ function handleAccountCheckoutLinkCapture() {
   rememberAccountEmail(email);
   recordLeadCapture(email, {
     downloadType: "checkout_plan",
+    count: 1,
     source: "checkout_account_prompt",
     captureSource: "checkout_account_prompt",
   });
