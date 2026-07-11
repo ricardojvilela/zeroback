@@ -188,7 +188,7 @@
         ]
       }
     </script>
-    <link rel="stylesheet" href="./styles.css?v=20260711-result-offer" />
+    <link rel="stylesheet" href="./styles.css?v=20260711-pack-renewal" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
   <body>
@@ -267,6 +267,16 @@
               <span id="accountUsageBar"></span>
             </div>
             <p id="accountUsageReset">O limite renova no início do próximo mês.</p>
+          </div>
+          <div class="account-pack-renewal hidden" id="accountPackRenewal" aria-label="Repor créditos Pack" data-i18n-aria="accountPackRenewalLabel">
+            <strong data-i18n="accountPackRenewalTitle">Créditos Pack quase no fim</strong>
+            <p data-i18n="accountPackRenewalText">
+              Continue com compra única ou mude para Pro se já trata imagens todos os meses.
+            </p>
+            <div class="account-pack-renewal-actions">
+              <button type="button" data-pack-renewal-plan="pack100" data-i18n="accountPackRenewalPackCta">Comprar novo Pack 100</button>
+              <button type="button" data-pack-renewal-plan="early" data-i18n="accountPackRenewalProCta">Mudar para Pro recorrente</button>
+            </div>
           </div>
           <form class="account-form" id="accountForm" novalidate>
             <input
@@ -679,7 +689,7 @@
       </section>
     </main>
 
-    <script type="module" src="./script.js?v=20260711-result-offer"></script>
+    <script type="module" src="./script.js?v=20260711-pack-renewal"></script>
   </body>
 </html>
 

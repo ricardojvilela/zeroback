@@ -72,6 +72,7 @@ const accountUsage = document.querySelector("#accountUsage");
 const accountUsageCount = document.querySelector("#accountUsageCount");
 const accountUsageBar = document.querySelector("#accountUsageBar");
 const accountUsageReset = document.querySelector("#accountUsageReset");
+const accountPackRenewal = document.querySelector("#accountPackRenewal");
 const accountMessage = document.querySelector("#accountMessage");
 const accountForm = document.querySelector("#accountForm");
 const accountEmail = document.querySelector("#accountEmail");
@@ -314,6 +315,11 @@ const baseTranslation = {
   accountUsageReset: "O limite mensal renova em {date}.",
   accountUsageResetUnknown: "O limite mensal renova no início do próximo mês.",
   accountUsageResetPack: "Os créditos do pack não renovam automaticamente.",
+  accountPackRenewalLabel: "Repor créditos Pack",
+  accountPackRenewalTitle: "Créditos Pack quase no fim",
+  accountPackRenewalText: "Continue com compra única ou mude para Pro se já trata imagens todos os meses.",
+  accountPackRenewalPackCta: "Comprar novo Pack 100",
+  accountPackRenewalProCta: "Mudar para Pro recorrente",
   accountStatusConfigMissing: "Login Pro ainda não configurado neste ambiente.",
   accountEmailPlaceholder: "O seu email",
   accountPasswordPlaceholder: "Password (mín. 6 caracteres)",
@@ -531,6 +537,11 @@ const translations = {
     accountUsageReset: "Monthly limit resets on {date}.",
     accountUsageResetUnknown: "Monthly limit resets at the start of next month.",
     accountUsageResetPack: "Pack credits do not renew automatically.",
+    accountPackRenewalLabel: "Top up pack credits",
+    accountPackRenewalTitle: "Pack credits are running low",
+    accountPackRenewalText: "Continue with a one-time purchase or move to Pro if this is now monthly work.",
+    accountPackRenewalPackCta: "Buy another 100 pack",
+    accountPackRenewalProCta: "Move to recurring Pro",
     accountStatusConfigMissing: "Pro login is not configured in this environment yet.",
     accountEmailPlaceholder: "Your email",
     accountPasswordPlaceholder: "Password (min. 6 characters)",
@@ -1120,6 +1131,11 @@ const translatedAddons = {
     accountUsageReset: "El límite mensual se renueva el {date}.",
     accountUsageResetUnknown: "El límite mensual se renueva al inicio del próximo mes.",
     accountUsageResetPack: "Los créditos del pack no se renuevan automáticamente.",
+    accountPackRenewalLabel: "Reponer créditos Pack",
+    accountPackRenewalTitle: "Quedan pocos créditos Pack",
+    accountPackRenewalText: "Continúa con compra única o cambia a Pro si ya tratas imágenes todos los meses.",
+    accountPackRenewalPackCta: "Comprar nuevo Pack 100",
+    accountPackRenewalProCta: "Cambiar a Pro recurrente",
     accountCheckoutGuideLabel: "Pasos para activar acceso",
     accountCheckoutGuideAccount: "Crea cuenta o entra",
     accountCheckoutGuideStripe: "Pago Stripe",
@@ -1383,6 +1399,11 @@ const proTranslations = {
     dropzoneHelper: "Teste com {limit} imagens grátis. O Pack 100 é para quem precisa de um lote real.",
     dropzoneHelperPro: "Arraste ou selecione as imagens que quer processar nesta conta.",
     batchLimitNotePro: "Limite da conta: até {limit} imagens por lote e {monthlyLimit} imagens por mês.",
+    accountPackRenewalLabel: "Repor créditos Pack",
+    accountPackRenewalTitle: "Créditos Pack quase no fim",
+    accountPackRenewalText: "Continue com compra única ou mude para Pro se já trata imagens todos os meses.",
+    accountPackRenewalPackCta: "Comprar novo Pack 100",
+    accountPackRenewalProCta: "Mudar para Pro recorrente",
     audienceKicker: "Criado para volume",
     audienceTitle: "Para quem trata imagens todos os dias",
     audienceStoresTitle: "Lojas online",
@@ -1443,6 +1464,11 @@ const proTranslations = {
     dropzoneHelper: "Test with {limit} free images. Pack 100 is for a real batch.",
     dropzoneHelperPro: "Drag or select the images you want to process on this account.",
     batchLimitNotePro: "Account limit: up to {limit} images per batch and {monthlyLimit} images per month.",
+    accountPackRenewalLabel: "Top up pack credits",
+    accountPackRenewalTitle: "Pack credits are running low",
+    accountPackRenewalText: "Continue with a one-time purchase or move to Pro if this is now monthly work.",
+    accountPackRenewalPackCta: "Buy another 100 pack",
+    accountPackRenewalProCta: "Move to recurring Pro",
     audienceKicker: "Built for volume",
     audienceTitle: "For teams handling images every day",
     audienceStoresTitle: "Online stores",
@@ -1465,6 +1491,14 @@ const proTranslations = {
 for (const language of Object.keys(translations)) {
   Object.assign(translations[language], proTranslations[language] || proTranslations.en);
 }
+
+Object.assign(translations.es, {
+  accountPackRenewalLabel: "Reponer créditos Pack",
+  accountPackRenewalTitle: "Quedan pocos créditos Pack",
+  accountPackRenewalText: "Continúa con compra única o cambia a Pro si ya tratas imágenes todos los meses.",
+  accountPackRenewalPackCta: "Comprar nuevo Pack 100",
+  accountPackRenewalProCta: "Cambiar a Pro recurrente",
+});
 
 let items = [];
 let currentLanguage = getRequestedLanguage() || localStorage.getItem("language") || detectLanguage();
@@ -2228,6 +2262,7 @@ function updateAccountUsageUi(access = {}) {
 
   if (!access.canUsePro) {
     accountUsage.classList.add("hidden");
+    accountPackRenewal?.classList.add("hidden");
     accountUsageBar.style.width = "0%";
     return;
   }
@@ -2252,6 +2287,9 @@ function updateAccountUsageUi(access = {}) {
     : resetDate
     ? t("accountUsageReset", { date: resetDate })
     : t("accountUsageResetUnknown");
+
+  const lowCreditThreshold = Math.max(10, Math.ceil(monthlyLimit * 0.2));
+  accountPackRenewal?.classList.toggle("hidden", !isPack || remaining > lowCreditThreshold);
 }
 
 function checkoutPlanDisplayName(plan) {
@@ -3983,6 +4021,20 @@ billingActions?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-checkout-plan]");
   if (!button) return;
   startCheckout(button.dataset.checkoutPlan, button);
+});
+accountPackRenewal?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-pack-renewal-plan]");
+  const plan = button?.dataset.packRenewalPlan || "";
+  if (!checkoutPlans.has(plan)) return;
+  trackEvent("pro_cta_clicked", {
+    source: "account_pack_renewal",
+    plan,
+    checkout_plan: plan,
+    purchase_type: checkoutPlanIsPack(plan) ? "pack" : "subscription",
+    monthly_remaining: currentAccount?.access?.monthlyRemaining ?? 0,
+    monthly_limit: currentAccount?.access?.monthlyLimit ?? 0,
+  });
+  startCheckout(plan, button);
 });
 billingPortal?.addEventListener("click", openBillingPortal);
 leadCaptureForm?.addEventListener("submit", handleLeadCaptureSubmit);
