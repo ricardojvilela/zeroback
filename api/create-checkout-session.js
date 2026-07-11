@@ -583,12 +583,12 @@ function checkoutEmailTimeout() {
 }
 
 async function createEmailPackCheckout({ stripe, settings, body, offering }) {
+  if (offering.kind !== "pack") {
+    return { status: 401, body: { ok: false, error: "missing_access_token" } };
+  }
   const email = normalizeEmail(body?.email || body?.customerEmail || body?.attribution?.email || "");
   if (!email) {
     return { status: 400, body: { ok: false, error: "missing_email" } };
-  }
-  if (offering.kind !== "pack") {
-    return { status: 401, body: { ok: false, error: "missing_access_token" } };
   }
 
   const plan = offering.plan;
