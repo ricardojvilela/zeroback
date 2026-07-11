@@ -854,7 +854,7 @@ export default async function handler(request, response) {
     const sourceBreakdown = Array.from(bySource.values())
       .sort((a, b) =>
         b.revenue - a.revenue ||
-        b.paidSubscriptions - a.paidSubscriptions ||
+        ((b.paidSubscriptions || 0) + (b.packPurchases || 0)) - ((a.paidSubscriptions || 0) + (a.packPurchases || 0)) ||
         b.visitors - a.visitors ||
         b.pageViews - a.pageViews ||
         b.events - a.events

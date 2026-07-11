@@ -1423,7 +1423,7 @@
                   <th>CTA parceiros</th>
                   <th>Parceiros</th>
                   <th>Checkouts</th>
-                  <th>Pagas</th>
+                  <th>Compras pagas</th>
                   <th>Receita</th>
                   <th>Portal</th>
                 </tr>
@@ -1500,7 +1500,7 @@
                 <th>CTA parceiros</th>
                 <th>Parceiros</th>
                 <th>Checkouts</th>
-                <th>Pagas</th>
+                <th>Compras pagas</th>
                 <th>Receita</th>
                 <th>Portal</th>
               </tr>
@@ -2478,7 +2478,7 @@
                   <td>${row.partnerCtaClicks || 0}</td>
                   <td>${row.partnerReferralCopies || 0}</td>
                   <td>${row.checkoutStarts || 0}</td>
-                  <td>${row.paidSubscriptions || 0}</td>
+                  <td>${(row.paidSubscriptions || 0) + (row.packPurchases || 0)}</td>
                   <td>${formatCurrency(row.revenue || 0)}</td>
                   <td>${row.billingPortalOpens || 0}</td>
                 </tr>
@@ -2518,7 +2518,7 @@
                 <td>${row.partnerCtaClicks || 0}</td>
                 <td>${row.partnerReferralCopies || 0}</td>
                 <td>${row.checkoutStarts || 0}</td>
-                <td>${row.paidSubscriptions || 0}</td>
+                <td>${(row.paidSubscriptions || 0) + (row.packPurchases || 0)}</td>
                 <td>${formatCurrency(row.revenue || 0)}</td>
                 <td>${row.billingPortalOpens || 0}</td>
               </tr>
