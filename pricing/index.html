@@ -1724,7 +1724,37 @@
         });
       }
 
-      function trackPricingCheckoutEvent(name, detail = {}) {
+      function postPricingServerEvent(name, eventParams, { waitForResponse = false } = {}) {
+        const payload = JSON.stringify({
+          name,
+          detail: eventParams,
+          visitorId: getPricingStableId(localStorage, pricingVisitorStorageKey),
+          sessionId: getPricingStableId(sessionStorage, pricingSessionStorageKey),
+        });
+
+        if (!waitForResponse) {
+          try {
+            if (navigator.sendBeacon) {
+              const sent = navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" }));
+              if (sent) return Promise.resolve({ ok: true, beacon: true });
+            }
+          } catch {
+            // Ignore measurement transport errors.
+          }
+        }
+
+        return fetch("/api/track", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: payload,
+          keepalive: !waitForResponse,
+        }).then(async (response) => {
+          const data = await response.json().catch(() => ({}));
+          return { ok: response.ok && data?.ok !== false, status: response.status, ...data };
+        });
+      }
+
+      function trackPricingCheckoutEvent(name, detail = {}, options = {}) {
         const eventParams = {
           event_category: "commercial_intent",
           event_label: detail.plan || detail.label || name,
@@ -1733,29 +1763,7 @@
         };
         window.dataLayer?.push({ event: name, ...eventParams });
         window.gtag?.("event", name, eventParams);
-
-        const payload = JSON.stringify({
-          name,
-          detail: eventParams,
-          visitorId: getPricingStableId(localStorage, pricingVisitorStorageKey),
-          sessionId: getPricingStableId(sessionStorage, pricingSessionStorageKey),
-        });
-
-        try {
-          if (navigator.sendBeacon) {
-            const sent = navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" }));
-            if (sent) return;
-          }
-        } catch {
-          // Ignore measurement transport errors.
-        }
-
-        fetch("/api/track", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: payload,
-          keepalive: true,
-        }).catch(() => {});
+        return postPricingServerEvent(name, eventParams, options).catch(() => ({ ok: false }));
       }
 
       async function handlePricingCheckoutLinkCapture() {
@@ -1777,7 +1785,7 @@
         pricingCheckoutLinkButton.disabled = true;
         pricingCheckoutLinkButton.textContent = pricingText("checkoutLinkSending");
         try {
-          trackPricingCheckoutEvent("lead_capture_submitted", {
+          const result = await trackPricingCheckoutEvent("lead_capture_submitted", {
             email,
             consent: true,
             source: "checkout_account_prompt",
@@ -1787,7 +1795,10 @@
             plan: selectedPricingPlan,
             price_plan: selectedPricingPlan,
             has_requested_checkout: true,
-          });
+          }, { waitForResponse: true });
+          const emailResult = result?.leadAutoreply || {};
+          const emailConfirmed = emailResult.sent === true || emailResult.reason === "already_sent_recently";
+          if (!result?.ok || !emailConfirmed) throw new Error("checkout_link_capture_failed");
           setPricingStatus("checkoutLinkSent");
         } catch {
           setPricingStatus("checkoutLinkError");

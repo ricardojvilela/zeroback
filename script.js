@@ -320,8 +320,10 @@ const baseTranslation = {
   accountCreateCheckout: "Criar conta e continuar para pagamento",
   accountCreateSending: "A criar conta...",
   accountCheckoutLink: "Receber link para continuar depois",
+  accountCheckoutLinkSending: "A enviar link...",
   accountCheckoutLinkSuccess: "Link do plano guardado. Deve receber o email para voltar ao BatchCutout dentro de instantes.",
   accountCheckoutLinkInvalid: "Introduza o email para receber o link do plano.",
+  accountCheckoutLinkError: "Não foi possível enviar o link agora. Pode criar conta ou entrar para continuar.",
   accountRefresh: "Atualizar conta",
   accountLogout: "Sair",
   billingPack100: "Pack 100 imagens - 5 EUR (melhor entrada)",
@@ -535,8 +537,10 @@ const translations = {
     accountCreateCheckout: "Create account and continue to payment",
     accountCreateSending: "Creating account...",
     accountCheckoutLink: "Get link to continue later",
+    accountCheckoutLinkSending: "Sending link...",
     accountCheckoutLinkSuccess: "Plan link saved. You should receive the email to return to BatchCutout shortly.",
     accountCheckoutLinkInvalid: "Enter your email to receive the plan link.",
+    accountCheckoutLinkError: "We could not send the link right now. You can create an account or sign in to continue.",
     accountRefresh: "Refresh account",
     accountLogout: "Sign out",
     billingPack100: "100 image pack - EUR 5 (best start)",
@@ -1133,8 +1137,10 @@ const translatedAddons = {
     accountCreateCheckout: "Crear cuenta y continuar al pago",
     accountCreateSending: "Creando cuenta...",
     accountCheckoutLink: "Recibir enlace para continuar después",
+    accountCheckoutLinkSending: "Enviando enlace...",
     accountCheckoutLinkSuccess: "Enlace del plan guardado. Deberías recibir el email para volver a BatchCutout en unos instantes.",
     accountCheckoutLinkInvalid: "Introduce tu email para recibir el enlace del plan.",
+    accountCheckoutLinkError: "No se pudo enviar el enlace ahora. Puedes crear cuenta o entrar para continuar.",
     accountRefresh: "Actualizar cuenta",
     accountLogout: "Salir",
     billingPack100: "Pack 100 imagenes - 5 EUR (mejor entrada)",
@@ -1532,7 +1538,7 @@ function trackEvent(name, detail = {}) {
     });
   }
   recordDebugEvent(name, eventParams);
-  sendServerEvent(name, eventParams);
+  return sendServerEvent(name, eventParams);
 }
 
 function getStableId(storage, key) {
@@ -1555,8 +1561,8 @@ function getSessionId() {
   return getStableId(sessionStorage, sessionStorageKey);
 }
 
-function sendServerEvent(name, detail = {}) {
-  if (!serverEventNames.has(name)) return;
+function sendServerEvent(name, detail = {}, { waitForResponse = false } = {}) {
+  if (!serverEventNames.has(name)) return Promise.resolve({ ok: true, skipped: true, reason: "event_not_server_tracked" });
 
   const payload = JSON.stringify({
     name,
@@ -1565,21 +1571,26 @@ function sendServerEvent(name, detail = {}) {
     sessionId: getSessionId(),
   });
 
-  try {
-    if (navigator.sendBeacon) {
-      const sent = navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" }));
-      if (sent) return;
+  if (!waitForResponse) {
+    try {
+      if (navigator.sendBeacon) {
+        const sent = navigator.sendBeacon("/api/track", new Blob([payload], { type: "application/json" }));
+        if (sent) return Promise.resolve({ ok: true, beacon: true });
+      }
+    } catch {
+      // Ignore measurement transport errors.
     }
-  } catch {
-    // Ignore measurement transport errors.
   }
 
-  fetch("/api/track", {
+  return fetch("/api/track", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: payload,
-    keepalive: true,
-  }).catch(() => {});
+    keepalive: !waitForResponse,
+  }).then(async (response) => {
+    const data = await response.json().catch(() => ({}));
+    return { ok: response.ok && data?.ok !== false, status: response.status, ...data };
+  }).catch(() => ({ ok: false }));
 }
 
 function getAttributionParams() {
@@ -2666,7 +2677,7 @@ async function handleAccountCreate(event) {
   }
 }
 
-function handleAccountCheckoutLinkCapture() {
+async function handleAccountCheckoutLinkCapture() {
   const waitingPlan = checkoutPlanWaitingForAuth() || defaultCheckoutPlan;
   const email = normalizeEmail(accountEmail?.value || "");
 
@@ -2683,14 +2694,33 @@ function handleAccountCheckoutLinkCapture() {
   }
 
   rememberAccountEmail(email);
-  recordLeadCapture(email, {
-    downloadType: "checkout_plan",
-    count: 1,
-    source: "checkout_account_prompt",
-    captureSource: "checkout_account_prompt",
-  });
-  updateAccountUi();
-  setAccountMessage("accountCheckoutLinkSuccess");
+  if (accountCheckoutLink) {
+    accountCheckoutLink.disabled = true;
+    accountCheckoutLink.textContent = t("accountCheckoutLinkSending");
+  }
+  setAccountMessage("accountCheckoutLinkSending");
+
+  try {
+    const result = await recordLeadCapture(email, {
+      downloadType: "checkout_plan",
+      count: 1,
+      source: "checkout_account_prompt",
+      captureSource: "checkout_account_prompt",
+      waitForResponse: true,
+    });
+    const emailResult = result?.leadAutoreply || {};
+    const emailConfirmed = emailResult.sent === true || emailResult.reason === "already_sent_recently";
+    if (!result?.ok || !emailConfirmed) throw new Error("checkout_link_capture_failed");
+    updateAccountUi();
+    setAccountMessage("accountCheckoutLinkSuccess");
+  } catch {
+    setAccountMessage("accountCheckoutLinkError");
+  } finally {
+    if (accountCheckoutLink) {
+      accountCheckoutLink.disabled = false;
+      accountCheckoutLink.textContent = t("accountCheckoutLink");
+    }
+  }
 }
 
 async function handleAccountLogout() {
@@ -3595,7 +3625,7 @@ function hideLeadCapture() {
   leadCapturePanel?.classList.add("hidden");
 }
 
-function recordLeadCapture(email, { downloadType = "unknown", count = 0, source = "post_download", captureSource = source } = {}) {
+function recordLeadCapture(email, { downloadType = "unknown", count = 0, source = "post_download", captureSource = source, waitForResponse = false } = {}) {
   localStorage.setItem(leadCaptureEmailStorageKey, email);
   if (accountEmail && !accountEmail.value.trim()) accountEmail.value = email;
   localStorage.removeItem(leadCaptureDismissedStorageKey);
@@ -3605,14 +3635,41 @@ function recordLeadCapture(email, { downloadType = "unknown", count = 0, source 
   postDownloadEmailForm?.classList.add("hidden");
   proLimitEmailForm?.classList.add("hidden");
   setGoogleUserData(email);
-  trackEvent("lead_capture_submitted", {
+  const eventParams = {
     email,
     consent: true,
     downloadType,
     count,
     source,
     capture_source: captureSource,
-  });
+  };
+  if (waitForResponse) {
+    window.dispatchEvent(new CustomEvent("rfel:analytics", { detail: { name: "lead_capture_submitted", ...eventParams } }));
+    window.dataLayer?.push({
+      event: "lead_capture_submitted",
+      event_category: "lead",
+      event_label: source,
+      language: currentLanguage,
+      ...getAttributionParams(),
+      ...eventParams,
+    });
+    window.gtag?.("event", "lead_capture_submitted", {
+      event_category: "lead",
+      event_label: source,
+      language: currentLanguage,
+      ...getAttributionParams(),
+      ...eventParams,
+    });
+    return sendServerEvent("lead_capture_submitted", {
+      event_category: "lead",
+      event_label: source,
+      language: currentLanguage,
+      ...getAttributionParams(),
+      ...eventParams,
+    }, { waitForResponse: true });
+  }
+
+  return trackEvent("lead_capture_submitted", eventParams);
 }
 
 function disableFormControls(form) {
