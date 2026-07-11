@@ -871,6 +871,38 @@ h2 {
   line-height: 1.42;
 }
 
+.result-ready-offer-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.result-ready-offer-facts span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  border: 1px solid rgba(15, 139, 124, 0.14);
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.result-ready-offer-facts strong {
+  color: var(--charcoal);
+  font-size: 0.82rem;
+  font-weight: 950;
+  line-height: 1.15;
+}
+
+.result-ready-offer-facts em {
+  color: #52606d;
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 820;
+  line-height: 1.24;
+}
+
 .result-ready-upgrade-actions {
   display: grid;
   gap: 8px;
@@ -3894,6 +3926,10 @@ progress::-moz-progress-bar {
   }
 
   .result-ready-upgrade {
+    grid-template-columns: 1fr;
+  }
+
+  .result-ready-offer-facts {
     grid-template-columns: 1fr;
   }
 
