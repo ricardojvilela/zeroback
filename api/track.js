@@ -209,6 +209,53 @@ function leadAutoreplyCopy(language) {
   };
 }
 
+function selectedCheckoutPlan(detail) {
+  const plan = String(detail.checkout_plan || detail.plan || "").toLowerCase();
+  return ["pack100", "pack250", "early", "monthly", "annual"].includes(plan) ? plan : "pack100";
+}
+
+function checkoutPricingUrl(language, plan) {
+  const langParam = language === "pt" ? "" : `lang=${encodeURIComponent(language)}&`;
+  return `https://batchcutout.com/pricing/?${langParam}checkout_plan=${encodeURIComponent(plan)}&utm_source=email&utm_medium=recovery&utm_campaign=checkout_account_prompt#pricing-account-title`;
+}
+
+function applyCheckoutPlanToLeadCopy(copy, language, plan) {
+  copy.pricingUrl = checkoutPricingUrl(language, plan);
+
+  const recurringBullets = language === "pt"
+    ? ["Ate 100 imagens por lote", "2.000 imagens por mes", "Gestao e cancelamento pelo Stripe"]
+    : language === "es"
+      ? ["Hasta 100 imagenes por lote", "2.000 imagenes al mes", "Gestion y cancelacion desde Stripe"]
+      : ["Up to 100 images per batch", "2,000 images per month", "Manage and cancel through Stripe"];
+
+  if (plan === "pack250") {
+    copy.pricingCta = language === "en" ? "Buy Pack 250 - EUR 9" : "Comprar Pack 250 - 9 EUR";
+    copy.bullets = language === "en"
+      ? ["250 image credits in one purchase", "Up to 100 images per batch", "Transparent PNG and ZIP export"]
+      : language === "es"
+        ? ["250 creditos de imagen en una compra unica", "Hasta 100 imagenes por lote", "PNG transparente y ZIP"]
+        : ["250 creditos de imagem numa compra unica", "Ate 100 imagens por lote", "PNG transparente e ZIP"];
+    return copy;
+  }
+
+  if (["early", "monthly", "annual"].includes(plan)) {
+    const recurringLabel = plan === "annual"
+      ? (language === "en" ? "Annual Pro" : "Pro anual")
+      : plan === "monthly"
+        ? (language === "en" ? "Monthly Pro" : language === "es" ? "Pro mensual" : "Pro mensal")
+        : (language === "en" ? "Recurring Pro - EUR 15/month" : language === "es" ? "Pro recurrente - 15 EUR/mes" : "Pro recorrente - 15 EUR/mes");
+    copy.pricingCta = recurringLabel;
+    copy.proLine = language === "pt"
+      ? "Se este trabalho ja e recorrente, o Pro da-lhe volume mensal e gestao pelo Stripe:"
+      : language === "es"
+        ? "Si este trabajo ya es recurrente, Pro te da volumen mensual y gestion desde Stripe:"
+        : "If this is already recurring work, Pro gives you monthly volume and Stripe billing management:";
+    copy.bullets = recurringBullets;
+  }
+
+  return copy;
+}
+
 function leadAutoreplyText(copy) {
   return [
     copy.greeting,
@@ -286,7 +333,7 @@ async function insertEvent(settings, tableName, row) {
   }
 }
 
-async function hasRecentLeadAutoreply(settings, tableName, email) {
+async function hasRecentLeadAutoreply(settings, tableName, email, downloadType = "") {
   const since = new Date(Date.now() - leadAutoreplyWindowMs).toISOString();
   const query = new URLSearchParams({
     select: "id",
@@ -295,6 +342,9 @@ async function hasRecentLeadAutoreply(settings, tableName, email) {
     occurred_at: `gte.${since}`,
     limit: "1",
   });
+  if (downloadType) {
+    query.set("detail->>original_download_type", `eq.${downloadType}`);
+  }
 
   const response = await fetch(`${settings.supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}?${query}`, {
     headers: {
@@ -343,11 +393,14 @@ async function sendLeadAutoreply(settings, tableName, detail, row) {
   const resendApiKey = process.env.RESEND_API_KEY || "";
   if (!resendApiKey) return { sent: false, skipped: true, reason: "resend_not_configured" };
 
-  const alreadySent = await hasRecentLeadAutoreply(settings, tableName, to);
+  const duplicateScope = downloadType === "checkout_plan" ? "checkout_plan" : "";
+  const alreadySent = await hasRecentLeadAutoreply(settings, tableName, to, duplicateScope);
   if (alreadySent) return { sent: false, skipped: true, reason: "already_sent_recently" };
 
   const language = leadLanguage(detail);
-  const copy = leadAutoreplyCopy(language);
+  const copy = detail.downloadType === "checkout_plan"
+    ? applyCheckoutPlanToLeadCopy(leadAutoreplyCopy(language), language, selectedCheckoutPlan(detail))
+    : leadAutoreplyCopy(language);
   const payload = {
     from: mailSettings.from,
     to,
@@ -429,6 +482,7 @@ async function sendLeadAutoreply(settings, tableName, detail, row) {
       resend_id: sent.data?.id || "",
       original_source: detail.source || "",
       original_download_type: detail.downloadType || "",
+      checkout_plan: detail.checkout_plan || detail.plan || "",
       original_count: Number(detail.count || 0) || 0,
     },
     occurred_at: new Date().toISOString(),

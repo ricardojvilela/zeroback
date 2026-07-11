@@ -175,6 +175,7 @@ let hasTrackedResultReadyStickyShown = false;
 let hasTrackedProLimitLeadShown = false;
 let lastTrackedAccountCheckoutPanelPlan = "";
 let hasTrackedAccountFormInteraction = false;
+let lastCheckoutLinkSentPlan = "";
 
 const supportedExtensions = [
   ".jpg",
@@ -2476,7 +2477,7 @@ function updateAccountUi() {
     accountCheckoutGuide?.classList.toggle("hidden", !waitingPlanName);
     accountCheckoutProof?.classList.toggle("hidden", !waitingPlanName);
     updateAccountCheckoutProof(waitingPlan, waitingPlanName);
-    accountCheckoutLinkBlock?.classList.toggle("hidden", !waitingPlanName || Boolean(getCapturedLeadEmail()));
+    accountCheckoutLinkBlock?.classList.toggle("hidden", !waitingPlanName || lastCheckoutLinkSentPlan === waitingPlan);
     if (waitingPlanName) trackAccountCheckoutPanelShown(waitingPlan);
     accountBadge.textContent = waitingPlanName ? t("accountBadgeCheckout") : t("accountBadgeGuest");
     accountStatus.textContent = waitingPlanName
@@ -2770,10 +2771,15 @@ async function handleAccountCheckoutLinkCapture() {
       source: "checkout_account_prompt",
       captureSource: "checkout_account_prompt",
       waitForResponse: true,
+      extra: {
+        checkout_plan: waitingPlan,
+        plan: waitingPlan,
+      },
     });
     const emailResult = result?.leadAutoreply || {};
     const emailConfirmed = emailResult.sent === true || emailResult.reason === "already_sent_recently";
     if (!result?.ok || !emailConfirmed) throw new Error("checkout_link_capture_failed");
+    lastCheckoutLinkSentPlan = waitingPlan;
     updateAccountUi();
     setAccountMessage("accountCheckoutLinkSuccess");
   } catch {
@@ -3688,7 +3694,7 @@ function hideLeadCapture() {
   leadCapturePanel?.classList.add("hidden");
 }
 
-function recordLeadCapture(email, { downloadType = "unknown", count = 0, source = "post_download", captureSource = source, waitForResponse = false } = {}) {
+function recordLeadCapture(email, { downloadType = "unknown", count = 0, source = "post_download", captureSource = source, waitForResponse = false, extra = {} } = {}) {
   localStorage.setItem(leadCaptureEmailStorageKey, email);
   if (accountEmail && !accountEmail.value.trim()) accountEmail.value = email;
   localStorage.removeItem(leadCaptureDismissedStorageKey);
@@ -3705,6 +3711,7 @@ function recordLeadCapture(email, { downloadType = "unknown", count = 0, source 
     count,
     source,
     capture_source: captureSource,
+    ...extra,
   };
   if (waitForResponse) {
     window.dispatchEvent(new CustomEvent("rfel:analytics", { detail: { name: "lead_capture_submitted", ...eventParams } }));
