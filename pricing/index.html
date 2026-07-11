@@ -143,7 +143,7 @@
             "name": "Tenho de criar conta antes de pagar?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Sim. A conta permite ligar a compra Stripe ao acesso correto e ativar os limites pagos automaticamente."
+              "text": "Para Packs, não antes do pagamento: pode pagar com email e ativar os créditos depois numa conta com o mesmo email. Para Pro recorrente, a conta é criada antes do pagamento."
             }
           },
           {
@@ -370,7 +370,7 @@
         <div class="pricing-faq-list">
           <article>
             <h3 data-i18n="faqAccountQuestion">Tenho de criar conta antes de pagar?</h3>
-            <p data-i18n="faqAccountAnswer">Sim. A conta permite ligar a compra Stripe ao acesso correto e ativar os limites pagos automaticamente.</p>
+            <p data-i18n="faqAccountAnswer">Para Packs, não antes do pagamento: pode pagar com email e ativar os créditos depois numa conta com o mesmo email. Para Pro recorrente, a conta é criada antes do pagamento.</p>
           </article>
           <article>
             <h3 data-i18n="faqActivationQuestion">O acesso fica ativo logo depois do pagamento?</h3>
@@ -404,11 +404,11 @@
         <section class="pricing-checkout-panel" aria-labelledby="pricing-account-title">
           <div class="pricing-checkout-head">
             <p class="section-kicker" data-i18n="checkoutKicker">Checkout direto</p>
-            <h3 id="pricing-account-title" data-i18n="checkoutTitle">Crie conta e escolha o plano</h3>
+            <h3 id="pricing-account-title" data-i18n="checkoutTitle">Escolha o plano</h3>
             <span class="pricing-account-badge" id="pricingAccountBadge" data-i18n="checkoutBadgeGuest">Sem sessão</span>
           </div>
           <p id="pricingAccountStatus" class="pricing-auth-status" data-i18n="checkoutStatusGuest">
-            Use o seu email para criar conta ou entrar. Depois abrimos o Stripe Checkout automaticamente.
+            Para Pack, basta introduzir o email e abrir o Stripe. Para Pro recorrente, crie conta ou entre primeiro.
           </p>
           <p class="pricing-selected-plan" id="pricingSelectedPlan" aria-live="polite"></p>
           <div class="pricing-selected-proof" id="pricingSelectedProof" aria-label="Resumo do plano selecionado" data-i18n-aria="selectedProofLabel">
@@ -445,7 +445,7 @@
               >Mostrar</button>
             </div>
             <p class="pricing-auth-note" data-i18n="checkoutAuthNote">
-              A conta serve apenas para ligar o pagamento Stripe ao acesso correto. As suas imagens continuam no browser.
+              Pack: o email liga o pagamento aos créditos. Pro recorrente: a conta liga a subscrição ao acesso correto.
             </p>
             <div class="pricing-auth-actions">
               <button type="submit" class="landing-button" id="pricingCreateButton" data-i18n="checkoutCreate">Criar conta e continuar</button>
@@ -461,7 +461,7 @@
             <button type="button" class="landing-secondary" data-pricing-checkout-plan="annual" data-i18n="annualPlanCta">Pro anual - 190 EUR/ano (poupe 38 EUR)</button>
           </div>
           <p class="pricing-checkout-note" data-i18n="checkoutNote">
-            Se já tiver sessão iniciada, o pagamento abre logo. Se ainda não tiver conta, escolha o plano e crie conta em seguida.
+            Pack pode avançar só com email. Pro recorrente exige conta antes do pagamento. O cartão só é pedido no Stripe.
           </p>
         </section>
         <form
@@ -483,7 +483,7 @@
           <input type="text" name="_honey" class="honeypot-field" tabindex="-1" autocomplete="off" />
           <button class="hidden" type="submit" data-pricing-fallback-submit data-i18n="formButton">Comprar acesso pago</button>
         </form>
-        <p class="pricing-privacy" data-i18n="privacy">É necessário criar conta ou iniciar sessão antes do pagamento para ligar a compra ao acesso correto. Consulte os termos, cancelamento e reembolsos antes de comprar.</p>
+        <p class="pricing-privacy" data-i18n="privacy">Packs podem ser pagos com email e ativados depois numa conta com o mesmo email. Pro recorrente exige conta antes do pagamento. Consulte termos, cancelamento e reembolsos antes de comprar.</p>
         <p class="pricing-legal-links">
           <a href="/termos.html" data-i18n="legalTerms" data-legal-link="terms">Termos</a>
           <a href="/reembolsos.html" data-i18n="legalRefunds" data-legal-link="refunds">Cancelamento e reembolsos</a>
@@ -578,7 +578,7 @@
           faqKicker: "Antes de pagar",
           faqTitle: "Dúvidas que normalmente travam a compra",
           faqAccountQuestion: "Tenho de criar conta antes de pagar?",
-          faqAccountAnswer: "Sim. A conta permite ligar a compra Stripe ao acesso correto e ativar os limites pagos automaticamente.",
+          faqAccountAnswer: "Para Packs, não antes do pagamento: pode pagar com email e ativar os créditos depois numa conta com o mesmo email. Para Pro recorrente, a conta é criada antes do pagamento.",
           faqActivationQuestion: "O acesso fica ativo logo depois do pagamento?",
           faqActivationAnswer: "Sim. Depois do pagamento por Stripe Checkout, o BatchCutout sincroniza a compra e ativa o acesso correto na conta.",
           faqCancelQuestion: "Posso cancelar quando quiser?",
@@ -593,15 +593,15 @@
           formPointReply: "Mensal: 19 EUR/mês.",
           formPointPriority: "Anual: 190 EUR/ano (poupe 38 EUR face ao mensal).",
           checkoutKicker: "Checkout direto",
-          checkoutTitle: "Crie conta e escolha o plano",
+          checkoutTitle: "Escolha o plano",
           checkoutBadgeGuest: "Sem sessão",
           checkoutBadgeSelected: "Plano escolhido",
           checkoutBadgeReady: "Conta pronta",
           checkoutBadgePro: "Pro ativo",
           checkoutBadgePack: "Pack ativo",
-          checkoutStatusGuest: "Use o seu email para criar uma conta grátis. Se já tiver conta, entre e abrimos o Stripe Checkout.",
+          checkoutStatusGuest: "Para Pack, basta introduzir o email e abrir o Stripe. Para Pro recorrente, crie conta ou entre primeiro.",
           checkoutStatusSelected: "Plano escolhido: {plan}. Crie uma conta grátis; depois abrimos o Stripe para pagar.",
-          checkoutStatusSelectedPack: "{plan}: compra única, sem subscrição. Crie conta para guardar os créditos no seu email; depois abrimos o Stripe.",
+          checkoutStatusSelectedPack: "{plan}: introduza o email e abrimos o Stripe. Depois do pagamento, entre ou crie conta com o mesmo email para ativar os créditos.",
           checkoutStatusSelectedSubscription: "{plan}: acesso recorrente para produção mensal. Crie conta para ligar a subscrição ao seu email; depois abrimos o Stripe.",
           checkoutStatusReady: "Conta validada. Escolha o plano para abrir o pagamento seguro no Stripe.",
           checkoutStatusPro: "Esta conta já tem Pro ativo. Volte à ferramenta para processar até {batchLimit} imagens por lote.",
@@ -619,7 +619,7 @@
           checkoutPasswordPlaceholder: "Password (mín. 6 caracteres)",
           passwordShow: "Mostrar",
           passwordHide: "Ocultar",
-          checkoutAuthNote: "Não há pagamento neste passo. A conta só liga o Stripe ao acesso correto; as imagens continuam no browser.",
+          checkoutAuthNote: "Pack: o email liga o pagamento aos créditos. Pro recorrente: a conta liga a subscrição ao acesso correto.",
           checkoutLogin: "Entrar e continuar",
           checkoutCreate: "Criar conta e continuar",
           checkoutCreatePayment: "Criar conta e continuar para pagamento",
@@ -628,6 +628,7 @@
           checkoutLinkSending: "A enviar link...",
           checkoutLinkSent: "Link enviado. Verifique o email para voltar ao Pack 100 quando quiser.",
           checkoutLinkError: "Não foi possível enviar o link agora. Pode criar conta ou entrar para continuar.",
+          checkoutPackEmailRequired: "Introduza um email válido para abrir o pagamento do Pack no Stripe.",
           checkoutLoggingIn: "A entrar...",
           checkoutCreating: "A criar conta...",
           checkoutOpening: "A abrir Stripe...",
@@ -641,7 +642,7 @@
           checkoutError: "Não foi possível abrir o pagamento agora.",
           checkoutCancelled: "Pagamento cancelado. O plano continua selecionado; clique em Retomar pagamento para abrir o Stripe Checkout novamente.",
           checkoutContinueError: "Não foi possível recuperar esse checkout. Escolha o plano para abrir uma nova sessão segura.",
-          checkoutNote: "A conta é gratuita e serve apenas para ativar o acesso pago depois do pagamento. O cartão só é pedido no Stripe.",
+          checkoutNote: "Pack pode avançar só com email. Pro recorrente exige conta antes do pagamento. O cartão só é pedido no Stripe.",
           checkoutNotePro: "A subscrição já está ativa nesta conta. Pode gerir o pagamento no painel principal.",
           checkoutNotePack: "O pack é compra única, sem renovação. Pode comprar mais créditos ou escolher Pro quando precisar de produção recorrente.",
           checkoutResumeCta: "Retomar pagamento",
@@ -657,7 +658,7 @@
           volumeLarge: "500-2.000 imagens/mês",
           volumeXL: "2.000+ imagens/mês",
           formButton: "Comprar acesso pago",
-          privacy: "É necessário criar conta ou iniciar sessão antes do pagamento para ligar a compra ao acesso correto. Consulte os termos, cancelamento e reembolsos antes de comprar.",
+          privacy: "Packs podem ser pagos com email e ativados depois numa conta com o mesmo email. Pro recorrente exige conta antes do pagamento. Consulte termos, cancelamento e reembolsos antes de comprar.",
           legalTerms: "Termos",
           legalRefunds: "Cancelamento e reembolsos",
           legalPrivacy: "Privacidade",
@@ -750,7 +751,7 @@
           faqKicker: "Before paying",
           faqTitle: "Questions that usually block purchase",
           faqAccountQuestion: "Do I need to create an account before paying?",
-          faqAccountAnswer: "Yes. The account links the Stripe purchase to the correct access and activates the paid limits automatically.",
+          faqAccountAnswer: "For Packs, not before payment: you can pay with an email and activate credits later on an account with the same email. For recurring Pro, the account is created before payment.",
           faqActivationQuestion: "Does access activate right after payment?",
           faqActivationAnswer: "Yes. After Stripe Checkout payment, BatchCutout syncs the purchase and activates the correct access on the account.",
           faqCancelQuestion: "Can I cancel anytime?",
@@ -765,15 +766,15 @@
           formPointReply: "Monthly: EUR 19/month.",
           formPointPriority: "Annual: EUR 190/year (save EUR 38 vs monthly).",
           checkoutKicker: "Direct checkout",
-          checkoutTitle: "Create an account and choose a plan",
+          checkoutTitle: "Choose a plan",
           checkoutBadgeGuest: "No session",
           checkoutBadgeSelected: "Plan selected",
           checkoutBadgeReady: "Account ready",
           checkoutBadgePro: "Pro active",
           checkoutBadgePack: "Pack active",
-          checkoutStatusGuest: "Use your email to create a free account. If you already have one, sign in and we open Stripe Checkout.",
+          checkoutStatusGuest: "For a Pack, enter your email and open Stripe. For recurring Pro, create an account or sign in first.",
           checkoutStatusSelected: "Selected plan: {plan}. Create a free account; then we open Stripe for payment.",
-          checkoutStatusSelectedPack: "{plan}: one-time purchase, no subscription. Create an account to save the credits to your email; then we open Stripe.",
+          checkoutStatusSelectedPack: "{plan}: enter your email and we open Stripe. After payment, sign in or create an account with the same email to activate credits.",
           checkoutStatusSelectedSubscription: "{plan}: recurring access for monthly production. Create an account to connect the subscription to your email; then we open Stripe.",
           checkoutStatusReady: "Account verified. Choose a plan to open secure Stripe payment.",
           checkoutStatusPro: "This account already has Pro active. Return to the tool to process up to {batchLimit} images per batch.",
@@ -791,7 +792,7 @@
           checkoutPasswordPlaceholder: "Password (min. 6 characters)",
           passwordShow: "Show",
           passwordHide: "Hide",
-          checkoutAuthNote: "No payment happens at this step. The account only connects Stripe to the correct access; your images stay in the browser.",
+          checkoutAuthNote: "Pack: the email links payment to credits. Recurring Pro: the account links the subscription to the correct access.",
           checkoutLogin: "Sign in and continue",
           checkoutCreate: "Create account and continue",
           checkoutCreatePayment: "Create account and continue to payment",
@@ -800,6 +801,7 @@
           checkoutLinkSending: "Sending link...",
           checkoutLinkSent: "Link sent. Check your email to return to Pack 100 when ready.",
           checkoutLinkError: "We could not send the link right now. You can create an account or sign in to continue.",
+          checkoutPackEmailRequired: "Enter a valid email to open the Pack payment on Stripe.",
           checkoutLoggingIn: "Signing in...",
           checkoutCreating: "Creating account...",
           checkoutOpening: "Opening Stripe...",
@@ -813,7 +815,7 @@
           checkoutError: "We could not open payment right now.",
           checkoutCancelled: "Payment was cancelled. The plan is still selected; click Resume payment to open Stripe Checkout again.",
           checkoutContinueError: "We could not recover that checkout. Choose the plan to open a new secure session.",
-          checkoutNote: "The account is free and only activates paid access after payment. Card details are requested only in Stripe.",
+          checkoutNote: "Packs can proceed with email only. Recurring Pro needs an account before payment. Card details are requested only in Stripe.",
           checkoutNotePro: "The subscription is already active on this account. You can manage payment from the main tool page.",
           checkoutNotePack: "The pack is a one-time purchase with no renewal. Buy more credits or choose Pro when you need recurring production.",
           checkoutResumeCta: "Resume payment",
@@ -829,7 +831,7 @@
           volumeLarge: "500-2,000 images/month",
           volumeXL: "2,000+ images/month",
           formButton: "Buy paid access",
-          privacy: "You need to create an account or sign in before payment so the purchase can be linked to the correct access. Review terms, cancellation, and refunds before buying.",
+          privacy: "Packs can be paid with an email and activated later on an account with the same email. Recurring Pro needs an account before payment. Review terms, cancellation, and refunds before buying.",
           legalTerms: "Terms",
           legalRefunds: "Cancellation and refunds",
           legalPrivacy: "Privacy",
@@ -922,7 +924,7 @@
           faqKicker: "Antes de pagar",
           faqTitle: "Dudas que suelen frenar la compra",
           faqAccountQuestion: "¿Tengo que crear una cuenta antes de pagar?",
-          faqAccountAnswer: "Sí. La cuenta permite vincular la compra de Stripe al acceso correcto y activar los límites de pago automáticamente.",
+          faqAccountAnswer: "Para Packs, no antes del pago: puedes pagar con email y activar los créditos después en una cuenta con el mismo email. Para Pro recurrente, la cuenta se crea antes del pago.",
           faqActivationQuestion: "¿El acceso se activa justo después del pago?",
           faqActivationAnswer: "Sí. Después del pago por Stripe Checkout, BatchCutout sincroniza la compra y activa el acceso correcto en la cuenta.",
           faqCancelQuestion: "¿Puedo cancelar cuando quiera?",
@@ -937,15 +939,15 @@
           formPointReply: "Mensual: 19 EUR/mes.",
           formPointPriority: "Anual: 190 EUR/año (ahorra 38 EUR frente al mensual).",
           checkoutKicker: "Checkout directo",
-          checkoutTitle: "Crea una cuenta y elige el plan",
+          checkoutTitle: "Elige el plan",
           checkoutBadgeGuest: "Sin sesión",
           checkoutBadgeSelected: "Plan elegido",
           checkoutBadgeReady: "Cuenta lista",
           checkoutBadgePro: "Pro activo",
           checkoutBadgePack: "Pack activo",
-          checkoutStatusGuest: "Usa tu email para crear una cuenta gratis. Si ya tienes una, entra y abrimos Stripe Checkout.",
+          checkoutStatusGuest: "Para Pack, introduce tu email y abrimos Stripe. Para Pro recurrente, crea cuenta o entra primero.",
           checkoutStatusSelected: "Plan elegido: {plan}. Crea una cuenta gratis; después abrimos Stripe para pagar.",
-          checkoutStatusSelectedPack: "{plan}: compra única, sin suscripción. Crea una cuenta para guardar los créditos en tu email; después abrimos Stripe.",
+          checkoutStatusSelectedPack: "{plan}: introduce tu email y abrimos Stripe. Después del pago, entra o crea cuenta con el mismo email para activar los créditos.",
           checkoutStatusSelectedSubscription: "{plan}: acceso recurrente para producción mensual. Crea una cuenta para conectar la suscripción a tu email; después abrimos Stripe.",
           checkoutStatusReady: "Cuenta validada. Elige el plan para abrir el pago seguro en Stripe.",
           checkoutStatusPro: "Esta cuenta ya tiene Pro activo. Vuelve a la herramienta para procesar hasta {batchLimit} imágenes por lote.",
@@ -963,7 +965,7 @@
           checkoutPasswordPlaceholder: "Contraseña (mín. 6 caracteres)",
           passwordShow: "Mostrar",
           passwordHide: "Ocultar",
-          checkoutAuthNote: "No hay pago en este paso. La cuenta solo conecta Stripe con el acceso correcto; tus imágenes siguen en el navegador.",
+          checkoutAuthNote: "Pack: el email vincula el pago a los créditos. Pro recurrente: la cuenta vincula la suscripción al acceso correcto.",
           checkoutLogin: "Entrar y continuar",
           checkoutCreate: "Crear cuenta y continuar",
           checkoutCreatePayment: "Crear cuenta y continuar al pago",
@@ -972,6 +974,7 @@
           checkoutLinkSending: "Enviando enlace...",
           checkoutLinkSent: "Enlace enviado. Revisa tu email para volver al Pack 100 cuando quieras.",
           checkoutLinkError: "No se pudo enviar el enlace ahora. Puedes crear cuenta o entrar para continuar.",
+          checkoutPackEmailRequired: "Introduce un email válido para abrir el pago del Pack en Stripe.",
           checkoutLoggingIn: "Entrando...",
           checkoutCreating: "Creando cuenta...",
           checkoutOpening: "Abriendo Stripe...",
@@ -985,7 +988,7 @@
           checkoutError: "No se pudo abrir el pago ahora.",
           checkoutCancelled: "Pago cancelado. El plan sigue seleccionado; haz clic en Retomar pago para abrir Stripe Checkout de nuevo.",
           checkoutContinueError: "No se pudo recuperar ese checkout. Elige el plan para abrir una nueva sesión segura.",
-          checkoutNote: "La cuenta es gratis y solo activa el acceso de pago después del pago. La tarjeta se pide solo en Stripe.",
+          checkoutNote: "El Pack puede avanzar solo con email. Pro recurrente exige cuenta antes del pago. La tarjeta se pide solo en Stripe.",
           checkoutNotePro: "La suscripción ya está activa en esta cuenta. Puedes gestionar el pago desde la página principal.",
           checkoutNotePack: "El pack es una compra única, sin renovación. Compra más créditos o elige Pro cuando necesites producción recurrente.",
           checkoutResumeCta: "Retomar pago",
@@ -1001,7 +1004,7 @@
           volumeLarge: "500-2.000 imágenes/mes",
           volumeXL: "2.000+ imágenes/mes",
           formButton: "Comprar acceso de pago",
-          privacy: "Es necesario crear una cuenta o iniciar sesión antes del pago para vincular la compra al acceso correcto. Revisa términos, cancelación y reembolsos antes de comprar.",
+          privacy: "Los Packs pueden pagarse con email y activarse después en una cuenta con el mismo email. Pro recurrente exige cuenta antes del pago. Revisa términos, cancelación y reembolsos antes de comprar.",
           legalTerms: "Términos",
           legalRefunds: "Cancelación y reembolsos",
           legalPrivacy: "Privacidad",
@@ -1442,6 +1445,8 @@
       const pricingEmail = document.querySelector("#pricingAccountEmail");
       const pricingPassword = document.querySelector("#pricingAccountPassword");
       const pricingPasswordToggle = document.querySelector("#pricingPasswordToggle");
+      const pricingPasswordField = pricingPassword?.closest(".password-field");
+      const pricingAuthActions = document.querySelector(".pricing-auth-actions");
       const pricingLoginButton = document.querySelector("#pricingLoginButton");
       const pricingCreateButton = document.querySelector("#pricingCreateButton");
       const pricingCheckoutLinkButton = document.querySelector("#pricingCheckoutLinkButton");
@@ -1944,9 +1949,12 @@
         const hasPaidAccess = Boolean(access.canUsePro);
         const isPack = Boolean(access.isCreditPack);
         const hasPro = hasPaidAccess && !isPack;
+        const guestPackCheckout = !ready && !hasPaidAccess && pricingPlanIsPack(selectedPricingPlan);
         const batchLimit = pricingAccount?.access?.batchLimit || 100;
         const selectedLabel = pricingPlanLabel(selectedPricingPlan);
         updateSelectedPricingPlanUi();
+        pricingPasswordField?.classList.toggle("hidden", guestPackCheckout);
+        pricingAuthActions?.classList.toggle("hidden", guestPackCheckout);
         pricingAccountBadge.textContent = hasPro
           ? pricingText("checkoutBadgePro")
           : isPack
@@ -2017,6 +2025,66 @@
         return pricingAccount;
       }
 
+      function setPricingCheckoutButtonsDisabled(disabled) {
+        for (const button of pricingCheckoutActions?.querySelectorAll("[data-pricing-checkout-plan]") || []) {
+          button.disabled = disabled;
+        }
+      }
+
+      async function startPricingEmailPackCheckout(plan = selectedPricingPlan) {
+        const selectedPlan = pricingPlanIsPack(plan) ? plan : defaultPricingPlan;
+        const email = normalizePricingEmail(pricingEmail?.value || "");
+        if (!email) {
+          trackPricingCheckoutEvent("pro_checkout_email_required", { plan: selectedPlan, source: "pricing_page" });
+          updatePricingAccountUi();
+          setPricingStatus("checkoutPackEmailRequired");
+          pricingEmail?.focus();
+          return false;
+        }
+
+        rememberPricingEmail(email);
+        setPricingCheckoutButtonsDisabled(true);
+        setPricingStatus("checkoutOpening");
+
+        try {
+          const response = await fetch("/api/create-checkout-session", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              plan: selectedPlan,
+              email,
+              attribution: {
+                ...pricingAttribution(),
+                email,
+              },
+            }),
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || !data.url) {
+            throw new Error(data.error || "checkout_failed");
+          }
+
+          trackPricingCheckoutEvent("pro_checkout_started", {
+            plan: selectedPlan,
+            label: data.label || pricingPlanLabel(selectedPlan),
+            value: pricingPlanValue(selectedPlan),
+            currency: "EUR",
+            source: "pricing_page",
+            purchase_type: "pack",
+            email_only_checkout: true,
+          });
+          trackPricingBeginCheckout(selectedPlan);
+          window.location.href = data.url;
+          return true;
+        } catch {
+          setPricingStatus("checkoutError");
+          setPricingCheckoutButtonsDisabled(false);
+          return false;
+        }
+      }
+
       async function startPricingCheckout(plan = selectedPricingPlan) {
         const selectedPlan = pricingCheckoutPlans.has(plan) ? plan : defaultPricingPlan;
         selectedPricingPlan = selectedPlan;
@@ -2028,16 +2096,18 @@
 
         const accessToken = await currentPricingAccessToken();
         if (!accessToken) {
+          if (pricingPlanIsPack(selectedPlan)) {
+            await startPricingEmailPackCheckout(selectedPlan);
+            return;
+          }
           trackPricingCheckoutEvent("pro_checkout_login_required", { plan: selectedPlan, source: "pricing_page" });
-          setPricingStatus(pricingSelectedStatusKey(selectedPlan), false, { plan: pricingPlanLabel(selectedPlan) });
           updatePricingAccountUi();
+          setPricingStatus(pricingSelectedStatusKey(selectedPlan), false, { plan: pricingPlanLabel(selectedPlan) });
           pricingEmail?.focus();
           return;
         }
 
-        for (const button of pricingCheckoutActions.querySelectorAll("[data-pricing-checkout-plan]")) {
-          button.disabled = true;
-        }
+        setPricingCheckoutButtonsDisabled(true);
         setPricingStatus("checkoutOpening");
 
         try {
@@ -2068,9 +2138,7 @@
           window.location.href = data.url;
         } catch {
           setPricingStatus("checkoutError");
-          for (const button of pricingCheckoutActions.querySelectorAll("[data-pricing-checkout-plan]")) {
-            button.disabled = false;
-          }
+          setPricingCheckoutButtonsDisabled(false);
         }
       }
 

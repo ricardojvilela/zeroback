@@ -78,10 +78,12 @@ const accountForm = document.querySelector("#accountForm");
 const accountEmail = document.querySelector("#accountEmail");
 const accountPassword = document.querySelector("#accountPassword");
 const accountPasswordToggle = document.querySelector("#accountPasswordToggle");
+const accountPasswordField = accountPassword?.closest(".password-field");
 const accountSubmit = document.querySelector("#accountSubmit");
 const accountCreate = document.querySelector("#accountCreate");
 const accountCheckoutLink = document.querySelector("#accountCheckoutLink");
 const accountCheckoutLinkBlock = document.querySelector("#accountCheckoutLinkBlock");
+const accountCheckoutLinkText = accountCheckoutLinkBlock?.querySelector("[data-i18n='accountCheckoutLinkText']");
 const accountActions = document.querySelector("#accountActions");
 const accountRefresh = document.querySelector("#accountRefresh");
 const accountLogout = document.querySelector("#accountLogout");
@@ -290,7 +292,7 @@ const baseTranslation = {
   accountBadgePack: "Pack",
   accountStatusGuest: "Crie uma conta grátis para ligar o acesso pago ao seu email, ou entre para gerir o acesso.",
   accountStatusCheckoutPending: "Plano escolhido: {plan}. Crie uma conta grátis com email e password; depois abrimos o Stripe para pagar.",
-  accountStatusCheckoutPendingPack: "{plan}: compra única, sem subscrição. Crie conta para guardar os créditos no seu email; depois abrimos o Stripe.",
+  accountStatusCheckoutPendingPack: "{plan}: introduza o email e abrimos o Stripe. Depois do pagamento, entre ou crie conta com o mesmo email para ativar os créditos.",
   accountStatusCheckoutPendingSubscription: "{plan}: acesso recorrente para produção mensal. Crie conta para ligar a subscrição ao seu email; depois abrimos o Stripe.",
   accountCheckoutGuideLabel: "Passos para ativar acesso",
   accountCheckoutGuideAccount: "Crie conta ou entre",
@@ -327,7 +329,7 @@ const baseTranslation = {
   accountPasswordPlaceholder: "Password (mín. 6 caracteres)",
   passwordShow: "Mostrar",
   passwordHide: "Ocultar",
-  accountAuthNote: "Depois de criar conta, abrimos o Stripe automaticamente. Não há pagamento neste passo; as imagens continuam no browser.",
+  accountAuthNote: "Pack: o email liga o pagamento aos créditos. Pro recorrente: a conta liga a subscrição ao acesso correto.",
   accountSubmit: "Entrar",
   accountSubmitCheckout: "Entrar e continuar",
   accountSubmitSending: "A entrar...",
@@ -335,7 +337,9 @@ const baseTranslation = {
   accountCreateCheckout: "Criar conta e continuar para pagamento",
   accountCreateSending: "A criar conta...",
   accountCheckoutLinkText: "Sem tempo para criar conta agora? Use o email acima e receba o link do plano para voltar ao pagamento.",
+  accountCheckoutLinkTextPack: "Para Pack, basta usar o email acima para abrir o pagamento seguro no Stripe. A conta pode ser criada depois com o mesmo email.",
   accountCheckoutLink: "Receber link do plano por email",
+  accountCheckoutLinkPack: "Pagar Pack no Stripe",
   accountCheckoutLinkSending: "A enviar link...",
   accountCheckoutLinkSuccess: "Link do plano guardado. Deve receber o email para voltar ao BatchCutout dentro de instantes.",
   accountCheckoutLinkInvalid: "Introduza o email para receber o link do plano.",
@@ -351,7 +355,7 @@ const baseTranslation = {
   billingCheckoutStarting: "A abrir pagamento...",
   billingPortalStarting: "A abrir gestão de pagamento...",
   billingCheckoutSuccess: "Pagamento recebido. A ativação Pro pode demorar alguns segundos.",
-  billingCheckoutSuccessPack: "Pagamento recebido. Os créditos do pack podem demorar alguns segundos a aparecer.",
+  billingCheckoutSuccessPack: "Pagamento Pack recebido. Entre ou crie conta com o mesmo email para ativar os créditos.",
   billingCheckoutCancelled: "Pagamento cancelado. Pode tentar novamente quando quiser.",
   billingLoginRequired: "Crie uma conta grátis ou entre. Só depois abrimos o Stripe para pagar o plano escolhido.",
   billingCheckoutError: "Não foi possível abrir o pagamento agora.",
@@ -513,7 +517,7 @@ const translations = {
     accountBadgePack: "Pack",
     accountStatusGuest: "Create a free account to connect paid access to your email, or sign in to manage access.",
     accountStatusCheckoutPending: "Selected plan: {plan}. Create a free account with email and password; then we open Stripe for payment.",
-    accountStatusCheckoutPendingPack: "{plan}: one-time purchase, no subscription. Create an account to save the credits to your email; then we open Stripe.",
+    accountStatusCheckoutPendingPack: "{plan}: enter your email and we open Stripe. After payment, sign in or create an account with the same email to activate credits.",
     accountStatusCheckoutPendingSubscription: "{plan}: recurring access for monthly production. Create an account to connect the subscription to your email; then we open Stripe.",
     accountCheckoutGuideLabel: "Steps to activate access",
     accountCheckoutGuideAccount: "Create account or sign in",
@@ -550,7 +554,7 @@ const translations = {
     accountPasswordPlaceholder: "Password (min. 6 characters)",
     passwordShow: "Show",
     passwordHide: "Hide",
-    accountAuthNote: "After creating the account, we open Stripe automatically. No payment happens at this step; your images stay in the browser.",
+    accountAuthNote: "Pack: the email links payment to credits. Recurring Pro: the account links the subscription to the correct access.",
     accountSubmit: "Sign in",
     accountSubmitCheckout: "Sign in and continue",
     accountSubmitSending: "Signing in...",
@@ -558,7 +562,9 @@ const translations = {
     accountCreateCheckout: "Create account and continue to payment",
     accountCreateSending: "Creating account...",
     accountCheckoutLinkText: "No time to create the account now? Use the email above and get the selected-plan link to return to payment.",
+    accountCheckoutLinkTextPack: "For a Pack, use the email above to open secure Stripe payment. The account can be created later with the same email.",
     accountCheckoutLink: "Get plan link by email",
+    accountCheckoutLinkPack: "Pay Pack on Stripe",
     accountCheckoutLinkSending: "Sending link...",
     accountCheckoutLinkSuccess: "Plan link saved. You should receive the email to return to BatchCutout shortly.",
     accountCheckoutLinkInvalid: "Enter your email to receive the plan link.",
@@ -574,7 +580,7 @@ const translations = {
     billingCheckoutStarting: "Opening payment...",
     billingPortalStarting: "Opening billing...",
     billingCheckoutSuccess: "Payment received. Pro activation can take a few seconds.",
-    billingCheckoutSuccessPack: "Payment received. Pack credits can take a few seconds to appear.",
+    billingCheckoutSuccessPack: "Pack payment received. Sign in or create an account with the same email to activate the credits.",
     billingCheckoutCancelled: "Payment cancelled. You can try again whenever you want.",
     billingLoginRequired: "Create a free account or sign in. Only then do we open Stripe for the selected plan.",
     billingCheckoutError: "We could not open payment right now.",
@@ -1126,7 +1132,7 @@ const translatedAddons = {
     accountBadgePack: "Pack",
     accountStatusGuest: "Crea una cuenta gratis para conectar el acceso de pago con tu email, o entra para gestionar el acceso.",
     accountStatusCheckoutPending: "Plan elegido: {plan}. Crea una cuenta gratis con email y contraseña; después abrimos Stripe para pagar.",
-    accountStatusCheckoutPendingPack: "{plan}: compra única, sin suscripción. Crea una cuenta para guardar los créditos en tu email; después abrimos Stripe.",
+    accountStatusCheckoutPendingPack: "{plan}: introduce tu email y abrimos Stripe. Después del pago, entra o crea cuenta con el mismo email para activar los créditos.",
     accountStatusCheckoutPendingSubscription: "{plan}: acceso recurrente para producción mensual. Crea una cuenta para conectar la suscripción a tu email; después abrimos Stripe.",
     accountUsageTitle: "Uso mensual",
     accountUsageTitlePack: "Créditos del pack",
@@ -1160,7 +1166,7 @@ const translatedAddons = {
     accountStatusPack: "Pack activo. Puedes procesar hasta {batchLimit} imágenes por lote; quedan {monthlyRemaining} de {monthlyLimit} créditos.",
     accountStatusConfigMissing: "El login Pro todavía no está configurado en este entorno.",
     accountEmailPlaceholder: "Tu email",
-    accountAuthNote: "Después de crear la cuenta, abrimos Stripe automáticamente. No hay pago en este paso; tus imágenes siguen en el navegador.",
+    accountAuthNote: "Pack: el email vincula el pago a los créditos. Pro recurrente: la cuenta vincula la suscripción al acceso correcto.",
     accountPasswordPlaceholder: "Contraseña (mín. 6 caracteres)",
     passwordShow: "Mostrar",
     passwordHide: "Ocultar",
@@ -1171,7 +1177,9 @@ const translatedAddons = {
     accountCreateCheckout: "Crear cuenta y continuar al pago",
     accountCreateSending: "Creando cuenta...",
     accountCheckoutLinkText: "¿Sin tiempo para crear la cuenta ahora? Usa el email de arriba y recibe el enlace del plan para volver al pago.",
+    accountCheckoutLinkTextPack: "Para Pack, basta usar el email de arriba para abrir el pago seguro en Stripe. La cuenta puede crearse después con el mismo email.",
     accountCheckoutLink: "Recibir enlace del plan por email",
+    accountCheckoutLinkPack: "Pagar Pack en Stripe",
     accountCheckoutLinkSending: "Enviando enlace...",
     accountCheckoutLinkSuccess: "Enlace del plan guardado. Deberías recibir el email para volver a BatchCutout en unos instantes.",
     accountCheckoutLinkInvalid: "Introduce tu email para recibir el enlace del plan.",
@@ -1187,7 +1195,7 @@ const translatedAddons = {
     billingCheckoutStarting: "Abriendo pago...",
     billingPortalStarting: "Abriendo gestión de pago...",
     billingCheckoutSuccess: "Pago recibido. La activación Pro puede tardar unos segundos.",
-    billingCheckoutSuccessPack: "Pago recibido. Los créditos del pack pueden tardar unos segundos en aparecer.",
+    billingCheckoutSuccessPack: "Pago del Pack recibido. Entra o crea cuenta con el mismo email para activar los créditos.",
     billingCheckoutCancelled: "Pago cancelado. Puedes intentarlo de nuevo cuando quieras.",
     billingLoginRequired: "Crea una cuenta gratis o entra. Solo después abrimos Stripe para pagar el plan elegido.",
     billingCheckoutError: "No se pudo abrir el pago ahora.",
@@ -1926,6 +1934,7 @@ async function continueExistingAccountAfterSignup(email, password, waitingPlan =
     });
     await refreshAccount();
     setAccountMessage(waitingPlan ? "accountExistingLoginReady" : "accountMagicLinkSent");
+    await syncCheckoutReturnAfterAuth();
     await maybeStartRequestedCheckout();
   } catch (error) {
     if (isEmailConfirmationRequiredError(error)) {
@@ -1948,6 +1957,12 @@ async function continueExistingAccountAfterSignup(email, password, waitingPlan =
     });
     setAccountMessage("accountExistingLoginError");
   }
+}
+
+async function syncCheckoutReturnAfterAuth() {
+  if (checkoutStatus !== "success" || !checkoutSessionId) return false;
+  await showCheckoutReturnMessage();
+  return true;
 }
 
 function setKnownGoogleUserData() {
@@ -2347,6 +2362,20 @@ function syncAccountAuthButtons() {
   }
 }
 
+function accountCheckoutLinkLabelKey(plan = checkoutPlanWaitingForAuth()) {
+  return checkoutPlanIsPack(plan) ? "accountCheckoutLinkPack" : "accountCheckoutLink";
+}
+
+function syncAccountCheckoutLinkCopy(plan = "") {
+  const isPackCheckout = checkoutPlanIsPack(plan);
+  if (accountCheckoutLinkText) {
+    accountCheckoutLinkText.textContent = t(isPackCheckout ? "accountCheckoutLinkTextPack" : "accountCheckoutLinkText");
+  }
+  if (accountCheckoutLink && !accountCheckoutLink.disabled) {
+    accountCheckoutLink.textContent = t(accountCheckoutLinkLabelKey(plan));
+  }
+}
+
 function trackAccountCheckoutPanelShown(plan = "") {
   if (!checkoutPlans.has(plan || "")) return;
   if (lastTrackedAccountCheckoutPanelPlan === plan) return;
@@ -2455,6 +2484,9 @@ function updateAccountUi() {
     prefillAccountEmail();
     accountForm?.classList.remove("hidden");
     accountCheckoutLinkBlock?.classList.add("hidden");
+    accountPasswordField?.classList.remove("hidden");
+    accountCreate?.classList.remove("hidden");
+    accountSubmit?.classList.remove("hidden");
     accountActions?.classList.add("hidden");
     billingActions?.classList.add("hidden");
     billingPortal?.classList.add("hidden");
@@ -2469,6 +2501,7 @@ function updateAccountUi() {
   if (!currentAccount) {
     const waitingPlan = checkoutPlanWaitingForAuth();
     const waitingPlanName = checkoutPlanDisplayName(waitingPlan);
+    const waitingPlanIsPack = checkoutPlanIsPack(waitingPlan);
     const waitingStatusKey = checkoutPlanIsPack(waitingPlan)
       ? "accountStatusCheckoutPendingPack"
       : "accountStatusCheckoutPendingSubscription";
@@ -2478,6 +2511,7 @@ function updateAccountUi() {
     accountCheckoutProof?.classList.toggle("hidden", !waitingPlanName);
     updateAccountCheckoutProof(waitingPlan, waitingPlanName);
     accountCheckoutLinkBlock?.classList.toggle("hidden", !waitingPlanName || lastCheckoutLinkSentPlan === waitingPlan);
+    syncAccountCheckoutLinkCopy(waitingPlan);
     if (waitingPlanName) trackAccountCheckoutPanelShown(waitingPlan);
     accountBadge.textContent = waitingPlanName ? t("accountBadgeCheckout") : t("accountBadgeGuest");
     accountStatus.textContent = waitingPlanName
@@ -2485,6 +2519,9 @@ function updateAccountUi() {
       : t("accountStatusGuest");
     prefillAccountEmail();
     accountForm?.classList.remove("hidden");
+    accountPasswordField?.classList.toggle("hidden", waitingPlanIsPack);
+    accountCreate?.classList.toggle("hidden", waitingPlanIsPack);
+    accountSubmit?.classList.toggle("hidden", waitingPlanIsPack);
     accountActions?.classList.add("hidden");
     billingActions?.classList.add("hidden");
     billingPortal?.classList.add("hidden");
@@ -2516,6 +2553,9 @@ function updateAccountUi() {
   updateAccountCheckoutProof();
   accountCheckoutLinkBlock?.classList.add("hidden");
   accountForm?.classList.add("hidden");
+  accountPasswordField?.classList.remove("hidden");
+  accountCreate?.classList.remove("hidden");
+  accountSubmit?.classList.remove("hidden");
   accountActions?.classList.remove("hidden");
   billingActions?.classList.toggle("hidden", access.accessType === "pro");
   billingPortal?.classList.toggle("hidden", access.accessType !== "pro" || !currentAccount?.billing?.hasStripeCustomer);
@@ -2636,6 +2676,7 @@ async function handleAccountLogin(event) {
     });
     setAccountMessage("accountMagicLinkSent");
     await refreshAccount();
+    await syncCheckoutReturnAfterAuth();
     await maybeStartRequestedCheckout();
   } catch (error) {
     const waitingPlan = checkoutPlanWaitingForAuth();
@@ -2672,6 +2713,22 @@ async function handleAccountCreate(event) {
 
   const email = normalizeEmail(accountEmail.value);
   const password = accountPassword.value;
+  const waitingPlan = checkoutPlanWaitingForAuth();
+  if (checkoutPlanIsPack(waitingPlan)) {
+    if (!accountEmail.checkValidity()) {
+      trackAccountFormValidationFailure("signup");
+      accountForm?.reportValidity();
+      return;
+    }
+    rememberAccountEmail(email);
+    const started = await startEmailPackCheckout(waitingPlan, email, accountCheckoutLink || accountCreate);
+    if (!started && accountCheckoutLink) {
+      accountCheckoutLink.disabled = false;
+      accountCheckoutLink.textContent = t(accountCheckoutLinkLabelKey(waitingPlan));
+    }
+    return;
+  }
+
   if (!accountEmail.checkValidity() || !accountPassword.checkValidity()) {
     trackAccountFormValidationFailure("signup");
     accountForm?.reportValidity();
@@ -2682,7 +2739,6 @@ async function handleAccountCreate(event) {
   accountCreate.disabled = true;
   accountCreate.textContent = t("accountCreateSending");
   setAccountMessage();
-  const waitingPlan = checkoutPlanWaitingForAuth();
   trackEvent("account_signup_started", {
     source: waitingPlan ? "checkout_plan" : "account_panel",
     has_requested_checkout: Boolean(waitingPlan),
@@ -2714,6 +2770,7 @@ async function handleAccountCreate(event) {
     if (data?.session) {
       await refreshAccount();
       setAccountMessage(waitingPlan ? "accountSignupReady" : "accountSignupReadyNoPlan");
+      await syncCheckoutReturnAfterAuth();
       await maybeStartRequestedCheckout();
     } else {
       trackEvent("account_email_confirmation_required", {
@@ -2758,6 +2815,15 @@ async function handleAccountCheckoutLinkCapture() {
   }
 
   rememberAccountEmail(email);
+  if (checkoutPlanIsPack(waitingPlan)) {
+    const started = await startEmailPackCheckout(waitingPlan, email, accountCheckoutLink);
+    if (!started && accountCheckoutLink) {
+      accountCheckoutLink.disabled = false;
+      accountCheckoutLink.textContent = t(accountCheckoutLinkLabelKey(waitingPlan));
+    }
+    return;
+  }
+
   if (accountCheckoutLink) {
     accountCheckoutLink.disabled = true;
     accountCheckoutLink.textContent = t("accountCheckoutLinkSending");
@@ -2787,7 +2853,7 @@ async function handleAccountCheckoutLinkCapture() {
   } finally {
     if (accountCheckoutLink) {
       accountCheckoutLink.disabled = false;
-      accountCheckoutLink.textContent = t("accountCheckoutLink");
+      accountCheckoutLink.textContent = t(accountCheckoutLinkLabelKey(waitingPlan));
     }
   }
 }
@@ -2881,11 +2947,74 @@ function accountEmailRedirectUrl(plan = "") {
   return url.toString();
 }
 
+async function startEmailPackCheckout(plan = defaultCheckoutPlan, email = "", triggerButton = null) {
+  const selectedPlan = checkoutPlanIsPack(plan) ? plan : defaultCheckoutPlan;
+  const normalizedEmail = normalizeEmail(email);
+  if (!checkoutPlanIsPack(selectedPlan) || !isValidEmail(normalizedEmail)) return false;
+
+  rememberAccountEmail(normalizedEmail);
+  if (triggerButton) {
+    triggerButton.disabled = true;
+    triggerButton.textContent = t("billingCheckoutStarting");
+  }
+  setAccountMessage("billingCheckoutStarting");
+
+  try {
+    const response = await fetch("/api/create-checkout-session", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        plan: selectedPlan,
+        email: normalizedEmail,
+        attribution: {
+          ...getAttributionParams(),
+          email: normalizedEmail,
+          visitor_id: getVisitorId(),
+          session_id: getSessionId(),
+        },
+      }),
+    });
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok || !data.url) {
+      throw new Error(data.error || "checkout_failed");
+    }
+
+    trackEvent("pro_checkout_started", {
+      plan: selectedPlan,
+      label: data.label || selectedPlan,
+      value: checkoutValueForPlan(selectedPlan),
+      currency: "EUR",
+      purchase_type: "pack",
+      email_only_checkout: true,
+    });
+    setGoogleUserData(normalizedEmail);
+    trackBeginCheckout(selectedPlan, "email_pack");
+    clearPendingCheckoutPlan();
+    window.location.href = data.url;
+    return true;
+  } catch {
+    setAccountMessage("billingCheckoutError");
+    if (triggerButton) {
+      triggerButton.disabled = false;
+      triggerButton.textContent = t(checkoutPlanLabelKey(selectedPlan));
+    }
+    return false;
+  }
+}
+
 async function startCheckout(plan = defaultCheckoutPlan, triggerButton = null) {
   const selectedPlan = checkoutPlans.has(plan) ? plan : defaultCheckoutPlan;
   const accessToken = await getCurrentAccessToken();
 
   if (!accessToken) {
+    const knownEmail = normalizeEmail(accountEmail?.value || getCapturedLeadEmail());
+    if (checkoutPlanIsPack(selectedPlan) && isValidEmail(knownEmail)) {
+      const started = await startEmailPackCheckout(selectedPlan, knownEmail, triggerButton);
+      if (started) return;
+    }
     setPendingCheckoutPlan(selectedPlan);
     trackEvent("pro_checkout_login_required", { plan: selectedPlan });
     updateAccountUi();

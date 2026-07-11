@@ -418,8 +418,9 @@ async function recordCheckoutSessionCreated(settings, { user, profile, session, 
   const detail = {
     ...attribution,
     stripe_session_id: session.id || "",
-    stripe_customer_id: profile.stripe_customer_id || session.customer || "",
-    supabase_user_id: user.id || "",
+    stripe_customer_id: profile?.stripe_customer_id || session.customer || "",
+    supabase_user_id: user?.id || "",
+    email: normalizeEmail(user?.email || profile?.email || session.customer_details?.email || ""),
     plan,
     price_plan: plan,
     purchase_type: offerKind,
@@ -481,8 +482,8 @@ async function recordCheckoutLinkEmail(settings, { eventName, user, profile, ses
     reason,
     resend_id: resendId,
     stripe_session_id: session.id || "",
-    stripe_customer_id: profile.stripe_customer_id || session.customer || "",
-    supabase_user_id: user.id || "",
+    stripe_customer_id: profile?.stripe_customer_id || session.customer || "",
+    supabase_user_id: user?.id || "",
     plan,
     price_plan: plan,
   };
@@ -508,7 +509,7 @@ async function sendCheckoutLinkEmail(settings, { user, profile, session, plan, a
   if (!checkoutEmailEnabled()) return { sent: false, skipped: true, reason: "disabled" };
   if (!session.url) return { sent: false, skipped: true, reason: "missing_session_url" };
 
-  const to = normalizeEmail(user.email);
+  const to = normalizeEmail(user?.email);
   if (!to) return { sent: false, skipped: true, reason: "missing_user_email" };
 
   const mailSettings = checkoutMailSettings();
@@ -581,6 +582,99 @@ function checkoutEmailTimeout() {
   });
 }
 
+async function createEmailPackCheckout({ stripe, settings, body, offering }) {
+  const email = normalizeEmail(body?.email || body?.customerEmail || body?.attribution?.email || "");
+  if (!email) {
+    return { status: 400, body: { ok: false, error: "missing_email" } };
+  }
+  if (offering.kind !== "pack") {
+    return { status: 401, body: { ok: false, error: "missing_access_token" } };
+  }
+
+  const plan = offering.plan;
+  const attribution = sanitizeAttribution(body?.attribution);
+  const siteUrl = getSiteUrl();
+  const checkoutReturnLanguage = checkoutLanguage(attribution);
+  const checkoutReturnLangParam = checkoutReturnLanguage === "pt" ? "" : `lang=${encodeURIComponent(checkoutReturnLanguage)}&`;
+  let customerId = "";
+
+  try {
+    const existingCustomers = await stripe.customers.list({ email, limit: 1 });
+    customerId = existingCustomers.data?.[0]?.id || "";
+  } catch {
+    customerId = "";
+  }
+
+  if (!customerId) {
+    const customer = await stripe.customers.create({
+      email,
+      metadata: {
+        batchcutout_pending_email: email,
+        batchcutout_plan: "pack",
+      },
+    });
+    customerId = customer.id;
+  }
+
+  const metadata = {
+    supabase_user_id: "",
+    batchcutout_plan: "pack",
+    batchcutout_purchase_type: "pack",
+    batchcutout_price_plan: plan,
+    batchcutout_pack_images: String(offering.images),
+    batchcutout_pending_email: email,
+    customer_email: email,
+    ...attribution,
+  };
+  const session = await stripe.checkout.sessions.create({
+    customer: customerId,
+    client_reference_id: `email:${email}`.slice(0, 200),
+    allow_promotion_codes: true,
+    success_url: `${siteUrl}/?${checkoutReturnLangParam}checkout=success&session_id={CHECKOUT_SESSION_ID}#accountTitle`,
+    cancel_url: `${siteUrl}/pricing/?${checkoutReturnLangParam}checkout=cancelled&checkout_plan=${encodeURIComponent(plan)}#pricing-account-title`,
+    metadata,
+    mode: "payment",
+    line_items: [{ price_data: offering.priceData, quantity: 1 }],
+    payment_intent_data: {
+      metadata,
+    },
+    customer_update: {
+      name: "auto",
+      address: "auto",
+    },
+  });
+
+  const user = { id: "", email };
+  const profile = { email, stripe_customer_id: customerId };
+  try {
+    await recordCheckoutSessionCreated(settings, { user, profile, session, plan, attribution, offerKind: "pack" });
+  } catch {
+    // Checkout must not fail because analytics storage failed.
+  }
+  try {
+    await Promise.race([
+      sendCheckoutLinkEmail(settings, { user, profile, session, plan, attribution }),
+      checkoutEmailTimeout(),
+    ]);
+  } catch {
+    // Checkout must not fail because email recovery failed.
+  }
+
+  return {
+    status: 200,
+    body: {
+      ok: true,
+      url: session.url,
+      plan,
+      kind: "pack",
+      images: offering.images,
+      label: getPlanLabel(plan),
+      customerId,
+      requiresAccountAfterPayment: true,
+    },
+  };
+}
+
 export default async function handler(request, response) {
   if (request.method === "OPTIONS") {
     return sendJson(response, 200, { ok: true });
@@ -604,11 +698,6 @@ export default async function handler(request, response) {
     return sendJson(response, 503, { ok: false, error: "supabase_not_configured" });
   }
 
-  const accessToken = getAccessToken(request);
-  if (!accessToken) {
-    return sendJson(response, 401, { ok: false, error: "missing_access_token" });
-  }
-
   let user = null;
   let profile = null;
   let plan = "monthly";
@@ -616,15 +705,22 @@ export default async function handler(request, response) {
   let offering = null;
 
   try {
+    const body = await readRequestBody(request);
+    offering = getCheckoutOffering(body?.plan);
+    plan = offering.plan;
+    attribution = sanitizeAttribution(body?.attribution);
+
+    const accessToken = getAccessToken(request);
+    if (!accessToken) {
+      const result = await createEmailPackCheckout({ stripe, settings, body, offering });
+      return sendJson(response, result.status, result.body);
+    }
+
     user = await getSupabaseUser(settings, accessToken);
     if (!user?.id) {
       return sendJson(response, 401, { ok: false, error: "invalid_access_token" });
     }
 
-    const body = await readRequestBody(request);
-    offering = getCheckoutOffering(body?.plan);
-    plan = offering.plan;
-    attribution = sanitizeAttribution(body?.attribution);
     if (offering.kind === "subscription" && !offering.priceId) {
       try {
         await recordCheckoutSessionFailed(settings, {

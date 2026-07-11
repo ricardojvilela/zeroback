@@ -144,11 +144,22 @@ export default async function handler(request, response) {
     }
 
     const { session, subscription } = await getSessionSubscription(stripe, sessionId);
-    if (session.client_reference_id !== user.id) {
+    const isPackSession = session.mode === "payment" && session.metadata?.batchcutout_purchase_type === "pack";
+    const sessionEmail = asText(
+      session.metadata?.batchcutout_pending_email ||
+      session.metadata?.customer_email ||
+      session.customer_details?.email ||
+      session.customer_email ||
+      "",
+      320,
+    ).toLowerCase();
+    const userEmail = asText(user.email || "", 320).toLowerCase();
+    const emailMatchedPackSession = isPackSession && sessionEmail && userEmail && sessionEmail === userEmail;
+    if (session.client_reference_id !== user.id && !emailMatchedPackSession) {
       return sendJson(response, 403, { ok: false, error: "checkout_session_user_mismatch" });
     }
 
-    if (session.mode === "payment" && session.metadata?.batchcutout_purchase_type === "pack") {
+    if (isPackSession) {
       if (session.payment_status !== "paid") {
         return sendJson(response, 409, { ok: false, error: "checkout_not_paid" });
       }

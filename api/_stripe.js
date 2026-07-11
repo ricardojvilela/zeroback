@@ -164,9 +164,18 @@ export function profilePatchForSubscription(subscription, customerId = "", profi
   };
 }
 
-export async function findProfileForStripe(settings, { userId = "", customerId = "", subscriptionId = "" }) {
+export async function findProfileForStripe(settings, { userId = "", customerId = "", subscriptionId = "", email = "" }) {
   if (userId) {
     const row = await supabaseSelectSingleByColumn({ ...settings, column: "user_id", value: userId });
+    if (row) return normalizeProfile(row, { id: row.user_id, email: row.email });
+  }
+
+  if (email) {
+    const row = await supabaseSelectSingleByColumn({
+      ...settings,
+      column: "email",
+      value: email,
+    });
     if (row) return normalizeProfile(row, { id: row.user_id, email: row.email });
   }
 
@@ -198,6 +207,7 @@ export async function updateProfileFromSubscription(settings, subscription, fall
     userId,
     customerId,
     subscriptionId: subscription?.id || "",
+    email: subscription?.customer_email || "",
   });
 
   if (!profile?.user_id) {
@@ -434,6 +444,7 @@ export async function applyPackPurchaseFromSession(settings, session, event = nu
     const profile = await findProfileForStripe(settings, {
       userId: metadata.supabase_user_id || session?.client_reference_id || "",
       customerId: customerIdFromSession(session),
+      email: text(metadata.batchcutout_pending_email || metadata.customer_email || session?.customer_details?.email, 320),
     });
     if (!profile?.user_id) {
       throw new Error("stripe_pack_profile_not_found");
@@ -444,6 +455,7 @@ export async function applyPackPurchaseFromSession(settings, session, event = nu
   const profile = await findProfileForStripe(settings, {
     userId: metadata.supabase_user_id || session?.client_reference_id || "",
     customerId: customerIdFromSession(session),
+    email: text(metadata.batchcutout_pending_email || metadata.customer_email || session?.customer_details?.email, 320),
   });
 
   if (!profile?.user_id) {
