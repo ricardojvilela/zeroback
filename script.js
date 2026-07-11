@@ -81,6 +81,7 @@ const accountPasswordToggle = document.querySelector("#accountPasswordToggle");
 const accountSubmit = document.querySelector("#accountSubmit");
 const accountCreate = document.querySelector("#accountCreate");
 const accountCheckoutLink = document.querySelector("#accountCheckoutLink");
+const accountCheckoutLinkBlock = document.querySelector("#accountCheckoutLinkBlock");
 const accountActions = document.querySelector("#accountActions");
 const accountRefresh = document.querySelector("#accountRefresh");
 const accountLogout = document.querySelector("#accountLogout");
@@ -332,7 +333,8 @@ const baseTranslation = {
   accountCreate: "Criar conta e continuar",
   accountCreateCheckout: "Criar conta e continuar para pagamento",
   accountCreateSending: "A criar conta...",
-  accountCheckoutLink: "Receber link para continuar depois",
+  accountCheckoutLinkText: "Sem tempo para criar conta agora? Use o email acima e receba o link do plano para voltar ao pagamento.",
+  accountCheckoutLink: "Receber link do plano por email",
   accountCheckoutLinkSending: "A enviar link...",
   accountCheckoutLinkSuccess: "Link do plano guardado. Deve receber o email para voltar ao BatchCutout dentro de instantes.",
   accountCheckoutLinkInvalid: "Introduza o email para receber o link do plano.",
@@ -554,7 +556,8 @@ const translations = {
     accountCreate: "Create account and continue",
     accountCreateCheckout: "Create account and continue to payment",
     accountCreateSending: "Creating account...",
-    accountCheckoutLink: "Get link to continue later",
+    accountCheckoutLinkText: "No time to create the account now? Use the email above and get the selected-plan link to return to payment.",
+    accountCheckoutLink: "Get plan link by email",
     accountCheckoutLinkSending: "Sending link...",
     accountCheckoutLinkSuccess: "Plan link saved. You should receive the email to return to BatchCutout shortly.",
     accountCheckoutLinkInvalid: "Enter your email to receive the plan link.",
@@ -1166,7 +1169,8 @@ const translatedAddons = {
     accountCreate: "Crear cuenta y continuar",
     accountCreateCheckout: "Crear cuenta y continuar al pago",
     accountCreateSending: "Creando cuenta...",
-    accountCheckoutLink: "Recibir enlace para continuar después",
+    accountCheckoutLinkText: "¿Sin tiempo para crear la cuenta ahora? Usa el email de arriba y recibe el enlace del plan para volver al pago.",
+    accountCheckoutLink: "Recibir enlace del plan por email",
     accountCheckoutLinkSending: "Enviando enlace...",
     accountCheckoutLinkSuccess: "Enlace del plan guardado. Deberías recibir el email para volver a BatchCutout en unos instantes.",
     accountCheckoutLinkInvalid: "Introduce tu email para recibir el enlace del plan.",
@@ -2449,7 +2453,7 @@ function updateAccountUi() {
     updateAccountCheckoutProof();
     prefillAccountEmail();
     accountForm?.classList.remove("hidden");
-    accountCheckoutLink?.classList.add("hidden");
+    accountCheckoutLinkBlock?.classList.add("hidden");
     accountActions?.classList.add("hidden");
     billingActions?.classList.add("hidden");
     billingPortal?.classList.add("hidden");
@@ -2472,7 +2476,7 @@ function updateAccountUi() {
     accountCheckoutGuide?.classList.toggle("hidden", !waitingPlanName);
     accountCheckoutProof?.classList.toggle("hidden", !waitingPlanName);
     updateAccountCheckoutProof(waitingPlan, waitingPlanName);
-    accountCheckoutLink?.classList.toggle("hidden", !waitingPlanName || Boolean(getCapturedLeadEmail()));
+    accountCheckoutLinkBlock?.classList.toggle("hidden", !waitingPlanName || Boolean(getCapturedLeadEmail()));
     if (waitingPlanName) trackAccountCheckoutPanelShown(waitingPlan);
     accountBadge.textContent = waitingPlanName ? t("accountBadgeCheckout") : t("accountBadgeGuest");
     accountStatus.textContent = waitingPlanName
@@ -2509,7 +2513,7 @@ function updateAccountUi() {
   accountCheckoutGuide?.classList.add("hidden");
   accountCheckoutProof?.classList.add("hidden");
   updateAccountCheckoutProof();
-  accountCheckoutLink?.classList.add("hidden");
+  accountCheckoutLinkBlock?.classList.add("hidden");
   accountForm?.classList.add("hidden");
   accountActions?.classList.remove("hidden");
   billingActions?.classList.toggle("hidden", access.accessType === "pro");

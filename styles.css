@@ -540,6 +540,36 @@ h2 {
   line-height: 1.35;
 }
 
+.account-checkout-link-block {
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(117, 168, 255, 0.34);
+  border-radius: 8px;
+  padding: 10px;
+  background: rgba(117, 168, 255, 0.12);
+}
+
+.account-checkout-link-block p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.78rem;
+  font-weight: 780;
+  line-height: 1.35;
+}
+
+.account-checkout-link-block button {
+  min-height: 40px;
+  border-color: rgba(117, 168, 255, 0.58);
+  background: rgba(117, 168, 255, 0.2);
+  font-size: 0.86rem;
+  line-height: 1.2;
+}
+
+.account-checkout-link-block button:hover:not(:disabled) {
+  border-color: rgba(117, 168, 255, 0.74);
+  background: rgba(117, 168, 255, 0.28);
+}
+
 .account-form > button,
 .account-actions .ghost-button {
   width: 100%;
