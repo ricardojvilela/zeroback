@@ -90,6 +90,9 @@ function emptyDay(date) {
     highVolumeContacts: 0,
     monthlyLimitReached: 0,
     checkoutLoginRequired: 0,
+    packEmailRequired: 0,
+    packEmailCheckoutStarts: 0,
+    packEmailCheckoutFailures: 0,
     checkoutStarts: 0,
     checkoutCancelledReturns: 0,
     checkoutContinueErrors: 0,
@@ -258,6 +261,9 @@ function emptySourceRow(source) {
     highVolumeContacts: 0,
     monthlyLimitReached: 0,
     checkoutLoginRequired: 0,
+    packEmailRequired: 0,
+    packEmailCheckoutStarts: 0,
+    packEmailCheckoutFailures: 0,
     checkoutStarts: 0,
     checkoutCancelledReturns: 0,
     checkoutContinueErrors: 0,
@@ -667,6 +673,10 @@ export default async function handler(request, response) {
           row.checkoutLoginRequired += 1;
           sourceRow.checkoutLoginRequired += 1;
           break;
+        case "pro_checkout_email_required":
+          row.packEmailRequired += 1;
+          sourceRow.packEmailRequired += 1;
+          break;
         case "account_checkout_panel_shown":
           row.accountCheckoutPanelViews += 1;
           sourceRow.accountCheckoutPanelViews += 1;
@@ -678,6 +688,14 @@ export default async function handler(request, response) {
         case "pro_checkout_started":
           row.checkoutStarts += 1;
           sourceRow.checkoutStarts += 1;
+          if (detail.email_only_checkout || detail.source === "email_pack") {
+            row.packEmailCheckoutStarts += 1;
+            sourceRow.packEmailCheckoutStarts += 1;
+          }
+          break;
+        case "pro_checkout_email_failed":
+          row.packEmailCheckoutFailures += 1;
+          sourceRow.packEmailCheckoutFailures += 1;
           break;
         case "pro_checkout_cancelled_return":
           row.checkoutCancelledReturns += 1;

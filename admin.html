@@ -1081,6 +1081,18 @@
               <strong id="packFunnelPackClicks">0</strong>
             </article>
             <article class="live-card">
+              <span>Email em falta</span>
+              <strong id="packFunnelEmailRequired">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Checkout por email</span>
+              <strong id="packFunnelEmailStarts">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Erros email → Stripe</span>
+              <strong id="packFunnelEmailFailures">0</strong>
+            </article>
+            <article class="live-card">
               <span>Sessões Stripe Pack</span>
               <strong id="packFunnelPackSessions">0</strong>
             </article>
@@ -1848,6 +1860,9 @@
         const checkoutLinkEmails = Number(totals.checkoutLinkEmailsSent || 0) || 0;
         const checkoutLinkEmailClicks = Number(totals.checkoutLinkEmailClicks || 0) || 0;
         const checkoutLinkEmailFailures = Number(totals.checkoutLinkEmailFailures || 0) || 0;
+        const packEmailRequired = Number(totals.packEmailRequired || 0) || 0;
+        const packEmailCheckoutStarts = Number(totals.packEmailCheckoutStarts || 0) || 0;
+        const packEmailCheckoutFailures = Number(totals.packEmailCheckoutFailures || 0) || 0;
         const paidSubscriptions = Number(totals.paidSubscriptions || 0) || 0;
         const packPurchases = Number(totals.packPurchases || 0) || 0;
         const packCheckoutSessions = Number(totals.packCheckoutSessions || 0) || 0;
@@ -1869,6 +1884,18 @@
 
         if (checkoutLinkEmails >= 2 && checkoutLinkEmailClicks === 0 && checkoutSessions === 0) {
           return "Gargalo principal: emails de checkout foram enviados mas ainda não geraram cliques. Prioridade: rever entregabilidade, assunto e clareza do link de continuação.";
+        }
+
+        if (packEmailCheckoutFailures > 0 && packCheckoutSessions === 0) {
+          return "Gargalo principal: compradores tentaram abrir Pack por email, mas o checkout falhou antes da Stripe. Prioridade: rever API, Stripe e detalhe do erro antes de mexer em preço ou tráfego.";
+        }
+
+        if (packEmailCheckoutStarts > 0 && packCheckoutSessions === 0) {
+          return "Gargalo principal: o browser iniciou checkout Pack por email, mas a API ainda não registou sessão Stripe Pack. Prioridade: confirmar consistência entre tracking e criação de sessão.";
+        }
+
+        if (packEmailRequired >= 2 && packCheckoutSessions === 0) {
+          return "Gargalo principal: utilizadores tentaram comprar Pack sem email válido. Prioridade: tornar o campo de email mais evidente no checkout Pack antes de aumentar tráfego.";
         }
 
         if (checkoutStarts > 0 && checkoutSessions === 0) {
@@ -1963,12 +1990,24 @@
         const packClicks = packToolClicks + packPricingClicks;
         const packSessions = Number(totals.packCheckoutSessions || 0) || 0;
         const packPurchases = Number(totals.packPurchases || 0) || 0;
+        const packEmailRequired = Number(totals.packEmailRequired || 0) || 0;
+        const packEmailStarts = Number(totals.packEmailCheckoutStarts || 0) || 0;
+        const packEmailFailures = Number(totals.packEmailCheckoutFailures || 0) || 0;
 
         if (packPurchases > 0) {
           return "Pack 100 já converteu. Próximo passo: identificar origem da compra e repetir esse canal com mais tráfego qualificado.";
         }
+        if (packEmailFailures > 0) {
+          return "Há erros no checkout Pack por email. Próximo passo: rever API/Stripe antes de mexer no preço.";
+        }
         if (packSessions > 0) {
           return "Há sessões Stripe Pack sem compra. Próximo passo: acompanhar cancelamentos e emails de continuação de checkout.";
+        }
+        if (packEmailStarts > 0) {
+          return "Há checkouts Pack por email iniciados sem sessão Stripe atribuída. Próximo passo: confirmar tracking e criação de sessão.";
+        }
+        if (packEmailRequired > 0) {
+          return "Há compradores Pack sem email válido. Próximo passo: tornar o campo de email mais óbvio no checkout.";
         }
         if (packClicks > 0) {
           return "Há cliques Pack sem sessão Stripe Pack. Próximo passo: testar conta/login/Stripe com foco no Pack 100.";
@@ -2393,6 +2432,9 @@
         const packClicks = packToolClicks + packPricingClicks;
         document.querySelector("#packFunnelResultReady").textContent = totals.downloadReadyShown || 0;
         document.querySelector("#packFunnelPackClicks").textContent = packClicks;
+        document.querySelector("#packFunnelEmailRequired").textContent = totals.packEmailRequired || 0;
+        document.querySelector("#packFunnelEmailStarts").textContent = totals.packEmailCheckoutStarts || 0;
+        document.querySelector("#packFunnelEmailFailures").textContent = totals.packEmailCheckoutFailures || 0;
         document.querySelector("#packFunnelPackSessions").textContent = totals.packCheckoutSessions || 0;
         document.querySelector("#packFunnelPackPurchases").textContent = totals.packPurchases || 0;
         document.querySelector("#packFunnelResultToClickRate").textContent = formatPercent(conversionRate(

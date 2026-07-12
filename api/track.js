@@ -36,6 +36,8 @@ const allowedEvents = new Set([
   "account_checkout_panel_shown",
   "account_form_interacted",
   "pro_checkout_login_required",
+  "pro_checkout_email_required",
+  "pro_checkout_email_failed",
   "pro_checkout_started",
   "pro_checkout_cancelled_return",
   "checkout_continue_error_shown",

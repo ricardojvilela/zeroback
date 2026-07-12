@@ -2716,6 +2716,11 @@ async function handleAccountCreate(event) {
   const waitingPlan = checkoutPlanWaitingForAuth();
   if (checkoutPlanIsPack(waitingPlan)) {
     if (!accountEmail.checkValidity()) {
+      trackEvent("pro_checkout_email_required", {
+        plan: waitingPlan,
+        source: "account_panel",
+        purchase_type: "pack",
+      });
       trackAccountFormValidationFailure("signup");
       accountForm?.reportValidity();
       return;
@@ -2803,6 +2808,13 @@ async function handleAccountCheckoutLinkCapture() {
   const email = normalizeEmail(accountEmail?.value || "");
 
   if (!isValidEmail(email)) {
+    if (checkoutPlanIsPack(waitingPlan)) {
+      trackEvent("pro_checkout_email_required", {
+        plan: waitingPlan,
+        source: "account_panel",
+        purchase_type: "pack",
+      });
+    }
     trackEvent("lead_capture_invalid", {
       downloadType: "checkout_plan",
       source: "checkout_account_prompt",
@@ -2950,7 +2962,15 @@ function accountEmailRedirectUrl(plan = "") {
 async function startEmailPackCheckout(plan = defaultCheckoutPlan, email = "", triggerButton = null) {
   const selectedPlan = checkoutPlanIsPack(plan) ? plan : defaultCheckoutPlan;
   const normalizedEmail = normalizeEmail(email);
-  if (!checkoutPlanIsPack(selectedPlan) || !isValidEmail(normalizedEmail)) return false;
+  if (!checkoutPlanIsPack(selectedPlan)) return false;
+  if (!isValidEmail(normalizedEmail)) {
+    trackEvent("pro_checkout_email_required", {
+      plan: selectedPlan,
+      source: "account_panel",
+      purchase_type: "pack",
+    });
+    return false;
+  }
 
   rememberAccountEmail(normalizedEmail);
   if (triggerButton) {
@@ -2995,7 +3015,13 @@ async function startEmailPackCheckout(plan = defaultCheckoutPlan, email = "", tr
     clearPendingCheckoutPlan();
     window.location.href = data.url;
     return true;
-  } catch {
+  } catch (error) {
+    trackEvent("pro_checkout_email_failed", {
+      plan: selectedPlan,
+      source: "account_panel",
+      purchase_type: "pack",
+      reason: error instanceof Error ? error.message : "checkout_failed",
+    });
     setAccountMessage("billingCheckoutError");
     if (triggerButton) {
       triggerButton.disabled = false;

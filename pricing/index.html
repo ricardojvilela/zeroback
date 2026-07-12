@@ -2078,7 +2078,13 @@
           trackPricingBeginCheckout(selectedPlan);
           window.location.href = data.url;
           return true;
-        } catch {
+        } catch (error) {
+          trackPricingCheckoutEvent("pro_checkout_email_failed", {
+            plan: selectedPlan,
+            source: "pricing_page",
+            purchase_type: "pack",
+            reason: error instanceof Error ? error.message : "checkout_failed",
+          });
           setPricingStatus("checkoutError");
           setPricingCheckoutButtonsDisabled(false);
           return false;
