@@ -622,6 +622,7 @@ async function createEmailPackCheckout({ stripe, settings, body, offering }) {
     batchcutout_purchase_type: "pack",
     batchcutout_price_plan: plan,
     batchcutout_pack_images: String(offering.images),
+    batchcutout_checkout_access: "email_only",
     batchcutout_pending_email: email,
     customer_email: email,
     ...attribution,
@@ -646,14 +647,26 @@ async function createEmailPackCheckout({ stripe, settings, body, offering }) {
 
   const user = { id: "", email };
   const profile = { email, stripe_customer_id: customerId };
+  const emailCheckoutAttribution = {
+    ...attribution,
+    checkout_access: "email_only",
+    email_only_checkout: true,
+  };
   try {
-    await recordCheckoutSessionCreated(settings, { user, profile, session, plan, attribution, offerKind: "pack" });
+    await recordCheckoutSessionCreated(settings, {
+      user,
+      profile,
+      session,
+      plan,
+      attribution: emailCheckoutAttribution,
+      offerKind: "pack",
+    });
   } catch {
     // Checkout must not fail because analytics storage failed.
   }
   try {
     await Promise.race([
-      sendCheckoutLinkEmail(settings, { user, profile, session, plan, attribution }),
+      sendCheckoutLinkEmail(settings, { user, profile, session, plan, attribution: emailCheckoutAttribution }),
       checkoutEmailTimeout(),
     ]);
   } catch {

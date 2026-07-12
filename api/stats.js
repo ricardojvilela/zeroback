@@ -92,6 +92,7 @@ function emptyDay(date) {
     checkoutLoginRequired: 0,
     packEmailRequired: 0,
     packEmailCheckoutStarts: 0,
+    packEmailCheckoutSessions: 0,
     packEmailCheckoutFailures: 0,
     checkoutStarts: 0,
     checkoutCancelledReturns: 0,
@@ -172,6 +173,7 @@ function classifySource(event, detail) {
     "pricing_page",
     "pricing_page_checkout_panel",
     "pricing-page",
+    "email_pack",
     "seo",
     "landing",
     "use-cases",
@@ -263,6 +265,7 @@ function emptySourceRow(source) {
     checkoutLoginRequired: 0,
     packEmailRequired: 0,
     packEmailCheckoutStarts: 0,
+    packEmailCheckoutSessions: 0,
     packEmailCheckoutFailures: 0,
     checkoutStarts: 0,
     checkoutCancelledReturns: 0,
@@ -342,6 +345,14 @@ function emptyLandingPageRow(pagePath) {
 
 function isPackCheckoutPlan(plan) {
   return ["pack100", "pack250"].includes(String(plan || "").toLowerCase());
+}
+
+function isEmailOnlyPackCheckout(detail = {}) {
+  const explicitMarker = detail.email_only_checkout === true ||
+    String(detail.email_only_checkout || "").toLowerCase() === "true" ||
+    String(detail.checkout_access || "").toLowerCase() === "email_only";
+  const legacyMarker = !asCleanText(detail.supabase_user_id, 200) && Boolean(asCleanText(detail.email, 320));
+  return explicitMarker || legacyMarker;
 }
 
 function verifyAdminToken(request) {
@@ -714,6 +725,10 @@ export default async function handler(request, response) {
           row.packCheckoutSessions += 1;
           sourceRow.checkoutSessionsCreated += 1;
           sourceRow.packCheckoutSessions += 1;
+          if (isEmailOnlyPackCheckout(detail)) {
+            row.packEmailCheckoutSessions += 1;
+            sourceRow.packEmailCheckoutSessions += 1;
+          }
           break;
         case "pro_checkout_session_failed":
           row.checkoutSessionFailures += 1;
@@ -878,6 +893,26 @@ export default async function handler(request, response) {
         b.events - a.events
       )
       .slice(0, 20);
+    const packSourceBreakdown = Array.from(bySource.values())
+      .filter((row) =>
+        (row.postDownloadPackClicks || 0) +
+        (row.packCtaClicks || 0) +
+        (row.packEmailRequired || 0) +
+        (row.packEmailCheckoutStarts || 0) +
+        (row.packEmailCheckoutSessions || 0) +
+        (row.packCheckoutSessions || 0) +
+        (row.packPurchases || 0) > 0
+      )
+      .sort((a, b) =>
+        b.packRevenue - a.packRevenue ||
+        b.packPurchases - a.packPurchases ||
+        b.packEmailCheckoutSessions - a.packEmailCheckoutSessions ||
+        b.packCheckoutSessions - a.packCheckoutSessions ||
+        b.packEmailCheckoutStarts - a.packEmailCheckoutStarts ||
+        ((b.postDownloadPackClicks || 0) + (b.packCtaClicks || 0)) -
+          ((a.postDownloadPackClicks || 0) + (a.packCtaClicks || 0))
+      )
+      .slice(0, 12);
     const landingBreakdown = Array.from(byLandingPage.values())
       .sort((a, b) =>
         b.pricingClicks - a.pricingClicks ||
@@ -900,6 +935,7 @@ export default async function handler(request, response) {
       rows,
       totals,
       sourceBreakdown,
+      packSourceBreakdown,
       landingBreakdown,
       generatedAt: new Date().toISOString(),
     });
