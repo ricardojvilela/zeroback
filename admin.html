@@ -1456,7 +1456,7 @@
           <div class="panel-head compact">
             <div>
               <h3>Campanhas e anúncios</h3>
-              <p class="note">Funil atribuído por UTM. As etapas contam pessoas únicas, para que visitas repetidas não criem taxas acima de 100%.</p>
+              <p class="note">Funil atribuído por UTM. O número principal conta pessoas únicas; a segunda linha preserva eventos históricos que possam não ter identificação de visitante.</p>
             </div>
           </div>
           <div class="table-wrap">
@@ -2751,9 +2751,23 @@
           ? data.campaignBreakdown.map((row) => {
               const paidIntentVisitors = Number(row.paidIntentVisitors || 0) || 0;
               const packClickVisitors = Number(row.packClickVisitors || 0) || 0;
+              const uploadEvents = Number(row.uploadsStarted || 0) || 0;
+              const downloadEvents = Number(row.downloads || 0) || 0;
+              const paidIntentEvents = (Number(row.proClicks || 0) || 0) +
+                (Number(row.pricingCtaClicks || 0) || 0) +
+                (Number(row.postDownloadPackClicks || 0) || 0);
+              const packClickEvents = (Number(row.postDownloadPackClicks || 0) || 0) +
+                (Number(row.packCtaClicks || 0) || 0);
               const purchaseEvents = (Number(row.paidSubscriptions || 0) || 0) +
                 (Number(row.packPurchases || 0) || 0);
               const purchases = (Number(row.purchaseVisitors || 0) || 0) || purchaseEvents;
+              const rateDisplay = (visitors, events, rate) => events > 0 && visitors === 0
+                ? `<span class="note">n/d</span>`
+                : formatPercent(rate || 0);
+              const peopleAndEvents = (visitors, events) => `
+                <strong>${visitors}</strong>
+                <br><span class="note">${events} evento${events === 1 ? "" : "s"}</span>
+              `;
               const attributionDetail = [
                 row.content ? `Anúncio: ${escapeHtml(row.content)}` : "",
                 row.term ? `Termo: ${escapeHtml(row.term)}` : "",
@@ -2767,13 +2781,13 @@
                   <td>${escapeHtml(sourceLabel(row.source))}</td>
                   <td>${escapeHtml(row.landingPage || "-")}</td>
                   <td>${row.visitors || 0}</td>
-                  <td>${row.uploadVisitors || 0}</td>
-                  <td>${formatPercent(row.uploadRate || 0)}</td>
-                  <td>${row.downloadVisitors || 0}</td>
-                  <td>${formatPercent(row.downloadRate || 0)}</td>
-                  <td>${paidIntentVisitors}</td>
-                  <td>${formatPercent(row.paidIntentRate || 0)}</td>
-                  <td>${packClickVisitors}</td>
+                  <td>${peopleAndEvents(Number(row.uploadVisitors || 0) || 0, uploadEvents)}</td>
+                  <td>${rateDisplay(Number(row.uploadVisitors || 0) || 0, uploadEvents, row.uploadRate)}</td>
+                  <td>${peopleAndEvents(Number(row.downloadVisitors || 0) || 0, downloadEvents)}</td>
+                  <td>${rateDisplay(Number(row.downloadVisitors || 0) || 0, downloadEvents, row.downloadRate)}</td>
+                  <td>${peopleAndEvents(paidIntentVisitors, paidIntentEvents)}</td>
+                  <td>${rateDisplay(paidIntentVisitors, paidIntentEvents, row.paidIntentRate)}</td>
+                  <td>${peopleAndEvents(packClickVisitors, packClickEvents)}</td>
                   <td>${row.accountVisitors || 0}</td>
                   <td>${row.stripeVisitors || 0}</td>
                   <td>${purchases}</td>
