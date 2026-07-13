@@ -3954,9 +3954,15 @@ progress::-moz-progress-bar {
 @media (max-width: 1040px) {
   .app-shell {
     grid-template-areas:
+      "workspace"
+      "brand";
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  body.checkout-intent .app-shell {
+    grid-template-areas:
       "brand"
       "workspace";
-    grid-template-columns: minmax(0, 1fr);
   }
 
   .brand-panel {

@@ -102,6 +102,10 @@ const checkoutStatus = pageParams.get("checkout");
 const checkoutSessionId = pageParams.get("session_id");
 const checkoutPlans = new Set(["monthly", "annual", "early", "pack100", "pack250"]);
 const defaultCheckoutPlan = "pack100";
+document.body.classList.toggle(
+  "checkout-intent",
+  checkoutPlans.has(requestedCheckoutPlan || "") || Boolean(checkoutStatus),
+);
 let maxFilesPerBatch = defaultMaxFilesPerBatch;
 const minExportSide = 1200;
 const defaultProBatchLimit = 100;
