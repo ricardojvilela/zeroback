@@ -216,6 +216,14 @@ Decision rules:
 - Updated the CSV with `sent_2026-07-09`, follow-up date `2026-07-14` and Resend IDs.
 - Do not send more direct outreach on 2026-07-09.
 
+## Executed growth work - July 13 follow-ups
+
+- Checked `support@batchcutout.com` before sending: 2 historical inbound emails, 0 unresolved, and no replies or opt-outs from the selected recipients.
+- Sent the 5 follow-ups prepared for July 10 and the 10 highest-score overdue follow-ups from the July 1 batch.
+- All 15 emails were accepted through `support@batchcutout.com`.
+- Updated the prospect CSV with Resend IDs, `watch_replies`, and no additional follow-up date.
+- Reached the daily warm-up cap; do not send another direct outreach batch on 2026-07-13.
+
 ## Executed growth work - support reply workflow
 
 - Added quick reply templates to the `/admin` support mailbox for interested prospects, pricing/limits, privacy/payment, fit qualification, opt-out and free response handling.

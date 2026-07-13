@@ -2,12 +2,14 @@
 
 Prepared: 2026-07-09
 
-Safety check pending: 2026-07-10
+Safety check completed: 2026-07-13
+
+Status: all 5 follow-ups were sent successfully on 2026-07-13 through `support@batchcutout.com`. The CSV contains the Resend IDs and no further follow-up is scheduled.
 
 - Do not send before checking `support@batchcutout.com` in `/admin` for replies, opt-outs or unresolved support messages.
 - Send only if none of the recipients replied since the first contact on 2026-07-06.
 - Keep this as the only direct outreach batch for 2026-07-10 unless a separate daily cap decision is made.
-- Status: ready to send after support check and explicit final confirmation for this commercial email batch.
+- Do not resend this batch.
 
 This is the proof-page batch originally sent on 2026-07-06. It has 5 recipients, inside the 10 to 15 email warm-up cap.
 

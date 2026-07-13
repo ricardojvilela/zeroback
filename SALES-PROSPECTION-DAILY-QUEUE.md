@@ -1,6 +1,6 @@
 # BatchCutout - daily prospecting queue
 
-Updated: 2026-07-09
+Updated: 2026-07-13
 
 ## Current pipeline
 
@@ -9,8 +9,8 @@ Updated: 2026-07-09
 - Ready with proof-page email variant: 28.
 - Already contacted: 84.
 - Blocked or not usable: 24.
-- Follow-ups due next: 2026-07-10.
-- Lower-priority 2026-07-07 follow-ups still unsent because the selected daily batch reached the warm-up cap.
+- Follow-ups due next: 2026-07-14 for the 10 prospects first contacted on 2026-07-09.
+- 19 lower-priority 2026-07-07 follow-ups remain unsent because the selected 2026-07-13 batch reached the warm-up cap.
 
 ## Today's status
 
@@ -24,6 +24,10 @@ Updated: 2026-07-09
 
 2026-07-09 action: sent `OUTREACH-BATCH-2026-07-09.md` to 10 high-score ready prospects. CSV updated with Resend IDs and follow-up date 2026-07-14.
 
+2026-07-13 support check passed before sending: 2 historical emails were present, 0 unresolved, and 0 matched the 15 contacts selected for today.
+
+2026-07-13 action: sent 15 follow-ups through `support@batchcutout.com`: the 5 contacts prepared in `OUTREACH-FOLLOWUP-2026-07-10.md` and the 10 highest-score contacts still due from 2026-07-07. All 15 sends succeeded. CSV updated with Resend IDs, `watch_replies`, and no further follow-up date.
+
 Sent on 2026-07-07:
 
 - 12 follow-ups from `OUTREACH-FOLLOWUP-2026-07-07.md`.
@@ -36,7 +40,11 @@ Sent on 2026-07-09:
 
 - 10 new prospect emails from `OUTREACH-BATCH-2026-07-09.md`.
 
-Do not send more direct outreach on 2026-07-09. The total is 10 emails, which is inside the warm-up cap.
+Sent on 2026-07-13:
+
+- 15 one-time follow-ups after checking the support inbox and opt-outs.
+
+Do not send more direct outreach on 2026-07-13. The total is 15 emails, which is the daily warm-up cap.
 
 38 new qualified prospects were added on 2026-07-06 as `ready` with the proof-page variant. 10 were sent on 2026-07-09, leaving 28 staged for future batches after the due follow-ups are handled.
 
@@ -106,4 +114,5 @@ Use them in small daily batches only after the held 2026-07-07 follow-ups and th
 - Previous 2026-07-01 batch: 12 high-score follow-ups sent on 2026-07-07. 29 lower-priority follow-ups remain unsent because of the daily cap.
 - Proof-page 2026-07-02 batch: 13 follow-ups sent on 2026-07-08 from `OUTREACH-FOLLOWUP-2026-07-08.md`.
 - Ready proof-page batch 2026-07-09: 10 new prospect emails sent from `OUTREACH-BATCH-2026-07-09.md`; follow-up due 2026-07-14 if no reply.
-- Proof-page 2026-07-06 batch: follow-up from 2026-07-10 if no reply. Prepared as `OUTREACH-FOLLOWUP-2026-07-10.md`.
+- Proof-page 2026-07-06 batch: the 5 follow-ups prepared as `OUTREACH-FOLLOWUP-2026-07-10.md` were sent on 2026-07-13 after the support check.
+- Older 2026-07-01 batch: 10 additional high-score follow-ups were sent on 2026-07-13; 19 lower-priority contacts remain held.
