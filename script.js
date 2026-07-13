@@ -179,7 +179,7 @@ let currentAccount = null;
 let lastUsageReservation = null;
 let lastAccountValidationFailureAt = 0;
 let hasStartedRequestedCheckout = false;
-let hasTrackedRequestedCheckoutLoginRequired = false;
+let hasTrackedRequestedCheckoutRequirement = false;
 let hasTrackedResultReadyEmailShown = false;
 let hasTrackedResultReadyStickyShown = false;
 let hasTrackedProLimitLeadShown = false;
@@ -306,6 +306,9 @@ const baseTranslation = {
   accountCheckoutGuideAccount: "Crie conta ou entre",
   accountCheckoutGuideStripe: "Pagamento Stripe",
   accountCheckoutGuideActive: "Acesso ativo automaticamente",
+  accountCheckoutGuidePackEmail: "Introduza o email",
+  accountCheckoutGuidePackStripe: "Pague no Stripe",
+  accountCheckoutGuidePackActive: "100 créditos ativos",
   accountCheckoutProofLabel: "Resumo da opção paga",
   accountCheckoutProofPrice: "Pack desde 5 EUR ou Pro recorrente",
   accountCheckoutProofBatch: "100 imagens por lote",
@@ -366,6 +369,7 @@ const baseTranslation = {
   billingCheckoutSuccessPack: "Pagamento Pack recebido. Entre ou crie conta com o mesmo email para ativar os créditos.",
   billingCheckoutCancelled: "Pagamento cancelado. Pode tentar novamente quando quiser.",
   billingLoginRequired: "Crie uma conta grátis ou entre. Só depois abrimos o Stripe para pagar o plano escolhido.",
+  billingPackEmailRequired: "Introduza o email acima para continuar diretamente para o Stripe. Não precisa de password.",
   billingCheckoutError: "Não foi possível abrir o pagamento agora.",
   billingPortalError: "Não foi possível abrir a gestão de pagamento agora.",
   accountMagicLinkSent: "Sessão iniciada.",
@@ -531,6 +535,9 @@ const translations = {
     accountCheckoutGuideAccount: "Create account or sign in",
     accountCheckoutGuideStripe: "Stripe payment",
     accountCheckoutGuideActive: "Access activates automatically",
+    accountCheckoutGuidePackEmail: "Enter your email",
+    accountCheckoutGuidePackStripe: "Pay on Stripe",
+    accountCheckoutGuidePackActive: "100 credits active",
     accountCheckoutProofLabel: "Paid option summary",
     accountCheckoutProofPrice: "Pack from EUR 5 or recurring Pro",
     accountCheckoutProofBatch: "100 images per batch",
@@ -591,6 +598,7 @@ const translations = {
     billingCheckoutSuccessPack: "Pack payment received. Sign in or create an account with the same email to activate the credits.",
     billingCheckoutCancelled: "Payment cancelled. You can try again whenever you want.",
     billingLoginRequired: "Create a free account or sign in. Only then do we open Stripe for the selected plan.",
+    billingPackEmailRequired: "Enter your email above to continue directly to Stripe. No password is required.",
     billingCheckoutError: "We could not open payment right now.",
     billingPortalError: "We could not open billing management right now.",
     accountMagicLinkSent: "Signed in.",
@@ -685,6 +693,9 @@ const translations = {
     benefitBatch: "Hecho para muchas fotos",
     benefitPng: "PNG transparente",
     benefitZip: "ZIP organizado",
+    cookieText: "Usamos medición básica para entender visitas y compras. Puedes aceptar o continuar sin medición.",
+    cookieAccept: "Aceptar medición",
+    cookieDecline: "Continuar sin medición",
     uploadLabel: "Subir fotos",
     startNow: "Empezar ahora",
     uploadTitle: "Sube tus fotos",
@@ -1158,6 +1169,9 @@ const translatedAddons = {
     accountCheckoutGuideAccount: "Crea cuenta o entra",
     accountCheckoutGuideStripe: "Pago Stripe",
     accountCheckoutGuideActive: "Acceso activo automáticamente",
+    accountCheckoutGuidePackEmail: "Introduce tu email",
+    accountCheckoutGuidePackStripe: "Paga en Stripe",
+    accountCheckoutGuidePackActive: "100 créditos activos",
     accountCheckoutProofLabel: "Resumen de la opción de pago",
     accountCheckoutProofPrice: "Pack desde 5 EUR o Pro recurrente",
     accountCheckoutProofBatch: "100 imágenes por lote",
@@ -1206,6 +1220,7 @@ const translatedAddons = {
     billingCheckoutSuccessPack: "Pago del Pack recibido. Entra o crea cuenta con el mismo email para activar los créditos.",
     billingCheckoutCancelled: "Pago cancelado. Puedes intentarlo de nuevo cuando quieras.",
     billingLoginRequired: "Crea una cuenta gratis o entra. Solo después abrimos Stripe para pagar el plan elegido.",
+    billingPackEmailRequired: "Introduce tu email arriba para continuar directamente a Stripe. No necesitas contraseña.",
     billingCheckoutError: "No se pudo abrir el pago ahora.",
     billingPortalError: "No se pudo abrir la gestión de pago ahora.",
     accountMagicLinkSent: "Sesión iniciada.",
@@ -2249,15 +2264,18 @@ function showConsentBanner() {
 
   banner.querySelector(".consent-accept").addEventListener("click", () => {
     updateConsent("accepted");
+    document.body.classList.remove("consent-visible");
     banner.remove();
     trackEvent("measurement_consent_accepted");
   });
 
   banner.querySelector(".consent-decline").addEventListener("click", () => {
     updateConsent("declined");
+    document.body.classList.remove("consent-visible");
     banner.remove();
   });
 
+  document.body.classList.add("consent-visible");
   document.body.appendChild(banner);
 }
 
@@ -2509,9 +2527,24 @@ function syncAccountCheckoutLinkCopy(plan = "") {
   if (accountCheckoutLinkText) {
     accountCheckoutLinkText.textContent = t(isPackCheckout ? "accountCheckoutLinkTextPack" : "accountCheckoutLinkText");
   }
+  accountCheckoutLinkBlock?.classList.toggle("is-pack-checkout", isPackCheckout);
+  accountCheckoutLink?.classList.toggle("is-pack-checkout", isPackCheckout);
+  accountForm?.classList.toggle("is-pack-checkout", isPackCheckout);
   if (accountCheckoutLink && !accountCheckoutLink.disabled) {
     accountCheckoutLink.textContent = t(accountCheckoutLinkLabelKey(plan));
   }
+}
+
+function syncAccountCheckoutGuideCopy(plan = "") {
+  const steps = accountCheckoutGuide?.querySelectorAll("em") || [];
+  const isPackCheckout = checkoutPlanIsPack(plan);
+  const keys = isPackCheckout
+    ? ["accountCheckoutGuidePackEmail", "accountCheckoutGuidePackStripe", "accountCheckoutGuidePackActive"]
+    : ["accountCheckoutGuideAccount", "accountCheckoutGuideStripe", "accountCheckoutGuideActive"];
+
+  keys.forEach((key, index) => {
+    if (steps[index]) steps[index].textContent = t(key);
+  });
 }
 
 function trackAccountCheckoutPanelShown(plan = "") {
@@ -2719,6 +2752,7 @@ function updateAccountUi() {
     accountCheckoutProof?.classList.toggle("hidden", !waitingPlanName);
     updateAccountCheckoutProof(waitingPlan, waitingPlanName);
     accountCheckoutLinkBlock?.classList.toggle("hidden", !waitingPlanName || lastCheckoutLinkSentPlan === waitingPlan);
+    syncAccountCheckoutGuideCopy(waitingPlan);
     syncAccountCheckoutLinkCopy(waitingPlan);
     if (waitingPlanName) trackAccountCheckoutPanelShown(waitingPlan);
     accountBadge.textContent = waitingPlanName ? t("accountBadgeCheckout") : t("accountBadgeGuest");
@@ -3250,9 +3284,17 @@ async function startCheckout(plan = defaultCheckoutPlan, triggerButton = null) {
       if (started) return;
     }
     setPendingCheckoutPlan(selectedPlan);
-    trackEvent("pro_checkout_login_required", { plan: selectedPlan });
+    if (checkoutPlanIsPack(selectedPlan)) {
+      trackEvent("pro_checkout_email_required", {
+        plan: selectedPlan,
+        source: "account_panel",
+        purchase_type: "pack",
+      });
+    } else {
+      trackEvent("pro_checkout_login_required", { plan: selectedPlan });
+    }
     updateAccountUi();
-    setAccountMessage("billingLoginRequired");
+    setAccountMessage(checkoutPlanIsPack(selectedPlan) ? "billingPackEmailRequired" : "billingLoginRequired");
     accountPanel?.scrollIntoView({ behavior: "smooth", block: "start" });
     window.setTimeout(() => accountEmail?.focus({ preventScroll: true }), 280);
     return;
@@ -3402,11 +3444,19 @@ async function maybeStartRequestedCheckout() {
   const planToStart = checkoutPlanWaitingForAuth();
   if (hasStartedRequestedCheckout || !checkoutPlans.has(planToStart || "")) return;
   if (!currentAccount) {
-    if (!hasTrackedRequestedCheckoutLoginRequired) {
-      hasTrackedRequestedCheckoutLoginRequired = true;
-      trackEvent("pro_checkout_login_required", { plan: planToStart });
+    if (!hasTrackedRequestedCheckoutRequirement) {
+      hasTrackedRequestedCheckoutRequirement = true;
+      if (checkoutPlanIsPack(planToStart)) {
+        trackEvent("pro_checkout_email_required", {
+          plan: planToStart,
+          source: "requested_checkout",
+          purchase_type: "pack",
+        });
+      } else {
+        trackEvent("pro_checkout_login_required", { plan: planToStart });
+      }
     }
-    setAccountMessage("billingLoginRequired");
+    setAccountMessage(checkoutPlanIsPack(planToStart) ? "billingPackEmailRequired" : "billingLoginRequired");
     return;
   }
   if (currentAccount.access?.canUsePro && !currentAccount.access?.isCreditPack) {

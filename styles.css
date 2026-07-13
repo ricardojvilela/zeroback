@@ -587,6 +587,38 @@ h2 {
   color: #ffffff;
 }
 
+.account-panel .account-checkout-link-block.is-pack-checkout {
+  border-color: rgba(81, 215, 198, 0.48);
+  background: rgba(81, 215, 198, 0.14);
+}
+
+.account-form.is-pack-checkout .account-checkout-link-block {
+  order: 1;
+}
+
+.account-form.is-pack-checkout .account-checkout-link-block button {
+  order: -1;
+}
+
+.account-form.is-pack-checkout .account-auth-note {
+  order: 2;
+}
+
+.account-panel .account-checkout-link-block button.is-pack-checkout {
+  min-height: 46px;
+  border-color: #51d7c6;
+  background: #51d7c6;
+  color: #062430;
+  font-size: 0.92rem;
+  font-weight: 900;
+}
+
+.account-panel .account-checkout-link-block button.is-pack-checkout:hover:not(:disabled) {
+  border-color: #ffffff;
+  background: #ffffff;
+  color: #062430;
+}
+
 .billing-actions {
   display: grid;
   gap: 8px;
@@ -1748,7 +1780,7 @@ h2 {
 }
 
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 .consent-banner {
@@ -3523,6 +3555,18 @@ progress::-moz-progress-bar {
   gap: 10px;
 }
 
+.pricing-auth-actions.is-pack-email-checkout {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.pricing-auth-form.is-pack-email-checkout .pricing-auth-actions {
+  order: 1;
+}
+
+.pricing-auth-form.is-pack-email-checkout .pricing-auth-note {
+  order: 2;
+}
+
 .pricing-auth-actions button,
 .pricing-checkout-panel .pricing-plan-actions button {
   width: 100%;
@@ -3952,6 +3996,10 @@ progress::-moz-progress-bar {
 }
 
 @media (max-width: 1040px) {
+  body.consent-visible {
+    padding-bottom: 170px;
+  }
+
   .app-shell {
     grid-template-areas:
       "workspace"

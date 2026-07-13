@@ -178,7 +178,7 @@
         ]
       }
     </script>
-    <link rel="stylesheet" href="../styles.css?v=20260711-checkout-recovery" />
+    <link rel="stylesheet" href="../styles.css?v=20260713-pack-email-checkout" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
   <body class="landing-page pro-page">
@@ -628,6 +628,7 @@
           checkoutLogin: "Entrar e continuar",
           checkoutCreate: "Criar conta e continuar",
           checkoutCreatePayment: "Criar conta e continuar para pagamento",
+          checkoutPackEmailCta: "Continuar para Stripe",
           checkoutLinkButton: "Receber link para continuar depois",
           checkoutLinkInvalid: "Introduza um email válido para receber o link do Pack 100.",
           checkoutLinkSending: "A enviar link...",
@@ -801,6 +802,7 @@
           checkoutLogin: "Sign in and continue",
           checkoutCreate: "Create account and continue",
           checkoutCreatePayment: "Create account and continue to payment",
+          checkoutPackEmailCta: "Continue to Stripe",
           checkoutLinkButton: "Get link to continue later",
           checkoutLinkInvalid: "Enter a valid email to receive the Pack 100 link.",
           checkoutLinkSending: "Sending link...",
@@ -974,6 +976,7 @@
           checkoutLogin: "Entrar y continuar",
           checkoutCreate: "Crear cuenta y continuar",
           checkoutCreatePayment: "Crear cuenta y continuar al pago",
+          checkoutPackEmailCta: "Continuar a Stripe",
           checkoutLinkButton: "Recibir enlace para continuar después",
           checkoutLinkInvalid: "Introduce un email válido para recibir el enlace del Pack 100.",
           checkoutLinkSending: "Enviando enlace...",
@@ -1574,8 +1577,9 @@
       }
 
       function syncPricingAuthButtons() {
+        const guestPackCheckout = !pricingAccount?.email && pricingPlanIsPack(selectedPricingPlan);
         if (pricingCreateButton && !pricingCreateButton.disabled) {
-          pricingCreateButton.textContent = pricingText("checkoutCreatePayment");
+          pricingCreateButton.textContent = pricingText(guestPackCheckout ? "checkoutPackEmailCta" : "checkoutCreatePayment");
         }
         if (pricingLoginButton && !pricingLoginButton.disabled) {
           pricingLoginButton.textContent = pricingText("checkoutLogin");
@@ -2070,7 +2074,12 @@
         const selectedLabel = pricingPlanLabel(selectedPricingPlan);
         updateSelectedPricingPlanUi();
         pricingPasswordField?.classList.toggle("hidden", guestPackCheckout);
-        pricingAuthActions?.classList.toggle("hidden", guestPackCheckout);
+        pricingAuthActions?.classList.remove("hidden");
+        pricingAuthActions?.classList.toggle("is-pack-email-checkout", guestPackCheckout);
+        pricingAuthForm?.classList.toggle("is-pack-email-checkout", guestPackCheckout);
+        pricingCreateButton?.classList.remove("hidden");
+        pricingLoginButton?.classList.toggle("hidden", guestPackCheckout);
+        pricingCheckoutLinkButton?.classList.toggle("hidden", guestPackCheckout);
         pricingAccountBadge.textContent = hasPro
           ? pricingText("checkoutBadgePro")
           : isPack
@@ -2145,6 +2154,10 @@
         for (const button of pricingCheckoutActions?.querySelectorAll("[data-pricing-checkout-plan]") || []) {
           button.disabled = disabled;
         }
+        if (pricingCreateButton && !pricingAccount?.email && pricingPlanIsPack(selectedPricingPlan)) {
+          pricingCreateButton.disabled = disabled;
+        }
+        if (!disabled) syncPricingAuthButtons();
       }
 
       async function startPricingEmailPackCheckout(plan = selectedPricingPlan) {
@@ -2321,6 +2334,15 @@
 
       async function handlePricingCreateAccount(event) {
         event?.preventDefault();
+        if (!pricingAccount?.email && pricingPlanIsPack(selectedPricingPlan)) {
+          trackPricingCheckoutEvent("pro_cta_clicked", {
+            plan: selectedPricingPlan,
+            label: pricingText("checkoutPackEmailCta"),
+            source: "pricing_page_email_checkout",
+          });
+          await startPricingEmailPackCheckout(selectedPricingPlan);
+          return;
+        }
         if (!pricingSupabase) {
           setPricingStatus("checkoutAuthError");
           return;

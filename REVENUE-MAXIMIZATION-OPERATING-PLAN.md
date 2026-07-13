@@ -223,3 +223,4 @@ Interpretation:
 - Browser measurement now falls back to one page-memory visitor/session identifier when local or session storage is blocked, preserving unique funnel attribution without adding cookies or personal data collection.
 - The main tool and pricing checkout now also keep language, consent state, free-test usage, campaign attribution, captured email and pending checkout functional in page memory when browser storage is blocked, preventing privacy-restricted visitors from losing the purchase path.
 - Normal mobile and tablet visits now show the working upload area before account, promotion and demo content; explicit checkout links and Stripe returns keep the account/payment step first.
+- Pack checkout now presents a single primary email-to-Stripe action on the main tool and pricing page, supports Enter without hidden-password validation, uses Pack-specific guidance/tracking, and keeps the consent banner from covering the mobile payment action.
