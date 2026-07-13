@@ -360,6 +360,108 @@ function isEmailOnlyPackCheckout(detail = {}) {
   return explicitMarker || legacyMarker;
 }
 
+function isNewFreeFunnelEvent(detail = {}) {
+  return String(detail.limit_variant || "").toLowerCase() === "free_total_2";
+}
+
+function isPackIntentEvent(eventName, detail = {}) {
+  if (eventName === "post_download_pack_clicked" || eventName === legacyPostDownloadPackClickedEvent) return true;
+  if (eventName !== "pro_cta_clicked") return false;
+  return isPackCheckoutPlan(detail.checkout_plan || detail.plan || detail.price_plan);
+}
+
+function packVisitorState(stages, visitorId) {
+  if (!stages.has(visitorId)) {
+    stages.set(visitorId, {
+      variantSeen: false,
+      resultReady: false,
+      freeTestCompleted: false,
+      freeTestExhausted: false,
+      packClicked: false,
+      emailCheckoutStarted: false,
+      stripeSession: false,
+      paid: false,
+      exhaustedAfterCompletion: false,
+      packClickedAfterCompletion: false,
+      emailStartedAfterCompletion: false,
+      stripeAfterCompletion: false,
+      paidAfterCompletion: false,
+    });
+  }
+  return stages.get(visitorId);
+}
+
+function updatePackVisitorFunnel(stages, event, detail = {}) {
+  const visitorId = asCleanText(event.visitor_id || detail.visitor_id, 80);
+  if (!visitorId) return;
+
+  const eventName = String(event.event_name || "");
+  const variantEvent = isNewFreeFunnelEvent(detail) || eventName === "free_test_completed" || eventName === "free_test_exhausted";
+  const existingState = stages.get(visitorId);
+  if (!variantEvent && !existingState?.freeTestCompleted) return;
+
+  const state = packVisitorState(stages, visitorId);
+  state.variantSeen = state.variantSeen || variantEvent;
+
+  if (eventName === "download_ready_shown" && variantEvent) state.resultReady = true;
+  if (eventName === "free_test_completed") state.freeTestCompleted = true;
+
+  if (eventName === "free_test_exhausted") {
+    state.freeTestExhausted = true;
+    if (state.freeTestCompleted) state.exhaustedAfterCompletion = true;
+  }
+
+  if (isPackIntentEvent(eventName, detail)) {
+    state.packClicked = true;
+    if (state.freeTestCompleted) state.packClickedAfterCompletion = true;
+  }
+
+  if (eventName === "pro_checkout_started" && isPackCheckoutPlan(detail.checkout_plan || detail.plan || detail.price_plan)) {
+    state.emailCheckoutStarted = true;
+    if (state.freeTestCompleted) state.emailStartedAfterCompletion = true;
+  }
+
+  if (eventName === "pack_checkout_session_created") {
+    state.stripeSession = true;
+    if (state.freeTestCompleted) state.stripeAfterCompletion = true;
+  }
+
+  if (eventName === "pack_purchase_paid") {
+    state.paid = true;
+    if (state.freeTestCompleted) state.paidAfterCompletion = true;
+  }
+}
+
+function packVisitorFunnelSummary(stages) {
+  const visitors = Array.from(stages.values());
+  const cohort = visitors.filter((visitor) => visitor.freeTestCompleted);
+  const count = (collection, key) => collection.filter((visitor) => visitor[key]).length;
+  const rate = (numerator, denominator) => denominator > 0 ? numerator / denominator : 0;
+  const completed = cohort.length;
+  const exhausted = count(cohort, "exhaustedAfterCompletion");
+  const packClicked = count(cohort, "packClickedAfterCompletion");
+  const emailCheckoutStarted = count(cohort, "emailStartedAfterCompletion");
+  const stripeSession = count(cohort, "stripeAfterCompletion");
+  const paid = count(cohort, "paidAfterCompletion");
+
+  return {
+    variant: "free_total_2",
+    trackingStartedAt: "2026-07-12",
+    uniqueVariantVisitors: count(visitors, "variantSeen"),
+    resultReady: count(visitors, "resultReady"),
+    completed,
+    exhausted,
+    packClicked,
+    emailCheckoutStarted,
+    stripeSession,
+    paid,
+    completionToExhaustedRate: rate(exhausted, completed),
+    completionToPackClickRate: rate(packClicked, completed),
+    packClickToStripeRate: rate(stripeSession, packClicked),
+    stripeToPaidRate: rate(paid, stripeSession),
+  };
+}
+
 function verifyAdminToken(request) {
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (!adminPassword) return false;
@@ -458,10 +560,12 @@ export default async function handler(request, response) {
 
     const byDay = new Map();
     const visitorsByDay = new Map();
+    const visitorsInWindow = new Set();
     const bySource = new Map();
     const visitorsBySource = new Map();
     const byLandingPage = new Map();
     const visitorsByLandingPage = new Map();
+    const packVisitorStages = new Map();
     let eventCount = 0;
 
     for (const event of events) {
@@ -477,6 +581,7 @@ export default async function handler(request, response) {
       const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
       const value = Number(event.value || detail.count || detail.accepted || 0) || 0;
       const sourceName = classifySource(event, detail);
+      updatePackVisitorFunnel(packVisitorStages, event, detail);
 
       if (!bySource.has(sourceName)) bySource.set(sourceName, emptySourceRow(sourceName));
       if (!visitorsBySource.has(sourceName)) visitorsBySource.set(sourceName, new Set());
@@ -485,6 +590,7 @@ export default async function handler(request, response) {
       if (event.visitor_id) visitorsBySource.get(sourceName).add(event.visitor_id);
 
       if (event.visitor_id) visitorsByDay.get(date).add(event.visitor_id);
+      if (event.visitor_id) visitorsInWindow.add(event.visitor_id);
 
       if ([
         "seo_landing_view",
@@ -898,6 +1004,8 @@ export default async function handler(request, response) {
       }
       return acc;
     }, {});
+    totals.visitorDays = totals.visitors || 0;
+    totals.visitors = visitorsInWindow.size;
     const sourceBreakdown = Array.from(bySource.values())
       .sort((a, b) =>
         b.revenue - a.revenue ||
@@ -952,6 +1060,7 @@ export default async function handler(request, response) {
       fetchedEventCount: events.length,
       rows,
       totals,
+      packVisitorFunnel: packVisitorFunnelSummary(packVisitorStages),
       sourceBreakdown,
       packSourceBreakdown,
       landingBreakdown,

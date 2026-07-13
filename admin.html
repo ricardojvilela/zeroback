@@ -695,7 +695,7 @@
 
       <section class="metrics-grid" aria-label="Resumo">
         <article class="metric">
-          <span>Visitantes 14 dias</span>
+          <span>Visitantes únicos 14 dias</span>
           <strong id="dashboardVisitors">0</strong>
         </article>
         <article class="metric">
@@ -783,7 +783,7 @@
         </div>
         <div class="live-grid">
           <article class="live-card">
-            <span>Visitantes reais</span>
+            <span>Visitantes únicos</span>
             <strong id="liveVisitors">0</strong>
           </article>
           <article class="live-card">
@@ -1080,24 +1080,24 @@
           <div class="panel-head compact">
             <div>
               <h3>Funil Pack 100</h3>
-              <p class="note">Leitura rápida da passagem do teste grátis para a primeira compra avulsa.</p>
+              <p class="note">As etapas principais contam pessoas únicas desde a oferta de 2 imagens no total, lançada em 12/07/2026. Os contadores de email mostram eventos operacionais.</p>
             </div>
           </div>
           <div class="live-grid">
             <article class="live-card">
-              <span>Resultados prontos</span>
+              <span>Pessoas com resultado</span>
               <strong id="packFunnelResultReady">0</strong>
             </article>
             <article class="live-card">
-              <span>Testes grátis concluídos</span>
+              <span>Pessoas com teste concluído</span>
               <strong id="packFunnelFreeTests">0</strong>
             </article>
             <article class="live-card">
-              <span>Tentativas após teste</span>
+              <span>Pessoas que tentaram continuar</span>
               <strong id="packFunnelFreeExhausted">0</strong>
             </article>
             <article class="live-card">
-              <span>Cliques Pack</span>
+              <span>Pessoas que clicaram Pack</span>
               <strong id="packFunnelPackClicks">0</strong>
             </article>
             <article class="live-card">
@@ -1117,11 +1117,11 @@
               <strong id="packFunnelEmailFailures">0</strong>
             </article>
             <article class="live-card">
-              <span>Sessões Stripe Pack</span>
+              <span>Pessoas que chegaram à Stripe</span>
               <strong id="packFunnelPackSessions">0</strong>
             </article>
             <article class="live-card">
-              <span>Compras Pack</span>
+              <span>Pessoas que compraram Pack</span>
               <strong id="packFunnelPackPurchases">0</strong>
             </article>
             <article class="live-card">
@@ -1133,7 +1133,7 @@
               <strong id="packFunnelEmailToStripeRate">0%</strong>
             </article>
             <article class="live-card">
-              <span>Resultado → clique</span>
+              <span>Teste → clique</span>
               <strong id="packFunnelResultToClickRate">0%</strong>
             </article>
             <article class="live-card">
@@ -1895,7 +1895,7 @@
         setDailyMetric("#dailyRevenue", "#dailyRevenueDelta", rowValue(today, "revenue"), rowValue(yesterday, "revenue"), { currency: true });
       }
 
-      function funnelDiagnosis(totals = {}) {
+      function funnelDiagnosis(totals = {}, packVisitorFunnel = {}) {
         const uploads = Number(totals.uploadsStarted || 0) || 0;
         const downloads = Number(totals.downloads || 0) || 0;
         const resultReady = Number(totals.downloadReadyShown || 0) || 0;
@@ -1957,6 +1957,34 @@
 
         if (packEmailRequired >= 2 && packEmailCheckoutSessions === 0) {
           return "Gargalo principal: utilizadores tentaram comprar Pack sem email válido. Prioridade: tornar o campo de email mais evidente no checkout Pack antes de aumentar tráfego.";
+        }
+
+        if (packVisitorFunnel.variant === "free_total_2") {
+          const uniqueCompleted = Number(packVisitorFunnel.completed || 0) || 0;
+          const uniqueExhausted = Number(packVisitorFunnel.exhausted || 0) || 0;
+          const uniquePackClicks = Number(packVisitorFunnel.packClicked || 0) || 0;
+          const uniqueStripeSessions = Number(packVisitorFunnel.stripeSession || 0) || 0;
+          const uniquePaid = Number(packVisitorFunnel.paid || 0) || 0;
+
+          if (uniquePaid > 0) {
+            return "Sinal positivo: o novo teste já gerou uma compra Pack atribuída. Prioridade: identificar a origem e repetir esse tráfego qualificado.";
+          }
+          if (uniqueStripeSessions > 0) {
+            return "Gargalo principal: pessoas do novo teste chegaram à Stripe mas ainda não pagaram. Prioridade: acompanhar cancelamentos e o email de continuação antes de rever preços.";
+          }
+          if (uniquePackClicks > 0) {
+            return "Gargalo principal: pessoas do novo teste clicaram no Pack mas ainda não chegaram à Stripe. Prioridade: validar email e abertura do checkout antes de aumentar tráfego.";
+          }
+          if (uniqueExhausted > 0) {
+            return "Gargalo principal: há pessoas a tentar continuar depois das 2 imagens, mas ainda sem clique Pack. Prioridade: observar e melhorar apenas a mensagem desse bloqueio.";
+          }
+          if (uniqueCompleted >= 3) {
+            return "Gargalo principal: pelo menos 3 pessoas concluíram o novo teste sem clicar no Pack. Prioridade: rever a passagem da segunda imagem para a compra única.";
+          }
+          if (uniqueCompleted > 0) {
+            return "A nova oferta já começou a ser usada, mas a amostra ainda é pequena. Prioridade: recolher mais testes concluídos antes de alterar preço, campanha ou percurso.";
+          }
+          return "A oferta de 2 imagens no total ainda não registou um teste concluído. Não há base para alterar preço; prioridade: deixar o novo funil recolher tráfego qualificado.";
         }
 
         if (freeTestExhaustedAttempts >= 2 && packCheckoutSessions === 0) {
@@ -2052,7 +2080,7 @@
         return "Diagnóstico: ainda falta volume suficiente para escolher um único gargalo. Continue a observar uploads, downloads, cliques Pack/Pro e sessões Stripe.";
       }
 
-      function packFunnelRecommendation(totals = {}) {
+      function packFunnelRecommendation(totals = {}, packVisitorFunnel = {}) {
         const resultReady = Number(totals.downloadReadyShown || 0) || 0;
         const packToolClicks = Number(totals.postDownloadPackClicks || 0) || 0;
         const packPricingClicks = Number(totals.packCtaClicks || 0) || 0;
@@ -2080,6 +2108,33 @@
         }
         if (packEmailAttempts >= 3 && emailCompletionRate < 0.6) {
           return `Só ${formatPercent(emailCompletionRate)} das tentativas Pack avançaram com email válido. Próximo passo: reforçar a visibilidade e a explicação do campo de email.`;
+        }
+        if (packVisitorFunnel.variant === "free_total_2") {
+          const uniqueCompleted = Number(packVisitorFunnel.completed || 0) || 0;
+          const uniqueExhausted = Number(packVisitorFunnel.exhausted || 0) || 0;
+          const uniquePackClicks = Number(packVisitorFunnel.packClicked || 0) || 0;
+          const uniqueStripeSessions = Number(packVisitorFunnel.stripeSession || 0) || 0;
+          const uniquePaid = Number(packVisitorFunnel.paid || 0) || 0;
+
+          if (uniquePaid > 0) {
+            return "O novo teste já converteu em Pack. Próximo passo: repetir a origem que trouxe esse comprador e acompanhar a utilização dos créditos.";
+          }
+          if (uniqueStripeSessions > 0) {
+            return "O novo teste já leva pessoas à Stripe, mas ainda não fecha. Próximo passo: analisar cancelamentos e continuação de checkout antes de rever o valor.";
+          }
+          if (uniquePackClicks > 0) {
+            return "O novo teste já gera cliques Pack, mas ainda não abre Stripe. Próximo passo: verificar o passo do email e a criação da sessão.";
+          }
+          if (uniqueExhausted > 0) {
+            return "Há pessoas a tentar continuar depois do teste sem clicar no Pack. Próximo passo: concentrar a próxima melhoria na mensagem de teste concluído.";
+          }
+          if (uniqueCompleted >= 3) {
+            return "Há pessoas suficientes a concluir o novo teste sem clicar no Pack. Próximo passo: testar uma nova mensagem na passagem para Pack 100.";
+          }
+          if (uniqueCompleted > 0) {
+            return "O novo funil já tem utilização, mas ainda não uma amostra suficiente. Próximo passo: manter a oferta e recolher mais dados.";
+          }
+          return "Ainda não há um teste concluído na nova oferta de 2 imagens no total. Próximo passo: manter preço e percurso até existir uma primeira amostra real.";
         }
         if (freeTestExhaustedAttempts > 0 && packSessions === 0) {
           return "Há utilizadores a tentar continuar depois do teste grátis, mas ainda sem sessão Stripe Pack. Próximo passo: observar o CTA de Pack no estado de teste concluído.";
@@ -2516,19 +2571,17 @@
           totals.checkoutSessionsCreated,
         ));
         document.querySelector("#liveRevenue").textContent = formatCurrency(totals.revenue || 0);
-        const packToolClicks = Number(totals.postDownloadPackClicks || 0) || 0;
-        const packPricingClicks = Number(totals.packCtaClicks || 0) || 0;
-        const packClicks = packToolClicks + packPricingClicks;
-        document.querySelector("#packFunnelResultReady").textContent = totals.downloadReadyShown || 0;
-        document.querySelector("#packFunnelFreeTests").textContent = totals.freeTestCompletions || 0;
-        document.querySelector("#packFunnelFreeExhausted").textContent = totals.freeTestExhaustedAttempts || 0;
-        document.querySelector("#packFunnelPackClicks").textContent = packClicks;
+        const packVisitorFunnel = data.packVisitorFunnel || {};
+        document.querySelector("#packFunnelResultReady").textContent = packVisitorFunnel.resultReady || 0;
+        document.querySelector("#packFunnelFreeTests").textContent = packVisitorFunnel.completed || 0;
+        document.querySelector("#packFunnelFreeExhausted").textContent = packVisitorFunnel.exhausted || 0;
+        document.querySelector("#packFunnelPackClicks").textContent = packVisitorFunnel.packClicked || 0;
         document.querySelector("#packFunnelEmailRequired").textContent = totals.packEmailRequired || 0;
         document.querySelector("#packFunnelEmailStarts").textContent = totals.packEmailCheckoutStarts || 0;
         document.querySelector("#packFunnelEmailSessions").textContent = totals.packEmailCheckoutSessions || 0;
         document.querySelector("#packFunnelEmailFailures").textContent = totals.packEmailCheckoutFailures || 0;
-        document.querySelector("#packFunnelPackSessions").textContent = totals.packCheckoutSessions || 0;
-        document.querySelector("#packFunnelPackPurchases").textContent = totals.packPurchases || 0;
+        document.querySelector("#packFunnelPackSessions").textContent = packVisitorFunnel.stripeSession || 0;
+        document.querySelector("#packFunnelPackPurchases").textContent = packVisitorFunnel.paid || 0;
         const packEmailAttempts = (Number(totals.packEmailRequired || 0) || 0) +
           (Number(totals.packEmailCheckoutStarts || 0) || 0);
         document.querySelector("#packFunnelEmailCompletionRate").textContent = formatPercent(conversionRate(
@@ -2540,19 +2593,19 @@
           totals.packEmailCheckoutStarts,
         ));
         document.querySelector("#packFunnelResultToClickRate").textContent = formatPercent(conversionRate(
-          packClicks,
-          totals.downloadReadyShown,
+          packVisitorFunnel.packClicked,
+          packVisitorFunnel.completed,
         ));
         document.querySelector("#packFunnelClickToStripeRate").textContent = formatPercent(conversionRate(
-          totals.packCheckoutSessions,
-          packClicks,
+          packVisitorFunnel.stripeSession,
+          packVisitorFunnel.packClicked,
         ));
         document.querySelector("#packFunnelStripeToPaidRate").textContent = formatPercent(conversionRate(
-          totals.packPurchases,
-          totals.packCheckoutSessions,
+          packVisitorFunnel.paid,
+          packVisitorFunnel.stripeSession,
         ));
         document.querySelector("#packFunnelRevenue").textContent = formatCurrency(totals.packRevenue || 0);
-        document.querySelector("#packFunnelAction").textContent = packFunnelRecommendation(totals);
+        document.querySelector("#packFunnelAction").textContent = packFunnelRecommendation(totals, packVisitorFunnel);
         packSourceRowsBody.innerHTML = data.packSourceBreakdown?.length
           ? data.packSourceBreakdown.map((row) => {
               const sourcePackClicks = (Number(row.postDownloadPackClicks || 0) || 0) +
@@ -2607,7 +2660,7 @@
         document.querySelector("#liveBillingPortalOpens").textContent = totals.billingPortalOpens || 0;
         const accountEntrants = Math.max((totals.accountSignups || 0) - (totals.accountEmailConfirmations || 0), 0) + (totals.accountLogins || 0);
         document.querySelector("#liveAccountCheckoutGap").textContent = Math.max(accountEntrants - (totals.checkoutStarts || 0), 0);
-        document.querySelector("#liveFunnelDiagnosis").textContent = funnelDiagnosis(totals);
+        document.querySelector("#liveFunnelDiagnosis").textContent = funnelDiagnosis(totals, packVisitorFunnel);
 
         liveRowsBody.innerHTML = data.rows?.length
           ? data.rows.slice().reverse().map((row) => {

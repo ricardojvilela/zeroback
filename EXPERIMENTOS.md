@@ -77,3 +77,42 @@ Rever apos:
 
 ### Decisao inicial
 Nao aplicar globalmente ainda. Usar apenas em campanhas e comunidades selecionadas.
+
+## Experimento 2: teste de 2 imagens no total para Pack 100
+
+### Hipotese
+Impedir a repeticao ilimitada do modo gratuito deve transformar utilizadores que ja confirmaram a qualidade do recorte em intencao Pack, sem alterar o preco de 5 EUR.
+
+### Estado
+Ativo desde 2026-07-12. A oferta gratuita permite 2 imagens concluidas no total por navegador. Depois disso, a acao principal e Pack 100.
+
+### Baseline anterior
+Leitura de 30 dias feita em 2026-07-13, ainda dominada pela versao gratuita antiga:
+- 360 dias-visitante (a mesma pessoa podia contar em dias diferentes);
+- 517 visualizacoes de pagina;
+- 296 inicios de upload;
+- 217 momentos de resultado pronto;
+- 188 downloads;
+- 27 cliques de intencao paga na ferramenta e 5 cliques de pricing;
+- 0 sessoes Stripe atribuidas e 0 pagamentos.
+
+Esta baseline prova utilizacao, mas nao deve ser usada como denominador do novo funil porque o gratuito podia ser repetido sem compra.
+
+### Medicao valida
+O painel `/admin` conta pessoas unicas na sequencia:
+1. teste de 2 imagens concluido;
+2. tentativa de continuar;
+3. clique Pack;
+4. chegada a Stripe;
+5. compra Pack.
+
+Cliques repetidos da mesma pessoa contam uma unica vez nas etapas principais.
+
+### Regra de decisao
+Nao alterar preco nem oferta antes de 30 pessoas unicas concluirem o novo teste ou 7 dias completos de trafego, o que acontecer mais tarde.
+
+Depois dessa amostra:
+- se teste -> clique Pack ficar abaixo de 5%, rever apenas mensagem e posicao do CTA;
+- se houver cliques Pack mas menos de 60% chegarem a Stripe, corrigir email/checkout antes de mexer no preco;
+- se pelo menos 5 pessoas chegarem a Stripe sem qualquer compra, rever confianca, recuperacao e so depois o valor;
+- se houver compras, repetir as origens que converteram e manter o preco enquanto a taxa se sustentar.

@@ -1080,6 +1080,8 @@
           source: new URLSearchParams(window.location.search).get("source") || "pricing-page",
           reason: new URLSearchParams(window.location.search).get("reason") || "",
           limit: new URLSearchParams(window.location.search).get("limit") || "",
+          free_limit: 2,
+          limit_variant: "free_total_2",
         };
       }
 
@@ -1689,6 +1691,8 @@
           language: languageSelect?.value || document.documentElement.lang || "unknown",
           visitor_id: getPricingStableId(localStorage, pricingVisitorStorageKey),
           session_id: getPricingStableId(sessionStorage, pricingSessionStorageKey),
+          free_limit: 2,
+          limit_variant: "free_total_2",
         };
         for (const key of pricingCampaignParamKeys) {
           const value = pricingPageParams.get(key);
