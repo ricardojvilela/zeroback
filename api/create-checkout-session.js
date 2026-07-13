@@ -52,6 +52,7 @@ const attributionMetadataKeys = [
   "language",
   "visitor_id",
   "session_id",
+  "checkout_source",
   "limit_variant",
   "free_limit",
 ];

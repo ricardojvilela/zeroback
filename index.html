@@ -421,9 +421,6 @@
             </div>
           </div>
           <div class="result-ready-upgrade-actions">
-            <button class="zip-pro-nudge hidden" id="zipProCta" type="button" data-i18n="zipProCta">
-              Comprar Pack 100 - 5 EUR
-            </button>
             <form class="result-ready-email-form hidden" id="resultReadyEmailForm" novalidate>
               <input
                 id="resultReadyEmail"
@@ -435,7 +432,10 @@
                 placeholder="O seu email"
                 data-i18n-placeholder="leadCapturePlaceholder"
               />
-              <button class="result-ready-secondary" type="submit" data-i18n="leadCaptureSubmit">
+              <button class="zip-pro-nudge" id="zipProCta" type="submit" data-i18n="zipProCta">
+                Comprar Pack 100 - 5 EUR
+              </button>
+              <button class="result-ready-secondary" id="resultReadySaveLinkCta" type="button" data-i18n="resultReadySaveLinkCta">
                 Receber link e checklist
               </button>
             </form>
@@ -700,7 +700,7 @@
       </section>
     </main>
 
-    <script type="module" src="./script.js?v=20260713-paid-intent-metrics"></script>
+    <script type="module" src="./script.js?v=20260713-result-email-checkout"></script>
   </body>
 </html>
 

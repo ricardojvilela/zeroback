@@ -1,6 +1,6 @@
 # BatchCutout - revenue maximization operating plan
 
-Updated: 2026-07-09
+Updated: 2026-07-13
 
 ## Objective
 
@@ -226,3 +226,7 @@ Interpretation:
 - Pack checkout now presents a single primary email-to-Stripe action on the main tool and pricing page, supports Enter without hidden-password validation, uses Pack-specific guidance/tracking, and keeps the consent banner from covering the mobile payment action.
 - The main tool now becomes interactive without eagerly downloading the background-removal and ZIP modules; they load only when processing or ZIP export is requested, while authentication initializes in the background and engine/ZIP failures are measured separately in `/admin`.
 - Paid-intent reporting now separates acquisition clicks, Pack offer impressions and actual plan selections; real Pack/Pro choices in the tool are tracked explicitly, while opening the tool or merely seeing an upgrade prompt no longer inflates paid-click totals.
+- A live 14-day audit on 2026-07-13 found 98 unique visitors, 31 uploads, 22 ready results, 20 downloads and 12 upgrade-prompt views, but no Pack choice inside the result flow, no Stripe session and no purchase. The next experiment therefore removes the account/password detour at the highest-intent moment.
+- The result-ready offer now uses one email field for direct Pack 100 checkout and for the secondary link/checklist request. A valid Pack choice opens Stripe immediately without password or account-panel navigation, while saving the link keeps the Pack purchase control available.
+- The result-ready sticky offer now stays hidden while the full email/Pack offer is visible and appears only after that offer leaves the viewport, preventing mobile overlap while preserving a later conversion reminder.
+- Email-only checkout attribution now records `result_ready_checkout` through the browser event and Stripe-session metadata, so the admin funnel can distinguish this reduced-friction path from account-panel Pack checkout.

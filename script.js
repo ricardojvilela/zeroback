@@ -2738,7 +2738,6 @@ function syncPaidAccessUi() {
   if (paidAccess) {
     proPromptButton?.classList.add("hidden");
     downloadReadyHint?.classList.add("hidden");
-    zipProCta?.classList.add("hidden");
     resultReadySaveLinkCta?.classList.add("hidden");
     resultReadyEmailForm?.classList.add("hidden");
     postDownloadNextPanel?.classList.add("hidden");
@@ -3295,14 +3294,16 @@ function trackCheckoutPlanClick(plan, source, detail = {}) {
   });
 }
 
-async function startEmailPackCheckout(plan = defaultCheckoutPlan, email = "", triggerButton = null) {
+async function startEmailPackCheckout(plan = defaultCheckoutPlan, email = "", triggerButton = null, options = {}) {
   const selectedPlan = checkoutPlanIsPack(plan) ? plan : defaultCheckoutPlan;
   const normalizedEmail = normalizeEmail(email);
+  const checkoutSource = options.source || "account_panel";
+  const buttonLabelKey = options.buttonLabelKey || checkoutPlanLabelKey(selectedPlan);
   if (!checkoutPlanIsPack(selectedPlan)) return false;
   if (!isValidEmail(normalizedEmail)) {
     trackEvent("pro_checkout_email_required", {
       plan: selectedPlan,
-      source: "account_panel",
+      source: checkoutSource,
       purchase_type: "pack",
     });
     return false;
@@ -3329,6 +3330,7 @@ async function startEmailPackCheckout(plan = defaultCheckoutPlan, email = "", tr
           email: normalizedEmail,
           visitor_id: getVisitorId(),
           session_id: getSessionId(),
+          checkout_source: checkoutSource,
         },
       }),
     });
@@ -3345,6 +3347,8 @@ async function startEmailPackCheckout(plan = defaultCheckoutPlan, email = "", tr
       currency: "EUR",
       purchase_type: "pack",
       email_only_checkout: true,
+      source: checkoutSource,
+      checkout_source: checkoutSource,
     });
     setGoogleUserData(normalizedEmail);
     trackBeginCheckout(selectedPlan, "email_pack");
@@ -3354,14 +3358,14 @@ async function startEmailPackCheckout(plan = defaultCheckoutPlan, email = "", tr
   } catch (error) {
     trackEvent("pro_checkout_email_failed", {
       plan: selectedPlan,
-      source: "account_panel",
+      source: checkoutSource,
       purchase_type: "pack",
       reason: error instanceof Error ? error.message : "checkout_failed",
     });
     setAccountMessage("billingCheckoutError");
     if (triggerButton) {
       triggerButton.disabled = false;
-      triggerButton.textContent = t(checkoutPlanLabelKey(selectedPlan));
+      triggerButton.textContent = t(buttonLabelKey);
     }
     return false;
   }
@@ -3644,6 +3648,14 @@ async function ensureMinimumPngResolution(blob) {
   });
 }
 
+function resultReadyOfferIsVisible() {
+  if (!downloadReadyHint || downloadReadyHint.classList.contains("hidden")) return false;
+  const rect = downloadReadyHint.getBoundingClientRect();
+  if (rect.height <= 0) return false;
+  const visibleHeight = Math.max(0, Math.min(window.innerHeight, rect.bottom) - Math.max(0, rect.top));
+  return visibleHeight / rect.height >= 0.15;
+}
+
 function updateControls() {
   const hasItems = items.length > 0;
   const allReady = hasItems && items.every((item) => item.outputBlob);
@@ -3660,15 +3672,18 @@ function updateControls() {
   clearButton.disabled = !hasItems || running;
   const hasLeadContact = Boolean(currentAccount?.email || getCapturedLeadEmail());
   const readyCount = items.filter((item) => item.outputBlob).length;
-  const shouldShowResultReadyEmail = !paidAccess && downloadReady && !running && !hasLeadContact;
-  const shouldShowResultReadySticky = !paidAccess && downloadReady && !running;
+  const shouldShowResultReadyCheckout = !paidAccess && downloadReady && !running;
+  const shouldShowResultReadyLeadOption = shouldShowResultReadyCheckout && !hasLeadContact;
   downloadReadyHint?.classList.toggle("hidden", paidAccess || !downloadReady);
-  zipProCta?.classList.toggle("hidden", paidAccess || !downloadReady || running);
-  resultReadySaveLinkCta?.classList.toggle("hidden", paidAccess || !downloadReady || running || hasLeadContact);
-  resultReadyEmailForm?.classList.toggle("hidden", !shouldShowResultReadyEmail);
+  const shouldShowResultReadySticky = shouldShowResultReadyCheckout && !resultReadyOfferIsVisible();
+  resultReadySaveLinkCta?.classList.toggle("hidden", !shouldShowResultReadyLeadOption);
+  resultReadyEmailForm?.classList.toggle("hidden", !shouldShowResultReadyCheckout);
   resultReadyStickyCta?.classList.toggle("hidden", !shouldShowResultReadySticky);
   resultReadyStickyLead?.classList.toggle("hidden", hasLeadContact);
-  if (!shouldShowResultReadyEmail && resultReadyEmailMessage) resultReadyEmailMessage.textContent = "";
+  if (shouldShowResultReadyCheckout && resultReadyEmail && !resultReadyEmail.value.trim()) {
+    resultReadyEmail.value = normalizeEmail(currentAccount?.email || getCapturedLeadEmail() || accountEmail?.value || "");
+  }
+  if (!shouldShowResultReadyCheckout && resultReadyEmailMessage) resultReadyEmailMessage.textContent = "";
   emptyState.classList.toggle("hidden", hasItems);
   countText.textContent = `${items.length} ${items.length === 1 ? t("photoSingular") : t("photoPlural")}`;
 
@@ -3680,7 +3695,7 @@ function updateControls() {
     });
   }
 
-  if (shouldShowResultReadyEmail && !hasTrackedResultReadyEmailShown) {
+  if (shouldShowResultReadyLeadOption && !hasTrackedResultReadyEmailShown) {
     hasTrackedResultReadyEmailShown = true;
     trackEvent("lead_capture_shown", {
       downloadType: readyCount > 1 ? "zip_available" : "png_available",
@@ -4215,7 +4230,6 @@ function focusResultReadyLeadCapture(source = "result_ready") {
   const count = items.filter((item) => item.outputBlob).length;
   const downloadType = count > 1 ? "zip_available" : "png_available";
   safeLocalStorageRemove(leadCaptureDismissedStorageKey);
-  showLeadCapture(downloadType, count, source);
   trackEvent("post_download_save_link_clicked", {
     downloadType,
     count,
@@ -4223,6 +4237,16 @@ function focusResultReadyLeadCapture(source = "result_ready") {
     totalInQueue: items.length,
     free_limit: maxFilesPerBatch,
   });
+  if (resultReadyEmailForm && !resultReadyEmailForm.classList.contains("hidden") && resultReadyEmail) {
+    if (!resultReadyEmail.value.trim()) {
+      resultReadyEmail.value = normalizeEmail(currentAccount?.email || getCapturedLeadEmail() || accountEmail?.value || "");
+    }
+    resultReadyEmailForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    resultReadyEmail.focus({ preventScroll: true });
+    return;
+  }
+
+  showLeadCapture(downloadType, count, source);
   leadCapturePanel?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   leadCaptureEmail?.focus({ preventScroll: true });
 }
@@ -4269,7 +4293,7 @@ function recordLeadCapture(email, { downloadType = "unknown", count = 0, source 
   safeLocalStorageRemove(leadCaptureDismissedStorageKey);
   postDownloadSaveLinkCta?.classList.add("hidden");
   resultReadySaveLinkCta?.classList.add("hidden");
-  resultReadyEmailForm?.classList.add("hidden");
+  resultReadyStickyLead?.classList.add("hidden");
   postDownloadEmailForm?.classList.add("hidden");
   proLimitEmailForm?.classList.add("hidden");
   setGoogleUserData(email);
@@ -4344,7 +4368,46 @@ async function handleLeadCaptureSubmit(event) {
   disableFormControls(leadCaptureForm);
 }
 
-function handleResultReadyEmailSubmit(event) {
+async function handleResultReadyPackCheckout(event) {
+  event.preventDefault();
+  if (!resultReadyEmail || !resultReadyEmailForm) return;
+
+  const email = normalizeEmail(resultReadyEmail.value);
+  const count = items.filter((item) => item.outputBlob).length;
+  const downloadType = count > 1 ? "zip_available" : "png_available";
+  const detail = {
+    reason: "result_ready_email_checkout",
+    plan: "pack100",
+    purchase_type: "pack",
+    downloadType,
+    count,
+    totalInQueue: items.length,
+    free_limit: maxFilesPerBatch,
+  };
+  trackEvent("post_download_pack_clicked", detail);
+
+  if (!isValidEmail(email)) {
+    if (resultReadyEmailMessage) resultReadyEmailMessage.textContent = t("billingPackEmailRequired");
+    await startEmailPackCheckout("pack100", email, zipProCta, {
+      source: "result_ready_checkout",
+      buttonLabelKey: "zipProCta",
+    });
+    resultReadyEmail.focus();
+    return;
+  }
+
+  resultReadyEmail.value = email;
+  if (resultReadyEmailMessage) resultReadyEmailMessage.textContent = "";
+  const started = await startEmailPackCheckout("pack100", email, zipProCta, {
+    source: "result_ready_checkout",
+    buttonLabelKey: "zipProCta",
+  });
+  if (!started && resultReadyEmailMessage) {
+    resultReadyEmailMessage.textContent = t("billingCheckoutError");
+  }
+}
+
+function handleResultReadySaveLink(event) {
   event.preventDefault();
   if (!resultReadyEmail || !resultReadyEmailForm) return;
 
@@ -4364,6 +4427,7 @@ function handleResultReadyEmailSubmit(event) {
     return;
   }
 
+  resultReadyEmail.value = email;
   trackEvent("post_download_save_link_clicked", {
     downloadType,
     count,
@@ -4381,7 +4445,6 @@ function handleResultReadyEmailSubmit(event) {
 
   hideLeadCapture();
   if (resultReadyEmailMessage) resultReadyEmailMessage.textContent = t("leadCaptureSuccess");
-  disableFormControls(resultReadyEmailForm);
 }
 
 function handlePostDownloadEmailSubmit(event) {
@@ -4546,20 +4609,6 @@ brandCta.addEventListener("click", () => {
   trackEvent("brand_cta_clicked");
 });
 inlineProCta.addEventListener("click", () => showProInterest("inline_pro_cta"));
-zipProCta?.addEventListener("click", () => {
-  const readyCount = items.filter((item) => item.outputBlob).length;
-  const detail = {
-    reason: "download_ready_pack",
-    plan: "pack100",
-    purchase_type: "pack",
-    downloadType: readyCount > 1 ? "zip_available" : "png_available",
-    count: readyCount,
-    totalInQueue: items.length,
-    free_limit: maxFilesPerBatch,
-  };
-  trackEvent("post_download_pack_clicked", detail);
-  startCheckout("pack100", zipProCta);
-});
 resultReadyStickyPro?.addEventListener("click", () => {
   const readyCount = items.filter((item) => item.outputBlob).length;
   const detail = {
@@ -4589,10 +4638,10 @@ postDownloadPackCta?.addEventListener("click", () => {
   trackEvent("post_download_pack_clicked", detail);
   startCheckout("pack100", postDownloadPackCta);
 });
-resultReadySaveLinkCta?.addEventListener("click", () => focusResultReadyLeadCapture());
+resultReadySaveLinkCta?.addEventListener("click", handleResultReadySaveLink);
 resultReadyStickyLead?.addEventListener("click", () => focusResultReadyLeadCapture("result_ready_sticky"));
 postDownloadSaveLinkCta?.addEventListener("click", focusPostDownloadLeadCapture);
-resultReadyEmailForm?.addEventListener("submit", handleResultReadyEmailSubmit);
+resultReadyEmailForm?.addEventListener("submit", handleResultReadyPackCheckout);
 postDownloadEmailForm?.addEventListener("submit", handlePostDownloadEmailSubmit);
 proLimitEmailForm?.addEventListener("submit", handleProLimitEmailSubmit);
 proInlineForm?.addEventListener("click", (event) => {
@@ -4650,6 +4699,11 @@ postDownloadOptions?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-post-download-feedback]");
   selectPostDownloadFeedback(button?.dataset.postDownloadFeedback);
 });
+
+const resultReadyOfferObserver = "IntersectionObserver" in window && downloadReadyHint
+  ? new IntersectionObserver(() => updateControls(), { threshold: [0, 0.15] })
+  : null;
+resultReadyOfferObserver?.observe(downloadReadyHint);
 
 initAuth();
 

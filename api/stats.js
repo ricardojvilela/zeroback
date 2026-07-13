@@ -164,6 +164,7 @@ function classifySource(event, detail) {
     "post_download_inline",
     "result_ready",
     "result_ready_inline",
+    "result_ready_checkout",
     "result_ready_sticky",
     "account_panel",
     "account_pack_renewal",
