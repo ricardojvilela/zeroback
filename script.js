@@ -1659,24 +1659,43 @@ function trackEvent(name, detail = {}) {
   return sendServerEvent(name, eventParams);
 }
 
+function createStableId() {
+  return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function getVolatileStableId(key) {
+  const ids = globalThis.__batchcutoutVolatileStableIds || new Map();
+  globalThis.__batchcutoutVolatileStableIds = ids;
+  if (!ids.has(key)) ids.set(key, createStableId());
+  return ids.get(key);
+}
+
 function getStableId(storage, key) {
   try {
     const existing = storage.getItem(key);
     if (existing) return existing;
-    const next = crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const next = createStableId();
     storage.setItem(key, next);
     return next;
   } catch {
-    return "";
+    return getVolatileStableId(key);
   }
 }
 
 function getVisitorId() {
-  return getStableId(localStorage, visitorStorageKey);
+  try {
+    return getStableId(window.localStorage, visitorStorageKey);
+  } catch {
+    return getVolatileStableId(visitorStorageKey);
+  }
 }
 
 function getSessionId() {
-  return getStableId(sessionStorage, sessionStorageKey);
+  try {
+    return getStableId(window.sessionStorage, sessionStorageKey);
+  } catch {
+    return getVolatileStableId(sessionStorageKey);
+  }
 }
 
 function sendServerEvent(name, detail = {}, { waitForResponse = false } = {}) {

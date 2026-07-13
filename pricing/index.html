@@ -1129,15 +1129,34 @@
         sendServerEvent(name, eventParams);
       }
 
+      function createPricingPageStableId() {
+        return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      }
+
+      function getVolatilePricingPageId(key) {
+        const ids = globalThis.__batchcutoutVolatileStableIds || new Map();
+        globalThis.__batchcutoutVolatileStableIds = ids;
+        if (!ids.has(key)) ids.set(key, createPricingPageStableId());
+        return ids.get(key);
+      }
+
       function getStableId(storage, key) {
         try {
           const existing = storage.getItem(key);
           if (existing) return existing;
-          const next = crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+          const next = createPricingPageStableId();
           storage.setItem(key, next);
           return next;
         } catch {
-          return "";
+          return getVolatilePricingPageId(key);
+        }
+      }
+
+      function getPricingPageStableId(storageName, key) {
+        try {
+          return getStableId(window[storageName], key);
+        } catch {
+          return getVolatilePricingPageId(key);
         }
       }
 
@@ -1147,8 +1166,8 @@
         const payload = JSON.stringify({
           name,
           detail,
-          visitorId: getStableId(localStorage, visitorStorageKey),
-          sessionId: getStableId(sessionStorage, sessionStorageKey),
+          visitorId: getPricingPageStableId("localStorage", visitorStorageKey),
+          sessionId: getPricingPageStableId("sessionStorage", sessionStorageKey),
         });
 
         try {
@@ -1671,15 +1690,34 @@
         });
       }
 
+      function createPricingCheckoutStableId() {
+        return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      }
+
+      function getVolatilePricingCheckoutId(key) {
+        const ids = globalThis.__batchcutoutVolatileStableIds || new Map();
+        globalThis.__batchcutoutVolatileStableIds = ids;
+        if (!ids.has(key)) ids.set(key, createPricingCheckoutStableId());
+        return ids.get(key);
+      }
+
       function getPricingStableId(storage, key) {
         try {
           const existing = storage.getItem(key);
           if (existing) return existing;
-          const next = crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+          const next = createPricingCheckoutStableId();
           storage.setItem(key, next);
           return next;
         } catch {
-          return "";
+          return getVolatilePricingCheckoutId(key);
+        }
+      }
+
+      function getSafePricingStableId(storageName, key) {
+        try {
+          return getPricingStableId(window[storageName], key);
+        } catch {
+          return getVolatilePricingCheckoutId(key);
         }
       }
 
@@ -1689,8 +1727,8 @@
           page_path: window.location.pathname,
           page_location: window.location.href.split("#")[0],
           language: languageSelect?.value || document.documentElement.lang || "unknown",
-          visitor_id: getPricingStableId(localStorage, pricingVisitorStorageKey),
-          session_id: getPricingStableId(sessionStorage, pricingSessionStorageKey),
+          visitor_id: getSafePricingStableId("localStorage", pricingVisitorStorageKey),
+          session_id: getSafePricingStableId("sessionStorage", pricingSessionStorageKey),
           free_limit: 2,
           limit_variant: "free_total_2",
         };
@@ -1740,8 +1778,8 @@
         const payload = JSON.stringify({
           name,
           detail: eventParams,
-          visitorId: getPricingStableId(localStorage, pricingVisitorStorageKey),
-          sessionId: getPricingStableId(sessionStorage, pricingSessionStorageKey),
+          visitorId: getSafePricingStableId("localStorage", pricingVisitorStorageKey),
+          sessionId: getSafePricingStableId("sessionStorage", pricingSessionStorageKey),
         });
 
         if (!waitForResponse) {
