@@ -45,7 +45,12 @@
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
-      const batchCutoutConsent = localStorage.getItem("batchcutout_consent");
+      let batchCutoutConsent = "";
+      try {
+        batchCutoutConsent = window.localStorage.getItem("batchcutout_consent") || "";
+      } catch {
+        // Keep consent denied when browser storage is unavailable.
+      }
       const batchCutoutConsentGranted = batchCutoutConsent === "accepted";
       gtag("consent", "default", {
         ad_storage: batchCutoutConsentGranted ? "granted" : "denied",

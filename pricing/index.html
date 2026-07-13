@@ -44,7 +44,12 @@
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
-      const batchCutoutConsent = localStorage.getItem("batchcutout_consent");
+      let batchCutoutConsent = "";
+      try {
+        batchCutoutConsent = window.localStorage.getItem("batchcutout_consent") || "";
+      } catch {
+        // Keep consent denied when browser storage is unavailable.
+      }
       const batchCutoutConsentGranted = batchCutoutConsent === "accepted";
       gtag("consent", "default", {
         ad_storage: batchCutoutConsentGranted ? "granted" : "denied",
@@ -1087,14 +1092,14 @@
 
       function getDebugEvents() {
         try {
-          return JSON.parse(localStorage.getItem(debugEventsStorageKey) || "[]");
+          return JSON.parse(getPricingPageStorageValue(debugEventsStorageKey, "[]") || "[]");
         } catch {
           return [];
         }
       }
 
       function saveDebugEvents(events) {
-        localStorage.setItem(debugEventsStorageKey, JSON.stringify(events.slice(-30)));
+        setPricingPageStorageValue(debugEventsStorageKey, JSON.stringify(events.slice(-30)));
       }
 
       function renderDebugEvents() {
@@ -1138,6 +1143,45 @@
         globalThis.__batchcutoutVolatileStableIds = ids;
         if (!ids.has(key)) ids.set(key, createPricingPageStableId());
         return ids.get(key);
+      }
+
+      function pricingPageStorageValues() {
+        const values = globalThis.__batchcutoutVolatileStorage || new Map();
+        globalThis.__batchcutoutVolatileStorage = values;
+        return values;
+      }
+
+      function getPricingPageStorageValue(key, fallback = "") {
+        const values = pricingPageStorageValues();
+        try {
+          const stored = window.localStorage.getItem(key);
+          if (stored !== null) {
+            values.set(key, stored);
+            return stored;
+          }
+        } catch {
+          // Use the page-memory value below.
+        }
+        return values.has(key) ? values.get(key) : fallback;
+      }
+
+      function setPricingPageStorageValue(key, value) {
+        const storedValue = String(value);
+        pricingPageStorageValues().set(key, storedValue);
+        try {
+          window.localStorage.setItem(key, storedValue);
+        } catch {
+          // Keep the value in page memory.
+        }
+      }
+
+      function removePricingPageStorageValue(key) {
+        pricingPageStorageValues().delete(key);
+        try {
+          window.localStorage.removeItem(key);
+        } catch {
+          // Persistent storage is already unavailable.
+        }
       }
 
       function getStableId(storage, key) {
@@ -1200,7 +1244,7 @@
         `;
         debugList = panel.querySelector("ul");
         panel.querySelector("button").addEventListener("click", () => {
-          localStorage.removeItem(debugEventsStorageKey);
+          removePricingPageStorageValue(debugEventsStorageKey);
           renderDebugEvents();
         });
         document.body.append(panel);
@@ -1210,7 +1254,7 @@
       function detectPricingLanguage() {
         const requestedLanguage = pricingPageParams.get("lang");
         if (pricingTranslations[requestedLanguage]) return requestedLanguage;
-        const saved = localStorage.getItem("language");
+        const saved = getPricingPageStorageValue("language");
         if (pricingTranslations[saved]) return saved;
         const browserLanguage = (navigator.language || "en").toLowerCase();
         if (browserLanguage.startsWith("es")) return "es";
@@ -1309,7 +1353,7 @@
 
         languageSelect.value = nextLanguage;
         pricingForm.querySelector('[name="language"]').value = nextLanguage;
-        localStorage.setItem("language", nextLanguage);
+        setPricingPageStorageValue("language", nextLanguage);
         window.updatePricingPasswordToggle?.();
         updatePricingSavingsCalculator();
         updatePricingVolumeContactLink();
@@ -1550,7 +1594,7 @@
         const email = normalizePricingEmail(value);
         if (!email) return "";
         try {
-          localStorage.setItem(pricingLeadEmailStorageKey, email);
+          setPricingCheckoutStorageValue(pricingLeadEmailStorageKey, email);
         } catch {
           // Local storage improves checkout continuity but is not required.
         }
@@ -1560,7 +1604,7 @@
       function prefillPricingEmail() {
         if (!pricingEmail || pricingEmail.value.trim()) return;
         try {
-          const capturedEmail = normalizePricingEmail(localStorage.getItem(pricingLeadEmailStorageKey) || "");
+          const capturedEmail = normalizePricingEmail(getPricingCheckoutStorageValue(pricingLeadEmailStorageKey));
           if (capturedEmail) pricingEmail.value = capturedEmail;
         } catch {
           // Missing storage access should not block checkout.
@@ -1701,6 +1745,36 @@
         return ids.get(key);
       }
 
+      function pricingCheckoutStorageValues() {
+        const values = globalThis.__batchcutoutVolatileStorage || new Map();
+        globalThis.__batchcutoutVolatileStorage = values;
+        return values;
+      }
+
+      function getPricingCheckoutStorageValue(key, fallback = "") {
+        const values = pricingCheckoutStorageValues();
+        try {
+          const stored = window.localStorage.getItem(key);
+          if (stored !== null) {
+            values.set(key, stored);
+            return stored;
+          }
+        } catch {
+          // Use the page-memory value below.
+        }
+        return values.has(key) ? values.get(key) : fallback;
+      }
+
+      function setPricingCheckoutStorageValue(key, value) {
+        const storedValue = String(value);
+        pricingCheckoutStorageValues().set(key, storedValue);
+        try {
+          window.localStorage.setItem(key, storedValue);
+        } catch {
+          // Keep the value in page memory.
+        }
+      }
+
       function getPricingStableId(storage, key) {
         try {
           const existing = storage.getItem(key);
@@ -1737,7 +1811,7 @@
           if (value) detail[key] = value;
         }
         try {
-          const stored = JSON.parse(localStorage.getItem("batchcutout_attribution") || "{}");
+          const stored = JSON.parse(getPricingCheckoutStorageValue("batchcutout_attribution", "{}") || "{}");
           for (const prefix of ["first", "last"]) {
             const storedVisit = stored?.[prefix] || {};
             for (const key of storedAttributionFields) {

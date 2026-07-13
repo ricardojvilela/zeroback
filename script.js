@@ -1559,7 +1559,7 @@ Object.assign(translations.es, {
 
 let items = [];
 let freeTestImagesUsed = readFreeTestImagesUsed();
-let currentLanguage = getRequestedLanguage() || localStorage.getItem("language") || detectLanguage();
+let currentLanguage = getRequestedLanguage() || safeLocalStorageGet("language") || detectLanguage();
 let engineHasLoaded = false;
 let hasTrackedDragIntent = false;
 let hasTrackedDownloadReady = false;
@@ -1661,6 +1661,45 @@ function trackEvent(name, detail = {}) {
 
 function createStableId() {
   return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+}
+
+function volatileStorageValues() {
+  const values = globalThis.__batchcutoutVolatileStorage || new Map();
+  globalThis.__batchcutoutVolatileStorage = values;
+  return values;
+}
+
+function safeLocalStorageGet(key, fallback = "") {
+  const values = volatileStorageValues();
+  try {
+    const stored = window.localStorage.getItem(key);
+    if (stored !== null) {
+      values.set(key, stored);
+      return stored;
+    }
+  } catch {
+    // Use the page-memory value below.
+  }
+  return values.has(key) ? values.get(key) : fallback;
+}
+
+function safeLocalStorageSet(key, value) {
+  const storedValue = String(value);
+  volatileStorageValues().set(key, storedValue);
+  try {
+    window.localStorage.setItem(key, storedValue);
+  } catch {
+    // The page-memory value keeps the current flow working.
+  }
+}
+
+function safeLocalStorageRemove(key) {
+  volatileStorageValues().delete(key);
+  try {
+    window.localStorage.removeItem(key);
+  } catch {
+    // Nothing else to remove when persistent storage is blocked.
+  }
 }
 
 function getVolatileStableId(key) {
@@ -1779,7 +1818,7 @@ function getAttributionParams() {
 
 function getStoredAttribution() {
   try {
-    return JSON.parse(localStorage.getItem(attributionStorageKey) || "{}");
+    return JSON.parse(safeLocalStorageGet(attributionStorageKey, "{}") || "{}");
   } catch {
     return {};
   }
@@ -1819,7 +1858,7 @@ function persistAttribution() {
     last: hasCampaignSignal || !stored.last ? current : stored.last,
   };
 
-  localStorage.setItem(attributionStorageKey, JSON.stringify(next));
+  safeLocalStorageSet(attributionStorageKey, JSON.stringify(next));
   recordDebugEvent("attribution_saved", next);
 }
 
@@ -1855,7 +1894,7 @@ function trackGoogleAdsConversion(sendTo, { value = 1.0, currency = "EUR", trans
 
 function getTrackedPaidSessions() {
   try {
-    const sessions = JSON.parse(localStorage.getItem(paidConversionStorageKey) || "[]");
+    const sessions = JSON.parse(safeLocalStorageGet(paidConversionStorageKey, "[]") || "[]");
     return Array.isArray(sessions) ? sessions : [];
   } catch {
     return [];
@@ -1866,7 +1905,7 @@ function rememberPaidSession(sessionId) {
   if (!sessionId) return;
   const sessions = getTrackedPaidSessions().filter(Boolean);
   if (!sessions.includes(sessionId)) sessions.push(sessionId);
-  localStorage.setItem(paidConversionStorageKey, JSON.stringify(sessions.slice(-20)));
+  safeLocalStorageSet(paidConversionStorageKey, JSON.stringify(sessions.slice(-20)));
 }
 
 function hasTrackedPaidSession(sessionId) {
@@ -1915,7 +1954,7 @@ function trackBeginCheckout(plan = "monthly", source = "app") {
 }
 
 function setGoogleUserData(email = "") {
-  if (!email || localStorage.getItem(consentStorageKey) !== "accepted") return;
+  if (!email || safeLocalStorageGet(consentStorageKey) !== "accepted") return;
   window.gtag?.("set", "user_data", {
     email,
   });
@@ -1930,17 +1969,13 @@ function isValidEmail(value = "") {
 }
 
 function getCapturedLeadEmail() {
-  return normalizeEmail(localStorage.getItem(leadCaptureEmailStorageKey) || "");
+  return normalizeEmail(safeLocalStorageGet(leadCaptureEmailStorageKey));
 }
 
 function rememberAccountEmail(value = "") {
   const email = normalizeEmail(value);
   if (!isValidEmail(email)) return "";
-  try {
-    localStorage.setItem(leadCaptureEmailStorageKey, email);
-  } catch {
-    // Local storage only reduces repeated typing; checkout must work without it.
-  }
+  safeLocalStorageSet(leadCaptureEmailStorageKey, email);
   return email;
 }
 
@@ -2079,14 +2114,14 @@ function trackPaidSubscriptionConversion(details = {}) {
 
 function getDebugEvents() {
   try {
-    return JSON.parse(localStorage.getItem(debugEventsStorageKey) || "[]");
+    return JSON.parse(safeLocalStorageGet(debugEventsStorageKey, "[]") || "[]");
   } catch {
     return [];
   }
 }
 
 function saveDebugEvents(events) {
-  localStorage.setItem(debugEventsStorageKey, JSON.stringify(events.slice(-30)));
+  safeLocalStorageSet(debugEventsStorageKey, JSON.stringify(events.slice(-30)));
 }
 
 function renderDebugEvents() {
@@ -2134,7 +2169,7 @@ function initDebugPanel() {
 
   debugList = panel.querySelector("ul");
   panel.querySelector("button").addEventListener("click", () => {
-    localStorage.removeItem(debugEventsStorageKey);
+    safeLocalStorageRemove(debugEventsStorageKey);
     renderDebugEvents();
   });
 
@@ -2184,7 +2219,7 @@ function showFreeTestUpgrade(source = "free_test_complete", detail = {}) {
 
 function updateConsent(consent) {
   const granted = consent === "accepted";
-  localStorage.setItem(consentStorageKey, consent);
+  safeLocalStorageSet(consentStorageKey, consent);
   window.gtag?.("consent", "update", {
     ad_storage: granted ? "granted" : "denied",
     ad_user_data: granted ? "granted" : "denied",
@@ -2195,7 +2230,7 @@ function updateConsent(consent) {
 }
 
 function showConsentBanner() {
-  if (localStorage.getItem(consentStorageKey)) return;
+  if (safeLocalStorageGet(consentStorageKey)) return;
 
   const banner = document.createElement("section");
   banner.className = "consent-banner";
@@ -2501,20 +2536,12 @@ function trackAccountFormInteraction(method = "unknown") {
 }
 
 function readFreeTestImagesUsed() {
-  try {
-    const stored = Number(localStorage.getItem(freeTestUsageStorageKey) || 0) || 0;
-    return Math.min(Math.max(Math.floor(stored), 0), freeTestImageLimit);
-  } catch {
-    return 0;
-  }
+  const stored = Number(safeLocalStorageGet(freeTestUsageStorageKey, "0") || 0) || 0;
+  return Math.min(Math.max(Math.floor(stored), 0), freeTestImageLimit);
 }
 
 function storeFreeTestImagesUsed() {
-  try {
-    localStorage.setItem(freeTestUsageStorageKey, String(freeTestImagesUsed));
-  } catch {
-    // Keep the in-memory limit active when storage is unavailable.
-  }
+  safeLocalStorageSet(freeTestUsageStorageKey, String(freeTestImagesUsed));
 }
 
 function getFreeTestRemaining() {
@@ -3093,22 +3120,22 @@ function checkoutPlanLabelKey(plan) {
 
 function getPendingCheckoutPlan() {
   try {
-    const pending = JSON.parse(localStorage.getItem(pendingCheckoutPlanStorageKey) || "{}");
+    const pending = JSON.parse(safeLocalStorageGet(pendingCheckoutPlanStorageKey, "{}") || "{}");
     const createdAt = Number(pending.createdAt || 0) || 0;
     if (!checkoutPlans.has(pending.plan) || Date.now() - createdAt > 24 * 60 * 60 * 1000) {
-      localStorage.removeItem(pendingCheckoutPlanStorageKey);
+      safeLocalStorageRemove(pendingCheckoutPlanStorageKey);
       return "";
     }
     return pending.plan;
   } catch {
-    localStorage.removeItem(pendingCheckoutPlanStorageKey);
+    safeLocalStorageRemove(pendingCheckoutPlanStorageKey);
     return "";
   }
 }
 
 function setPendingCheckoutPlan(plan) {
   const selectedPlan = checkoutPlans.has(plan) ? plan : defaultCheckoutPlan;
-  localStorage.setItem(pendingCheckoutPlanStorageKey, JSON.stringify({
+  safeLocalStorageSet(pendingCheckoutPlanStorageKey, JSON.stringify({
     plan: selectedPlan,
     createdAt: Date.now(),
   }));
@@ -3116,7 +3143,7 @@ function setPendingCheckoutPlan(plan) {
 }
 
 function clearPendingCheckoutPlan() {
-  localStorage.removeItem(pendingCheckoutPlanStorageKey);
+  safeLocalStorageRemove(pendingCheckoutPlanStorageKey);
 }
 
 function checkoutPlanWaitingForAuth() {
@@ -3996,7 +4023,7 @@ function showPostDownloadNext(downloadType, count) {
 function focusPostDownloadLeadCapture() {
   const downloadType = postDownloadNextPanel?.dataset.downloadType || "unknown";
   const count = Number(postDownloadNextPanel?.dataset.downloadCount || 0) || 0;
-  localStorage.removeItem(leadCaptureDismissedStorageKey);
+  safeLocalStorageRemove(leadCaptureDismissedStorageKey);
   showLeadCapture(downloadType, count, "post_download_next");
   trackEvent("post_download_save_link_clicked", {
     downloadType,
@@ -4011,7 +4038,7 @@ function focusPostDownloadLeadCapture() {
 function focusResultReadyLeadCapture(source = "result_ready") {
   const count = items.filter((item) => item.outputBlob).length;
   const downloadType = count > 1 ? "zip_available" : "png_available";
-  localStorage.removeItem(leadCaptureDismissedStorageKey);
+  safeLocalStorageRemove(leadCaptureDismissedStorageKey);
   showLeadCapture(downloadType, count, source);
   trackEvent("post_download_save_link_clicked", {
     downloadType,
@@ -4035,7 +4062,7 @@ function showPostDownloadFeedback(downloadType, count) {
 
 function shouldShowLeadCapture() {
   if (!leadCapturePanel || canUsePaidAccess() || currentAccount?.email) return false;
-  if (localStorage.getItem(leadCaptureDismissedStorageKey)) return false;
+  if (safeLocalStorageGet(leadCaptureDismissedStorageKey)) return false;
   return !getCapturedLeadEmail();
 }
 
@@ -4061,9 +4088,9 @@ function hideLeadCapture() {
 }
 
 function recordLeadCapture(email, { downloadType = "unknown", count = 0, source = "post_download", captureSource = source, waitForResponse = false, extra = {} } = {}) {
-  localStorage.setItem(leadCaptureEmailStorageKey, email);
+  safeLocalStorageSet(leadCaptureEmailStorageKey, email);
   if (accountEmail && !accountEmail.value.trim()) accountEmail.value = email;
-  localStorage.removeItem(leadCaptureDismissedStorageKey);
+  safeLocalStorageRemove(leadCaptureDismissedStorageKey);
   postDownloadSaveLinkCta?.classList.add("hidden");
   resultReadySaveLinkCta?.classList.add("hidden");
   resultReadyEmailForm?.classList.add("hidden");
@@ -4251,7 +4278,7 @@ function handleProLimitEmailSubmit(event) {
 }
 
 function dismissLeadCapture() {
-  localStorage.setItem(leadCaptureDismissedStorageKey, new Date().toISOString());
+  safeLocalStorageSet(leadCaptureDismissedStorageKey, new Date().toISOString());
   trackEvent("lead_capture_dismissed", {
     downloadType: leadCapturePanel?.dataset.downloadType || "unknown",
     count: Number(leadCapturePanel?.dataset.downloadCount || 0) || 0,
@@ -4285,7 +4312,7 @@ function selectPostDownloadFeedback(answer) {
 
 languageSelect.addEventListener("change", (event) => {
   currentLanguage = event.target.value;
-  localStorage.setItem("language", currentLanguage);
+  safeLocalStorageSet("language", currentLanguage);
   trackEvent("language_changed", { language: currentLanguage });
   applyLanguage();
 });
