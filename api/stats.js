@@ -234,6 +234,37 @@ function classifySource(event, detail) {
   return "Direto / sem origem";
 }
 
+function campaignAttribution(event, detail, source) {
+  const medium = asCleanText(
+    detail.utm_medium || detail.medium || detail.last_medium || detail.first_medium,
+    80,
+  ).toLowerCase();
+  const campaign = asCleanText(
+    event.campaign || detail.utm_campaign || detail.campaign || detail.last_campaign || detail.first_campaign,
+    200,
+  );
+  const content = asCleanText(detail.utm_content || detail.last_content || detail.first_content, 160);
+  const term = asCleanText(detail.utm_term || detail.last_term || detail.first_term, 200);
+  const hasAdClickId = Boolean(
+    detail.gclid || detail.gbraid || detail.wbraid ||
+    detail.last_gclid || detail.last_gbraid || detail.last_wbraid ||
+    detail.first_gclid || detail.first_gbraid || detail.first_wbraid
+  );
+  const isPaidTraffic = source === "Google Ads" || hasAdClickId || ["cpc", "ppc", "paid", "ads"].some((value) => medium.includes(value));
+
+  if (!campaign && !isPaidTraffic) return null;
+
+  const campaignName = campaign || "google_ads_auto_tagged";
+  return {
+    key: [source, campaignName, content, term].join("\u001f"),
+    source,
+    medium,
+    campaign: campaignName,
+    content,
+    term,
+  };
+}
+
 function emptySourceRow(source) {
   return {
     source,
@@ -315,6 +346,35 @@ function emptySourceRow(source) {
   };
 }
 
+function emptyCampaignRow(attribution) {
+  return {
+    ...emptySourceRow(attribution.source),
+    campaign: attribution.campaign,
+    medium: attribution.medium,
+    content: attribution.content,
+    term: attribution.term,
+    landingPage: "",
+    uploadRate: 0,
+    downloadRate: 0,
+    paidIntentRate: 0,
+  };
+}
+
+function numericSnapshot(row) {
+  return Object.fromEntries(
+    Object.entries(row).filter(([, value]) => typeof value === "number"),
+  );
+}
+
+function applyNumericDeltas(before, after, target, excludedKeys = new Set()) {
+  if (!before || !target) return;
+  for (const [key, value] of Object.entries(after)) {
+    if (excludedKeys.has(key) || typeof value !== "number") continue;
+    const delta = value - (Number(before[key]) || 0);
+    if (delta) target[key] = (Number(target[key]) || 0) + delta;
+  }
+}
+
 function landingPageFromEvent(event, detail) {
   const directPath = asCleanText(detail.page_path || event.page_path, 500);
   if (directPath) return directPath;
@@ -327,6 +387,18 @@ function landingPageFromEvent(event, detail) {
     return `${url.pathname}${url.search}`.slice(0, 500);
   } catch {
     return "";
+  }
+}
+
+function campaignLandingPage(event, detail) {
+  const storedLanding = asCleanText(detail.first_landing_page || detail.last_landing_page, 1000);
+  const raw = storedLanding || landingPageFromEvent(event, detail);
+  if (!raw) return "";
+
+  try {
+    return new URL(raw, "https://batchcutout.com").pathname.slice(0, 500);
+  } catch {
+    return raw.split(/[?#]/)[0].slice(0, 500);
   }
 }
 
@@ -563,6 +635,8 @@ export default async function handler(request, response) {
     const visitorsInWindow = new Set();
     const bySource = new Map();
     const visitorsBySource = new Map();
+    const byCampaign = new Map();
+    const visitorsByCampaign = new Map();
     const byLandingPage = new Map();
     const visitorsByLandingPage = new Map();
     const packVisitorStages = new Map();
@@ -588,6 +662,19 @@ export default async function handler(request, response) {
       const sourceRow = bySource.get(sourceName);
       sourceRow.events += 1;
       if (event.visitor_id) visitorsBySource.get(sourceName).add(event.visitor_id);
+
+      const attribution = campaignAttribution(event, detail, sourceName);
+      let campaignRow = null;
+      let sourceMetricsBefore = null;
+      if (attribution) {
+        if (!byCampaign.has(attribution.key)) byCampaign.set(attribution.key, emptyCampaignRow(attribution));
+        if (!visitorsByCampaign.has(attribution.key)) visitorsByCampaign.set(attribution.key, new Set());
+        campaignRow = byCampaign.get(attribution.key);
+        campaignRow.events += 1;
+        if (!campaignRow.landingPage) campaignRow.landingPage = campaignLandingPage(event, detail);
+        if (event.visitor_id) visitorsByCampaign.get(attribution.key).add(event.visitor_id);
+        sourceMetricsBefore = numericSnapshot(sourceRow);
+      }
 
       if (event.visitor_id) visitorsByDay.get(date).add(event.visitor_id);
       if (event.visitor_id) visitorsInWindow.add(event.visitor_id);
@@ -979,6 +1066,8 @@ export default async function handler(request, response) {
         default:
           break;
       }
+
+      applyNumericDeltas(sourceMetricsBefore, sourceRow, campaignRow, new Set(["events", "visitors"]));
     }
 
     for (const [date, visitors] of visitorsByDay) {
@@ -986,6 +1075,14 @@ export default async function handler(request, response) {
     }
     for (const [source, visitors] of visitorsBySource) {
       bySource.get(source).visitors = visitors.size;
+    }
+    for (const [campaignKey, visitors] of visitorsByCampaign) {
+      const campaignRow = byCampaign.get(campaignKey);
+      campaignRow.visitors = visitors.size;
+      campaignRow.uploadRate = campaignRow.visitors ? campaignRow.uploadsStarted / campaignRow.visitors : 0;
+      campaignRow.downloadRate = campaignRow.visitors ? campaignRow.downloads / campaignRow.visitors : 0;
+      const paidIntent = (campaignRow.proClicks || 0) + (campaignRow.pricingCtaClicks || 0);
+      campaignRow.paidIntentRate = campaignRow.visitors ? paidIntent / campaignRow.visitors : 0;
     }
     for (const [pagePath, visitors] of visitorsByLandingPage) {
       const landingRow = byLandingPage.get(pagePath);
@@ -1039,6 +1136,17 @@ export default async function handler(request, response) {
           ((a.postDownloadPackClicks || 0) + (a.packCtaClicks || 0))
       )
       .slice(0, 12);
+    const campaignBreakdown = Array.from(byCampaign.values())
+      .sort((a, b) =>
+        b.revenue - a.revenue ||
+        ((b.paidSubscriptions || 0) + (b.packPurchases || 0)) - ((a.paidSubscriptions || 0) + (a.packPurchases || 0)) ||
+        b.checkoutSessionsCreated - a.checkoutSessionsCreated ||
+        ((b.proClicks || 0) + (b.pricingCtaClicks || 0)) - ((a.proClicks || 0) + (a.pricingCtaClicks || 0)) ||
+        b.downloads - a.downloads ||
+        b.visitors - a.visitors ||
+        b.events - a.events
+      )
+      .slice(0, 40);
     const landingBreakdown = Array.from(byLandingPage.values())
       .sort((a, b) =>
         b.pricingClicks - a.pricingClicks ||
@@ -1063,6 +1171,7 @@ export default async function handler(request, response) {
       packVisitorFunnel: packVisitorFunnelSummary(packVisitorStages),
       sourceBreakdown,
       packSourceBreakdown,
+      campaignBreakdown,
       landingBreakdown,
       generatedAt: new Date().toISOString(),
     });

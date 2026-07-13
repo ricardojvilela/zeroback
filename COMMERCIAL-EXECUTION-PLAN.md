@@ -287,6 +287,13 @@ Decision rules:
 - Active pack accounts keep functional tool UI focused on processing, while still being able to buy another pack or move to Pro.
 - `/admin` now tracks pack checkout sessions, pack purchases and pack revenue separately from renewable MRR.
 
+## Executed growth work - campaign profitability reporting
+
+- Added campaign-level attribution to `/api/stats` using the UTM campaign, ad content and search term already preserved throughout the customer journey.
+- Added an operational `/admin` table with unique visitors, uploads, downloads, paid-intent clicks, Pack clicks, accounts, Stripe sessions, purchases and revenue per campaign/ad combination.
+- Added upload, download and paid-intent rates so weak paid traffic can be identified without increasing budget or relying on aggregate Google Ads totals.
+- Keep spend unchanged until this view has enough activity from the 2-image-total offer to identify a campaign that reaches Pack or Stripe.
+
 ## First revenue targets
 
 Target 1:

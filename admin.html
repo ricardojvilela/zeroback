@@ -1452,6 +1452,42 @@
             </table>
           </div>
         </section>
+        <section class="source-live-block" aria-label="Desempenho por campanha">
+          <div class="panel-head compact">
+            <div>
+              <h3>Campanhas e anúncios</h3>
+              <p class="note">Funil atribuído por UTM. Use as taxas para separar tráfego que apenas visita de campanhas que geram utilização e intenção paga.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Campanha / anúncio</th>
+                  <th>Origem</th>
+                  <th>Landing</th>
+                  <th>Visitantes</th>
+                  <th>Uploads</th>
+                  <th>Taxa upload</th>
+                  <th>Downloads</th>
+                  <th>Taxa download</th>
+                  <th>Cliques pagos</th>
+                  <th>Taxa intenção</th>
+                  <th>Cliques Pack</th>
+                  <th>Contas</th>
+                  <th>Stripe</th>
+                  <th>Compras</th>
+                  <th>Receita</th>
+                </tr>
+              </thead>
+              <tbody id="campaignRowsBody">
+                <tr>
+                  <td class="empty" colspan="15">A carregar campanhas.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
         <section class="source-live-block" aria-label="Origem das visitas">
           <div class="panel-head compact">
             <div>
@@ -1591,6 +1627,7 @@
       const authForm = document.querySelector("#authForm");
       const authError = document.querySelector("#authError");
       const liveRowsBody = document.querySelector("#liveRowsBody");
+      const campaignRowsBody = document.querySelector("#campaignRowsBody");
       const sourceRowsBody = document.querySelector("#sourceRowsBody");
       const packSourceRowsBody = document.querySelector("#packSourceRowsBody");
       const landingRowsBody = document.querySelector("#landingRowsBody");
@@ -2230,6 +2267,11 @@
         return value || "-";
       }
 
+      function campaignLabel(value) {
+        if (value === "google_ads_auto_tagged") return "Google Ads sem nome UTM";
+        return String(value || "-").replace(/[_-]+/g, " ");
+      }
+
       function hoursSince(value) {
         const date = new Date(value || 0);
         if (Number.isNaN(date.getTime())) return 0;
@@ -2704,6 +2746,43 @@
               `;
             }).join("")
           : `<tr><td class="empty" colspan="33">Ainda não existem eventos reais no período.</td></tr>`;
+
+        campaignRowsBody.innerHTML = data.campaignBreakdown?.length
+          ? data.campaignBreakdown.map((row) => {
+              const paidIntentClicks = (Number(row.proClicks || 0) || 0) +
+                (Number(row.pricingCtaClicks || 0) || 0);
+              const packClicks = (Number(row.postDownloadPackClicks || 0) || 0) +
+                (Number(row.packCtaClicks || 0) || 0);
+              const purchases = (Number(row.paidSubscriptions || 0) || 0) +
+                (Number(row.packPurchases || 0) || 0);
+              const attributionDetail = [
+                row.content ? `Anúncio: ${escapeHtml(row.content)}` : "",
+                row.term ? `Termo: ${escapeHtml(row.term)}` : "",
+              ].filter(Boolean).join(" · ");
+              return `
+                <tr>
+                  <td>
+                    <strong>${escapeHtml(campaignLabel(row.campaign))}</strong>
+                    ${attributionDetail ? `<br><span class="note">${attributionDetail}</span>` : ""}
+                  </td>
+                  <td>${escapeHtml(sourceLabel(row.source))}</td>
+                  <td>${escapeHtml(row.landingPage || "-")}</td>
+                  <td>${row.visitors || 0}</td>
+                  <td>${row.uploadsStarted || 0}</td>
+                  <td>${formatPercent(row.uploadRate || 0)}</td>
+                  <td>${row.downloads || 0}</td>
+                  <td>${formatPercent(row.downloadRate || 0)}</td>
+                  <td>${paidIntentClicks}</td>
+                  <td>${formatPercent(row.paidIntentRate || 0)}</td>
+                  <td>${packClicks}</td>
+                  <td>${row.accountSignups || 0}</td>
+                  <td>${row.checkoutSessionsCreated || 0}</td>
+                  <td>${purchases}</td>
+                  <td>${formatCurrency(row.revenue || 0)}</td>
+                </tr>
+              `;
+            }).join("")
+          : `<tr><td class="empty" colspan="15">Ainda não existem campanhas identificadas no período.</td></tr>`;
 
         sourceRowsBody.innerHTML = data.sourceBreakdown?.length
           ? data.sourceBreakdown.map((row) => `
@@ -3553,6 +3632,7 @@
             document.body.classList.add("locked");
           }
           liveRowsBody.innerHTML = `<tr><td class="empty" colspan="33">Não foi possível carregar atividade.</td></tr>`;
+          campaignRowsBody.innerHTML = `<tr><td class="empty" colspan="15">Não foi possível carregar campanhas.</td></tr>`;
           sourceRowsBody.innerHTML = `<tr><td class="empty" colspan="32">Não foi possível carregar origens.</td></tr>`;
           packSourceRowsBody.innerHTML = `<tr><td class="empty" colspan="11">Não foi possível carregar origens do Pack.</td></tr>`;
           landingRowsBody.innerHTML = `<tr><td class="empty" colspan="9">Não foi possível carregar páginas SEO.</td></tr>`;
