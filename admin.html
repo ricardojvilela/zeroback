@@ -1456,7 +1456,7 @@
           <div class="panel-head compact">
             <div>
               <h3>Campanhas e anúncios</h3>
-              <p class="note">Funil atribuído por UTM. Use as taxas para separar tráfego que apenas visita de campanhas que geram utilização e intenção paga.</p>
+              <p class="note">Funil atribuído por UTM. As etapas contam pessoas únicas, para que visitas repetidas não criem taxas acima de 100%.</p>
             </div>
           </div>
           <div class="table-wrap">
@@ -1467,13 +1467,13 @@
                   <th>Origem</th>
                   <th>Landing</th>
                   <th>Visitantes</th>
-                  <th>Uploads</th>
+                  <th>Upload (pessoas)</th>
                   <th>Taxa upload</th>
-                  <th>Downloads</th>
+                  <th>Download (pessoas)</th>
                   <th>Taxa download</th>
-                  <th>Cliques pagos</th>
+                  <th>Intenção paga (pessoas)</th>
                   <th>Taxa intenção</th>
-                  <th>Cliques Pack</th>
+                  <th>Pack (pessoas)</th>
                   <th>Contas</th>
                   <th>Stripe</th>
                   <th>Compras</th>
@@ -2749,12 +2749,11 @@
 
         campaignRowsBody.innerHTML = data.campaignBreakdown?.length
           ? data.campaignBreakdown.map((row) => {
-              const paidIntentClicks = (Number(row.proClicks || 0) || 0) +
-                (Number(row.pricingCtaClicks || 0) || 0);
-              const packClicks = (Number(row.postDownloadPackClicks || 0) || 0) +
-                (Number(row.packCtaClicks || 0) || 0);
-              const purchases = (Number(row.paidSubscriptions || 0) || 0) +
+              const paidIntentVisitors = Number(row.paidIntentVisitors || 0) || 0;
+              const packClickVisitors = Number(row.packClickVisitors || 0) || 0;
+              const purchaseEvents = (Number(row.paidSubscriptions || 0) || 0) +
                 (Number(row.packPurchases || 0) || 0);
+              const purchases = (Number(row.purchaseVisitors || 0) || 0) || purchaseEvents;
               const attributionDetail = [
                 row.content ? `Anúncio: ${escapeHtml(row.content)}` : "",
                 row.term ? `Termo: ${escapeHtml(row.term)}` : "",
@@ -2768,15 +2767,15 @@
                   <td>${escapeHtml(sourceLabel(row.source))}</td>
                   <td>${escapeHtml(row.landingPage || "-")}</td>
                   <td>${row.visitors || 0}</td>
-                  <td>${row.uploadsStarted || 0}</td>
+                  <td>${row.uploadVisitors || 0}</td>
                   <td>${formatPercent(row.uploadRate || 0)}</td>
-                  <td>${row.downloads || 0}</td>
+                  <td>${row.downloadVisitors || 0}</td>
                   <td>${formatPercent(row.downloadRate || 0)}</td>
-                  <td>${paidIntentClicks}</td>
+                  <td>${paidIntentVisitors}</td>
                   <td>${formatPercent(row.paidIntentRate || 0)}</td>
-                  <td>${packClicks}</td>
-                  <td>${row.accountSignups || 0}</td>
-                  <td>${row.checkoutSessionsCreated || 0}</td>
+                  <td>${packClickVisitors}</td>
+                  <td>${row.accountVisitors || 0}</td>
+                  <td>${row.stripeVisitors || 0}</td>
                   <td>${purchases}</td>
                   <td>${formatCurrency(row.revenue || 0)}</td>
                 </tr>

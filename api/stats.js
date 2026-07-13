@@ -354,10 +354,42 @@ function emptyCampaignRow(attribution) {
     content: attribution.content,
     term: attribution.term,
     landingPage: "",
+    uploadVisitors: 0,
+    downloadVisitors: 0,
+    paidIntentVisitors: 0,
+    packClickVisitors: 0,
+    accountVisitors: 0,
+    stripeVisitors: 0,
+    purchaseVisitors: 0,
     uploadRate: 0,
     downloadRate: 0,
     paidIntentRate: 0,
   };
+}
+
+function emptyCampaignVisitorStages() {
+  return {
+    upload: new Set(),
+    download: new Set(),
+    paidIntent: new Set(),
+    packClick: new Set(),
+    account: new Set(),
+    stripe: new Set(),
+    purchase: new Set(),
+  };
+}
+
+function updateCampaignVisitorStages(stages, eventName, detail, visitorId) {
+  if (!stages || !visitorId) return;
+  if (eventName === "tool_upload_started") stages.upload.add(visitorId);
+  if (["tool_download_png", "tool_download_zip"].includes(eventName)) stages.download.add(visitorId);
+  if (eventName === "tool_pro_clicked" || eventName === "pro_cta_clicked" || isPackIntentEvent(eventName, detail)) {
+    stages.paidIntent.add(visitorId);
+  }
+  if (isPackIntentEvent(eventName, detail)) stages.packClick.add(visitorId);
+  if (eventName === "account_signup_succeeded") stages.account.add(visitorId);
+  if (["pro_checkout_session_created", "pack_checkout_session_created"].includes(eventName)) stages.stripe.add(visitorId);
+  if (["pro_subscription_paid", "pack_purchase_paid"].includes(eventName)) stages.purchase.add(visitorId);
 }
 
 function numericSnapshot(row) {
@@ -637,6 +669,7 @@ export default async function handler(request, response) {
     const visitorsBySource = new Map();
     const byCampaign = new Map();
     const visitorsByCampaign = new Map();
+    const visitorStagesByCampaign = new Map();
     const byLandingPage = new Map();
     const visitorsByLandingPage = new Map();
     const packVisitorStages = new Map();
@@ -669,10 +702,12 @@ export default async function handler(request, response) {
       if (attribution) {
         if (!byCampaign.has(attribution.key)) byCampaign.set(attribution.key, emptyCampaignRow(attribution));
         if (!visitorsByCampaign.has(attribution.key)) visitorsByCampaign.set(attribution.key, new Set());
+        if (!visitorStagesByCampaign.has(attribution.key)) visitorStagesByCampaign.set(attribution.key, emptyCampaignVisitorStages());
         campaignRow = byCampaign.get(attribution.key);
         campaignRow.events += 1;
         if (!campaignRow.landingPage) campaignRow.landingPage = campaignLandingPage(event, detail);
         if (event.visitor_id) visitorsByCampaign.get(attribution.key).add(event.visitor_id);
+        updateCampaignVisitorStages(visitorStagesByCampaign.get(attribution.key), event.event_name, detail, event.visitor_id);
         sourceMetricsBefore = numericSnapshot(sourceRow);
       }
 
@@ -1078,11 +1113,18 @@ export default async function handler(request, response) {
     }
     for (const [campaignKey, visitors] of visitorsByCampaign) {
       const campaignRow = byCampaign.get(campaignKey);
+      const stages = visitorStagesByCampaign.get(campaignKey) || emptyCampaignVisitorStages();
       campaignRow.visitors = visitors.size;
-      campaignRow.uploadRate = campaignRow.visitors ? campaignRow.uploadsStarted / campaignRow.visitors : 0;
-      campaignRow.downloadRate = campaignRow.visitors ? campaignRow.downloads / campaignRow.visitors : 0;
-      const paidIntent = (campaignRow.proClicks || 0) + (campaignRow.pricingCtaClicks || 0);
-      campaignRow.paidIntentRate = campaignRow.visitors ? paidIntent / campaignRow.visitors : 0;
+      campaignRow.uploadVisitors = stages.upload.size;
+      campaignRow.downloadVisitors = stages.download.size;
+      campaignRow.paidIntentVisitors = stages.paidIntent.size;
+      campaignRow.packClickVisitors = stages.packClick.size;
+      campaignRow.accountVisitors = stages.account.size;
+      campaignRow.stripeVisitors = stages.stripe.size;
+      campaignRow.purchaseVisitors = stages.purchase.size;
+      campaignRow.uploadRate = campaignRow.visitors ? campaignRow.uploadVisitors / campaignRow.visitors : 0;
+      campaignRow.downloadRate = campaignRow.visitors ? campaignRow.downloadVisitors / campaignRow.visitors : 0;
+      campaignRow.paidIntentRate = campaignRow.visitors ? campaignRow.paidIntentVisitors / campaignRow.visitors : 0;
     }
     for (const [pagePath, visitors] of visitorsByLandingPage) {
       const landingRow = byLandingPage.get(pagePath);
