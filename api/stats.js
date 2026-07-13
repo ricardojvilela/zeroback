@@ -70,6 +70,8 @@ function emptyDay(date) {
     freeTestCompletions: 0,
     freeTestExhaustedAttempts: 0,
     processingCompleted: 0,
+    engineLoadFailures: 0,
+    zipGenerationFailures: 0,
     downloadReadyShown: 0,
     downloads: 0,
     pngDownloads: 0,
@@ -279,6 +281,8 @@ function emptySourceRow(source) {
     limitAttempts: 0,
     freeTestCompletions: 0,
     freeTestExhaustedAttempts: 0,
+    engineLoadFailures: 0,
+    zipGenerationFailures: 0,
     downloads: 0,
     zipDownloads: 0,
     postDownloadNextShown: 0,
@@ -845,6 +849,14 @@ export default async function handler(request, response) {
           break;
         case "tool_processing_completed":
           row.processingCompleted += 1;
+          break;
+        case "tool_engine_load_failed":
+          row.engineLoadFailures += 1;
+          sourceRow.engineLoadFailures += 1;
+          break;
+        case "tool_zip_generation_failed":
+          row.zipGenerationFailures += 1;
+          sourceRow.zipGenerationFailures += 1;
           break;
         case "download_ready_shown":
           row.downloadReadyShown += 1;

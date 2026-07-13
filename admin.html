@@ -812,6 +812,14 @@
             <strong id="liveDownloadReady">0</strong>
           </article>
           <article class="live-card">
+            <span>Falhas motor</span>
+            <strong id="liveEngineLoadFailures">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Falhas ZIP</span>
+            <strong id="liveZipGenerationFailures">0</strong>
+          </article>
+          <article class="live-card">
             <span>Landing SEO</span>
             <strong id="liveSeoLandingViews">0</strong>
           </article>
@@ -1937,6 +1945,8 @@
         const uploads = Number(totals.uploadsStarted || 0) || 0;
         const downloads = Number(totals.downloads || 0) || 0;
         const resultReady = Number(totals.downloadReadyShown || 0) || 0;
+        const engineLoadFailures = Number(totals.engineLoadFailures || 0) || 0;
+        const zipGenerationFailures = Number(totals.zipGenerationFailures || 0) || 0;
         const limitAttempts = Number(totals.limitAttempts || 0) || 0;
         const freeTestCompletions = Number(totals.freeTestCompletions || 0) || 0;
         const freeTestExhaustedAttempts = Number(totals.freeTestExhaustedAttempts || 0) || 0;
@@ -1972,6 +1982,14 @@
         const emailConfirmations = Number(totals.accountEmailConfirmations || 0) || 0;
         const confirmationResends = Number(totals.accountEmailConfirmationResends || 0) || 0;
         const activeAccountEntrants = Math.max((Number(totals.accountSignups || 0) || 0) - emailConfirmations, 0) + Number(totals.accountLogins || 0);
+
+        if (engineLoadFailures >= 2 || (engineLoadFailures > 0 && resultReady === 0)) {
+          return "Gargalo técnico: o motor de remoção falhou ao carregar. Prioridade: confirmar CDN/ligação e corrigir isto antes de aumentar tráfego ou rever preço.";
+        }
+
+        if (zipGenerationFailures >= 2) {
+          return "Gargalo técnico: houve falhas repetidas ao criar o ZIP. Prioridade: validar o módulo ZIP e o browser afetado antes de promover lotes maiores.";
+        }
 
         if (checkoutSessionFailures > 0 && checkoutSessions === 0) {
           return "Gargalo principal: a criação da sessão Stripe falhou depois de haver intenção de pagamento. Prioridade: verificar preços/env vars Stripe, ligação do cliente e detalhe do erro no painel.";
@@ -2562,6 +2580,8 @@
         document.querySelector("#liveFreeTestExhausted").textContent = totals.freeTestExhaustedAttempts || 0;
         document.querySelector("#liveDownloads").textContent = totals.downloads || 0;
         document.querySelector("#liveDownloadReady").textContent = totals.downloadReadyShown || 0;
+        document.querySelector("#liveEngineLoadFailures").textContent = totals.engineLoadFailures || 0;
+        document.querySelector("#liveZipGenerationFailures").textContent = totals.zipGenerationFailures || 0;
         document.querySelector("#liveSeoLandingViews").textContent = totals.seoLandingViews || 0;
         document.querySelector("#liveSeoLandingCtaClicks").textContent = totals.seoLandingCtaClicks || 0;
         document.querySelector("#liveDirectoryLaunchViews").textContent = totals.directoryLaunchPageViews || 0;

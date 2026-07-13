@@ -1,6 +1,70 @@
-import JSZip from "https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm";
-import { removeBackground } from "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.6.0/+esm";
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+const externalModuleUrls = Object.freeze({
+  backgroundRemoval: "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.6.0/+esm",
+  jsZip: "https://cdn.jsdelivr.net/npm/jszip@3.10.1/+esm",
+  supabase: "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm",
+});
+
+let backgroundRemovalModulePromise = null;
+let jsZipModulePromise = null;
+let supabaseModulePromise = null;
+let backgroundRemovalModuleAttempt = 0;
+let jsZipModuleAttempt = 0;
+let supabaseModuleAttempt = 0;
+
+function moduleUrlForAttempt(url, attempt) {
+  return attempt > 0 ? `${url}?retry=${attempt}` : url;
+}
+
+function loadBackgroundRemoval() {
+  if (!backgroundRemovalModulePromise) {
+    const moduleUrl = moduleUrlForAttempt(externalModuleUrls.backgroundRemoval, backgroundRemovalModuleAttempt);
+    backgroundRemovalModulePromise = import(moduleUrl)
+      .then((module) => {
+        if (typeof module.removeBackground !== "function") throw new Error("background_removal_module_invalid");
+        return module.removeBackground;
+      })
+      .catch((error) => {
+        backgroundRemovalModulePromise = null;
+        backgroundRemovalModuleAttempt += 1;
+        throw error;
+      });
+  }
+  return backgroundRemovalModulePromise;
+}
+
+function loadJsZip() {
+  if (!jsZipModulePromise) {
+    const moduleUrl = moduleUrlForAttempt(externalModuleUrls.jsZip, jsZipModuleAttempt);
+    jsZipModulePromise = import(moduleUrl)
+      .then((module) => {
+        if (typeof module.default !== "function") throw new Error("zip_module_invalid");
+        return module.default;
+      })
+      .catch((error) => {
+        jsZipModulePromise = null;
+        jsZipModuleAttempt += 1;
+        throw error;
+      });
+  }
+  return jsZipModulePromise;
+}
+
+function loadSupabaseCreateClient() {
+  if (!supabaseModulePromise) {
+    const moduleUrl = moduleUrlForAttempt(externalModuleUrls.supabase, supabaseModuleAttempt);
+    supabaseModulePromise = import(moduleUrl)
+      .then((module) => {
+        if (typeof module.createClient !== "function") throw new Error("supabase_module_invalid");
+        return module.createClient;
+      })
+      .catch((error) => {
+        supabaseModulePromise = null;
+        supabaseModuleAttempt += 1;
+        throw error;
+      });
+  }
+  return supabaseModulePromise;
+}
 
 const fileInput = document.querySelector("#fileInput");
 const dropzone = document.querySelector("#dropzone");
@@ -292,6 +356,8 @@ const baseTranslation = {
   cookieText: "Usamos medição simples para perceber visitas e adesões pagas. Pode aceitar ou continuar sem medição.",
   cookieAccept: "Aceitar medição",
   cookieDecline: "Continuar sem medição",
+  statusEngineUnavailable: "Não foi possível carregar o motor de remoção. Verifique a ligação e tente novamente.",
+  statusZipUnavailable: "Não foi possível criar o ZIP. Tente novamente.",
   accountKicker: "Acesso pago",
   accountBadgeGuest: "Sem sessão",
   accountBadgeCheckout: "Plano escolhido",
@@ -678,6 +744,8 @@ const translations = {
     statusFailures: "{count} image(s) with errors",
     statusPreparingZip: "Preparing ZIP",
     statusZipReady: "ZIP ready",
+    statusEngineUnavailable: "We could not load the removal engine. Check your connection and try again.",
+    statusZipUnavailable: "We could not create the ZIP. Try again.",
     statusPngReady: "PNG ready",
     zipFilename: "background-removed-photos.zip",
     fileSuffix: "background-removed",
@@ -721,6 +789,8 @@ const translations = {
     statusFailures: "{count} imagen(es) con error",
     statusPreparingZip: "Preparando ZIP",
     statusZipReady: "ZIP listo",
+    statusEngineUnavailable: "No se pudo cargar el motor de eliminación. Comprueba la conexión e inténtalo de nuevo.",
+    statusZipUnavailable: "No se pudo crear el ZIP. Inténtalo de nuevo.",
     statusPngReady: "PNG listo",
     zipFilename: "fotos-sin-fondo.zip",
     fileSuffix: "sin-fondo",
@@ -1631,6 +1701,8 @@ const analyticsEvents = {
   limite_20: { category: "funnel", label: "batch_limit_legacy", step: 4 },
   background_removal_started: { category: "processing", label: "started" },
   background_removal_finished: { category: "processing", label: "finished" },
+  tool_engine_load_failed: { category: "processing", label: "engine_load_failed" },
+  tool_zip_generation_failed: { category: "processing", label: "zip_generation_failed" },
   png_downloaded: { category: "download", label: "single_png" },
   zip_downloaded: { category: "download", label: "zip" },
   pro_interest_prompt_clicked: { category: "commercial_intent", label: "pro_interest" },
@@ -2715,7 +2787,7 @@ function updateAccountUi() {
   syncBatchLimit();
   refreshStatusText();
 
-  if (!authConfig?.configured) {
+  if (authConfig && !authConfig.configured) {
     accountBadge.textContent = t("accountBadgeGuest");
     accountStatus.textContent = t("accountStatusConfigMissing");
     accountPanel.classList.remove("has-pending-checkout");
@@ -2815,14 +2887,22 @@ async function fetchAuthConfig() {
     authConfig = { configured: false };
   }
 
+  updateAccountUi();
+
   if (authConfig?.configured && authConfig.url && authConfig.anonKey) {
-    supabaseClient = createClient(authConfig.url, authConfig.anonKey, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-      },
-    });
+    try {
+      const createClient = await loadSupabaseCreateClient();
+      supabaseClient = createClient(authConfig.url, authConfig.anonKey, {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      supabaseClient = null;
+    }
   }
 
   updateAccountUi();
@@ -3785,6 +3865,27 @@ async function processImages() {
     return;
   }
 
+  processButton.disabled = true;
+  pngButton.disabled = true;
+  zipButton.disabled = true;
+  clearButton.disabled = true;
+
+  let removeBackground;
+  try {
+    if (!engineHasLoaded) setStatus("statusEngineLoading", progressBar.value);
+    removeBackground = await loadBackgroundRemoval();
+  } catch (error) {
+    console.error(error);
+    setStatus("statusEngineUnavailable", 0);
+    trackEvent("tool_engine_load_failed", {
+      count: items.length,
+      pending: pendingCount,
+      reason: "module_load",
+    });
+    updateControls();
+    return;
+  }
+
   if (canUsePaidAccess()) {
     const reservation = await reserveMonthlyUsage(pendingCount);
     if (!reservation.ok) {
@@ -3808,6 +3909,7 @@ async function processImages() {
         { monthlyLimit },
       );
       render();
+      updateControls();
       return;
     }
   }
@@ -3818,10 +3920,6 @@ async function processImages() {
   });
   trackEvent("background_removal_started", { count: items.length });
   trackEvent("processar", { count: items.length });
-  processButton.disabled = true;
-  pngButton.disabled = true;
-  zipButton.disabled = true;
-  clearButton.disabled = true;
 
   const total = pendingCount;
   let processedIndex = 0;
@@ -3840,10 +3938,6 @@ async function processImages() {
     render();
 
     try {
-      if (!engineHasLoaded) {
-        setStatus("statusEngineLoading", progressBar.value);
-      }
-
       const removedBackground = await removeBackground(item.file, {
         output: {
           format: "image/png",
@@ -3884,31 +3978,46 @@ async function processImages() {
 }
 
 async function downloadZip() {
-  const zip = new JSZip();
   const readyItems = items.filter((item) => item.outputBlob);
-
-  for (const [index, item] of readyItems.entries()) {
-    zip.file(exportPngName(item.file.name, `imagem-${index + 1}`), item.outputBlob);
-  }
+  if (!readyItems.length) return;
 
   setStatus("statusPreparingZip", 100);
-  const zipBlob = await zip.generateAsync({ type: "blob" });
-  const url = URL.createObjectURL(zipBlob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = exportZipName();
-  link.click();
-  URL.revokeObjectURL(url);
-  setStatus("statusZipReady", 100);
-  trackEvent("zip_downloaded", { count: readyItems.length });
-  trackEvent("download_zip", { count: readyItems.length });
-  trackEvent("tool_download_zip", {
-    count: readyItems.length,
-    fileType: "zip",
-    minExportSide,
-  });
-  trackGoogleAdsConversion(downloadZipConversionId);
-  showPostDownloadFeedback("zip", readyItems.length);
+  zipButton.disabled = true;
+
+  try {
+    const JSZip = await loadJsZip();
+    const zip = new JSZip();
+    for (const [index, item] of readyItems.entries()) {
+      zip.file(exportPngName(item.file.name, `imagem-${index + 1}`), item.outputBlob);
+    }
+
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(zipBlob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = exportZipName();
+    link.click();
+    URL.revokeObjectURL(url);
+    setStatus("statusZipReady", 100);
+    trackEvent("zip_downloaded", { count: readyItems.length });
+    trackEvent("download_zip", { count: readyItems.length });
+    trackEvent("tool_download_zip", {
+      count: readyItems.length,
+      fileType: "zip",
+      minExportSide,
+    });
+    trackGoogleAdsConversion(downloadZipConversionId);
+    showPostDownloadFeedback("zip", readyItems.length);
+  } catch (error) {
+    console.error(error);
+    setStatus("statusZipUnavailable", 100);
+    trackEvent("tool_zip_generation_failed", {
+      count: readyItems.length,
+      reason: jsZipModulePromise ? "zip_generation" : "module_load",
+    });
+  } finally {
+    updateControls();
+  }
 }
 
 function downloadSinglePng() {

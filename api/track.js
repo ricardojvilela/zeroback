@@ -15,6 +15,8 @@ const allowedEvents = new Set([
   "free_test_exhausted",
   "tool_processing_started",
   "tool_processing_completed",
+  "tool_engine_load_failed",
+  "tool_zip_generation_failed",
   "tool_download_png",
   "tool_download_zip",
   "post_download_next_shown",
