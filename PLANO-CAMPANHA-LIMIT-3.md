@@ -1,5 +1,7 @@
 # BatchCutout - Plano campanha teste Limit 3
 
+> Arquivado em 2026-07-12. O parametro `?limit=3` ja nao aumenta o limite gratuito; a campanha pode manter os UTM, mas deve usar a proposta atual de 2 imagens gratuitas no total.
+
 ## Objetivo
 
 Validar se um limite gratuito de 3 imagens aumenta a intencao Pro sem reduzir demasiado a utilizacao da ferramenta.

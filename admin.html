@@ -510,7 +510,7 @@
       }
 
       table.pack-source-table {
-        min-width: 920px;
+        min-width: 1100px;
       }
 
       table.outreach-table {
@@ -791,8 +791,16 @@
             <strong id="liveUploads">0</strong>
           </article>
           <article class="live-card">
-            <span>Limite acima de 2</span>
+            <span>Limites atingidos</span>
             <strong id="liveLimit">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Testes grátis concluídos</span>
+            <strong id="liveFreeTestCompletions">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Tentativas após teste</span>
+            <strong id="liveFreeTestExhausted">0</strong>
           </article>
           <article class="live-card">
             <span>Downloads reais</span>
@@ -1081,6 +1089,14 @@
               <strong id="packFunnelResultReady">0</strong>
             </article>
             <article class="live-card">
+              <span>Testes grátis concluídos</span>
+              <strong id="packFunnelFreeTests">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Tentativas após teste</span>
+              <strong id="packFunnelFreeExhausted">0</strong>
+            </article>
+            <article class="live-card">
               <span>Cliques Pack</span>
               <strong id="packFunnelPackClicks">0</strong>
             </article>
@@ -1138,6 +1154,8 @@
               <thead>
                 <tr>
                   <th>Origem</th>
+                  <th>Testes concluídos</th>
+                  <th>Tentativas extra</th>
                   <th>Cliques Pack</th>
                   <th>Sem email</th>
                   <th>Com email</th>
@@ -1150,7 +1168,7 @@
               </thead>
               <tbody id="packSourceRowsBody">
                 <tr>
-                  <td class="empty" colspan="9">A carregar origens do Pack.</td>
+                  <td class="empty" colspan="11">A carregar origens do Pack.</td>
                 </tr>
               </tbody>
             </table>
@@ -1699,6 +1717,7 @@
       function dailyIntentValue(row = {}) {
         return rowValue(row, "proClicks") +
           rowValue(row, "pricingCtaClicks") +
+          rowValue(row, "freeTestExhaustedAttempts") +
           rowValue(row, "leadCaptures") +
           rowValue(row, "postDownloadSaveLinkClicks") +
           rowValue(row, "resultReadyStickySaveLinkClicks") +
@@ -1881,6 +1900,8 @@
         const downloads = Number(totals.downloads || 0) || 0;
         const resultReady = Number(totals.downloadReadyShown || 0) || 0;
         const limitAttempts = Number(totals.limitAttempts || 0) || 0;
+        const freeTestCompletions = Number(totals.freeTestCompletions || 0) || 0;
+        const freeTestExhaustedAttempts = Number(totals.freeTestExhaustedAttempts || 0) || 0;
         const resultUpgradeClicks = Number(totals.postDownloadPackClicks || 0) || 0;
         const packCtaClicks = Number(totals.packCtaClicks || 0) || 0;
         const packIntentClicks = resultUpgradeClicks + packCtaClicks;
@@ -1936,6 +1957,14 @@
 
         if (packEmailRequired >= 2 && packEmailCheckoutSessions === 0) {
           return "Gargalo principal: utilizadores tentaram comprar Pack sem email válido. Prioridade: tornar o campo de email mais evidente no checkout Pack antes de aumentar tráfego.";
+        }
+
+        if (freeTestExhaustedAttempts >= 2 && packCheckoutSessions === 0) {
+          return "Gargalo principal: há utilizadores a tentar continuar depois das 2 imagens grátis, mas ainda não chegam à Stripe. Prioridade: acompanhar o novo percurso teste concluído → Pack antes de mexer no preço.";
+        }
+
+        if (freeTestCompletions >= 5 && packIntentClicks === 0) {
+          return "Gargalo principal: os utilizadores concluem o teste de 2 imagens, mas não clicam no Pack 100. Prioridade: reforçar a transição do resultado para a compra única.";
         }
 
         if (checkoutStarts > 0 && checkoutSessions === 0) {
@@ -2030,6 +2059,8 @@
         const packClicks = packToolClicks + packPricingClicks;
         const packSessions = Number(totals.packCheckoutSessions || 0) || 0;
         const packPurchases = Number(totals.packPurchases || 0) || 0;
+        const freeTestCompletions = Number(totals.freeTestCompletions || 0) || 0;
+        const freeTestExhaustedAttempts = Number(totals.freeTestExhaustedAttempts || 0) || 0;
         const packEmailRequired = Number(totals.packEmailRequired || 0) || 0;
         const packEmailStarts = Number(totals.packEmailCheckoutStarts || 0) || 0;
         const packEmailSessions = Number(totals.packEmailCheckoutSessions || 0) || 0;
@@ -2049,6 +2080,12 @@
         }
         if (packEmailAttempts >= 3 && emailCompletionRate < 0.6) {
           return `Só ${formatPercent(emailCompletionRate)} das tentativas Pack avançaram com email válido. Próximo passo: reforçar a visibilidade e a explicação do campo de email.`;
+        }
+        if (freeTestExhaustedAttempts > 0 && packSessions === 0) {
+          return "Há utilizadores a tentar continuar depois do teste grátis, mas ainda sem sessão Stripe Pack. Próximo passo: observar o CTA de Pack no estado de teste concluído.";
+        }
+        if (freeTestCompletions >= 3 && packClicks === 0) {
+          return "Há testes gratuitos concluídos sem clique Pack. Próximo passo: rever a mensagem apresentada imediatamente após a segunda imagem.";
         }
         if (packSessions > 0) {
           return "Há sessões Stripe Pack sem compra. Próximo passo: acompanhar cancelamentos e emails de continuação de checkout.";
@@ -2423,6 +2460,8 @@
         document.querySelector("#liveVisitors").textContent = totals.visitors || 0;
         document.querySelector("#liveUploads").textContent = totals.uploadsStarted || 0;
         document.querySelector("#liveLimit").textContent = totals.limitAttempts || 0;
+        document.querySelector("#liveFreeTestCompletions").textContent = totals.freeTestCompletions || 0;
+        document.querySelector("#liveFreeTestExhausted").textContent = totals.freeTestExhaustedAttempts || 0;
         document.querySelector("#liveDownloads").textContent = totals.downloads || 0;
         document.querySelector("#liveDownloadReady").textContent = totals.downloadReadyShown || 0;
         document.querySelector("#liveSeoLandingViews").textContent = totals.seoLandingViews || 0;
@@ -2481,6 +2520,8 @@
         const packPricingClicks = Number(totals.packCtaClicks || 0) || 0;
         const packClicks = packToolClicks + packPricingClicks;
         document.querySelector("#packFunnelResultReady").textContent = totals.downloadReadyShown || 0;
+        document.querySelector("#packFunnelFreeTests").textContent = totals.freeTestCompletions || 0;
+        document.querySelector("#packFunnelFreeExhausted").textContent = totals.freeTestExhaustedAttempts || 0;
         document.querySelector("#packFunnelPackClicks").textContent = packClicks;
         document.querySelector("#packFunnelEmailRequired").textContent = totals.packEmailRequired || 0;
         document.querySelector("#packFunnelEmailStarts").textContent = totals.packEmailCheckoutStarts || 0;
@@ -2519,6 +2560,8 @@
               return `
                 <tr>
                   <td>${escapeHtml(sourceLabel(row.source))}</td>
+                  <td>${row.freeTestCompletions || 0}</td>
+                  <td>${row.freeTestExhaustedAttempts || 0}</td>
                   <td>${sourcePackClicks}</td>
                   <td>${row.packEmailRequired || 0}</td>
                   <td>${row.packEmailCheckoutStarts || 0}</td>
@@ -2530,7 +2573,7 @@
                 </tr>
               `;
             }).join("")
-          : `<tr><td class="empty" colspan="9">Ainda não há atividade Pack atribuída a uma origem.</td></tr>`;
+          : `<tr><td class="empty" colspan="11">Ainda não há atividade Pack atribuída a uma origem.</td></tr>`;
         document.querySelector("#livePaymentFailures").textContent = totals.paymentFailures || 0;
         document.querySelector("#livePaymentFailureValue").textContent = formatCurrency(totals.paymentFailureValue || 0);
         document.querySelector("#liveSubscriptionCancelScheduled").textContent = totals.subscriptionCancelScheduled || 0;
@@ -3457,7 +3500,7 @@
           }
           liveRowsBody.innerHTML = `<tr><td class="empty" colspan="33">Não foi possível carregar atividade.</td></tr>`;
           sourceRowsBody.innerHTML = `<tr><td class="empty" colspan="32">Não foi possível carregar origens.</td></tr>`;
-          packSourceRowsBody.innerHTML = `<tr><td class="empty" colspan="9">Não foi possível carregar origens do Pack.</td></tr>`;
+          packSourceRowsBody.innerHTML = `<tr><td class="empty" colspan="11">Não foi possível carregar origens do Pack.</td></tr>`;
           landingRowsBody.innerHTML = `<tr><td class="empty" colspan="9">Não foi possível carregar páginas SEO.</td></tr>`;
           proUsersRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar contas.</td></tr>`;
           recoveryRowsBody.innerHTML = `<tr><td class="empty" colspan="4">Não foi possível carregar oportunidades comerciais.</td></tr>`;

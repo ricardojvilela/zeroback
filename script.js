@@ -5,6 +5,9 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const fileInput = document.querySelector("#fileInput");
 const dropzone = document.querySelector("#dropzone");
 const dropzoneBadge = document.querySelector(".dropzone-badge");
+const dropzoneIcon = document.querySelector(".dropzone-icon");
+const dropzoneTitle = document.querySelector(".dropzone-title");
+const dropzoneMeta = document.querySelector(".dropzone-meta");
 const dropzoneHelper = document.querySelector(".dropzone-helper");
 const languageSelect = document.querySelector("#languageSelect");
 const brandCta = document.querySelector("#brandCta");
@@ -92,16 +95,14 @@ const billingPortal = document.querySelector("#billingPortal");
 const batchLimitNote = document.querySelector("[data-i18n='batchLimitNote']");
 
 const defaultMaxFilesPerBatch = 2;
+const freeTestImageLimit = 2;
 const pageParams = new URLSearchParams(window.location.search);
-const requestedLimit = Number(pageParams.get("limit"));
 const requestedCheckoutPlan = pageParams.get("checkout_plan");
 const checkoutStatus = pageParams.get("checkout");
 const checkoutSessionId = pageParams.get("session_id");
 const checkoutPlans = new Set(["monthly", "annual", "early", "pack100", "pack250"]);
 const defaultCheckoutPlan = "pack100";
-let maxFilesPerBatch = [2, 3, 5, 10, 20].includes(requestedLimit)
-  ? requestedLimit
-  : defaultMaxFilesPerBatch;
+let maxFilesPerBatch = defaultMaxFilesPerBatch;
 const minExportSide = 1200;
 const defaultProBatchLimit = 100;
 const defaultProMonthlyLimit = 2000;
@@ -119,6 +120,7 @@ const paidConversionStorageKey = "batchcutout_paid_conversion_sessions";
 const leadCaptureEmailStorageKey = "batchcutout_lead_capture_email";
 const leadCaptureDismissedStorageKey = "batchcutout_lead_capture_dismissed";
 const pendingCheckoutPlanStorageKey = "batchcutout_pending_checkout_plan";
+const freeTestUsageStorageKey = "batchcutout_free_test_images_used";
 const localizedPolicyLinks = {
   pt: "./privacidade.html",
   en: "./en/privacy.html",
@@ -131,6 +133,8 @@ const serverEventNames = new Set([
   "tool_upload_added",
   "download_ready_shown",
   "batch_limit_exceeded",
+  "free_test_completed",
+  "free_test_exhausted",
   "tool_processing_started",
   "tool_processing_completed",
   "tool_download_png",
@@ -245,7 +249,7 @@ const baseTranslation = {
   proLimitLeadSubmit: "Receber link do lote",
   proPlanContrastLabel: "Comparação entre grátis e acesso pago",
   proFreeLabel: "Grátis",
-  proFreeLimit: "2 imagens por lote",
+  proFreeLimit: "2 imagens no total",
   proBatchLabel: "Pack",
   proBatchLimit: "100 imagens por lote",
   proMonthlyLabel: "Recorrente",
@@ -415,7 +419,7 @@ const translations = {
     languageLabel: "Idioma",
     eyebrow: "Remoção de fundo em massa",
     title: "BatchCutout",
-    lead: "Plano gr\u00e1tis: remova o fundo de at\u00e9 {limit} imagens agora. Descarregue PNGs transparentes ou um ZIP pronto para loja.",
+    lead: "Teste gr\u00e1tis: remova o fundo de {limit} imagens no total. Descarregue PNGs transparentes ou um ZIP pronto para loja.",
     benefitBatch: "V\u00e1rias fotos de uma vez",
     uploadLabel: "Carregar fotos",
     startNow: "Começar agora",
@@ -496,7 +500,7 @@ const translations = {
     proLimitLeadSubmit: "Get batch link",
     proPlanContrastLabel: "Free versus paid access comparison",
     proFreeLabel: "Free",
-    proFreeLimit: "2 images per batch",
+    proFreeLimit: "2 images total",
     proBatchLabel: "Pack",
     proBatchLimit: "100 images per batch",
     proMonthlyLabel: "Recurring",
@@ -632,7 +636,7 @@ const translations = {
     resultReadyStickySaveCta: "Get link",
     eyebrow: "Bulk background removal",
     title: "BatchCutout",
-    lead: "Free plan: remove the background from up to {limit} images now. Download transparent PNGs or a store-ready ZIP.",
+    lead: "Free test: remove the background from {limit} images total. Download transparent PNGs or a store-ready ZIP.",
     benefitsLabel: "Service benefits",
     benefitBatch: "Multiple photos at once",
     benefitPng: "Transparent PNG",
@@ -672,7 +676,7 @@ const translations = {
     languageLabel: "Idioma",
     eyebrow: "Eliminación de fondo en masa",
     title: "BatchCutout",
-    lead: "Quita el fondo de muchas fotos a la vez y exporta imágenes listas para tiendas online, catálogos y redes sociales.",
+    lead: "Prueba gratis: quita el fondo de 2 imágenes en total y comprueba la calidad antes de comprar créditos.",
     benefitsLabel: "Ventajas del servicio",
     benefitBatch: "Hecho para muchas fotos",
     benefitPng: "PNG transparente",
@@ -1075,7 +1079,7 @@ const translatedAddons = {
     trustText: "Ideal para lojas online, catálogos, marketplaces e equipas que tratam muitas imagens.",
     privacyNote: "Processamento local",
     formatNote: "Vários formatos",
-    batchLimitNote: "{limit} imagens grátis. Para mais volume, comece pelo Pack 100.",
+    batchLimitNote: "Teste grátis de {limit} imagens no total. Para mais volume, comece pelo Pack 100.",
     privacyLink: "Privacidade, termos e contacto",
     statusTooManyFiles: "Foram adicionadas {accepted} de {total} imagens. Para processar lotes maiores de uma vez, comece pelo Pack 100.",
     statusNoSupportedFiles: "Nenhum ficheiro de imagem suportado foi encontrado.",
@@ -1087,7 +1091,7 @@ const translatedAddons = {
     trustText: "Ideal for online stores, catalogues, marketplaces, and teams handling many images.",
     privacyNote: "Local processing",
     formatNote: "Multiple formats",
-    batchLimitNote: "{limit} images free. Need more volume? Start with Pack 100.",
+    batchLimitNote: "Free test of {limit} images total. Need more volume? Start with Pack 100.",
     privacyLink: "Privacy, terms, and contact",
     statusTooManyFiles: "{accepted} of {total} images were added. To process larger batches at once, start with Pack 100.",
     statusNoSupportedFiles: "No supported image file was found.",
@@ -1099,7 +1103,7 @@ const translatedAddons = {
     trustText: "Ideal para tiendas online, catálogos, marketplaces y equipos que gestionan muchas imágenes.",
     privacyNote: "Las imágenes se procesan en tu dispositivo y no se suben a nuestros servidores.",
     formatNote: "Algunos formatos pueden depender del soporte del navegador.",
-    batchLimitNote: "{limit} imágenes gratis. Para más volumen, empieza con Pack 100.",
+    batchLimitNote: "Prueba gratis de {limit} imágenes en total. Para más volumen, empieza con Pack 100.",
     postDownloadKicker: "Siguiente lote",
     postDownloadTitle: "¿BatchCutout ayudó con tus fotos?",
     postDownloadSavedTime: "Sí, ahorró tiempo",
@@ -1376,6 +1380,8 @@ const proTranslations = {
     proLimitCta: "Ver Pack 100",
     proNoCommitment: "Pack único ou Pro recorrente, sempre com pagamento seguro por Stripe Checkout.",
     brandCta: "Testar grátis com {limit} imagens",
+    brandCtaFreeRemaining: "Testar a última imagem grátis",
+    brandCtaFreeComplete: "Continuar com Pack 100",
     brandCtaPro: "Carregar fotos",
     brandProLink: "Precisa de mais volume? Pack desde 5 EUR",
     leadPro: "Conta ativa: remova fundos em lotes até {limit} imagens e exporte PNGs transparentes ou ZIP pronto para loja.",
@@ -1407,10 +1413,20 @@ const proTranslations = {
     demoLabel: "Exemplo antes e depois",
     demoBefore: "Antes",
     demoAfter: "Depois",
-    freeLimitBadge: "{limit} imagens gr\u00e1tis por lote",
+    freeLimitBadge: "Teste grátis: {limit} imagens no total",
+    freeLimitBadgeRemaining: "Resta 1 imagem grátis",
+    freeLimitBadgeComplete: "Teste grátis concluído",
     proLimitBadge: "Até {limit} imagens por lote",
-    dropzoneHelper: "Teste com {limit} imagens grátis. O Pack 100 é para quem precisa de um lote real.",
+    dropzoneHelper: "Use {limit} imagens para confirmar a qualidade. O Pack 100 é para um lote real.",
+    dropzoneHelperRemaining: "Use a última imagem grátis para confirmar a qualidade do recorte.",
+    dropzoneHelperComplete: "Continue com 100 créditos por 5 EUR, sem subscrição.",
+    selectPhotosFreeComplete: "Continuar com Pack 100",
+    dropzoneMetaComplete: "100 créditos, compra única, sem renovação",
     dropzoneHelperPro: "Arraste ou selecione as imagens que quer processar nesta conta.",
+    statusFreeTestLimit: "O teste gratuito inclui {limit} imagens no total. As imagens adicionais não foram adicionadas.",
+    statusFreeTestExhausted: "Já utilizou as {limit} imagens do teste grátis. Continue com o Pack 100 por 5 EUR.",
+    proInlineTitleFreeTestComplete: "Teste concluído. Continue com 100 créditos.",
+    proInlineLeadFreeTestComplete: "Já confirmou o resultado com imagens reais. O Pack 100 desbloqueia 100 créditos por 5 EUR, sem subscrição.",
     batchLimitNotePro: "Limite da conta: até {limit} imagens por lote e {monthlyLimit} imagens por mês.",
     accountPackRenewalLabel: "Repor créditos Pack",
     accountPackRenewalTitle: "Créditos Pack quase no fim",
@@ -1432,7 +1448,7 @@ const proTranslations = {
     faqFormatsQ: "Que formatos são aceites?",
     faqFormatsA: "JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG, HEIC, HEIF e outros formatos de imagem suportados pelo navegador.",
     faqVolumeQ: "Posso processar mais de {limit} imagens?",
-    faqVolumeA: "O modo gratuito permite {limit} imagens por lote. O Pack 100 permite validar um lote real sem subscrição; o Pro fica para 2.000 imagens por mês.",
+    faqVolumeA: "O teste gratuito inclui {limit} imagens no total. O Pack 100 permite validar um lote real sem subscrição; o Pro fica para 2.000 imagens por mês.",
   },
   en: {
     proKicker: "For teams and stores",
@@ -1441,6 +1457,8 @@ const proTranslations = {
     proLimitCta: "View 100 image pack",
     proNoCommitment: "One-time pack or recurring Pro, always through secure Stripe Checkout.",
     brandCta: "Start free with {limit} images",
+    brandCtaFreeRemaining: "Test the last free image",
+    brandCtaFreeComplete: "Continue with Pack 100",
     brandCtaPro: "Upload photos",
     brandProLink: "Need more volume? Pack from EUR 5",
     leadPro: "Account active: remove backgrounds in batches up to {limit} images and export transparent PNGs or a store-ready ZIP.",
@@ -1472,10 +1490,20 @@ const proTranslations = {
     demoLabel: "Before and after example",
     demoBefore: "Before",
     demoAfter: "After",
-    freeLimitBadge: "{limit} free images per batch",
+    freeLimitBadge: "Free test: {limit} images total",
+    freeLimitBadgeRemaining: "1 free image remaining",
+    freeLimitBadgeComplete: "Free test complete",
     proLimitBadge: "Up to {limit} images per batch",
-    dropzoneHelper: "Test with {limit} free images. Pack 100 is for a real batch.",
+    dropzoneHelper: "Use {limit} images to check the cutout quality. Pack 100 is for a real batch.",
+    dropzoneHelperRemaining: "Use the last free image to check the cutout quality.",
+    dropzoneHelperComplete: "Continue with 100 credits for EUR 5, no subscription.",
+    selectPhotosFreeComplete: "Continue with Pack 100",
+    dropzoneMetaComplete: "100 credits, one-time purchase, no renewal",
     dropzoneHelperPro: "Drag or select the images you want to process on this account.",
+    statusFreeTestLimit: "The free test includes {limit} images total. Additional images were not added.",
+    statusFreeTestExhausted: "You have used the {limit} free test images. Continue with Pack 100 for EUR 5.",
+    proInlineTitleFreeTestComplete: "Free test complete. Continue with 100 credits.",
+    proInlineLeadFreeTestComplete: "You have checked the result with real images. Pack 100 unlocks 100 credits for EUR 5, with no subscription.",
     batchLimitNotePro: "Account limit: up to {limit} images per batch and {monthlyLimit} images per month.",
     accountPackRenewalLabel: "Top up pack credits",
     accountPackRenewalTitle: "Pack credits are running low",
@@ -1497,7 +1525,7 @@ const proTranslations = {
     faqFormatsQ: "Which formats are supported?",
     faqFormatsA: "JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG, HEIC, HEIF, and other image formats supported by your browser.",
     faqVolumeQ: "Can I process more than {limit} images?",
-    faqVolumeA: "Free mode allows {limit} images per batch. Pack 100 lets you validate a real batch without a subscription; Pro is for 2,000 images per month.",
+    faqVolumeA: "The free test includes {limit} images total. Pack 100 lets you validate a real batch without a subscription; Pro is for 2,000 images per month.",
   },
 };
 
@@ -1506,6 +1534,22 @@ for (const language of Object.keys(translations)) {
 }
 
 Object.assign(translations.es, {
+  brandCtaFreeRemaining: "Probar la última imagen gratis",
+  brandCtaFreeComplete: "Continuar con Pack 100",
+  proFreeLimit: "2 imágenes en total",
+  freeLimitBadge: "Prueba gratis: 2 imágenes en total",
+  freeLimitBadgeRemaining: "Queda 1 imagen gratis",
+  freeLimitBadgeComplete: "Prueba gratis completada",
+  dropzoneHelper: "Usa 2 imágenes para comprobar la calidad. Pack 100 es para un lote real.",
+  dropzoneHelperRemaining: "Usa la última imagen gratis para comprobar la calidad del recorte.",
+  dropzoneHelperComplete: "Continúa con 100 créditos por 5 EUR, sin suscripción.",
+  selectPhotosFreeComplete: "Continuar con Pack 100",
+  dropzoneMetaComplete: "100 créditos, compra única, sin renovación",
+  statusFreeTestLimit: "La prueba gratis incluye 2 imágenes en total. Las imágenes adicionales no se añadieron.",
+  statusFreeTestExhausted: "Ya usaste las 2 imágenes de la prueba gratis. Continúa con Pack 100 por 5 EUR.",
+  proInlineTitleFreeTestComplete: "Prueba completada. Continúa con 100 créditos.",
+  proInlineLeadFreeTestComplete: "Ya comprobaste el resultado con imágenes reales. Pack 100 desbloquea 100 créditos por 5 EUR, sin suscripción.",
+  faqVolumeA: "La prueba gratis incluye 2 imágenes en total. Pack 100 permite validar un lote real sin suscripción; Pro es para 2.000 imágenes al mes.",
   accountPackRenewalLabel: "Reponer créditos Pack",
   accountPackRenewalTitle: "Quedan pocos créditos Pack",
   accountPackRenewalText: "Continúa con compra única o cambia a Pro si ya tratas imágenes todos los meses.",
@@ -1514,12 +1558,14 @@ Object.assign(translations.es, {
 });
 
 let items = [];
+let freeTestImagesUsed = readFreeTestImagesUsed();
 let currentLanguage = getRequestedLanguage() || localStorage.getItem("language") || detectLanguage();
 let engineHasLoaded = false;
 let hasTrackedDragIntent = false;
 let hasTrackedDownloadReady = false;
 let activeProPromptReason = "";
 let activeProPromptParams = {};
+let hasTrackedFreeTestExhausted = false;
 
 const analyticsEvents = {
   tool_page_view: { category: "funnel", label: "page_view", step: 0 },
@@ -1529,6 +1575,8 @@ const analyticsEvents = {
   tool_upload_added: { category: "funnel", label: "upload_added", step: 2 },
   download_ready_shown: { category: "funnel", label: "download_ready", step: 5 },
   batch_limit_exceeded: { category: "commercial_intent", label: "batch_limit_exceeded", step: 3 },
+  free_test_completed: { category: "funnel", label: "free_test_completed", step: 5 },
+  free_test_exhausted: { category: "commercial_intent", label: "free_test_exhausted", step: 7 },
   tool_processing_started: { category: "funnel", label: "processing_started", step: 4 },
   tool_processing_completed: { category: "funnel", label: "processing_completed", step: 5 },
   tool_download_png: { category: "funnel", label: "download_png", step: 6 },
@@ -1574,6 +1622,8 @@ const analyticsEvents = {
 const audienceSignals = {
   tool_upload_started: "upload_started",
   download_ready_shown: "result_ready",
+  free_test_completed: "free_test_completed",
+  free_test_exhausted: "free_test_exhausted",
   tool_pro_clicked: "pro_interest",
   pro_checkout_login_required: "checkout_login_required",
   pro_checkout_started: "checkout_started",
@@ -1669,8 +1719,9 @@ function getAttributionParams() {
     page_title: document.title,
     page_location: window.location.href.split("#")[0],
     language: currentLanguage,
-    free_limit: maxFilesPerBatch,
-    limit_variant: maxFilesPerBatch === defaultMaxFilesPerBatch ? "default" : `limit_${maxFilesPerBatch}`,
+    free_limit: freeTestImageLimit,
+    free_remaining: canUsePaidAccess() ? null : getFreeTestRemaining(),
+    limit_variant: canUsePaidAccess() ? `paid_${maxFilesPerBatch}` : "free_total_2",
     utm_source: params.get("utm_source"),
     utm_medium: params.get("utm_medium"),
     utm_campaign: params.get("utm_campaign"),
@@ -1733,7 +1784,8 @@ function getVisitAttribution() {
     wbraid: params.get("wbraid") || "",
     landing_page: window.location.href.split("#")[0],
     referrer,
-    free_limit: maxFilesPerBatch,
+    free_limit: freeTestImageLimit,
+    free_remaining: getFreeTestRemaining(),
     seen_at: new Date().toISOString(),
   };
 }
@@ -2084,6 +2136,33 @@ function trackBatchLimitExceeded(detail = {}) {
   trackGoogleAdsConversion(batchLimitConversionId);
 }
 
+function trackFreeTestExhausted(detail = {}) {
+  if (hasTrackedFreeTestExhausted) return;
+  hasTrackedFreeTestExhausted = true;
+  trackEvent("free_test_exhausted", {
+    ...detail,
+    free_limit: freeTestImageLimit,
+    free_used: freeTestImagesUsed,
+    free_remaining: getFreeTestRemaining(),
+  });
+}
+
+function showFreeTestUpgrade(source = "free_test_complete", detail = {}) {
+  const params = {
+    trigger_source: source,
+    accepted: 0,
+    attempted: Number(detail.attempted || 0) || 0,
+    rejected: Number(detail.rejected || detail.attempted || 0) || 0,
+    total: Number(detail.total || detail.attempted || 0) || 0,
+    free_limit: freeTestImageLimit,
+    free_used: freeTestImagesUsed,
+    free_remaining: getFreeTestRemaining(),
+    ...detail,
+  };
+  trackFreeTestExhausted(params);
+  showProInterest("free_test_exhausted", params);
+}
+
 function updateConsent(consent) {
   const granted = consent === "accepted";
   localStorage.setItem(consentStorageKey, consent);
@@ -2167,7 +2246,8 @@ function setStatus(key, progress = 0, params = {}) {
   statusText.dataset.statusParams = JSON.stringify(params);
   statusText.textContent = t(key, params);
   progressBar.value = progress;
-  proPromptButton.classList.toggle("hidden", canUsePaidAccess() || key !== "statusTooManyFiles");
+  const paidPromptStatus = ["statusTooManyFiles", "statusFreeTestLimit", "statusFreeTestExhausted"].includes(key);
+  proPromptButton.classList.toggle("hidden", canUsePaidAccess() || !paidPromptStatus);
   statusVolumeContact?.classList.toggle("hidden", !isHighVolumeStatus(key));
   updateStatusVolumeContactLink({ ...params, statusKey: key });
 }
@@ -2401,9 +2481,55 @@ function trackAccountFormInteraction(method = "unknown") {
   });
 }
 
-function getRequestedBatchLimit() {
-  if (![2, 3, 5, 10, 20].includes(requestedLimit)) return defaultMaxFilesPerBatch;
-  return requestedLimit;
+function readFreeTestImagesUsed() {
+  try {
+    const stored = Number(localStorage.getItem(freeTestUsageStorageKey) || 0) || 0;
+    return Math.min(Math.max(Math.floor(stored), 0), freeTestImageLimit);
+  } catch {
+    return 0;
+  }
+}
+
+function storeFreeTestImagesUsed() {
+  try {
+    localStorage.setItem(freeTestUsageStorageKey, String(freeTestImagesUsed));
+  } catch {
+    // Keep the in-memory limit active when storage is unavailable.
+  }
+}
+
+function getFreeTestRemaining() {
+  return Math.max(freeTestImageLimit - freeTestImagesUsed, 0);
+}
+
+function getPendingFreeTestSlots() {
+  return items.filter((item) => !item.freeUsageCounted).length;
+}
+
+function getFreeTestAvailableSlots() {
+  if (canUsePaidAccess()) return maxFilesPerBatch;
+  return Math.max(getFreeTestRemaining() - getPendingFreeTestSlots(), 0);
+}
+
+function isFreeTestComplete() {
+  return !canUsePaidAccess() && getFreeTestRemaining() <= 0;
+}
+
+function recordFreeTestSuccess(item) {
+  if (canUsePaidAccess() || item.freeUsageCounted || !item.outputBlob) return;
+
+  const previousUsed = freeTestImagesUsed;
+  freeTestImagesUsed = Math.min(freeTestImagesUsed + 1, freeTestImageLimit);
+  item.freeUsageCounted = true;
+  storeFreeTestImagesUsed();
+
+  if (previousUsed < freeTestImageLimit && freeTestImagesUsed >= freeTestImageLimit) {
+    trackEvent("free_test_completed", {
+      count: freeTestImageLimit,
+      free_limit: freeTestImageLimit,
+      free_remaining: 0,
+    });
+  }
 }
 
 function getAccountBatchLimit() {
@@ -2426,7 +2552,7 @@ function getPaidAccessParams() {
 }
 
 function syncBatchLimit() {
-  const nextLimit = Math.max(defaultMaxFilesPerBatch, getRequestedBatchLimit(), getAccountBatchLimit());
+  const nextLimit = Math.max(defaultMaxFilesPerBatch, getAccountBatchLimit());
   maxFilesPerBatch = nextLimit;
 }
 
@@ -2434,8 +2560,16 @@ function syncPaidAccessUi() {
   const paidAccess = canUsePaidAccess();
   const paidParams = getPaidAccessParams();
   const packAccess = Boolean(currentAccount?.access?.isCreditPack);
+  const freeRemaining = getFreeTestRemaining();
+  const freeTestComplete = !paidAccess && freeRemaining <= 0;
 
   document.body.classList.toggle("account-pro-active", paidAccess);
+  dropzone?.classList.toggle("free-test-complete", freeTestComplete);
+  dropzone?.setAttribute("aria-label", t(freeTestComplete ? "dropzoneHelperComplete" : "selectPhotos"));
+  if (fileInput) fileInput.disabled = false;
+  if (dropzoneIcon) dropzoneIcon.textContent = freeTestComplete ? "100" : "+";
+  if (dropzoneTitle) dropzoneTitle.textContent = t(freeTestComplete ? "selectPhotosFreeComplete" : "selectPhotos");
+  if (dropzoneMeta) dropzoneMeta.textContent = t(freeTestComplete ? "dropzoneMetaComplete" : "fileTypes");
   brandProLink?.classList.toggle("hidden", paidAccess);
   freeTestFlow?.classList.toggle("hidden", paidAccess);
   inlineProCta?.classList.toggle("hidden", paidAccess);
@@ -2461,10 +2595,34 @@ function syncPaidAccessUi() {
     return;
   }
 
-  if (brandCta) brandCta.textContent = t("brandCta");
+  if (brandCta) {
+    brandCta.textContent = t(
+      freeTestComplete
+        ? "brandCtaFreeComplete"
+        : freeRemaining === 1
+          ? "brandCtaFreeRemaining"
+          : "brandCta",
+    );
+  }
   if (brandLead) brandLead.textContent = t("lead");
-  if (dropzoneBadge) dropzoneBadge.textContent = t("freeLimitBadge");
-  if (dropzoneHelper) dropzoneHelper.textContent = t("dropzoneHelper");
+  if (dropzoneBadge) {
+    dropzoneBadge.textContent = t(
+      freeTestComplete
+        ? "freeLimitBadgeComplete"
+        : freeRemaining === 1
+          ? "freeLimitBadgeRemaining"
+          : "freeLimitBadge",
+    );
+  }
+  if (dropzoneHelper) {
+    dropzoneHelper.textContent = t(
+      freeTestComplete
+        ? "dropzoneHelperComplete"
+        : freeRemaining === 1
+          ? "dropzoneHelperRemaining"
+          : "dropzoneHelper",
+    );
+  }
   if (batchLimitNote) batchLimitNote.textContent = t("batchLimitNote");
 }
 
@@ -3407,9 +3565,25 @@ function addFiles(fileList) {
   const selectedFiles = [...fileList];
   const imageFiles = selectedFiles.filter(isSupportedImage);
   const unsupportedFiles = selectedFiles.length - imageFiles.length;
-  const availableSlots = Math.max(maxFilesPerBatch - items.length, 0);
+  const paidAccess = canUsePaidAccess();
+  const batchAvailableSlots = Math.max(maxFilesPerBatch - items.length, 0);
+  const freeAvailableSlots = paidAccess ? batchAvailableSlots : getFreeTestAvailableSlots();
+  const availableSlots = Math.min(batchAvailableSlots, freeAvailableSlots);
   const acceptedFiles = imageFiles.slice(0, availableSlots);
-  const overLimitStatusKey = canUsePaidAccess() ? "statusTooManyFilesPro" : "statusTooManyFiles";
+  const freeTestAlreadyComplete = !paidAccess && getFreeTestRemaining() <= 0;
+  const freeTestConstrained = !paidAccess && imageFiles.length > freeAvailableSlots;
+  const overLimitStatusKey = paidAccess
+    ? "statusTooManyFilesPro"
+    : freeTestAlreadyComplete
+      ? "statusFreeTestExhausted"
+      : freeTestConstrained
+        ? "statusFreeTestLimit"
+        : "statusTooManyFiles";
+  const limitReason = freeTestAlreadyComplete
+    ? "free_test_exhausted"
+    : freeTestConstrained
+      ? "free_test_limit"
+      : "batch_limit";
   hasTrackedDownloadReady = false;
 
   trackEvent("tool_upload_started", {
@@ -3420,9 +3594,10 @@ function addFiles(fileList) {
   });
 
   if (!acceptedFiles.length) {
+    fileInput.value = "";
     setStatus(imageFiles.length ? overLimitStatusKey : "statusNoSupportedFiles", 0, {
       accepted: 0,
-      limit: maxFilesPerBatch,
+      limit: paidAccess ? maxFilesPerBatch : freeTestImageLimit,
       total: items.length + imageFiles.length,
     });
     render();
@@ -3434,14 +3609,18 @@ function addFiles(fileList) {
         unsupported: unsupportedFiles,
         rejected: imageFiles.length,
         totalInQueue: items.length,
-        reason: "batch_limit",
+        reason: limitReason,
+        free_remaining: getFreeTestRemaining(),
       };
       trackBatchLimitExceeded(limitDetail);
-      if (!canUsePaidAccess()) {
-        showProInterest("batch_limit", limitDetail);
+      if (freeTestAlreadyComplete) {
+        trackFreeTestExhausted(limitDetail);
+      }
+      if (!paidAccess) {
+        showProInterest(limitReason, limitDetail);
       }
     }
-    trackEvent("upload_rejected", { reason: imageFiles.length ? "batch_limit" : "unsupported_files" });
+    trackEvent("upload_rejected", { reason: imageFiles.length ? limitReason : "unsupported_files" });
     return;
   }
 
@@ -3450,15 +3629,17 @@ function addFiles(fileList) {
     file,
     previewUrl: URL.createObjectURL(file),
     outputBlob: null,
+    freeUsageCounted: false,
     statusKey: "statusReady",
     statusClass: "",
   }));
 
   items = [...items, ...nextItems];
+  fileInput.value = "";
   setStatus(rejectedByLimit ? overLimitStatusKey : "statusLoaded", 0, {
     accepted: acceptedFiles.length,
     count: acceptedFiles.length,
-    limit: maxFilesPerBatch,
+    limit: paidAccess ? maxFilesPerBatch : freeTestImageLimit,
     total: imageFiles.length,
   });
   if (rejectedByLimit) {
@@ -3469,11 +3650,12 @@ function addFiles(fileList) {
       unsupported: unsupportedFiles,
       rejected: rejectedByLimit,
       totalInQueue: items.length,
-      reason: "batch_limit",
+      reason: limitReason,
+      free_remaining: getFreeTestRemaining(),
     };
     trackBatchLimitExceeded(limitDetail);
-    if (!canUsePaidAccess()) {
-      showProInterest("batch_limit", limitDetail);
+    if (!paidAccess) {
+      showProInterest(limitReason, limitDetail);
     }
   }
   trackEvent("photos_selected", {
@@ -3575,6 +3757,7 @@ async function processImages() {
       item.previewUrl = URL.createObjectURL(output);
       item.statusKey = "statusProcessed";
       item.statusClass = "ready";
+      recordFreeTestSuccess(item);
       engineHasLoaded = true;
     } catch (error) {
       console.error(error);
@@ -3596,6 +3779,7 @@ async function processImages() {
   setStatus(failures ? "statusFailures" : "statusReadyZip", 100, { count: failures });
   trackEvent("background_removal_finished", { count: items.length, completed, failures });
   trackEvent("tool_processing_completed", { count: items.length, completed, failures });
+  syncPaidAccessUi();
   updateControls();
 }
 
@@ -3679,14 +3863,22 @@ function showProInterest(reason = "manual", params = {}) {
 
 function updateProPromptCopy() {
   if (!proInterestPanel || !proInterestTitle || !proInterestLead || !proInterestBenefits) return;
-  const batchLimitPrompt = activeProPromptReason === "batch_limit";
+  const freeTestCompletePrompt = activeProPromptReason === "free_test_exhausted";
+  const freeTestLimitPrompt = activeProPromptReason === "free_test_limit";
+  const batchLimitPrompt = activeProPromptReason === "batch_limit" || freeTestLimitPrompt || freeTestCompletePrompt;
   const copyParams = {
     accepted: activeProPromptParams.accepted ?? maxFilesPerBatch,
     rejected: activeProPromptParams.rejected ?? 0,
     total: activeProPromptParams.attempted ?? activeProPromptParams.total ?? activeProPromptParams.selected ?? items.length,
   };
-  proInterestTitle.textContent = t(batchLimitPrompt ? "proInlineTitleBatchLimit" : "proInlineTitle", copyParams);
-  proInterestLead.textContent = t(batchLimitPrompt ? "proInlineLeadBatchLimit" : "proInlineLead", copyParams);
+  proInterestTitle.textContent = t(
+    freeTestCompletePrompt ? "proInlineTitleFreeTestComplete" : batchLimitPrompt ? "proInlineTitleBatchLimit" : "proInlineTitle",
+    copyParams,
+  );
+  proInterestLead.textContent = t(
+    freeTestCompletePrompt ? "proInlineLeadFreeTestComplete" : batchLimitPrompt ? "proInlineLeadBatchLimit" : "proInlineLead",
+    copyParams,
+  );
   proInterestBenefits.textContent = t(batchLimitPrompt ? "proInlineBenefitsBatchLimit" : "proInlineBenefits", copyParams);
   updateProLimitLeadBlock(batchLimitPrompt, copyParams);
 }
@@ -4098,7 +4290,19 @@ actionsPackCta?.addEventListener("click", () => {
   startCheckout("pack100", actionsPackCta);
 });
 clearButton.addEventListener("click", clearAll);
-proPromptButton.addEventListener("click", () => showProInterest("status_limit_cta"));
+proPromptButton.addEventListener("click", () => {
+  const statusKey = statusText.dataset.statusKey || "";
+  const statusParams = JSON.parse(statusText.dataset.statusParams || "{}");
+  if (statusKey === "statusFreeTestExhausted" || isFreeTestComplete()) {
+    showFreeTestUpgrade("status_limit_cta", statusParams);
+    return;
+  }
+  if (statusKey === "statusFreeTestLimit") {
+    showProInterest("free_test_limit", statusParams);
+    return;
+  }
+  showProInterest("status_limit_cta", statusParams);
+});
 statusVolumeContact?.addEventListener("click", () => {
   const params = highVolumeContactParams(JSON.parse(statusText.dataset.statusParams || "{}"));
   trackEvent("high_volume_contact_clicked", {
@@ -4112,6 +4316,10 @@ statusVolumeContact?.addEventListener("click", () => {
   });
 });
 brandCta.addEventListener("click", () => {
+  if (isFreeTestComplete()) {
+    showFreeTestUpgrade("brand_cta");
+    return;
+  }
   dropzone.scrollIntoView({ behavior: "smooth", block: "center" });
   fileInput.focus({ preventScroll: true });
   trackEvent("brand_cta_clicked");
@@ -4211,6 +4419,25 @@ postDownloadOptions?.addEventListener("click", (event) => {
 });
 
 initAuth();
+
+dropzone.addEventListener("click", (event) => {
+  if (isFreeTestComplete()) {
+    event.preventDefault();
+    showFreeTestUpgrade("dropzone_click");
+    return;
+  }
+  if (event.target !== fileInput) fileInput.click();
+});
+
+dropzone.addEventListener("keydown", (event) => {
+  if (!["Enter", " "].includes(event.key)) return;
+  event.preventDefault();
+  if (isFreeTestComplete()) {
+    showFreeTestUpgrade("dropzone_keyboard");
+    return;
+  }
+  fileInput.click();
+});
 
 for (const eventName of ["dragenter", "dragover", "dragleave", "drop"]) {
   document.addEventListener(eventName, (event) => {

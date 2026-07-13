@@ -838,6 +838,25 @@ h2 {
   font-size: 0.98rem;
 }
 
+.dropzone.free-test-complete {
+  border-style: solid;
+  border-color: rgba(38, 70, 216, 0.42);
+  background: #f4f7ff;
+  outline-color: rgba(38, 70, 216, 0.08);
+}
+
+.dropzone.free-test-complete .dropzone-badge {
+  background: #263fd8;
+  color: #ffffff;
+}
+
+.dropzone.free-test-complete .dropzone-icon {
+  border-color: rgba(38, 70, 216, 0.28);
+  color: #ffffff;
+  font-size: 1.05rem;
+  letter-spacing: 0;
+}
+
 .dropzone-helper {
   display: block;
   max-width: 31rem;

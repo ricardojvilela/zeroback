@@ -67,6 +67,8 @@ function emptyDay(date) {
     uploadsStarted: 0,
     imagesAccepted: 0,
     limitAttempts: 0,
+    freeTestCompletions: 0,
+    freeTestExhaustedAttempts: 0,
     processingCompleted: 0,
     downloadReadyShown: 0,
     downloads: 0,
@@ -243,6 +245,9 @@ function emptySourceRow(source) {
     directoryLaunchCtaClicks: 0,
     uploadsStarted: 0,
     imagesAccepted: 0,
+    limitAttempts: 0,
+    freeTestCompletions: 0,
+    freeTestExhaustedAttempts: 0,
     downloads: 0,
     zipDownloads: 0,
     postDownloadNextShown: 0,
@@ -600,6 +605,15 @@ export default async function handler(request, response) {
           break;
         case "batch_limit_exceeded":
           row.limitAttempts += 1;
+          sourceRow.limitAttempts += 1;
+          break;
+        case "free_test_completed":
+          row.freeTestCompletions += 1;
+          sourceRow.freeTestCompletions += 1;
+          break;
+        case "free_test_exhausted":
+          row.freeTestExhaustedAttempts += 1;
+          sourceRow.freeTestExhaustedAttempts += 1;
           break;
         case "tool_processing_completed":
           row.processingCompleted += 1;
@@ -895,6 +909,8 @@ export default async function handler(request, response) {
       .slice(0, 20);
     const packSourceBreakdown = Array.from(bySource.values())
       .filter((row) =>
+        (row.freeTestCompletions || 0) +
+        (row.freeTestExhaustedAttempts || 0) +
         (row.postDownloadPackClicks || 0) +
         (row.packCtaClicks || 0) +
         (row.packEmailRequired || 0) +
@@ -909,6 +925,8 @@ export default async function handler(request, response) {
         b.packEmailCheckoutSessions - a.packEmailCheckoutSessions ||
         b.packCheckoutSessions - a.packCheckoutSessions ||
         b.packEmailCheckoutStarts - a.packEmailCheckoutStarts ||
+        b.freeTestExhaustedAttempts - a.freeTestExhaustedAttempts ||
+        b.freeTestCompletions - a.freeTestCompletions ||
         ((b.postDownloadPackClicks || 0) + (b.packCtaClicks || 0)) -
           ((a.postDownloadPackClicks || 0) + (a.packCtaClicks || 0))
       )

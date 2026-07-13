@@ -6,7 +6,7 @@
 Reduzir o limite gratuito de 20 para 3 imagens em trafego controlado pode aumentar a intencao Pro sem destruir a utilizacao inicial da ferramenta.
 
 ### Estado
-Preparado, mas nao aplicado globalmente.
+Encerrado em 2026-07-12. O parametro publico `limit` deixou de alterar o acesso gratuito. O teste gratuito passou a incluir 2 imagens no total por navegador para impedir processamento gratuito repetido em lotes pequenos.
 
 ### URL padrao atual
 https://batchcutout.com/

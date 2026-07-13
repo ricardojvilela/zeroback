@@ -180,7 +180,7 @@
                 "name": "É possível processar lotes maiores?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "A versão grátis permite até 2 imagens por lote. O Pack 100 permite processar um lote real sem subscrição; o Pro fica para produção recorrente até 2.000 imagens por mês."
+                  "text": "O teste grátis inclui 2 imagens no total. O Pack 100 permite processar um lote real sem subscrição; o Pro fica para produção recorrente até 2.000 imagens por mês."
                 }
               }
             ]
@@ -188,7 +188,7 @@
         ]
       }
     </script>
-    <link rel="stylesheet" href="./styles.css?v=20260711-email-pack-checkout" />
+    <link rel="stylesheet" href="./styles.css?v=20260712-free-test-total" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
   <body>
@@ -361,19 +361,19 @@
           </button>
         </div>
 
-        <label class="dropzone" id="dropzone">
+        <div class="dropzone" id="dropzone" role="button" tabindex="0">
           <input
             id="fileInput"
             type="file"
             accept="image/*,.jpg,.jpeg,.jfif,.pjpeg,.pjp,.png,.apng,.webp,.avif,.gif,.bmp,.tif,.tiff,.svg,.heic,.heif,.ico,.cur"
             multiple
           />
-          <span class="dropzone-badge" data-i18n="freeLimitBadge">2 imagens grátis por lote</span>
+          <span class="dropzone-badge" data-i18n="freeLimitBadge">Teste grátis: 2 imagens no total</span>
           <span class="dropzone-icon" aria-hidden="true">+</span>
           <span class="dropzone-title" data-i18n="selectPhotos">Arraste ou selecione várias fotos</span>
           <span class="dropzone-meta" data-i18n="fileTypes">JPG, PNG ou WebP em lote</span>
-          <span class="dropzone-helper" data-i18n="dropzoneHelper">Teste com 2 imagens grátis. O Pack 100 é para quem precisa de um lote real.</span>
-        </label>
+          <span class="dropzone-helper" data-i18n="dropzoneHelper">Use 2 imagens para confirmar a qualidade. O Pack 100 é para um lote real.</span>
+        </div>
 
         <section class="results tool-results" data-i18n-aria="resultsLabel" aria-label="Fotos processadas">
           <div class="results-header">
@@ -552,7 +552,7 @@
               Pack 100: compra única, até 100 imagens por lote e ZIP. Pro fica para produção recorrente.
             </p>
             <div class="pro-plan-contrast" data-i18n-aria="proPlanContrastLabel" aria-label="Comparação entre grátis e acesso pago">
-              <span><strong data-i18n="proFreeLabel">Grátis</strong><em data-i18n="proFreeLimit">2 imagens por lote</em></span>
+              <span><strong data-i18n="proFreeLabel">Grátis</strong><em data-i18n="proFreeLimit">2 imagens no total</em></span>
               <span><strong data-i18n="proBatchLabel">Pack</strong><em data-i18n="proBatchLimit">100 imagens por lote</em></span>
               <span><strong data-i18n="proMonthlyLabel">Recorrente</strong><em data-i18n="proMonthlyLimit">2.000 imagens por mês</em></span>
               <span><strong data-i18n="proCancelLabel">Controlo</strong><em data-i18n="proCancelText">Cancele quando quiser</em></span>
@@ -606,7 +606,7 @@
             Alguns formatos podem depender do suporte do navegador.
           </p>
             <p data-i18n="batchLimitNote">
-            Grátis até 2 imagens por lote. Para mais volume, comece pelo Pack 100.
+            Teste grátis de 2 imagens no total. Para mais volume, comece pelo Pack 100.
           </p>
         </div>
         <button class="inline-pro-cta" id="inlineProCta" type="button" data-i18n="inlineProCta">
@@ -626,7 +626,7 @@
           </details>
           <details>
             <summary data-i18n="faqVolumeQ">Posso processar mais de 2 imagens?</summary>
-            <p data-i18n="faqVolumeA">O modo gratuito permite 2 imagens por lote. O Pack 100 permite processar um lote real sem subscrição; o Pro fica para produção recorrente até 2.000 imagens por mês.</p>
+            <p data-i18n="faqVolumeA">O teste gratuito inclui 2 imagens no total. O Pack 100 permite processar um lote real sem subscrição; o Pro fica para produção recorrente até 2.000 imagens por mês.</p>
           </details>
         </section>
 
@@ -694,7 +694,7 @@
       </section>
     </main>
 
-    <script type="module" src="./script.js?v=20260711-email-pack-checkout"></script>
+    <script type="module" src="./script.js?v=20260712-free-test-total"></script>
   </body>
 </html>
 
