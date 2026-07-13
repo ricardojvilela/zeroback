@@ -212,6 +212,7 @@ const serverEventNames = new Set([
   "post_download_save_link_clicked",
   "post_download_feedback_selected",
   "tool_pro_clicked",
+  "pro_cta_clicked",
   "monthly_limit_reached",
   "high_volume_contact_clicked",
   "pro_prompt_shown",
@@ -1672,6 +1673,7 @@ const analyticsEvents = {
   tool_download_zip: { category: "funnel", label: "download_zip", step: 6 },
   tool_pro_clicked: { category: "commercial_intent", label: "pro_clicked", step: 7 },
   pro_prompt_shown: { category: "commercial_intent", label: "pro_prompt_shown", step: 7 },
+  pro_cta_clicked: { category: "commercial_intent", label: "plan_selected", step: 8 },
   pro_form_started: { category: "commercial_intent", label: "pro_form_started", step: 8 },
   pro_submit_attempt: { category: "commercial_intent", label: "pro_submit_attempt", step: 9 },
   pro_checkout_login_required: { category: "commercial_intent", label: "checkout_login_required", step: 10 },
@@ -1716,6 +1718,7 @@ const audienceSignals = {
   free_test_completed: "free_test_completed",
   free_test_exhausted: "free_test_exhausted",
   tool_pro_clicked: "pro_interest",
+  pro_cta_clicked: "pro_interest",
   pro_checkout_login_required: "checkout_login_required",
   pro_checkout_started: "checkout_started",
   lead_capture_submitted: "lead_capture",
@@ -3281,6 +3284,17 @@ function accountEmailRedirectUrl(plan = "") {
   return url.toString();
 }
 
+function trackCheckoutPlanClick(plan, source, detail = {}) {
+  const selectedPlan = checkoutPlans.has(plan) ? plan : defaultCheckoutPlan;
+  return trackEvent("pro_cta_clicked", {
+    cta_source: source,
+    plan: selectedPlan,
+    checkout_plan: selectedPlan,
+    purchase_type: checkoutPlanIsPack(selectedPlan) ? "pack" : "subscription",
+    ...detail,
+  });
+}
+
 async function startEmailPackCheckout(plan = defaultCheckoutPlan, email = "", triggerButton = null) {
   const selectedPlan = checkoutPlanIsPack(plan) ? plan : defaultCheckoutPlan;
   const normalizedEmail = normalizeEmail(email);
@@ -4066,7 +4080,6 @@ function showProInterest(reason = "manual", params = {}) {
 
   const detail = { reason, totalInQueue: items.length, free_limit: maxFilesPerBatch, ...params };
   trackEvent("pro_interest_prompt_clicked", detail);
-  trackEvent("tool_pro_clicked", detail);
   showProPrompt(reason, { params });
 }
 
@@ -4495,7 +4508,6 @@ actionsPackCta?.addEventListener("click", () => {
     free_limit: maxFilesPerBatch,
   };
   trackEvent("post_download_pack_clicked", detail);
-  trackEvent("tool_pro_clicked", detail);
   startCheckout("pack100", actionsPackCta);
 });
 clearButton.addEventListener("click", clearAll);
@@ -4546,7 +4558,6 @@ zipProCta?.addEventListener("click", () => {
     free_limit: maxFilesPerBatch,
   };
   trackEvent("post_download_pack_clicked", detail);
-  trackEvent("tool_pro_clicked", detail);
   startCheckout("pack100", zipProCta);
 });
 resultReadyStickyPro?.addEventListener("click", () => {
@@ -4561,7 +4572,6 @@ resultReadyStickyPro?.addEventListener("click", () => {
     free_limit: maxFilesPerBatch,
   };
   trackEvent("post_download_pack_clicked", detail);
-  trackEvent("tool_pro_clicked", detail);
   startCheckout("pack100", resultReadyStickyPro);
 });
 postDownloadPackCta?.addEventListener("click", () => {
@@ -4577,7 +4587,6 @@ postDownloadPackCta?.addEventListener("click", () => {
     free_limit: maxFilesPerBatch,
   };
   trackEvent("post_download_pack_clicked", detail);
-  trackEvent("tool_pro_clicked", detail);
   startCheckout("pack100", postDownloadPackCta);
 });
 resultReadySaveLinkCta?.addEventListener("click", () => focusResultReadyLeadCapture());
@@ -4589,7 +4598,18 @@ proLimitEmailForm?.addEventListener("submit", handleProLimitEmailSubmit);
 proInlineForm?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-checkout-plan]");
   if (!button) return;
-  startCheckout(button.dataset.checkoutPlan, button);
+  const plan = button.dataset.checkoutPlan;
+  trackCheckoutPlanClick(plan, "tool_upgrade_prompt", {
+    reason: activeProPromptReason || "tool_upgrade_prompt",
+    totalInQueue: items.length,
+  });
+  startCheckout(plan, button);
+});
+proAllPlansLink?.addEventListener("click", () => {
+  trackCheckoutPlanClick("pack100", "tool_upgrade_compare_plans", {
+    reason: activeProPromptReason || "compare_plans",
+    totalInQueue: items.length,
+  });
 });
 accountForm?.addEventListener("focusin", () => trackAccountFormInteraction("focus"));
 accountForm?.addEventListener("input", () => trackAccountFormInteraction("input"));
@@ -4603,14 +4623,18 @@ accountLogout?.addEventListener("click", handleAccountLogout);
 billingActions?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-checkout-plan]");
   if (!button) return;
-  startCheckout(button.dataset.checkoutPlan, button);
+  const plan = button.dataset.checkoutPlan;
+  trackCheckoutPlanClick(plan, "account_billing_actions", {
+    has_account: Boolean(currentAccount?.email),
+  });
+  startCheckout(plan, button);
 });
 accountPackRenewal?.addEventListener("click", (event) => {
   const button = event.target.closest("[data-pack-renewal-plan]");
   const plan = button?.dataset.packRenewalPlan || "";
   if (!checkoutPlans.has(plan)) return;
   trackEvent("pro_cta_clicked", {
-    source: "account_pack_renewal",
+    cta_source: "account_pack_renewal",
     plan,
     checkout_plan: plan,
     purchase_type: checkoutPlanIsPack(plan) ? "pack" : "subscription",

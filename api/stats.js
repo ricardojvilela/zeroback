@@ -85,6 +85,7 @@ function emptyDay(date) {
     resultReadyStickySaveLinkClicks: 0,
     postDownloadFeedbacks: 0,
     postDownloadLargerBatchFeedbacks: 0,
+    upgradePromptViews: 0,
     proofPageViews: 0,
     proofCtaClicks: 0,
     proClicks: 0,
@@ -165,6 +166,7 @@ function classifySource(event, detail) {
     "result_ready_inline",
     "result_ready_sticky",
     "account_panel",
+    "account_pack_renewal",
     "checkout_account_prompt",
     "checkout_plan",
     "pro_trial",
@@ -177,6 +179,9 @@ function classifySource(event, detail) {
     "pricing_page",
     "pricing_page_checkout_panel",
     "pricing-page",
+    "tool_upgrade_prompt",
+    "tool_upgrade_compare_plans",
+    "account_billing_actions",
     "email_pack",
     "seo",
     "landing",
@@ -294,6 +299,7 @@ function emptySourceRow(source) {
     resultReadyStickySaveLinkClicks: 0,
     postDownloadFeedbacks: 0,
     postDownloadLargerBatchFeedbacks: 0,
+    upgradePromptViews: 0,
     proofPageViews: 0,
     proofCtaClicks: 0,
     proClicks: 0,
@@ -387,7 +393,11 @@ function updateCampaignVisitorStages(stages, eventName, detail, visitorId) {
   if (!stages || !visitorId) return;
   if (eventName === "tool_upload_started") stages.upload.add(visitorId);
   if (["tool_download_png", "tool_download_zip"].includes(eventName)) stages.download.add(visitorId);
-  if (eventName === "tool_pro_clicked" || eventName === "pro_cta_clicked" || isPackIntentEvent(eventName, detail)) {
+  if (
+    (eventName === "tool_pro_clicked" && isCheckoutPlan(detail.checkout_plan || detail.plan || detail.price_plan)) ||
+    eventName === "pro_cta_clicked" ||
+    isPackIntentEvent(eventName, detail)
+  ) {
     stages.paidIntent.add(visitorId);
   }
   if (isPackIntentEvent(eventName, detail)) stages.packClick.add(visitorId);
@@ -458,6 +468,10 @@ function emptyLandingPageRow(pagePath) {
 
 function isPackCheckoutPlan(plan) {
   return ["pack100", "pack250"].includes(String(plan || "").toLowerCase());
+}
+
+function isCheckoutPlan(plan) {
+  return ["pack100", "pack250", "early", "monthly", "annual"].includes(String(plan || "").toLowerCase());
 }
 
 function isEmailOnlyPackCheckout(detail = {}) {
@@ -772,9 +786,6 @@ export default async function handler(request, response) {
               row.subscriptionCtaClicks += 1;
               sourceRow.subscriptionCtaClicks += 1;
             }
-          } else if (detail.target === "tool") {
-            row.proClicks += 1;
-            sourceRow.proClicks += 1;
           }
           break;
         case "directory_launch_page_view":
@@ -796,9 +807,6 @@ export default async function handler(request, response) {
               row.subscriptionCtaClicks += 1;
               sourceRow.subscriptionCtaClicks += 1;
             }
-          } else if (detail.target === "tool") {
-            row.proClicks += 1;
-            sourceRow.proClicks += 1;
           }
           break;
         case "proof_page_view":
@@ -906,10 +914,14 @@ export default async function handler(request, response) {
           }
           break;
         case "tool_pro_clicked":
-          row.proClicks += 1;
-          sourceRow.proClicks += 1;
+          if (isCheckoutPlan(detail.checkout_plan || detail.plan || detail.price_plan)) {
+            row.proClicks += 1;
+            sourceRow.proClicks += 1;
+          }
           break;
         case "pro_prompt_shown":
+          row.upgradePromptViews += 1;
+          sourceRow.upgradePromptViews += 1;
           if (detail.reason === "result_ready_sticky") {
             row.resultReadyStickyShown += 1;
             sourceRow.resultReadyStickyShown += 1;

@@ -892,15 +892,19 @@
             <strong id="liveProofCtaClicks">0</strong>
           </article>
           <article class="live-card">
-            <span>Cliques pagos</span>
+            <span>Oferta Pack vista</span>
+            <strong id="liveUpgradePromptViews">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Plano na ferramenta</span>
             <strong id="liveProClicks">0</strong>
           </article>
           <article class="live-card">
-            <span>CTA pricing</span>
+            <span>Planos escolhidos</span>
             <strong id="livePricingCtaClicks">0</strong>
           </article>
           <article class="live-card">
-            <span>Pricing para Stripe</span>
+            <span>Plano para Stripe</span>
             <strong id="livePricingStripeRate">0%</strong>
           </article>
           <article class="live-card">
@@ -2609,11 +2613,15 @@
         document.querySelector("#livePostDownloadLargerBatch").textContent = totals.postDownloadLargerBatchFeedbacks || 0;
         document.querySelector("#liveProofPageViews").textContent = totals.proofPageViews || 0;
         document.querySelector("#liveProofCtaClicks").textContent = totals.proofCtaClicks || 0;
+        document.querySelector("#liveUpgradePromptViews").textContent = totals.upgradePromptViews || 0;
         document.querySelector("#liveProClicks").textContent = totals.proClicks || 0;
         document.querySelector("#livePricingCtaClicks").textContent = totals.pricingCtaClicks || 0;
+        const paidChoiceClicks = (Number(totals.proClicks || 0) || 0) +
+          (Number(totals.pricingCtaClicks || 0) || 0) +
+          (Number(totals.postDownloadPackClicks || 0) || 0);
         document.querySelector("#livePricingStripeRate").textContent = formatPercent(conversionRate(
           totals.checkoutSessionsCreated,
-          totals.pricingCtaClicks,
+          paidChoiceClicks,
         ));
         document.querySelector("#liveHighVolumeContacts").textContent = totals.highVolumeContacts || 0;
         document.querySelector("#liveMonthlyLimitReached").textContent = totals.monthlyLimitReached || 0;
