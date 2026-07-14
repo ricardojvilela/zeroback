@@ -380,6 +380,56 @@
         margin-bottom: 16px;
       }
 
+      .validation-panel {
+        margin-bottom: 16px;
+      }
+
+      .validation-progress-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .validation-progress-item {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+        background: #fbfdff;
+      }
+
+      .validation-progress-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 10px;
+        font-size: 13px;
+        font-weight: 900;
+      }
+
+      .validation-progress-label span {
+        color: var(--muted);
+      }
+
+      .validation-progress-item progress {
+        display: block;
+        width: 100%;
+        height: 10px;
+        accent-color: var(--accent);
+      }
+
+      .validation-feedback-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .validation-feedback-grid .live-card strong {
+        font-size: 22px;
+      }
+
       .daily-brief-layout {
         display: grid;
         grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
@@ -627,7 +677,8 @@
         .metrics-grid,
         .live-grid,
         .daily-brief-layout,
-        .daily-metrics {
+        .daily-metrics,
+        .validation-feedback-grid {
           grid-template-columns: repeat(2, minmax(0, 1fr));
         }
       }
@@ -639,10 +690,21 @@
           flex-direction: column;
         }
 
+        .validation-panel .panel-head {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .validation-panel .panel-head .pill {
+          white-space: nowrap;
+        }
+
         .metrics-grid,
         .live-grid,
         .daily-brief-layout,
-        .daily-metrics {
+        .daily-metrics,
+        .validation-progress-grid,
+        .validation-feedback-grid {
           grid-template-columns: 1fr;
         }
 
@@ -683,8 +745,8 @@
       <section class="hero">
         <div class="hero-main">
           <p class="eyebrow">Painel interno</p>
-          <h1>Subscrições, receita e uso real</h1>
-          <p>Acompanhe MRR pago, clientes ativos, acessos Pro e utilização do produto. O sinal comercial principal agora é a subscrição Stripe paga.</p>
+          <h1>Compras, subscrições e uso real</h1>
+          <p>Acompanhe Pack 100, receita, clientes ativos, acessos Pro e utilização do produto. O sinal comercial principal é qualquer pagamento real confirmado pelo Stripe.</p>
         </div>
 
         <aside class="recommendation">
@@ -770,6 +832,77 @@
             </article>
           </div>
         </div>
+      </section>
+
+      <section class="panel validation-panel" aria-label="Validação comercial Pack 100">
+        <div class="panel-head">
+          <div>
+            <h2>Validação Pack 100</h2>
+            <p class="note" id="validationPeriod">14/07/2026 a 13/08/2026. Decisão baseada em utilização e pagamentos reais.</p>
+          </div>
+          <span class="pill muted" id="validationStatusBadge">A recolher dados</span>
+        </div>
+        <div class="validation-progress-grid">
+          <article class="validation-progress-item">
+            <div class="validation-progress-label">
+              <strong>Testes concluídos</strong>
+              <span id="validationTestsLabel">0 / 50</span>
+            </div>
+            <progress id="validationTestsProgress" value="0" max="50">0 de 50</progress>
+          </article>
+          <article class="validation-progress-item">
+            <div class="validation-progress-label">
+              <strong>Compras Pack reais</strong>
+              <span id="validationPurchasesLabel">0 / 3</span>
+            </div>
+            <progress id="validationPurchasesProgress" value="0" max="3">0 de 3</progress>
+          </article>
+        </div>
+        <div class="live-grid">
+          <article class="live-card">
+            <span>Dias restantes</span>
+            <strong id="validationDaysRemaining">30</strong>
+          </article>
+          <article class="live-card">
+            <span>Pessoas com resultado</span>
+            <strong id="validationResultReady">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Tentaram continuar</span>
+            <strong id="validationExhausted">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Cliques Pack</span>
+            <strong id="validationPackClicks">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Chegaram à Stripe</span>
+            <strong id="validationStripeSessions">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Respostas de decisão</span>
+            <strong id="validationFeedbackResponses">0</strong>
+          </article>
+        </div>
+        <div class="validation-feedback-grid" aria-label="Motivos para não comprar Pack 100">
+          <article class="live-card">
+            <span>Sem mais fotos</span>
+            <strong id="validationFeedbackNoPhotos">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Recorte insuficiente</span>
+            <strong id="validationFeedbackQuality">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Falta acabamento</span>
+            <strong id="validationFeedbackCatalog">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Preço não compensa</span>
+            <strong id="validationFeedbackPrice">0</strong>
+          </article>
+        </div>
+        <p class="funnel-diagnosis" id="validationDecision">A recolher a primeira amostra da oferta atual.</p>
       </section>
 
       <section class="panel live-panel" aria-label="Operação BatchCutout">
@@ -2572,9 +2705,78 @@
         return false;
       }
 
+      function renderValidationExperiment(experiment = {}) {
+        const targetTests = Number(experiment.targetCompletedTests || 50) || 50;
+        const targetPurchases = Number(experiment.targetPackPurchases || 3) || 3;
+        const completedTests = Number(experiment.completedTests || 0) || 0;
+        const packPurchases = Number(experiment.packPurchases || 0) || 0;
+        const feedback = experiment.feedback || {};
+        const statusViews = {
+          collecting: { label: "A recolher dados", tone: "muted" },
+          validated: { label: "Validado", tone: "success" },
+          review: { label: "Rever decisão", tone: "warning" },
+          stop_candidate: { label: "Critério de paragem", tone: "danger" },
+        };
+        const statusView = statusViews[experiment.status] || statusViews.collecting;
+        const statusBadge = document.querySelector("#validationStatusBadge");
+        statusBadge.textContent = statusView.label;
+        statusBadge.className = `pill ${statusView.tone}`;
+
+        const periodStart = formatDate(experiment.startDate || "2026-07-14");
+        const periodEnd = formatDate(experiment.endDate || "2026-08-13");
+        document.querySelector("#validationPeriod").textContent = `${periodStart} a ${periodEnd}. Decisão baseada em utilização e pagamentos reais.`;
+        document.querySelector("#validationDaysRemaining").textContent = Number(experiment.daysRemaining || 0) || 0;
+        document.querySelector("#validationResultReady").textContent = Number(experiment.resultReady || 0) || 0;
+        document.querySelector("#validationExhausted").textContent = Number(experiment.exhaustedAfterTest || 0) || 0;
+        document.querySelector("#validationPackClicks").textContent = Number(experiment.packClicks || 0) || 0;
+        document.querySelector("#validationStripeSessions").textContent = Number(experiment.stripeSessions || 0) || 0;
+        document.querySelector("#validationFeedbackResponses").textContent = Number(experiment.feedbackResponses || 0) || 0;
+        document.querySelector("#validationFeedbackNoPhotos").textContent = Number(feedback.no_more_photos || 0) || 0;
+        document.querySelector("#validationFeedbackQuality").textContent = Number(feedback.needs_quality || 0) || 0;
+        document.querySelector("#validationFeedbackCatalog").textContent = Number(feedback.needs_catalog_finish || 0) || 0;
+        document.querySelector("#validationFeedbackPrice").textContent = Number(feedback.price_not_worth_it || 0) || 0;
+
+        const testsProgress = document.querySelector("#validationTestsProgress");
+        testsProgress.max = targetTests;
+        testsProgress.value = Math.min(completedTests, targetTests);
+        testsProgress.textContent = `${completedTests} de ${targetTests}`;
+        document.querySelector("#validationTestsLabel").textContent = `${completedTests} / ${targetTests}`;
+
+        const purchasesProgress = document.querySelector("#validationPurchasesProgress");
+        purchasesProgress.max = targetPurchases;
+        purchasesProgress.value = Math.min(packPurchases, targetPurchases);
+        purchasesProgress.textContent = `${packPurchases} de ${targetPurchases}`;
+        document.querySelector("#validationPurchasesLabel").textContent = `${packPurchases} / ${targetPurchases}`;
+
+        const feedbackLabels = {
+          no_more_photos: "a falta de volume imediato",
+          needs_quality: "a qualidade do recorte",
+          needs_catalog_finish: "a falta de acabamento de catálogo",
+          price_not_worth_it: "o valor percebido face aos 5 EUR",
+        };
+        const leadingFeedback = feedbackLabels[experiment.leadingFeedback] || "";
+        const remainingTests = Math.max(targetTests - completedTests, 0);
+        const remainingPurchases = Math.max(targetPurchases - packPurchases, 0);
+        let decision = `A recolher dados: faltam ${remainingTests} testes concluídos e ${remainingPurchases} compras Pack para atingir os critérios definidos.`;
+
+        if (experiment.status === "validated") {
+          decision = "Validação positiva: o objetivo de compras reais foi atingido. Próximo passo: repetir as origens que converteram e medir recompra.";
+        } else if (experiment.status === "stop_candidate") {
+          decision = "Critério de paragem atingido: a amostra ou o prazo terminou sem compras nem chegadas suficientes à Stripe. Parar investimento pago e decidir entre arquivo ou reposicionamento.";
+        } else if (experiment.status === "review") {
+          decision = "A amostra ou o prazo terminou com algum sinal comercial, mas sem atingir 3 compras. Rever origens, respostas e possibilidade de recompra antes de investir mais.";
+        } else if (completedTests === 0) {
+          decision = "Ainda não existe um teste concluído desde o início da validação. Manter oferta e preço até chegar a uma primeira amostra real.";
+        } else if (leadingFeedback) {
+          decision += ` O obstáculo mais referido até agora é ${leadingFeedback}.`;
+        }
+        document.querySelector("#validationDecision").textContent = decision;
+      }
+
       function renderLiveStats(data) {
         const totals = data.totals || {};
         renderDailyBrief(data);
+        renderValidationExperiment(data.validationExperiment || {});
         document.querySelector("#dashboardVisitors").textContent = totals.visitors || 0;
         document.querySelector("#dashboardUploads").textContent = totals.uploadsStarted || 0;
         document.querySelector("#liveVisitors").textContent = totals.visitors || 0;

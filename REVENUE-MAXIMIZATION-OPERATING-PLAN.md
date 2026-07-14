@@ -230,3 +230,21 @@ Interpretation:
 - The result-ready offer now uses one email field for direct Pack 100 checkout and for the secondary link/checklist request. A valid Pack choice opens Stripe immediately without password or account-panel navigation, while saving the link keeps the Pack purchase control available.
 - The result-ready sticky offer now stays hidden while the full email/Pack offer is visible and appears only after that offer leaves the viewport, preventing mobile overlap while preserving a later conversion reminder.
 - Email-only checkout attribution now records `result_ready_checkout` through the browser event and Stripe-session metadata, so the admin funnel can distinguish this reduced-friction path from account-panel Pack checkout.
+
+## Pack 100 validation sprint - 2026-07-14 to 2026-08-13
+
+The project is now in a bounded commercial validation period rather than open-ended feature development.
+
+Decision targets:
+
+- 50 unique visitors completing the current 2-image free test.
+- 3 genuine Pack 100 purchases from unrelated customers.
+- Stripe sessions, attempts after the free test, and the main non-purchase objection measured separately.
+
+Decision rule:
+
+- 3 or more Pack purchases: continue and repeat the sources that converted.
+- 1 or 2 purchases: review repeat usage and customer feedback before further investment.
+- 0 purchases and fewer than 3 Stripe sessions after the sample target or deadline: stop paid investment and decide between archiving the product or repositioning it as a catalogue-preparation workflow.
+
+The post-download question now measures four concrete objections: no immediate photo volume, insufficient cutout quality, missing catalogue-ready finish, or insufficient value at 5 EUR. `/admin` shows the experiment period, progress, Stripe activity, purchases, and the leading objection without mixing the cohort with the older subscription-first history.

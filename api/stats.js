@@ -8,6 +8,19 @@ const corsHeaders = {
 
 const defaultStatsTimeZone = "Europe/Lisbon";
 const legacyPostDownloadPackClickedEvent = ["post", "download", "found" + "er", "clicked"].join("_");
+const validationExperimentConfig = Object.freeze({
+  id: "pack100_30d_20260714",
+  startDate: "2026-07-14",
+  endDate: "2026-08-13",
+  targetCompletedTests: 50,
+  targetPackPurchases: 3,
+});
+const validationFeedbackAnswers = Object.freeze([
+  "no_more_photos",
+  "needs_quality",
+  "needs_catalog_finish",
+  "price_not_worth_it",
+]);
 
 function sendJson(response, status, data) {
   for (const [key, value] of Object.entries(corsHeaders)) {
@@ -85,6 +98,10 @@ function emptyDay(date) {
     resultReadyStickySaveLinkClicks: 0,
     postDownloadFeedbacks: 0,
     postDownloadLargerBatchFeedbacks: 0,
+    postDownloadNoMorePhotosFeedbacks: 0,
+    postDownloadQualityFeedbacks: 0,
+    postDownloadCatalogFinishFeedbacks: 0,
+    postDownloadPriceFeedbacks: 0,
     upgradePromptViews: 0,
     proofPageViews: 0,
     proofCtaClicks: 0,
@@ -300,6 +317,10 @@ function emptySourceRow(source) {
     resultReadyStickySaveLinkClicks: 0,
     postDownloadFeedbacks: 0,
     postDownloadLargerBatchFeedbacks: 0,
+    postDownloadNoMorePhotosFeedbacks: 0,
+    postDownloadQualityFeedbacks: 0,
+    postDownloadCatalogFinishFeedbacks: 0,
+    postDownloadPriceFeedbacks: 0,
     upgradePromptViews: 0,
     proofPageViews: 0,
     proofCtaClicks: 0,
@@ -585,6 +606,75 @@ function packVisitorFunnelSummary(stages) {
   };
 }
 
+function dateKeyDistance(fromDateKey, toDateKey) {
+  const from = Date.parse(`${fromDateKey}T12:00:00Z`);
+  const to = Date.parse(`${toDateKey}T12:00:00Z`);
+  if (!Number.isFinite(from) || !Number.isFinite(to)) return 0;
+  return Math.round((to - from) / (24 * 60 * 60 * 1000));
+}
+
+function validationExperimentSummary(events, timeZone, today) {
+  const stages = new Map();
+  const latestFeedbackByVisitor = new Map();
+
+  for (const event of events) {
+    const date = toLocalDate(event.occurred_at, timeZone);
+    if (!date || date < validationExperimentConfig.startDate || date > validationExperimentConfig.endDate) continue;
+
+    const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+    updatePackVisitorFunnel(stages, event, detail);
+
+    const visitorId = asCleanText(event.visitor_id || detail.visitor_id, 80);
+    const answer = asCleanText(detail.answer, 80).toLowerCase();
+    if (event.event_name === "post_download_feedback_selected" && visitorId && validationFeedbackAnswers.includes(answer)) {
+      latestFeedbackByVisitor.set(visitorId, answer);
+    }
+  }
+
+  const funnel = packVisitorFunnelSummary(stages);
+  for (const visitorId of latestFeedbackByVisitor.keys()) {
+    if (!stages.get(visitorId)?.freeTestCompleted) latestFeedbackByVisitor.delete(visitorId);
+  }
+  const feedback = Object.fromEntries(validationFeedbackAnswers.map((answer) => [answer, 0]));
+  for (const answer of latestFeedbackByVisitor.values()) feedback[answer] += 1;
+
+  const leadingFeedback = Object.entries(feedback)
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0] || ["", 0];
+  const deadlinePassed = today > validationExperimentConfig.endDate;
+  const sampleReached = funnel.completed >= validationExperimentConfig.targetCompletedTests;
+  const purchaseTargetReached = funnel.paid >= validationExperimentConfig.targetPackPurchases;
+  let status = "collecting";
+
+  if (purchaseTargetReached) {
+    status = "validated";
+  } else if ((deadlinePassed || sampleReached) && funnel.paid === 0 && funnel.stripeSession < 3) {
+    status = "stop_candidate";
+  } else if (deadlinePassed || sampleReached) {
+    status = "review";
+  }
+
+  return {
+    ...validationExperimentConfig,
+    status,
+    deadlinePassed,
+    sampleReached,
+    purchaseTargetReached,
+    daysRemaining: Math.max(dateKeyDistance(today, validationExperimentConfig.endDate), 0),
+    uniqueVariantVisitors: funnel.uniqueVariantVisitors,
+    resultReady: funnel.resultReady,
+    completedTests: funnel.completed,
+    exhaustedAfterTest: funnel.exhausted,
+    packClicks: funnel.packClicked,
+    stripeSessions: funnel.stripeSession,
+    packPurchases: funnel.paid,
+    completedTestProgress: Math.min(funnel.completed / validationExperimentConfig.targetCompletedTests, 1),
+    purchaseProgress: Math.min(funnel.paid / validationExperimentConfig.targetPackPurchases, 1),
+    feedbackResponses: latestFeedbackByVisitor.size,
+    feedback,
+    leadingFeedback: leadingFeedback[1] > 0 ? leadingFeedback[0] : "",
+  };
+}
+
 function verifyAdminToken(request) {
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (!adminPassword) return false;
@@ -643,8 +733,11 @@ export default async function handler(request, response) {
   const timeZone = statsTimeZoneFrom(request);
   const today = toLocalDate(new Date(), timeZone);
   const startDate = dateKeyOffset(today, days - 1) || today;
-  const since = new Date(Date.now() - (days + 1) * 24 * 60 * 60 * 1000);
-  since.setUTCHours(0, 0, 0, 0);
+  const rollingSince = new Date(Date.now() - (days + 1) * 24 * 60 * 60 * 1000);
+  rollingSince.setUTCHours(0, 0, 0, 0);
+  const validationSince = new Date(`${validationExperimentConfig.startDate}T00:00:00Z`);
+  const keepValidationWindow = today <= dateKeyOffset(validationExperimentConfig.endDate, -14);
+  const since = keepValidationWindow && validationSince < rollingSince ? validationSince : rollingSince;
   const query = new URLSearchParams({
     select: "event_name,visitor_id,value,detail,source,campaign,page_path,page_location,occurred_at",
     occurred_at: `gte.${since.toISOString()}`,
@@ -912,6 +1005,22 @@ export default async function handler(request, response) {
           if (detail.answer === "larger_batches") {
             row.postDownloadLargerBatchFeedbacks += 1;
             sourceRow.postDownloadLargerBatchFeedbacks += 1;
+          }
+          if (detail.answer === "no_more_photos") {
+            row.postDownloadNoMorePhotosFeedbacks += 1;
+            sourceRow.postDownloadNoMorePhotosFeedbacks += 1;
+          }
+          if (detail.answer === "needs_quality") {
+            row.postDownloadQualityFeedbacks += 1;
+            sourceRow.postDownloadQualityFeedbacks += 1;
+          }
+          if (detail.answer === "needs_catalog_finish") {
+            row.postDownloadCatalogFinishFeedbacks += 1;
+            sourceRow.postDownloadCatalogFinishFeedbacks += 1;
+          }
+          if (detail.answer === "price_not_worth_it") {
+            row.postDownloadPriceFeedbacks += 1;
+            sourceRow.postDownloadPriceFeedbacks += 1;
           }
           break;
         case "tool_pro_clicked":
@@ -1236,6 +1345,7 @@ export default async function handler(request, response) {
       rows,
       totals,
       packVisitorFunnel: packVisitorFunnelSummary(packVisitorStages),
+      validationExperiment: validationExperimentSummary(events, timeZone, today),
       sourceBreakdown,
       packSourceBreakdown,
       campaignBreakdown,

@@ -282,12 +282,13 @@ const baseTranslation = {
   feedbackQuality: "Testar qualidade",
   feedbackCompare: "Comparar ferramentas",
   feedbackThanks: "Obrigado. Isto ajuda-nos a melhorar a ferramenta.",
-  postDownloadKicker: "Feedback rápido",
-  postDownloadTitle: "O BatchCutout ajudou nas suas fotos?",
-  postDownloadSavedTime: "Sim, poupou tempo",
-  postDownloadNeedsQuality: "Precisa de melhor recorte",
-  postDownloadLargerBatches: "Preciso de lotes maiores",
-  postDownloadThanks: "Obrigado. A sua resposta ajuda-nos a melhorar a ferramenta.",
+  postDownloadKicker: "Decisão do Pack 100",
+  postDownloadTitle: "Se não comprar hoje, qual é o principal motivo?",
+  postDownloadNoMorePhotos: "Não tenho mais fotos agora",
+  postDownloadNeedsQuality: "O recorte precisa melhorar",
+  postDownloadNeedsCatalogFinish: "Falta fundo e tamanho final",
+  postDownloadPriceNotWorthIt: "5 EUR ainda não compensa",
+  postDownloadThanks: "Obrigado. Esta resposta conta para a decisão sobre o próximo passo do BatchCutout.",
   postDownloadNextKicker: "Próximo lote",
   postDownloadNextTitle: "Resultado descarregado. Quer repetir isto em mais produtos?",
   postDownloadNextText: "Se o resultado ficou bom, compre o Pack 100 por 5 EUR para tratar um lote real sem subscrição. Se isto passar a ser mensal, o Pro fica disponível para volume recorrente.",
@@ -536,12 +537,13 @@ const translations = {
     feedbackQuality: "Test quality",
     feedbackCompare: "Compare tools",
     feedbackThanks: "Thanks. This helps us improve the tool.",
-    postDownloadKicker: "Quick feedback",
-    postDownloadTitle: "Did BatchCutout work for your product photos?",
-    postDownloadSavedTime: "Yes, it saved time",
-    postDownloadNeedsQuality: "Needs better cutout",
-    postDownloadLargerBatches: "I need larger batches",
-    postDownloadThanks: "Thanks. This helps us improve the tool.",
+    postDownloadKicker: "Pack 100 decision",
+    postDownloadTitle: "If you do not buy today, what is the main reason?",
+    postDownloadNoMorePhotos: "I do not have more photos now",
+    postDownloadNeedsQuality: "The cutout needs to improve",
+    postDownloadNeedsCatalogFinish: "I need the final background and size",
+    postDownloadPriceNotWorthIt: "EUR 5 is not worth it yet",
+    postDownloadThanks: "Thanks. This response counts toward the decision on BatchCutout's next step.",
     postDownloadNextKicker: "Next batch",
     postDownloadNextTitle: "Result downloaded. Want to repeat this for more products?",
     postDownloadNextText: "If the result looks good, buy the 100 image pack for EUR 5 to process a real batch without a subscription. If this becomes monthly work, recurring Pro remains available.",
@@ -1190,12 +1192,13 @@ const translatedAddons = {
     privacyNote: "Las imágenes se procesan en tu dispositivo y no se suben a nuestros servidores.",
     formatNote: "Algunos formatos pueden depender del soporte del navegador.",
     batchLimitNote: "Prueba gratis de {limit} imágenes en total. Para más volumen, empieza con Pack 100.",
-    postDownloadKicker: "Siguiente lote",
-    postDownloadTitle: "¿BatchCutout ayudó con tus fotos?",
-    postDownloadSavedTime: "Sí, ahorró tiempo",
-    postDownloadNeedsQuality: "Necesita mejor recorte",
-    postDownloadLargerBatches: "Necesito lotes mayores",
-    postDownloadThanks: "Gracias. Tu respuesta nos ayuda a mejorar la herramienta.",
+    postDownloadKicker: "Decisión del Pack 100",
+    postDownloadTitle: "Si no compras hoy, ¿cuál es el motivo principal?",
+    postDownloadNoMorePhotos: "No tengo más fotos ahora",
+    postDownloadNeedsQuality: "El recorte necesita mejorar",
+    postDownloadNeedsCatalogFinish: "Falta el fondo y tamaño final",
+    postDownloadPriceNotWorthIt: "5 EUR todavía no compensa",
+    postDownloadThanks: "Gracias. Esta respuesta cuenta para decidir el próximo paso de BatchCutout.",
     postDownloadNextKicker: "Siguiente lote",
     postDownloadNextTitle: "Resultado descargado. ¿Quieres repetir esto en más productos?",
     postDownloadNextText: "Si el resultado quedó bien, compra el Pack 100 por 5 EUR para procesar un lote real sin suscripción. Si pasa a ser trabajo mensual, Pro queda disponible para volumen recurrente.",
@@ -4253,6 +4256,12 @@ function focusResultReadyLeadCapture(source = "result_ready") {
 
 function showPostDownloadFeedback(downloadType, count) {
   showPostDownloadNext(downloadType, count);
+  if (canUsePaidAccess() || !isFreeTestComplete()) {
+    postDownloadFeedback?.classList.add("hidden");
+    showProPrompt(`post_download_${downloadType}`, { scroll: false });
+    return;
+  }
+
   postDownloadFeedback?.classList.remove("hidden");
   postDownloadFeedback?.setAttribute("data-download-type", downloadType);
   postDownloadFeedback?.setAttribute("data-download-count", String(count));
