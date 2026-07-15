@@ -177,6 +177,7 @@ const defaultProMonthlyLimit = 2000;
 const downloadZipConversionId = "AW-18177126609/2EdRCMzF7bMcENHhw9tD";
 const batchLimitConversionId = "AW-18177126609/prPXCPXD8LMcENHhw9tD";
 const paidSubscriptionConversionId = "AW-18177126609/fpcoCP2kmMgcENHhw9tD";
+const packPurchaseConversionId = "AW-18177126609/MVG_CLHb0dAcENHhw9tD";
 const campaignParamKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "source", "campaign", "gclid", "gbraid", "wbraid"];
 const consentStorageKey = "batchcutout_consent";
 const debugMode = pageParams.get("debug") === "1";
@@ -2173,12 +2174,13 @@ function setKnownGoogleUserData() {
   setGoogleUserData(knownEmail);
 }
 
-function trackPaidSubscriptionConversion(details = {}) {
+function trackPaidCheckoutConversion(details = {}) {
   const sessionId = details.sessionId || details.stripe_session_id || checkoutSessionId;
   if (!sessionId || hasTrackedPaidSession(sessionId)) return;
 
   const plan = details.checkoutPlan || details.plan || "monthly";
   const purchaseType = details.purchaseType || (plan === "pack100" || plan === "pack250" ? "pack" : "subscription");
+  const googleAdsConversionId = purchaseType === "pack" ? packPurchaseConversionId : paidSubscriptionConversionId;
   const amount = Number(details.amount || 0) || checkoutValueForPlan(plan);
   const currency = String(details.currency || "EUR").toUpperCase();
   const customerEmail = details.customerEmail || currentAccount?.email || "";
@@ -2191,7 +2193,7 @@ function trackPaidSubscriptionConversion(details = {}) {
     affiliation: "Stripe Checkout",
     items: [googleCommerceItem(plan)],
   });
-  trackGoogleAdsConversion(paidSubscriptionConversionId, {
+  trackGoogleAdsConversion(googleAdsConversionId, {
     value: amount,
     currency,
     transaction_id: sessionId,
@@ -2204,7 +2206,8 @@ function trackPaidSubscriptionConversion(details = {}) {
     stripe_session_id: sessionId,
     stripe_subscription_id: details.subscriptionId || "",
     stripe_price_id: details.priceId || "",
-    conversion_configured: Boolean(paidSubscriptionConversionId),
+    conversion_configured: Boolean(googleAdsConversionId),
+    conversion_type: purchaseType === "pack" ? "pack_purchase" : "paid_subscription",
   });
   rememberPaidSession(sessionId);
 }
@@ -3534,7 +3537,7 @@ async function showCheckoutReturnMessage() {
       setAccountMessage("billingCheckoutSuccessPack");
     }
     if (conversionDetails?.synced || conversionDetails?.paid) {
-      trackPaidSubscriptionConversion(conversionDetails);
+      trackPaidCheckoutConversion(conversionDetails);
     }
   } else if (checkoutStatus === "cancelled") {
     setAccountMessage("billingCheckoutCancelled");
