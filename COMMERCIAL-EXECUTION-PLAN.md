@@ -176,7 +176,7 @@ Decision rules:
 - Added proof request HTML email templates in `emails/proof-request.html` and `emails/proof-request-pt.html`.
 - Added manual recovery/proof candidate section to `/admin`.
 - Activated `Search - BatchCutout - Alternatives` with 2 EUR/day and kept total active Search spend at 10 EUR/day.
-- Verified both active Search campaigns use the account-default `Subscrever` conversion goal and `Maximizar as conversoes`.
+- At activation, verified both active Search campaigns used the account-default `Subscrever` conversion goal and `Maximizar as conversoes`.
 
 ## Executed growth work - prospecting system
 
@@ -292,7 +292,19 @@ Decision rules:
 - Added campaign-level attribution to `/api/stats` using the UTM campaign, ad content and search term already preserved throughout the customer journey.
 - Added an operational `/admin` table with unique visitors, uploads, downloads, paid-intent clicks, Pack clicks, accounts, Stripe sessions, purchases and revenue per campaign/ad combination.
 - Added upload, download and paid-intent rates so weak paid traffic can be identified without increasing budget or relying on aggregate Google Ads totals.
-- Keep spend unchanged until this view has enough activity from the 2-image-total offer to identify a campaign that reaches Pack or Stripe.
+- Use this view to identify which campaign reaches Pack or Stripe before making any permanent budget reallocation.
+
+## Executed growth work - Pack conversion and promotion credit
+
+- Created `Pack 100 Purchase BatchCutout` as a primary Google Ads purchase conversion, separate from the renewable Pro subscription conversion.
+- Published checkout-return tracking that selects the correct Google Ads conversion after the Stripe payment is verified: Pack for one-time credits and subscription for Pro.
+- Verified both active Search campaigns now use the account-default `Compras, Subscrever` goals with `Maximizar as conversoes`.
+- Temporarily changed daily budgets on 2026-07-15:
+  - `Search - BatchCutout - Pro Launch`: 8 EUR to 14 EUR/day.
+  - `Search - BatchCutout - Alternatives`: 2 EUR to 4 EUR/day.
+- The Google Ads promotion card showed 58.35 EUR still to spend by 2026-07-19 to unlock 400 EUR in ad credit.
+- Daily monitoring is authorized to restore 8 EUR/day and 2 EUR/day immediately after the credit unlocks, or on 2026-07-20 at the latest.
+- Do not enable the paused legacy `Campaign #1`.
 
 ## First revenue targets
 
