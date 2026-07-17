@@ -1574,7 +1574,7 @@ async function sendOutreach(supabaseSettings, body) {
   };
 }
 
-async function sendPackActivationEmail(settings, body) {
+export async function sendPackActivationEmail(settings, body) {
   const mailSettings = supportSettings();
   if (!allowedOutreachDomains.has(mailSettings.fromDomain)) {
     return { status: 503, body: { ok: false, error: "support_from_domain_not_allowed" } };

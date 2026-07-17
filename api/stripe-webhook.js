@@ -1,5 +1,6 @@
 import { getSupabaseSettings } from "./_pro.js";
 import { applyPackPurchaseFromSession, getStripeClient, updateProfileFromSubscription } from "./_stripe.js";
+import { sendPackActivationEmail } from "./pro-users.js";
 import { Resend } from "resend";
 
 const attributionKeys = [
@@ -546,7 +547,15 @@ async function handleStripeEvent(event) {
         try {
           await applyPackPurchaseFromSession(settings, session, event);
         } catch (error) {
-          console.error("BatchCutout pack purchase activation failed", error);
+          if (error instanceof Error && error.message === "stripe_pack_profile_not_found") {
+            const activation = await sendPackActivationEmail(settings, { sessionId: session.id });
+            const alreadySent = activation.status === 409 && activation.body?.error === "pack_activation_already_sent";
+            if (activation.status !== 200 && !alreadySent) {
+              throw new Error(`pack_activation_email_failed:${activation.body?.error || activation.status}`);
+            }
+          } else {
+            throw error;
+          }
         }
       } else {
         const subscription = await getSubscriptionFromCheckout(stripe, session);
