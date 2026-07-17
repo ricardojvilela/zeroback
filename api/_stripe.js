@@ -164,8 +164,12 @@ export function profilePatchForSubscription(subscription, customerId = "", profi
   };
 }
 
+function isUuid(value) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ""));
+}
+
 export async function findProfileForStripe(settings, { userId = "", customerId = "", subscriptionId = "", email = "" }) {
-  if (userId) {
+  if (isUuid(userId)) {
     const row = await supabaseSelectSingleByColumn({ ...settings, column: "user_id", value: userId });
     if (row) return normalizeProfile(row, { id: row.user_id, email: row.email });
   }
