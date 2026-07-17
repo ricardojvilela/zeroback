@@ -317,6 +317,9 @@ Decision rules:
 - Sent one transactional activation email from `support@batchcutout.com` on 2026-07-17 with the secure checkout-return link and instructions to create or sign in with the payment email.
 - Duplicate protection is active for this Stripe session; do not send another activation message unless the customer replies and support requires it.
 - Future paid Pack checkouts without an existing account now trigger the same activation email automatically from the Stripe webhook; failed sends cause a webhook retry, while successful sends remain idempotent.
+- Added an anonymized account-failure diagnostic to `/admin` on 2026-07-17 after the first buyer remained without an account.
+- The diagnostic confirmed that all 8 signup failures came from one visitor and were caused by a checkout-state initialization error in the account form; the same session then produced 5 invalid-login attempts.
+- Fixed and deployed the account-creation error in commit `2fb1ff0`. The original activation link remains valid, but the buyer still needs to retry account creation before the 250 credits can be attached.
 - Do not count this one-time Pack payment as a subscription or MRR.
 
 ## First revenue targets
