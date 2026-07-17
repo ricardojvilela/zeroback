@@ -3747,7 +3747,11 @@ async function fetchCheckoutConversionDetails() {
 async function showCheckoutReturnMessage() {
   if (checkoutStatus === "success") {
     const checkoutDetails = await syncCheckoutReturnSession();
-    const isPackCheckout = checkoutDetails?.purchaseType === "pack" || checkoutDetails?.checkoutPlan === "pack100" || checkoutDetails?.checkoutPlan === "pack250";
+    const isPackCheckout =
+      checkoutDetails?.purchaseType === "pack" ||
+      checkoutDetails?.checkoutPlan === "pack100" ||
+      checkoutDetails?.checkoutPlan === "pack250" ||
+      (!currentAccount && isCheckoutActivationReturn);
     setAccountMessage(isPackCheckout ? "billingCheckoutSuccessPack" : "billingCheckoutSuccess");
     await refreshAccount();
     const conversionDetails = checkoutDetails?.synced ? checkoutDetails : await fetchCheckoutConversionDetails();
