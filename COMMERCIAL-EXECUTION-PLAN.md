@@ -321,6 +321,10 @@ Decision rules:
 - The diagnostic confirmed that all 8 signup failures came from one visitor and were caused by a checkout-state initialization error in the account form; the same session then produced 5 invalid-login attempts.
 - Fixed and deployed the account-creation error in commit `2fb1ff0`. The original activation link remains valid, but the buyer still needs to retry account creation before the 250 credits can be attached.
 - Sent one transactional recovery email from `support@batchcutout.com` on 2026-07-17 after the fix, using the same secure activation link and no commercial offer. The recovery send has its own duplicate protection; do not send another message unless the customer replies.
+- Deployed passwordless Pack activation on 2026-07-17. Future activation emails now contain a one-time Supabase access link sent by BatchCutout; opening it starts the session and attaches the paid credits through the existing idempotent Stripe synchronization.
+- Existing activation-page links now offer a fresh access link by email, so the first buyer can complete activation without creating a password. Password login remains available only as an alternative for customers who already have one.
+- Added `/admin` counters for access links requested, sent, failed and successfully authenticated.
+- Verified the production return flow and the authenticated admin panel in Chrome without sending a test email. The normal account form remains unchanged outside a paid Pack return.
 - Do not count this one-time Pack payment as a subscription or MRR.
 
 ## First revenue targets
