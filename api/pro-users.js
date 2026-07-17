@@ -982,6 +982,31 @@ async function findDuplicateCommercialEmail(settings, email, { recoverySegment =
   return null;
 }
 
+async function findEventByNameAndLabel(settings, eventName, eventLabel) {
+  const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
+  const query = new URLSearchParams({
+    select: "id,detail,occurred_at",
+    event_name: `eq.${cleanText(eventName, 120)}`,
+    event_label: `eq.${cleanText(eventLabel, 160)}`,
+    order: "occurred_at.desc",
+    limit: "1",
+  });
+  const response = await fetch(`${settings.supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}?${query}`, {
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+    },
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`event_lookup_failed:${response.status}:${detail.slice(0, 300)}`);
+  }
+
+  const rows = await response.json();
+  return Array.isArray(rows) && rows.length ? rows[0] : null;
+}
+
 async function guardCommercialEmailSend(settings, { to, recoverySegment = "", subject = "", dryRun = false } = {}) {
   if (dryRun) return null;
 
@@ -1549,6 +1574,116 @@ async function sendOutreach(supabaseSettings, body) {
   };
 }
 
+async function sendPackActivationEmail(settings, body) {
+  const mailSettings = supportSettings();
+  if (!allowedOutreachDomains.has(mailSettings.fromDomain)) {
+    return { status: 503, body: { ok: false, error: "support_from_domain_not_allowed" } };
+  }
+
+  const resendApiKey = process.env.RESEND_API_KEY || "";
+  const stripe = getStripeClient();
+  const sessionId = cleanText(body?.sessionId, 160);
+  if (!resendApiKey) return { status: 503, body: { ok: false, error: "resend_not_configured" } };
+  if (!stripe) return { status: 503, body: { ok: false, error: "stripe_not_configured" } };
+  if (!sessionId.startsWith("cs_")) return { status: 400, body: { ok: false, error: "invalid_session_id" } };
+
+  const duplicate = await findEventByNameAndLabel(settings, "pack_activation_email_sent", sessionId);
+  if (duplicate) {
+    return {
+      status: 409,
+      body: {
+        ok: false,
+        error: "pack_activation_already_sent",
+        sentAt: duplicate.occurred_at || "",
+        resendId: cleanText(duplicate.detail?.resend_id, 120),
+      },
+    };
+  }
+
+  const session = await stripe.checkout.sessions.retrieve(sessionId, {
+    expand: ["customer", "payment_intent"],
+  });
+  if (
+    session?.mode !== "payment" ||
+    session?.payment_status !== "paid" ||
+    session?.metadata?.batchcutout_purchase_type !== "pack"
+  ) {
+    return { status: 409, body: { ok: false, error: "pack_checkout_not_paid" } };
+  }
+
+  const to = packPaymentEmail(session);
+  if (!to) return { status: 409, body: { ok: false, error: "pack_customer_email_missing" } };
+  const plan = packPaymentPlan(session);
+  const credits = Number(session?.metadata?.batchcutout_pack_images || 0) || (plan === "pack250" ? 250 : 100);
+  const amount = Number(session.amount_total || 0) || 0;
+  const amountLabel = new Intl.NumberFormat("en-IE", {
+    style: "currency",
+    currency: String(session.currency || "eur").toUpperCase(),
+  }).format(amount / 100);
+  const activationUrl = `https://batchcutout.com/?checkout=success&session_id=${encodeURIComponent(session.id)}#accountTitle`;
+  const subject = `Activate your BatchCutout Pack ${credits}`;
+  const text = `Hi,
+
+Your ${amountLabel} payment for BatchCutout Pack ${credits} has been confirmed.
+
+To activate your ${credits} image credits:
+1. Open the secure link below.
+2. Create an account or sign in using the same email address used for payment.
+3. Your credits will be linked automatically. No additional payment is required.
+
+Activate your credits: ${activationUrl}
+
+If you need help, reply to this email.
+
+BatchCutout Support
+NexaFlow Labs`;
+  const html = `<p>Hi,</p><p>Your <strong>${amountLabel}</strong> payment for <strong>BatchCutout Pack ${credits}</strong> has been confirmed.</p><p>To activate your ${credits} image credits:</p><ol><li>Open the secure link below.</li><li>Create an account or sign in using the same email address used for payment.</li><li>Your credits will be linked automatically. No additional payment is required.</li></ol><p><a href="${activationUrl}" style="display:inline-block;padding:12px 18px;background:#0877d1;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:700">Activate ${credits} credits</a></p><p>If you need help, reply to this email.</p><p>BatchCutout Support<br>NexaFlow Labs</p>`;
+  const payload = {
+    from: mailSettings.from,
+    to,
+    replyTo: mailSettings.replyTo,
+    subject,
+    text,
+    html,
+    tags: [
+      { name: "source", value: "pack_activation" },
+      { name: "product", value: "batchcutout" },
+    ],
+  };
+  const resend = new Resend(resendApiKey);
+  const sent = await resend.emails.send(payload);
+  if (sent.error) {
+    return { status: 502, body: { ok: false, error: "pack_activation_send_failed", detail: sent.error.message } };
+  }
+
+  await insertSupportEvent(settings, "pack_activation_email_sent", {
+    stripe_session_id: session.id,
+    email: to,
+    plan,
+    credits,
+    amount_cents: amount,
+    currency: String(session.currency || "eur").toUpperCase(),
+    from: payload.from,
+    reply_to: payload.replyTo,
+    subject,
+    resend_id: sent.data?.id || "",
+    purpose: "paid_pack_activation",
+  }, session.id);
+
+  return {
+    status: 200,
+    body: {
+      ok: true,
+      id: sent.data?.id || "",
+      from: payload.from,
+      replyTo: payload.replyTo,
+      to: payload.to,
+      subject: payload.subject,
+      sessionId: session.id,
+    },
+  };
+}
+
 export default async function handler(request, response) {
   if (request.method === "OPTIONS") {
     return sendJson(response, 200, { ok: true });
@@ -1619,6 +1754,11 @@ export default async function handler(request, response) {
 
     if (mode === "support-resolve") {
       const result = await resolveSupportEmail(settings, body);
+      return sendJson(response, result.status, result.body);
+    }
+
+    if (mode === "send-pack-activation") {
+      const result = await sendPackActivationEmail(settings, body);
       return sendJson(response, result.status, result.body);
     }
 
