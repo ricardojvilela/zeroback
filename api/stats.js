@@ -613,9 +613,11 @@ function dateKeyDistance(fromDateKey, toDateKey) {
   return Math.round((to - from) / (24 * 60 * 60 * 1000));
 }
 
-function validationExperimentSummary(events, timeZone, today) {
+export function validationExperimentSummary(events, timeZone, today) {
   const stages = new Map();
   const latestFeedbackByVisitor = new Map();
+  const stripeSessionIds = new Set();
+  const paidPackSessionIds = new Set();
 
   for (const event of events) {
     const date = toLocalDate(event.occurred_at, timeZone);
@@ -623,6 +625,17 @@ function validationExperimentSummary(events, timeZone, today) {
 
     const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
     updatePackVisitorFunnel(stages, event, detail);
+
+    const stripeSessionId = asCleanText(
+      detail.stripe_session_id || (event.event_name === "pack_purchase_paid" ? event.event_label : ""),
+      160,
+    );
+    if (event.event_name === "pack_checkout_session_created") {
+      stripeSessionIds.add(stripeSessionId || `created:${event.visitor_id || "unknown"}:${event.occurred_at}`);
+    }
+    if (event.event_name === "pack_purchase_paid") {
+      paidPackSessionIds.add(stripeSessionId || `paid:${event.visitor_id || "unknown"}:${event.occurred_at}`);
+    }
 
     const visitorId = asCleanText(event.visitor_id || detail.visitor_id, 80);
     const answer = asCleanText(detail.answer, 80).toLowerCase();
@@ -640,14 +653,16 @@ function validationExperimentSummary(events, timeZone, today) {
 
   const leadingFeedback = Object.entries(feedback)
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))[0] || ["", 0];
+  const stripeSessions = stripeSessionIds.size;
+  const packPurchases = paidPackSessionIds.size;
   const deadlinePassed = today > validationExperimentConfig.endDate;
   const sampleReached = funnel.completed >= validationExperimentConfig.targetCompletedTests;
-  const purchaseTargetReached = funnel.paid >= validationExperimentConfig.targetPackPurchases;
+  const purchaseTargetReached = packPurchases >= validationExperimentConfig.targetPackPurchases;
   let status = "collecting";
 
   if (purchaseTargetReached) {
     status = "validated";
-  } else if ((deadlinePassed || sampleReached) && funnel.paid === 0 && funnel.stripeSession < 3) {
+  } else if ((deadlinePassed || sampleReached) && packPurchases === 0 && stripeSessions < 3) {
     status = "stop_candidate";
   } else if (deadlinePassed || sampleReached) {
     status = "review";
@@ -665,10 +680,10 @@ function validationExperimentSummary(events, timeZone, today) {
     completedTests: funnel.completed,
     exhaustedAfterTest: funnel.exhausted,
     packClicks: funnel.packClicked,
-    stripeSessions: funnel.stripeSession,
-    packPurchases: funnel.paid,
+    stripeSessions,
+    packPurchases,
     completedTestProgress: Math.min(funnel.completed / validationExperimentConfig.targetCompletedTests, 1),
-    purchaseProgress: Math.min(funnel.paid / validationExperimentConfig.targetPackPurchases, 1),
+    purchaseProgress: Math.min(packPurchases / validationExperimentConfig.targetPackPurchases, 1),
     feedbackResponses: latestFeedbackByVisitor.size,
     feedback,
     leadingFeedback: leadingFeedback[1] > 0 ? leadingFeedback[0] : "",
@@ -739,7 +754,7 @@ export default async function handler(request, response) {
   const keepValidationWindow = today <= dateKeyOffset(validationExperimentConfig.endDate, -14);
   const since = keepValidationWindow && validationSince < rollingSince ? validationSince : rollingSince;
   const query = new URLSearchParams({
-    select: "event_name,visitor_id,value,detail,source,campaign,page_path,page_location,occurred_at",
+    select: "event_name,event_label,visitor_id,value,detail,source,campaign,page_path,page_location,occurred_at",
     occurred_at: `gte.${since.toISOString()}`,
     order: "occurred_at.asc",
   });

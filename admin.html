@@ -1263,11 +1263,11 @@
               <strong id="packFunnelEmailFailures">0</strong>
             </article>
             <article class="live-card">
-              <span>Pessoas que chegaram à Stripe</span>
+              <span>Sessões Stripe Pack</span>
               <strong id="packFunnelPackSessions">0</strong>
             </article>
             <article class="live-card">
-              <span>Pessoas que compraram Pack</span>
+              <span>Compras Pack reais</span>
               <strong id="packFunnelPackPurchases">0</strong>
             </article>
             <article class="live-card">
@@ -2906,8 +2906,8 @@
         document.querySelector("#packFunnelEmailStarts").textContent = totals.packEmailCheckoutStarts || 0;
         document.querySelector("#packFunnelEmailSessions").textContent = totals.packEmailCheckoutSessions || 0;
         document.querySelector("#packFunnelEmailFailures").textContent = totals.packEmailCheckoutFailures || 0;
-        document.querySelector("#packFunnelPackSessions").textContent = packVisitorFunnel.stripeSession || 0;
-        document.querySelector("#packFunnelPackPurchases").textContent = packVisitorFunnel.paid || 0;
+        document.querySelector("#packFunnelPackSessions").textContent = totals.packCheckoutSessions || 0;
+        document.querySelector("#packFunnelPackPurchases").textContent = totals.packPurchases || 0;
         const packEmailAttempts = (Number(totals.packEmailRequired || 0) || 0) +
           (Number(totals.packEmailCheckoutStarts || 0) || 0);
         document.querySelector("#packFunnelEmailCompletionRate").textContent = formatPercent(conversionRate(
@@ -2922,13 +2922,15 @@
           packVisitorFunnel.packClicked,
           packVisitorFunnel.completed,
         ));
+        const totalPackClicks = (Number(totals.postDownloadPackClicks || 0) || 0) +
+          (Number(totals.packCtaClicks || 0) || 0);
         document.querySelector("#packFunnelClickToStripeRate").textContent = formatPercent(conversionRate(
-          packVisitorFunnel.stripeSession,
-          packVisitorFunnel.packClicked,
+          totals.packCheckoutSessions,
+          totalPackClicks,
         ));
         document.querySelector("#packFunnelStripeToPaidRate").textContent = formatPercent(conversionRate(
-          packVisitorFunnel.paid,
-          packVisitorFunnel.stripeSession,
+          totals.packPurchases,
+          totals.packCheckoutSessions,
         ));
         document.querySelector("#packFunnelRevenue").textContent = formatCurrency(totals.packRevenue || 0);
         document.querySelector("#packFunnelAction").textContent = packFunnelRecommendation(totals, packVisitorFunnel);
