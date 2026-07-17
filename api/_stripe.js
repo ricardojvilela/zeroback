@@ -402,6 +402,13 @@ async function recordPackPurchaseEvent(settings, { event = null, session, profil
     stripe_event_id: text(event?.id, 120),
     stripe_session_id: sessionId,
     stripe_customer_id: text(customerIdFromSession(session), 120),
+    customer_email: text(
+      session?.customer_details?.email ||
+      session?.customer_email ||
+      session?.metadata?.batchcutout_pending_email ||
+      session?.metadata?.customer_email,
+      320,
+    ),
     supabase_user_id: text(profile?.user_id || session?.client_reference_id || session?.metadata?.supabase_user_id, 120),
     plan: pack.plan,
     price_plan: pack.plan,
@@ -431,6 +438,35 @@ async function recordPackPurchaseEvent(settings, { event = null, session, profil
   });
 }
 
+async function recordPackCreditsAppliedEvent(settings, { session, profile, pack }) {
+  const sessionId = text(session?.id, 120);
+  if (!sessionId) return;
+  const attribution = packAttributionFromSession(session);
+
+  await insertCommercialEvent(settings, {
+    event_name: "pack_credits_applied",
+    event_category: "access",
+    event_label: sessionId,
+    page_path: text(attribution.page_path, 500),
+    page_location: text(attribution.page_location, 1000),
+    language: text(attribution.language, 20),
+    session_id: text(attribution.session_id, 80),
+    visitor_id: text(attribution.visitor_id, 80),
+    source: text(attribution.utm_source || attribution.source || attribution.last_source || attribution.first_source || "stripe", 160),
+    campaign: text(attribution.utm_campaign || attribution.campaign || attribution.last_campaign || attribution.first_campaign || "one_time_pack", 160),
+    free_limit: Number(attribution.free_limit || 0) || null,
+    value: 0,
+    detail: {
+      stripe_session_id: sessionId,
+      supabase_user_id: text(profile?.user_id, 120),
+      plan: pack.plan,
+      purchase_type: "pack",
+      credits_added: pack.images,
+    },
+    occurred_at: new Date().toISOString(),
+  });
+}
+
 export async function applyPackPurchaseFromSession(settings, session, event = null) {
   const metadata = session?.metadata || {};
   const purchaseType = String(metadata.batchcutout_purchase_type || "").toLowerCase();
@@ -440,18 +476,7 @@ export async function applyPackPurchaseFromSession(settings, session, event = nu
   }
 
   const sessionId = text(session?.id, 120);
-  if (await commercialEventExists(settings, "pack_purchase_paid", sessionId)) {
-    const profile = await findProfileForStripe(settings, {
-      userId: metadata.supabase_user_id || session?.client_reference_id || "",
-      customerId: customerIdFromSession(session),
-      email: text(metadata.batchcutout_pending_email || metadata.customer_email || session?.customer_details?.email, 320),
-    });
-    if (!profile?.user_id) {
-      throw new Error("stripe_pack_profile_not_found");
-    }
-    return { profile, pack, credited: false, alreadyStored: true };
-  }
-
+  const paymentAlreadyStored = await commercialEventExists(settings, "pack_purchase_paid", sessionId);
   const profile = await findProfileForStripe(settings, {
     userId: metadata.supabase_user_id || session?.client_reference_id || "",
     customerId: customerIdFromSession(session),
@@ -459,7 +484,21 @@ export async function applyPackPurchaseFromSession(settings, session, event = nu
   });
 
   if (!profile?.user_id) {
+    if (!paymentAlreadyStored) {
+      await recordPackPurchaseEvent(settings, {
+        event,
+        session,
+        profile: null,
+        pack,
+        credited: false,
+      });
+    }
     throw new Error("stripe_pack_profile_not_found");
+  }
+
+  const creditsAlreadyApplied = await commercialEventExists(settings, "pack_credits_applied", sessionId);
+  if (creditsAlreadyApplied) {
+    return { profile, pack, credited: false, alreadyStored: true };
   }
 
   const updated = await supabaseUpdateByUserId({
@@ -469,13 +508,16 @@ export async function applyPackPurchaseFromSession(settings, session, event = nu
   });
   const normalized = normalizeProfile(updated, { id: updated.user_id, email: updated.email });
 
-  await recordPackPurchaseEvent(settings, {
-    event,
-    session,
-    profile: normalized,
-    pack,
-    credited: true,
-  });
+  if (!paymentAlreadyStored) {
+    await recordPackPurchaseEvent(settings, {
+      event,
+      session,
+      profile: normalized,
+      pack,
+      credited: true,
+    });
+  }
+  await recordPackCreditsAppliedEvent(settings, { session, profile: normalized, pack });
 
   return { profile: normalized, pack, credited: true, alreadyStored: false };
 }

@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { Resend } from "resend";
 import { getSupabaseSettings, sendJson, readRequestBody, supabaseUpdateByUserId } from "./_pro.js";
-import { getStripeClient } from "./_stripe.js";
+import { applyPackPurchaseFromSession, getStripeClient } from "./_stripe.js";
 
 const defaultOutreachFrom = "BatchCutout <support@batchcutout.com>";
 const defaultOutreachReplyTo = "support@batchcutout.com";
@@ -746,6 +746,52 @@ async function listPackPayments(settings) {
       paidWithoutAccess: paidPayments.filter((payment) => payment.linkedToSupabase && payment.accessStatus !== "active").length,
     },
     payments,
+  };
+}
+
+async function reconcilePackPayments(settings) {
+  const stripe = getStripeClient();
+  if (!stripe) {
+    throw new Error("stripe_not_configured");
+  }
+
+  const stripeList = await stripe.checkout.sessions.list({
+    limit: 100,
+    expand: ["data.customer", "data.payment_intent"],
+  });
+  const sessions = stripeList.data.filter((session) =>
+    session?.mode === "payment" &&
+    session?.payment_status === "paid" &&
+    session?.metadata?.batchcutout_purchase_type === "pack"
+  );
+  const results = [];
+
+  for (const session of sessions) {
+    try {
+      const result = await applyPackPurchaseFromSession(settings, session, {
+        id: `admin_reconcile_${session.id}`,
+        created: session.created,
+      });
+      results.push({
+        sessionId: session.id,
+        status: result.credited ? "credited" : "already_credited",
+        credited: Boolean(result.credited),
+      });
+    } catch (error) {
+      results.push({
+        sessionId: session.id,
+        status: error instanceof Error ? error.message : "reconcile_failed",
+        credited: false,
+      });
+    }
+  }
+
+  return {
+    processed: results.length,
+    credited: results.filter((result) => result.credited).length,
+    pendingAccount: results.filter((result) => result.status === "stripe_pack_profile_not_found").length,
+    failed: results.filter((result) => !["credited", "already_credited", "stripe_pack_profile_not_found"].includes(result.status)).length,
+    results,
   };
 }
 
@@ -1574,6 +1620,11 @@ export default async function handler(request, response) {
     if (mode === "support-resolve") {
       const result = await resolveSupportEmail(settings, body);
       return sendJson(response, result.status, result.body);
+    }
+
+    if (mode === "reconcile-pack-payments") {
+      const reconciliation = await reconcilePackPayments(settings);
+      return sendJson(response, 200, { ok: true, reconciliation });
     }
 
     if (mode === "cancel-subscription") {
