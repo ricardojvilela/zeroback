@@ -58,6 +58,79 @@ export function getSupabaseSettings() {
   };
 }
 
+export async function generateSupabaseMagicLink(settings, { email, redirectTo, fetchImpl = fetch } = {}) {
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(normalizedEmail)) {
+    throw new Error("magic_link_invalid_email");
+  }
+
+  let supabaseUrl;
+  let redirectUrl;
+  try {
+    supabaseUrl = new URL(String(settings?.supabaseUrl || ""));
+    redirectUrl = new URL(String(redirectTo || ""));
+  } catch {
+    throw new Error("magic_link_invalid_url");
+  }
+
+  if (supabaseUrl.protocol !== "https:" || !settings?.serviceRoleKey) {
+    throw new Error("magic_link_supabase_not_configured");
+  }
+  if (
+    redirectUrl.origin !== "https://batchcutout.com" ||
+    redirectUrl.username ||
+    redirectUrl.password
+  ) {
+    throw new Error("magic_link_invalid_redirect");
+  }
+
+  const response = await fetchImpl(new URL("/auth/v1/admin/generate_link", supabaseUrl).toString(), {
+    method: "POST",
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      type: "magiclink",
+      email: normalizedEmail,
+      redirect_to: redirectUrl.toString(),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`magic_link_generation_failed:${response.status}`);
+  }
+
+  let payload;
+  try {
+    payload = await response.json();
+  } catch {
+    throw new Error("magic_link_invalid_response");
+  }
+
+  let actionUrl;
+  try {
+    actionUrl = new URL(String(payload?.action_link || ""));
+  } catch {
+    throw new Error("magic_link_invalid_response");
+  }
+
+  const verifyPath = actionUrl.pathname.replace(/\/+$/, "");
+  const hasToken = actionUrl.searchParams.has("token") || actionUrl.searchParams.has("token_hash");
+  if (
+    actionUrl.protocol !== "https:" ||
+    actionUrl.origin !== supabaseUrl.origin ||
+    verifyPath !== "/auth/v1/verify" ||
+    actionUrl.searchParams.get("type") !== "magiclink" ||
+    !hasToken
+  ) {
+    throw new Error("magic_link_invalid_response");
+  }
+
+  return actionUrl.toString();
+}
+
 export function getAccessToken(request) {
   const header = request.headers?.authorization || request.headers?.Authorization || "";
   const match = String(header).match(/^Bearer\s+(.+)$/i);

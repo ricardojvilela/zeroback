@@ -1,6 +1,12 @@
 import crypto from "node:crypto";
 import { Resend } from "resend";
-import { getSupabaseSettings, sendJson, readRequestBody, supabaseUpdateByUserId } from "./_pro.js";
+import {
+  generateSupabaseMagicLink,
+  getSupabaseSettings,
+  readRequestBody,
+  sendJson,
+  supabaseUpdateByUserId,
+} from "./_pro.js";
 import { applyPackPurchaseFromSession, getStripeClient } from "./_stripe.js";
 
 const defaultOutreachFrom = "BatchCutout <support@batchcutout.com>";
@@ -73,6 +79,14 @@ function fromEmail(value) {
 
 function cleanText(value, maxLength) {
   return String(value || "").trim().slice(0, maxLength);
+}
+
+function escapeHtmlAttribute(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }
 
 function isInternalValidationEvent(event) {
@@ -1622,15 +1636,32 @@ export async function sendPackActivationEmail(settings, body) {
     style: "currency",
     currency: String(session.currency || "eur").toUpperCase(),
   }).format(amount / 100);
-  const activationUrl = `https://batchcutout.com/?checkout=success&session_id=${encodeURIComponent(session.id)}#accountTitle`;
+  const activationPageUrl = `https://batchcutout.com/?checkout=success&session_id=${encodeURIComponent(session.id)}#accountTitle`;
+  const magicRedirectUrl = new URL(activationPageUrl);
+  magicRedirectUrl.hash = "";
+  magicRedirectUrl.searchParams.set("auth", "magiclink");
+  let activationUrl;
+  try {
+    activationUrl = await generateSupabaseMagicLink(settings, {
+      email: to,
+      redirectTo: magicRedirectUrl.toString(),
+    });
+  } catch {
+    return { status: 502, body: { ok: false, error: "pack_magic_link_generation_failed" } };
+  }
+
+  const activationHtmlUrl = escapeHtmlAttribute(activationUrl);
+  const activationPageHtmlUrl = escapeHtmlAttribute(activationPageUrl);
   const subject = isRecovery ? "Your BatchCutout account setup is fixed" : `Activate your BatchCutout Pack ${credits}`;
   const text = isRecovery ? `Hi,
 
 We identified and fixed a technical issue that prevented account creation after your BatchCutout Pack ${credits} purchase.
 
-Your payment and ${credits} image credits are safe. Please reopen the secure link below and create an account or sign in using the same email address used for payment. Your credits will then be linked automatically, with no additional payment.
+Your payment and ${credits} image credits are safe. Open the secure access link below: your session starts without a password and the credits are linked automatically, with no additional payment.
 
-Activate your credits: ${activationUrl}
+Access your Pack ${credits}: ${activationUrl}
+
+If the secure link has expired, request a new access link here: ${activationPageUrl}
 
 If anything still blocks you, reply to this email and we will help.
 
@@ -1642,19 +1673,21 @@ NexaFlow Labs` : `Hi,
 Your ${amountLabel} payment for BatchCutout Pack ${credits} has been confirmed.
 
 To activate your ${credits} image credits:
-1. Open the secure link below.
-2. Create an account or sign in using the same email address used for payment.
-3. Your credits will be linked automatically. No additional payment is required.
+1. Open the secure access link below.
+2. Your BatchCutout session starts automatically, without a password.
+3. Your credits are linked automatically. No additional payment is required.
 
-Activate your credits: ${activationUrl}
+Access your Pack ${credits}: ${activationUrl}
+
+If the secure link has expired, request a new access link here: ${activationPageUrl}
 
 If you need help, reply to this email.
 
 BatchCutout Support
 NexaFlow Labs`;
   const html = isRecovery
-    ? `<p>Hi,</p><p>We identified and fixed a technical issue that prevented account creation after your <strong>BatchCutout Pack ${credits}</strong> purchase.</p><p>Your payment and ${credits} image credits are safe. Please reopen the secure link below and create an account or sign in using the same email address used for payment. Your credits will then be linked automatically, with no additional payment.</p><p><a href="${activationUrl}" style="display:inline-block;padding:12px 18px;background:#0877d1;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:700">Activate ${credits} credits</a></p><p>If anything still blocks you, reply to this email and we will help.</p><p>We are sorry for the interruption.</p><p>BatchCutout Support<br>NexaFlow Labs</p>`
-    : `<p>Hi,</p><p>Your <strong>${amountLabel}</strong> payment for <strong>BatchCutout Pack ${credits}</strong> has been confirmed.</p><p>To activate your ${credits} image credits:</p><ol><li>Open the secure link below.</li><li>Create an account or sign in using the same email address used for payment.</li><li>Your credits will be linked automatically. No additional payment is required.</li></ol><p><a href="${activationUrl}" style="display:inline-block;padding:12px 18px;background:#0877d1;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:700">Activate ${credits} credits</a></p><p>If you need help, reply to this email.</p><p>BatchCutout Support<br>NexaFlow Labs</p>`;
+    ? `<p>Hi,</p><p>We identified and fixed a technical issue that prevented account creation after your <strong>BatchCutout Pack ${credits}</strong> purchase.</p><p>Your payment and ${credits} image credits are safe. Open the secure access button below: your session starts without a password and the credits are linked automatically, with no additional payment.</p><p><a href="${activationHtmlUrl}" style="display:inline-block;padding:12px 18px;background:#0877d1;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:700">Access Pack ${credits}</a></p><p style="font-size:13px;color:#5f6b76">If the secure link has expired, <a href="${activationPageHtmlUrl}">request a new access link</a>.</p><p>If anything still blocks you, reply to this email and we will help.</p><p>We are sorry for the interruption.</p><p>BatchCutout Support<br>NexaFlow Labs</p>`
+    : `<p>Hi,</p><p>Your <strong>${amountLabel}</strong> payment for <strong>BatchCutout Pack ${credits}</strong> has been confirmed.</p><p>To activate your ${credits} image credits:</p><ol><li>Open the secure access button below.</li><li>Your BatchCutout session starts automatically, without a password.</li><li>Your credits are linked automatically. No additional payment is required.</li></ol><p><a href="${activationHtmlUrl}" style="display:inline-block;padding:12px 18px;background:#0877d1;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:700">Access Pack ${credits}</a></p><p style="font-size:13px;color:#5f6b76">If the secure link has expired, <a href="${activationPageHtmlUrl}">request a new access link</a>.</p><p>If you need help, reply to this email.</p><p>BatchCutout Support<br>NexaFlow Labs</p>`;
   const payload = {
     from: mailSettings.from,
     to,
@@ -1685,6 +1718,8 @@ NexaFlow Labs`;
     subject,
     resend_id: sent.data?.id || "",
     purpose: isRecovery ? "paid_pack_activation_recovery" : "paid_pack_activation",
+    access_method: "supabase_magic_link",
+    password_required: false,
   }, session.id);
 
   return {
@@ -1697,6 +1732,7 @@ NexaFlow Labs`;
       to: payload.to,
       subject: payload.subject,
       sessionId: session.id,
+      accessMethod: "magic_link",
     },
   };
 }

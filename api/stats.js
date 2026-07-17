@@ -143,6 +143,10 @@ function emptyDay(date) {
     accountEmailConfirmationResends: 0,
     accountLogins: 0,
     accountLoginFailures: 0,
+    accountMagicLinkRequests: 0,
+    accountMagicLinksSent: 0,
+    accountMagicLinkFailures: 0,
+    accountMagicLinkAuthentications: 0,
     leadCaptures: 0,
     resultReadyLeadCaptures: 0,
     limitPromptLeadCaptures: 0,
@@ -362,6 +366,10 @@ function emptySourceRow(source) {
     accountEmailConfirmationResends: 0,
     accountLogins: 0,
     accountLoginFailures: 0,
+    accountMagicLinkRequests: 0,
+    accountMagicLinksSent: 0,
+    accountMagicLinkFailures: 0,
+    accountMagicLinkAuthentications: 0,
     leadCaptures: 0,
     resultReadyLeadCaptures: 0,
     limitPromptLeadCaptures: 0,
@@ -1265,6 +1273,22 @@ export default async function handler(request, response) {
         case "account_login_failed":
           row.accountLoginFailures += 1;
           sourceRow.accountLoginFailures += 1;
+          break;
+        case "account_magic_link_requested":
+          row.accountMagicLinkRequests += 1;
+          sourceRow.accountMagicLinkRequests += 1;
+          break;
+        case "account_magic_link_sent":
+          row.accountMagicLinksSent += 1;
+          sourceRow.accountMagicLinksSent += 1;
+          break;
+        case "account_magic_link_failed":
+          row.accountMagicLinkFailures += 1;
+          sourceRow.accountMagicLinkFailures += 1;
+          break;
+        case "account_magic_link_authenticated":
+          row.accountMagicLinkAuthentications += 1;
+          sourceRow.accountMagicLinkAuthentications += 1;
           break;
         case "lead_capture_submitted":
           row.leadCaptures += 1;

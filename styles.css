@@ -497,6 +497,39 @@ h2 {
   color: rgba(255, 255, 255, 0.62);
 }
 
+.account-magic-link-block {
+  display: grid;
+  gap: 8px;
+}
+
+.account-magic-link-block p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.82rem;
+  font-weight: 760;
+  line-height: 1.45;
+}
+
+.account-magic-link-block > button {
+  width: 100%;
+  min-height: 44px;
+}
+
+.account-magic-link-block > #accountMagicLink {
+  border: 1px solid #51d7c6;
+  border-radius: 8px;
+  background: #51d7c6;
+  color: #062430;
+  font-size: 0.92rem;
+  font-weight: 900;
+}
+
+.account-magic-link-block > #accountMagicLink:hover:not(:disabled) {
+  border-color: #ffffff;
+  background: #ffffff;
+  color: #062430;
+}
+
 .password-field {
   position: relative;
   display: grid;

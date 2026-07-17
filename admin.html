@@ -1165,6 +1165,22 @@
             <strong id="liveAccountLoginFailures">0</strong>
           </article>
           <article class="live-card">
+            <span>Links acesso pedidos</span>
+            <strong id="liveAccountMagicLinkRequests">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Links acesso enviados</span>
+            <strong id="liveAccountMagicLinksSent">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Links acesso falharam</span>
+            <strong id="liveAccountMagicLinkFailures">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Acessos por link</span>
+            <strong id="liveAccountMagicLinkAuthentications">0</strong>
+          </article>
+          <article class="live-card">
             <span>Leads capturados</span>
             <strong id="liveLeadCaptures">0</strong>
           </article>
@@ -3044,6 +3060,10 @@
         document.querySelector("#liveAccountEmailConfirmationResends").textContent = totals.accountEmailConfirmationResends || 0;
         document.querySelector("#liveAccountLogins").textContent = totals.accountLogins || 0;
         document.querySelector("#liveAccountLoginFailures").textContent = totals.accountLoginFailures || 0;
+        document.querySelector("#liveAccountMagicLinkRequests").textContent = totals.accountMagicLinkRequests || 0;
+        document.querySelector("#liveAccountMagicLinksSent").textContent = totals.accountMagicLinksSent || 0;
+        document.querySelector("#liveAccountMagicLinkFailures").textContent = totals.accountMagicLinkFailures || 0;
+        document.querySelector("#liveAccountMagicLinkAuthentications").textContent = totals.accountMagicLinkAuthentications || 0;
         document.querySelector("#liveLeadCaptures").textContent = totals.leadCaptures || 0;
         document.querySelector("#liveResultReadyLeadCaptures").textContent = totals.resultReadyLeadCaptures || 0;
         document.querySelector("#liveLimitPromptLeadCaptures").textContent = totals.limitPromptLeadCaptures || 0;
