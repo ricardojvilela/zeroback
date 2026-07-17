@@ -615,6 +615,140 @@ async function listSubscriptions(settings) {
   };
 }
 
+async function listRecordedPackPaymentIds(settings) {
+  const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
+  const query = new URLSearchParams({
+    select: "event_label",
+    event_name: "eq.pack_purchase_paid",
+    order: "occurred_at.desc",
+    limit: "200",
+  });
+  const response = await fetch(`${settings.supabaseUrl}/rest/v1/${tableName}?${query}`, {
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+    },
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`pack_payment_events_read_failed:${response.status}:${detail.slice(0, 300)}`);
+  }
+
+  const rows = await response.json();
+  return new Set(rows.map((row) => cleanText(row.event_label, 160)).filter(Boolean));
+}
+
+function checkoutCustomer(session) {
+  return session?.customer && typeof session.customer === "object" && !session.customer.deleted
+    ? session.customer
+    : null;
+}
+
+function packPaymentEmail(session) {
+  const metadata = session?.metadata || {};
+  return normalizeEmail(
+    session?.customer_details?.email ||
+    session?.customer_email ||
+    metadata.batchcutout_pending_email ||
+    metadata.customer_email ||
+    checkoutCustomer(session)?.email ||
+    "",
+  );
+}
+
+function packPaymentPlan(session) {
+  const plan = cleanText(session?.metadata?.batchcutout_price_plan, 80);
+  return plan === "pack250" ? "pack250" : "pack100";
+}
+
+function mapPackPayment(session, profile, recorded) {
+  const customer = checkoutCustomer(session);
+  const paymentIntentId = typeof session?.payment_intent === "string"
+    ? session.payment_intent
+    : session?.payment_intent?.id || "";
+  const paid = session?.payment_status === "paid";
+  const accessActive = Boolean(
+    profile?.userId &&
+    ["pack", "pro"].includes(profile.plan) &&
+    profile.planStatus === "active",
+  );
+  const needsAction = paid && (!recorded || !profile?.userId || !accessActive);
+
+  return {
+    id: session.id,
+    paymentIntentId,
+    paymentStatus: session.payment_status || "",
+    checkoutStatus: session.status || "",
+    paid,
+    recorded,
+    needsAction,
+    createdAt: stripeDate(session.created),
+    amount: Number(session.amount_total || 0) || 0,
+    currency: String(session.currency || "eur").toLowerCase(),
+    plan: packPaymentPlan(session),
+    packImages: Number(session?.metadata?.batchcutout_pack_images || 0) || (packPaymentPlan(session) === "pack250" ? 250 : 100),
+    customerId: customer?.id || (typeof session.customer === "string" ? session.customer : ""),
+    customerEmail: packPaymentEmail(session),
+    linkedToSupabase: Boolean(profile?.userId),
+    accessPlan: profile?.plan || "",
+    accessStatus: profile?.planStatus || "",
+    monthlyRemaining: profile?.monthlyRemaining || 0,
+    attributionSource: cleanText(session?.metadata?.utm_source || session?.metadata?.source, 160),
+    attributionCampaign: cleanText(session?.metadata?.utm_campaign || session?.metadata?.campaign, 160),
+    stripeDashboardUrl: paymentIntentId ? `https://dashboard.stripe.com/payments/${paymentIntentId}` : "",
+  };
+}
+
+async function listPackPayments(settings) {
+  const stripe = getStripeClient();
+  if (!stripe) {
+    throw new Error("stripe_not_configured");
+  }
+
+  const [profiles, stripeList, recordedIds] = await Promise.all([
+    listUsers(settings),
+    stripe.checkout.sessions.list({
+      limit: 100,
+      expand: ["data.customer", "data.payment_intent"],
+    }),
+    listRecordedPackPaymentIds(settings),
+  ]);
+  const profilesByUserId = new Map(profiles.map((profile) => [profile.userId, profile]).filter(([id]) => id));
+  const profilesByCustomer = new Map(profiles.map((profile) => [profile.stripeCustomerId, profile]).filter(([id]) => id));
+  const profilesByEmail = new Map(profiles.map((profile) => [normalizeEmail(profile.email), profile]).filter(([email]) => email));
+
+  const payments = stripeList.data
+    .filter((session) => session?.mode === "payment" && session?.metadata?.batchcutout_purchase_type === "pack")
+    .map((session) => {
+      const customer = checkoutCustomer(session);
+      const userId = cleanText(session?.metadata?.supabase_user_id || session?.client_reference_id, 160);
+      const customerId = customer?.id || (typeof session.customer === "string" ? session.customer : "");
+      const email = packPaymentEmail(session);
+      const profile = profilesByUserId.get(userId) || profilesByCustomer.get(customerId) || profilesByEmail.get(email) || null;
+      return mapPackPayment(session, profile, recordedIds.has(session.id));
+    })
+    .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime());
+  const paidPayments = payments.filter((payment) => payment.paid);
+  const currency = paidPayments.find((payment) => payment.currency)?.currency || "eur";
+
+  return {
+    generatedAt: new Date().toISOString(),
+    summary: {
+      total: payments.length,
+      paid: paidPayments.length,
+      paidAmount: paidPayments.reduce((sum, payment) => sum + payment.amount, 0),
+      currency,
+      recorded: paidPayments.filter((payment) => payment.recorded).length,
+      needsAction: paidPayments.filter((payment) => payment.needsAction).length,
+      paidWithoutRecord: paidPayments.filter((payment) => !payment.recorded).length,
+      paidWithoutAccount: paidPayments.filter((payment) => !payment.linkedToSupabase).length,
+      paidWithoutAccess: paidPayments.filter((payment) => payment.linkedToSupabase && payment.accessStatus !== "active").length,
+    },
+    payments,
+  };
+}
+
 async function cancelSubscriptionRenewal(subscriptionId) {
   const stripe = getStripeClient();
   if (!stripe) {
@@ -1389,6 +1523,10 @@ export default async function handler(request, response) {
       if (url.searchParams.get("view") === "subscriptions") {
         const subscriptionData = await listSubscriptions(settings);
         return sendJson(response, 200, { ok: true, ...subscriptionData });
+      }
+      if (url.searchParams.get("view") === "pack-payments") {
+        const paymentData = await listPackPayments(settings);
+        return sendJson(response, 200, { ok: true, ...paymentData });
       }
       if (url.searchParams.get("view") === "support-mailbox") {
         const mailboxData = await listSupportMailbox(settings);

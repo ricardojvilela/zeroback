@@ -1322,6 +1322,57 @@
           <p class="live-status" id="packFunnelAction">A carregar recomendação Pack 100...</p>
         </section>
         <p class="live-status" id="liveStatus">A carregar atividade...</p>
+        <section class="source-live-block" aria-label="Pagamentos Pack Stripe">
+          <div class="panel-head compact">
+            <div>
+              <h3>Pagamentos Pack Stripe</h3>
+              <p class="note">Confirma diretamente no Stripe os pagamentos únicos, a receita e os casos pagos sem conta ou sem acesso.</p>
+            </div>
+            <div class="actions">
+              <button class="secondary" type="button" id="refreshPackPayments">Atualizar pagamentos</button>
+            </div>
+          </div>
+          <div class="live-grid">
+            <article class="live-card">
+              <span>Packs pagos</span>
+              <strong id="stripePackPaid">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Receita Pack Stripe</span>
+              <strong id="stripePackRevenue">0 EUR</strong>
+            </article>
+            <article class="live-card">
+              <span>Registados no BatchCutout</span>
+              <strong id="stripePackRecorded">0</strong>
+            </article>
+            <article class="live-card">
+              <span>Precisam de ação</span>
+              <strong id="stripePackAttention">0</strong>
+            </article>
+          </div>
+          <p class="live-status" id="packPaymentsStatus">A carregar pagamentos Pack...</p>
+          <div class="table-wrap">
+            <table class="subscriptions-table">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Pagamento</th>
+                  <th>Pack</th>
+                  <th>Valor</th>
+                  <th>Data</th>
+                  <th>Acesso BatchCutout</th>
+                  <th>Origem</th>
+                  <th>Stripe</th>
+                </tr>
+              </thead>
+              <tbody id="packPaymentsRowsBody">
+                <tr>
+                  <td class="empty" colspan="8">A carregar pagamentos Pack.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
         <section class="source-live-block" aria-label="Subscrições Stripe">
           <div class="panel-head compact">
             <div>
@@ -1784,6 +1835,8 @@
       const outreachFilter = document.querySelector("#outreachFilter");
       const supportRowsBody = document.querySelector("#supportRowsBody");
       const supportStatus = document.querySelector("#supportStatus");
+      const packPaymentsRowsBody = document.querySelector("#packPaymentsRowsBody");
+      const packPaymentsStatus = document.querySelector("#packPaymentsStatus");
       const subscriptionsRowsBody = document.querySelector("#subscriptionsRowsBody");
       const subscriptionsStatus = document.querySelector("#subscriptionsStatus");
       let outreachProspects = [];
@@ -3396,6 +3449,68 @@
           : `<tr><td class="empty" colspan="6">Ainda não existem emails recebidos em support@batchcutout.com.</td></tr>`;
       }
 
+      function packPaymentState(payment) {
+        if (!payment.paid) return { label: "Não pago", tone: "warning" };
+        if (!payment.recorded && !payment.linkedToSupabase) return { label: "Pago sem conta", tone: "danger" };
+        if (!payment.recorded) return { label: "Pago não registado", tone: "danger" };
+        if (!payment.linkedToSupabase) return { label: "Pago sem conta", tone: "danger" };
+        if (payment.accessStatus !== "active") return { label: "Acesso por confirmar", tone: "warning" };
+        return { label: "Pago e ativo", tone: "success" };
+      }
+
+      function renderPackPayments(data) {
+        const summary = data.summary || {};
+        document.querySelector("#stripePackPaid").textContent = summary.paid || 0;
+        document.querySelector("#stripePackRevenue").textContent = formatCurrencyFromCents(summary.paidAmount || 0, summary.currency || "eur");
+        document.querySelector("#stripePackRecorded").textContent = summary.recorded || 0;
+        document.querySelector("#stripePackAttention").textContent = summary.needsAction || 0;
+
+        if (summary.needsAction) {
+          document.querySelector("#decisionBadge").textContent = "Ação";
+          document.querySelector("#decisionTitle").textContent = `${summary.needsAction} pagamento Pack precisa de atenção`;
+          document.querySelector("#decisionText").textContent = "Existe pagamento confirmado diretamente no Stripe que ainda não está totalmente registado ou ligado ao acesso BatchCutout.";
+        }
+
+        packPaymentsRowsBody.innerHTML = data.payments?.length
+          ? data.payments.map((payment) => {
+              const state = packPaymentState(payment);
+              const accessLabel = payment.linkedToSupabase
+                ? `${payment.accessPlan || "free"} / ${payment.accessStatus || "active"}`
+                : "sem conta BatchCutout";
+              const usageLabel = payment.linkedToSupabase
+                ? `${payment.monthlyRemaining || 0} créditos disponíveis`
+                : "criar ou ligar conta com o mesmo email";
+              const source = payment.attributionSource || "-";
+              const campaign = payment.attributionCampaign || "";
+
+              return `
+                <tr>
+                  <td>
+                    ${escapeHtml(payment.customerEmail || "-")}
+                    <span class="muted-small">${escapeHtml(payment.customerId || "-")}</span>
+                  </td>
+                  <td>
+                    <span class="pill ${escapeHtml(state.tone)}">${escapeHtml(state.label)}</span>
+                    <span class="muted-small">${escapeHtml(payment.paymentStatus || "-")}</span>
+                  </td>
+                  <td>${escapeHtml(payment.plan || "Pack")}<span class="muted-small">${payment.packImages || 0} imagens</span></td>
+                  <td>${formatCurrencyFromCents(payment.amount || 0, payment.currency || "eur")}</td>
+                  <td>${payment.createdAt ? formatDate(payment.createdAt) : "-"}</td>
+                  <td>
+                    <span class="pill ${payment.linkedToSupabase && payment.accessStatus === "active" ? "success" : "warning"}">${escapeHtml(accessLabel)}</span>
+                    <span class="muted-small">${escapeHtml(usageLabel)}</span>
+                  </td>
+                  <td>${escapeHtml(source)}${campaign ? `<span class="muted-small">${escapeHtml(campaign)}</span>` : ""}</td>
+                  <td>${payment.stripeDashboardUrl ? `<a class="subscription-link" href="${escapeHtml(payment.stripeDashboardUrl)}" target="_blank" rel="noreferrer">Pagamento</a>` : "-"}</td>
+                </tr>
+              `;
+            }).join("")
+          : `<tr><td class="empty" colspan="8">Ainda não existem pagamentos Pack no Stripe.</td></tr>`;
+
+        const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString("pt-PT") : "";
+        packPaymentsStatus.textContent = `${summary.total || 0} sessões Pack lidas diretamente no Stripe. Última atualização: ${generatedAt}`;
+      }
+
       function renderSubscriptions(data) {
         const summary = data.summary || {};
         const businessTypes = summary.businessTypes || {};
@@ -3638,6 +3753,29 @@
         }
       }
 
+      async function loadPackPayments() {
+        const token = getAdminToken();
+        if (!token) return;
+
+        packPaymentsStatus.textContent = "A carregar pagamentos Pack...";
+        try {
+          const response = await fetch("/api/pro-users?view=pack-payments", {
+            headers: {
+              Accept: "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          const data = await response.json();
+          if (!response.ok || !data.ok) {
+            throw new Error(data.error || "admin_pack_payments_failed");
+          }
+          renderPackPayments(data);
+        } catch {
+          packPaymentsRowsBody.innerHTML = `<tr><td class="empty" colspan="8">Não foi possível carregar pagamentos Pack do Stripe.</td></tr>`;
+          packPaymentsStatus.textContent = "Erro ao carregar pagamentos Pack diretamente do Stripe.";
+        }
+      }
+
       async function loadSupportMailbox() {
         const token = getAdminToken();
         if (!token) return;
@@ -3695,6 +3833,7 @@
 
         await loadProUsers();
         await loadSubscriptions();
+        await loadPackPayments();
       }
 
       async function cancelSubscription(subscriptionId) {
@@ -3866,6 +4005,7 @@
           await loadCheckoutRecoveries();
           await loadEmailConfirmationRecoveries();
           await loadSubscriptions();
+          await loadPackPayments();
           await loadOutreachProspects();
           await loadSupportMailbox();
         } catch (error) {
@@ -3884,14 +4024,17 @@
           outreachProspectsBody.innerHTML = `<tr><td class="empty" colspan="8">Não foi possível carregar prospects.</td></tr>`;
           supportRowsBody.innerHTML = `<tr><td class="empty" colspan="6">Não foi possível carregar a caixa de suporte.</td></tr>`;
           subscriptionsRowsBody.innerHTML = `<tr><td class="empty" colspan="9">Não foi possível carregar subscrições Stripe.</td></tr>`;
+          packPaymentsRowsBody.innerHTML = `<tr><td class="empty" colspan="8">Não foi possível carregar pagamentos Pack Stripe.</td></tr>`;
           liveStatus.textContent = "Erro ao carregar Supabase. Verificar /api/stats e variáveis Vercel.";
           subscriptionsStatus.textContent = "Erro ao carregar subscrições.";
+          packPaymentsStatus.textContent = "Erro ao carregar pagamentos Pack.";
         }
       }
 
       document.querySelector("#refreshLive").addEventListener("click", loadLiveStats);
       document.querySelector("#refreshProUsers").addEventListener("click", loadProUsers);
       document.querySelector("#refreshSubscriptions").addEventListener("click", loadSubscriptions);
+      document.querySelector("#refreshPackPayments").addEventListener("click", loadPackPayments);
       document.querySelector("#refreshOutreachProspects").addEventListener("click", loadOutreachProspects);
       outreachFilter?.addEventListener("change", () => renderOutreachProspects(outreachProspects));
       document.querySelector("#refreshSupportMailbox").addEventListener("click", loadSupportMailbox);
