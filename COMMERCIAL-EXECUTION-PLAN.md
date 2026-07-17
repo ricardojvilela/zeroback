@@ -320,6 +320,7 @@ Decision rules:
 - Added an anonymized account-failure diagnostic to `/admin` on 2026-07-17 after the first buyer remained without an account.
 - The diagnostic confirmed that all 8 signup failures came from one visitor and were caused by a checkout-state initialization error in the account form; the same session then produced 5 invalid-login attempts.
 - Fixed and deployed the account-creation error in commit `2fb1ff0`. The original activation link remains valid, but the buyer still needs to retry account creation before the 250 credits can be attached.
+- Sent one transactional recovery email from `support@batchcutout.com` on 2026-07-17 after the fix, using the same secure activation link and no commercial offer. The recovery send has its own duplicate protection; do not send another message unless the customer replies.
 - Do not count this one-time Pack payment as a subscription or MRR.
 
 ## First revenue targets
