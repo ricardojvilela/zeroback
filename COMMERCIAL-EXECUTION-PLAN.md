@@ -314,6 +314,8 @@ Decision rules:
 - Added direct Stripe Pack payment reporting to `/admin`, separate from event-based attribution and renewable MRR.
 - Fixed Pack fulfillment so a paid checkout is recorded as revenue even when the customer account does not exist yet, while credit application remains independently idempotent.
 - Reconciled the historical payment: 1 paid Pack, 9 EUR recorded revenue, 0 EUR renewable MRR and 1 paid customer awaiting account activation.
+- Sent one transactional activation email from `support@batchcutout.com` on 2026-07-17 with the secure checkout-return link and instructions to create or sign in with the payment email.
+- Duplicate protection is active for this Stripe session; do not send another activation message unless the customer replies and support requires it.
 - Do not count this one-time Pack payment as a subscription or MRR.
 
 ## First revenue targets
