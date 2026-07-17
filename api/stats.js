@@ -690,11 +690,15 @@ export function validationExperimentSummary(events, timeZone, today) {
   };
 }
 
-function accountFailureReason(value) {
-  const reason = asCleanText(value, 160)
+function normalizedAccountFailureReason(value) {
+  return asCleanText(value, 160)
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "_")
     .replace(/^_+|_+$/g, "");
+}
+
+function accountFailureReason(value) {
+  const reason = normalizedAccountFailureReason(value);
   if (!reason) return "unknown";
   if (reason.includes("weak_password") || reason.includes("password_should") || reason.includes("password_must")) {
     return "weak_password";
@@ -724,13 +728,16 @@ export function accountFailureBreakdown(events) {
   for (const event of events) {
     if (!trackedEvents.has(event.event_name)) continue;
     const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
-    const reason = accountFailureReason(detail.reason);
+    const rawReasonCode = normalizedAccountFailureReason(detail.reason) || "unknown";
+    const reason = accountFailureReason(rawReasonCode);
+    const reasonCode = reason === "other" ? rawReasonCode : reason;
     const source = asCleanText(detail.source, 80) || "unknown";
     const pagePath = asCleanText(event.page_path || detail.page_path, 240) || "-";
-    const key = [event.event_name, reason, source, pagePath].join("\u001f");
+    const key = [event.event_name, reason, reasonCode, source, pagePath].join("\u001f");
     const current = groups.get(key) || {
       eventName: event.event_name,
       reason,
+      reasonCode,
       source,
       pagePath,
       attempts: 0,

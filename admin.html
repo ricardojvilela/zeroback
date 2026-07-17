@@ -2879,17 +2879,23 @@
           ? `${totalAttempts} falha(s) agrupadas por motivo nos últimos 14 dias.`
           : "Sem falhas de registo ou login nos últimos 14 dias.";
         accountFailureRowsBody.innerHTML = rows.length
-          ? rows.map((row) => `
+          ? rows.map((row) => {
+              const reasonLabel = reasonLabels[row.reason] || row.reason || "-";
+              const reasonDetail = row.reason === "other" && row.reasonCode && row.reasonCode !== "unknown"
+                ? `${reasonLabel}: ${row.reasonCode}`
+                : reasonLabel;
+              return `
               <tr>
                 <td>${escapeHtml(processLabels[row.eventName] || row.eventName || "-")}</td>
-                <td>${escapeHtml(reasonLabels[row.reason] || row.reason || "-")}</td>
+                <td>${escapeHtml(reasonDetail)}</td>
                 <td>${escapeHtml(row.source || "-")}</td>
                 <td>${escapeHtml(row.pagePath || "-")}</td>
                 <td>${Number(row.attempts || 0) || 0}</td>
                 <td>${Number(row.uniqueVisitors || 0) || 0}</td>
                 <td>${row.lastAt ? new Date(row.lastAt).toLocaleString("pt-PT") : "-"}</td>
               </tr>
-            `).join("")
+            `;
+            }).join("")
           : `<tr><td class="empty" colspan="7">Sem falhas de acesso no período.</td></tr>`;
       }
 
