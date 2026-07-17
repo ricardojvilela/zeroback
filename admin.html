@@ -1222,6 +1222,32 @@
           </article>
         </div>
         <p class="funnel-diagnosis" id="liveFunnelDiagnosis">A carregar diagnóstico do funil...</p>
+        <section class="source-live-block" aria-label="Falhas de acesso">
+          <div class="panel-head compact">
+            <div>
+              <h3>Diagnóstico de acesso</h3>
+              <p class="note" id="accountFailureStatus">A carregar falhas de registo e login.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Processo</th>
+                  <th>Motivo</th>
+                  <th>Origem</th>
+                  <th>Página</th>
+                  <th>Tentativas</th>
+                  <th>Pessoas</th>
+                  <th>Última</th>
+                </tr>
+              </thead>
+              <tbody id="accountFailureRowsBody">
+                <tr><td class="empty" colspan="7">A carregar diagnóstico.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
         <section class="source-live-block" aria-label="Funil Pack 100">
           <div class="panel-head compact">
             <div>
@@ -1823,6 +1849,8 @@
       const authForm = document.querySelector("#authForm");
       const authError = document.querySelector("#authError");
       const liveRowsBody = document.querySelector("#liveRowsBody");
+      const accountFailureRowsBody = document.querySelector("#accountFailureRowsBody");
+      const accountFailureStatus = document.querySelector("#accountFailureStatus");
       const campaignRowsBody = document.querySelector("#campaignRowsBody");
       const sourceRowsBody = document.querySelector("#sourceRowsBody");
       const packSourceRowsBody = document.querySelector("#packSourceRowsBody");
@@ -2826,10 +2854,50 @@
         document.querySelector("#validationDecision").textContent = decision;
       }
 
+      function renderAccountFailures(rows = []) {
+        const processLabels = {
+          account_form_validation_failed: "Validação do formulário",
+          account_signup_failed: "Criação de conta",
+          account_login_failed: "Login",
+        };
+        const reasonLabels = {
+          weak_password: "Password não cumpre os requisitos",
+          existing_account: "Conta já existente",
+          email_not_confirmed: "Email ainda não confirmado",
+          invalid_credentials: "Credenciais inválidas",
+          rate_limit: "Limite temporário do serviço",
+          signups_disabled: "Novos registos desativados",
+          captcha_failed: "Validação anti-spam falhou",
+          invalid_email: "Email inválido",
+          network_error: "Falha de rede",
+          service_error: "Falha do serviço de contas",
+          other: "Outro erro",
+          unknown: "Sem motivo registado",
+        };
+        const totalAttempts = rows.reduce((sum, row) => sum + (Number(row.attempts || 0) || 0), 0);
+        accountFailureStatus.textContent = totalAttempts
+          ? `${totalAttempts} falha(s) agrupadas por motivo nos últimos 14 dias.`
+          : "Sem falhas de registo ou login nos últimos 14 dias.";
+        accountFailureRowsBody.innerHTML = rows.length
+          ? rows.map((row) => `
+              <tr>
+                <td>${escapeHtml(processLabels[row.eventName] || row.eventName || "-")}</td>
+                <td>${escapeHtml(reasonLabels[row.reason] || row.reason || "-")}</td>
+                <td>${escapeHtml(row.source || "-")}</td>
+                <td>${escapeHtml(row.pagePath || "-")}</td>
+                <td>${Number(row.attempts || 0) || 0}</td>
+                <td>${Number(row.uniqueVisitors || 0) || 0}</td>
+                <td>${row.lastAt ? new Date(row.lastAt).toLocaleString("pt-PT") : "-"}</td>
+              </tr>
+            `).join("")
+          : `<tr><td class="empty" colspan="7">Sem falhas de acesso no período.</td></tr>`;
+      }
+
       function renderLiveStats(data) {
         const totals = data.totals || {};
         renderDailyBrief(data);
         renderValidationExperiment(data.validationExperiment || {});
+        renderAccountFailures(data.accountFailureBreakdown || []);
         document.querySelector("#dashboardVisitors").textContent = totals.visitors || 0;
         document.querySelector("#dashboardUploads").textContent = totals.uploadsStarted || 0;
         document.querySelector("#liveVisitors").textContent = totals.visitors || 0;
@@ -4017,6 +4085,8 @@
             document.body.classList.add("locked");
           }
           liveRowsBody.innerHTML = `<tr><td class="empty" colspan="33">Não foi possível carregar atividade.</td></tr>`;
+          accountFailureRowsBody.innerHTML = `<tr><td class="empty" colspan="7">Não foi possível carregar o diagnóstico de acesso.</td></tr>`;
+          accountFailureStatus.textContent = "Erro ao carregar falhas de registo e login.";
           campaignRowsBody.innerHTML = `<tr><td class="empty" colspan="15">Não foi possível carregar campanhas.</td></tr>`;
           sourceRowsBody.innerHTML = `<tr><td class="empty" colspan="32">Não foi possível carregar origens.</td></tr>`;
           packSourceRowsBody.innerHTML = `<tr><td class="empty" colspan="11">Não foi possível carregar origens do Pack.</td></tr>`;

@@ -690,6 +690,68 @@ export function validationExperimentSummary(events, timeZone, today) {
   };
 }
 
+function accountFailureReason(value) {
+  const reason = asCleanText(value, 160)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  if (!reason) return "unknown";
+  if (reason.includes("weak_password") || reason.includes("password_should") || reason.includes("password_must")) {
+    return "weak_password";
+  }
+  if (reason.includes("already_registered") || reason.includes("already_exists") || reason.includes("user_already")) {
+    return "existing_account";
+  }
+  if (reason.includes("email_not_confirmed") || reason.includes("not_confirmed")) return "email_not_confirmed";
+  if (reason.includes("invalid_login") || reason.includes("invalid_credentials")) return "invalid_credentials";
+  if (reason.includes("rate_limit") || reason.includes("too_many_requests")) return "rate_limit";
+  if (reason.includes("signup_disabled") || reason.includes("signups_not_allowed")) return "signups_disabled";
+  if (reason.includes("captcha")) return "captcha_failed";
+  if (reason.includes("invalid_email") || reason.includes("email_address_invalid")) return "invalid_email";
+  if (reason.includes("network") || reason.includes("fetch")) return "network_error";
+  if (reason.includes("database") || reason.includes("unexpected_failure")) return "service_error";
+  return "other";
+}
+
+export function accountFailureBreakdown(events) {
+  const trackedEvents = new Set([
+    "account_form_validation_failed",
+    "account_signup_failed",
+    "account_login_failed",
+  ]);
+  const groups = new Map();
+
+  for (const event of events) {
+    if (!trackedEvents.has(event.event_name)) continue;
+    const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+    const reason = accountFailureReason(detail.reason);
+    const source = asCleanText(detail.source, 80) || "unknown";
+    const pagePath = asCleanText(event.page_path || detail.page_path, 240) || "-";
+    const key = [event.event_name, reason, source, pagePath].join("\u001f");
+    const current = groups.get(key) || {
+      eventName: event.event_name,
+      reason,
+      source,
+      pagePath,
+      attempts: 0,
+      visitors: new Set(),
+      lastAt: "",
+    };
+
+    current.attempts += 1;
+    const visitorId = asCleanText(event.visitor_id || detail.visitor_id, 120);
+    if (visitorId) current.visitors.add(visitorId);
+    const occurredAt = asCleanText(event.occurred_at, 80);
+    if (occurredAt > current.lastAt) current.lastAt = occurredAt;
+    groups.set(key, current);
+  }
+
+  return Array.from(groups.values())
+    .map(({ visitors, ...row }) => ({ ...row, uniqueVisitors: visitors.size }))
+    .sort((a, b) => b.attempts - a.attempts || b.lastAt.localeCompare(a.lastAt))
+    .slice(0, 20);
+}
+
 function verifyAdminToken(request) {
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (!adminPassword) return false;
@@ -1361,6 +1423,7 @@ export default async function handler(request, response) {
       totals,
       packVisitorFunnel: packVisitorFunnelSummary(packVisitorStages),
       validationExperiment: validationExperimentSummary(events, timeZone, today),
+      accountFailureBreakdown: accountFailureBreakdown(events),
       sourceBreakdown,
       packSourceBreakdown,
       campaignBreakdown,
