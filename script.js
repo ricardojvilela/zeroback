@@ -3096,7 +3096,6 @@ async function handleAccountCreate(event) {
       return;
     }
     setGoogleUserData(email);
-    const waitingPlan = checkoutPlanWaitingForAuth();
     trackEvent("account_signup_succeeded", {
       source: waitingPlan ? "checkout_plan" : "account_panel",
       has_requested_checkout: Boolean(waitingPlan),
