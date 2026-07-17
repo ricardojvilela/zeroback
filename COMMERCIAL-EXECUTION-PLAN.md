@@ -306,6 +306,16 @@ Decision rules:
 - Daily monitoring is authorized to restore 8 EUR/day and 2 EUR/day immediately after the credit unlocks, or on 2026-07-20 at the latest.
 - Do not enable the paused legacy `Campaign #1`.
 
+## First real Pack payment - 2026-07-16
+
+- Stripe confirmed the first real customer payment: Pack 250 for 9 EUR.
+- Google Ads recorded the matching 9 EUR Pack purchase conversion.
+- The customer completed the email-only checkout without creating a BatchCutout account, so no credits could be attached yet.
+- Added direct Stripe Pack payment reporting to `/admin`, separate from event-based attribution and renewable MRR.
+- Fixed Pack fulfillment so a paid checkout is recorded as revenue even when the customer account does not exist yet, while credit application remains independently idempotent.
+- Reconciled the historical payment: 1 paid Pack, 9 EUR recorded revenue, 0 EUR renewable MRR and 1 paid customer awaiting account activation.
+- Do not count this one-time Pack payment as a subscription or MRR.
+
 ## First revenue targets
 
 Target 1:
