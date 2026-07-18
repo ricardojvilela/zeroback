@@ -13,12 +13,12 @@ Contact:
 support@batchcutout.com
 
 Legal pages:
-- https://batchcutout.com/termos.html
-- https://batchcutout.com/en/terms.html
-- https://batchcutout.com/es/terminos.html
-- https://batchcutout.com/privacidade.html
-- https://batchcutout.com/en/privacy.html
-- https://batchcutout.com/es/privacidad.html
+- https://batchcutout.com/termos
+- https://batchcutout.com/en/terms
+- https://batchcutout.com/es/terminos
+- https://batchcutout.com/privacidade
+- https://batchcutout.com/en/privacy
+- https://batchcutout.com/es/privacidad
 
 Core positioning:
 - Remove backgrounds from product photos in batches.

@@ -124,6 +124,7 @@ Interpretation:
 - Post-download email capture now offers a concrete link plus product-photo checklist, and the automatic email delivers that checklist before pointing to the founder plan.
 - Public SEO/proof/use-case pages now include a consistent social preview image, improving link presentation in directories, communities and manual outreach.
 - The sitemap now includes `lastmod` dates for all public URLs, helping search crawlers notice the updated commercial pages.
+- On 2026-07-18, Search Console reported three redirected legal URLs last crawled on 2026-07-08 to 2026-07-10. All 12 legal/contact pages, canonical and hreflang tags, internal links, `sitemap.xml` and `llms.txt` now use the final extensionless URLs produced by Vercel `cleanUrls`; regression tests prevent redirected `.html` URLs from returning to the sitemap.
 - Manual recovery templates in `/admin` now match the link-plus-checklist lead capture and default recovery checkout links to the founder plan.
 - Five new qualified ecommerce/product-photo prospects were added to the outreach CSV as ready proof-page candidates, staged for a small domain-safe batch after support replies are checked.
 - Added an English Canva background remover alternative landing page focused on product-photo batches, transparent PNGs and ZIP export, with founder-plan CTAs and UTM tracking.

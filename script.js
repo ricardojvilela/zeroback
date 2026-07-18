@@ -208,9 +208,9 @@ const leadCaptureDismissedStorageKey = "batchcutout_lead_capture_dismissed";
 const pendingCheckoutPlanStorageKey = "batchcutout_pending_checkout_plan";
 const freeTestUsageStorageKey = "batchcutout_free_test_images_used";
 const localizedPolicyLinks = {
-  pt: "./privacidade.html",
-  en: "./en/privacy.html",
-  es: "./es/privacidad.html",
+  pt: "/privacidade",
+  en: "/en/privacy",
+  es: "/es/privacidad",
 };
 const serverEventNames = new Set([
   "tool_page_view",
