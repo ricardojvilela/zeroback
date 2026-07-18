@@ -319,7 +319,7 @@ Decision rules:
 - Future paid Pack checkouts without an existing account now trigger the same activation email automatically from the Stripe webhook; failed sends cause a webhook retry, while successful sends remain idempotent.
 - Added an anonymized account-failure diagnostic to `/admin` on 2026-07-17 after the first buyer remained without an account.
 - The diagnostic confirmed that all 8 signup failures came from one visitor and were caused by a checkout-state initialization error in the account form; the same session then produced 5 invalid-login attempts.
-- Fixed and deployed the account-creation error in commit `2fb1ff0`. The original activation link remains valid, but the buyer still needs to retry account creation before the 250 credits can be attached.
+- Fixed and deployed the account-creation error in commit `2fb1ff0`. The buyer subsequently completed account activation on 2026-07-18.
 - Sent one transactional recovery email from `support@batchcutout.com` on 2026-07-17 after the fix, using the same secure activation link and no commercial offer. The recovery send has its own duplicate protection; do not send another message unless the customer replies.
 - Deployed passwordless Pack activation on 2026-07-17. Future activation emails now contain a one-time Supabase access link sent by BatchCutout; opening it starts the session and attaches the paid credits through the existing idempotent Stripe synchronization.
 - Existing activation-page links now offer a fresh access link by email, so the first buyer can complete activation without creating a password. Password login remains available only as an alternative for customers who already have one.
@@ -329,6 +329,7 @@ Decision rules:
 - A signed-out customer can request a Supabase password-recovery email. The recovery return opens the password form directly; an expired link exposes the request option again.
 - Added `/admin` counters for recovery requests, recovery emails, opened recovery links, passwords defined and password failures. No password value is stored in analytics.
 - Verified the guest, Pack password-alternative and expired-recovery states in production Chrome without sending a recovery email; no BatchCutout page errors were detected.
+- Confirmed on 2026-07-18 that the first paid Pack customer is linked to a `pack / active` account with all 250 credits available and no paid-without-account warning. Usage remained 0/250 at the time of the check; monitor retention without sending another activation email.
 - Do not count this one-time Pack payment as a subscription or MRR.
 
 ## First revenue targets
