@@ -99,3 +99,20 @@ test("keeps passwordless Pack activation and password fallback wired in the fron
   assert.match(script, /account_magic_link_authenticated/);
   assert.match(script, /usePasswordForActivation \? handleAccountLogin/);
 });
+
+test("keeps password recovery and authenticated password setup wired without tracking passwords", async () => {
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const [html, script] = await Promise.all([
+    readFile(path.join(root, "index.html"), "utf8"),
+    readFile(path.join(root, "script.js"), "utf8"),
+  ]);
+
+  assert.match(html, /id="accountPasswordResetRequest"/);
+  assert.match(html, /id="accountPasswordSetup"/);
+  assert.match(html, /id="accountPasswordSetupOpen"/);
+  assert.match(script, /resetPasswordForEmail/);
+  assert.match(script, /accountPasswordRecoveryRedirectUrl/);
+  assert.match(script, /PASSWORD_RECOVERY/);
+  assert.match(script, /updateUser\(\{ password \}\)/);
+  assert.doesNotMatch(script, /trackEvent\([^)]*password\s*[,}:]/s);
+});

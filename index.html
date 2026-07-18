@@ -194,7 +194,7 @@
         ]
       }
     </script>
-    <link rel="stylesheet" href="./styles.css?v=20260717-pack-magic-access" />
+    <link rel="stylesheet" href="./styles.css?v=20260717-password-login" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
   <body>
@@ -334,9 +334,49 @@
             </div>
             <button type="submit" id="accountCreate" data-i18n="accountCreate">Criar conta e continuar</button>
             <button type="button" class="ghost-button small" id="accountSubmit" data-i18n="accountSubmit">Entrar</button>
+            <button type="button" class="ghost-button small hidden" id="accountPasswordResetRequest" data-i18n="accountPasswordResetRequest">
+              Definir ou recuperar password
+            </button>
+          </form>
+          <form class="account-password-setup hidden" id="accountPasswordSetup" novalidate aria-labelledby="accountPasswordSetupTitle">
+            <div class="account-password-setup-head">
+              <strong id="accountPasswordSetupTitle" data-i18n="accountPasswordSetupTitle">Definir nova password</strong>
+              <p data-i18n="accountPasswordSetupText">Use pelo menos 6 caracteres. Depois poderá entrar sempre com email e password.</p>
+            </div>
+            <div class="password-field">
+              <input
+                id="accountNewPassword"
+                type="password"
+                autocomplete="new-password"
+                required
+                minlength="6"
+                placeholder="Nova password (mín. 6 caracteres)"
+                data-i18n-placeholder="accountNewPasswordPlaceholder"
+              />
+              <button
+                class="password-toggle"
+                id="accountNewPasswordToggle"
+                type="button"
+                aria-controls="accountNewPassword accountConfirmPassword"
+                aria-pressed="false"
+                data-i18n="passwordShow"
+              >Mostrar</button>
+            </div>
+            <input
+              id="accountConfirmPassword"
+              type="password"
+              autocomplete="new-password"
+              required
+              minlength="6"
+              placeholder="Confirmar nova password"
+              data-i18n-placeholder="accountConfirmPasswordPlaceholder"
+            />
+            <button type="submit" id="accountPasswordSave" data-i18n="accountPasswordSave">Guardar password</button>
+            <button type="button" class="ghost-button small" id="accountPasswordCancel" data-i18n="accountPasswordCancel">Cancelar</button>
           </form>
           <div class="account-actions hidden" id="accountActions">
             <button type="button" class="ghost-button small" id="accountRefresh" data-i18n="accountRefresh">Atualizar conta</button>
+            <button type="button" class="ghost-button small" id="accountPasswordSetupOpen" data-i18n="accountPasswordSetupOpen">Definir ou alterar password</button>
             <div class="billing-actions" id="billingActions">
               <button type="button" data-checkout-plan="pack100" data-i18n="billingPack100">Pack 100 imagens - 5 EUR (melhor entrada)</button>
               <button type="button" data-checkout-plan="pack250" data-i18n="billingPack250">Pack 250 imagens - 9 EUR</button>
@@ -714,7 +754,7 @@
       </section>
     </main>
 
-    <script type="module" src="./script.js?v=20260717-pack-magic-access"></script>
+    <script type="module" src="./script.js?v=20260717-password-login"></script>
   </body>
 </html>
 

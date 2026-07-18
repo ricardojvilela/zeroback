@@ -1181,6 +1181,26 @@
             <strong id="liveAccountMagicLinkAuthentications">0</strong>
           </article>
           <article class="live-card">
+            <span>Recuperações pedidas</span>
+            <strong id="liveAccountPasswordRecoveryRequests">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Emails recuperação</span>
+            <strong id="liveAccountPasswordRecoveryEmailsSent">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Links recuperação abertos</span>
+            <strong id="liveAccountPasswordRecoveryAuthentications">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Passwords definidas</span>
+            <strong id="liveAccountPasswordSetupSuccesses">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Falhas password</span>
+            <strong id="liveAccountPasswordFailures">0</strong>
+          </article>
+          <article class="live-card">
             <span>Leads capturados</span>
             <strong id="liveLeadCaptures">0</strong>
           </article>
@@ -3064,6 +3084,11 @@
         document.querySelector("#liveAccountMagicLinksSent").textContent = totals.accountMagicLinksSent || 0;
         document.querySelector("#liveAccountMagicLinkFailures").textContent = totals.accountMagicLinkFailures || 0;
         document.querySelector("#liveAccountMagicLinkAuthentications").textContent = totals.accountMagicLinkAuthentications || 0;
+        document.querySelector("#liveAccountPasswordRecoveryRequests").textContent = totals.accountPasswordRecoveryRequests || 0;
+        document.querySelector("#liveAccountPasswordRecoveryEmailsSent").textContent = totals.accountPasswordRecoveryEmailsSent || 0;
+        document.querySelector("#liveAccountPasswordRecoveryAuthentications").textContent = totals.accountPasswordRecoveryAuthentications || 0;
+        document.querySelector("#liveAccountPasswordSetupSuccesses").textContent = totals.accountPasswordSetupSuccesses || 0;
+        document.querySelector("#liveAccountPasswordFailures").textContent = totals.accountPasswordFailures || 0;
         document.querySelector("#liveLeadCaptures").textContent = totals.leadCaptures || 0;
         document.querySelector("#liveResultReadyLeadCaptures").textContent = totals.resultReadyLeadCaptures || 0;
         document.querySelector("#liveLimitPromptLeadCaptures").textContent = totals.limitPromptLeadCaptures || 0;

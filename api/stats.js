@@ -147,6 +147,11 @@ function emptyDay(date) {
     accountMagicLinksSent: 0,
     accountMagicLinkFailures: 0,
     accountMagicLinkAuthentications: 0,
+    accountPasswordRecoveryRequests: 0,
+    accountPasswordRecoveryEmailsSent: 0,
+    accountPasswordRecoveryAuthentications: 0,
+    accountPasswordSetupSuccesses: 0,
+    accountPasswordFailures: 0,
     leadCaptures: 0,
     resultReadyLeadCaptures: 0,
     limitPromptLeadCaptures: 0,
@@ -370,6 +375,11 @@ function emptySourceRow(source) {
     accountMagicLinksSent: 0,
     accountMagicLinkFailures: 0,
     accountMagicLinkAuthentications: 0,
+    accountPasswordRecoveryRequests: 0,
+    accountPasswordRecoveryEmailsSent: 0,
+    accountPasswordRecoveryAuthentications: 0,
+    accountPasswordSetupSuccesses: 0,
+    accountPasswordFailures: 0,
     leadCaptures: 0,
     resultReadyLeadCaptures: 0,
     limitPromptLeadCaptures: 0,
@@ -1289,6 +1299,27 @@ export default async function handler(request, response) {
         case "account_magic_link_authenticated":
           row.accountMagicLinkAuthentications += 1;
           sourceRow.accountMagicLinkAuthentications += 1;
+          break;
+        case "account_password_recovery_requested":
+          row.accountPasswordRecoveryRequests += 1;
+          sourceRow.accountPasswordRecoveryRequests += 1;
+          break;
+        case "account_password_recovery_sent":
+          row.accountPasswordRecoveryEmailsSent += 1;
+          sourceRow.accountPasswordRecoveryEmailsSent += 1;
+          break;
+        case "account_password_recovery_failed":
+        case "account_password_setup_failed":
+          row.accountPasswordFailures += 1;
+          sourceRow.accountPasswordFailures += 1;
+          break;
+        case "account_password_recovery_authenticated":
+          row.accountPasswordRecoveryAuthentications += 1;
+          sourceRow.accountPasswordRecoveryAuthentications += 1;
+          break;
+        case "account_password_setup_succeeded":
+          row.accountPasswordSetupSuccesses += 1;
+          sourceRow.accountPasswordSetupSuccesses += 1;
           break;
         case "lead_capture_submitted":
           row.leadCaptures += 1;

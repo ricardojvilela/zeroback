@@ -477,13 +477,15 @@ h2 {
 }
 
 .account-form,
+.account-password-setup,
 .account-actions {
   display: grid;
   gap: 10px;
   margin-top: 12px;
 }
 
-.account-form input {
+.account-form input,
+.account-password-setup input {
   width: 100%;
   min-height: 44px;
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -493,8 +495,33 @@ h2 {
   color: #ffffff;
 }
 
-.account-form input::placeholder {
+.account-form input::placeholder,
+.account-password-setup input::placeholder {
   color: rgba(255, 255, 255, 0.62);
+}
+
+.account-password-setup {
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  padding-top: 12px;
+}
+
+.account-password-setup-head {
+  display: grid;
+  gap: 4px;
+}
+
+.account-password-setup-head strong {
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 900;
+}
+
+.account-password-setup-head p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.76);
+  font-size: 0.78rem;
+  font-weight: 760;
+  line-height: 1.4;
 }
 
 .account-magic-link-block {
@@ -604,6 +631,7 @@ h2 {
 }
 
 .account-form > button,
+.account-password-setup > button,
 .account-actions .ghost-button {
   width: 100%;
 }

@@ -151,6 +151,14 @@ const accountPasswordMode = document.querySelector("#accountPasswordMode");
 const accountPassword = document.querySelector("#accountPassword");
 const accountPasswordToggle = document.querySelector("#accountPasswordToggle");
 const accountPasswordField = accountPassword?.closest(".password-field");
+const accountPasswordResetRequest = document.querySelector("#accountPasswordResetRequest");
+const accountPasswordSetup = document.querySelector("#accountPasswordSetup");
+const accountNewPassword = document.querySelector("#accountNewPassword");
+const accountConfirmPassword = document.querySelector("#accountConfirmPassword");
+const accountNewPasswordToggle = document.querySelector("#accountNewPasswordToggle");
+const accountPasswordSave = document.querySelector("#accountPasswordSave");
+const accountPasswordCancel = document.querySelector("#accountPasswordCancel");
+const accountPasswordSetupOpen = document.querySelector("#accountPasswordSetupOpen");
 const accountSubmit = document.querySelector("#accountSubmit");
 const accountCreate = document.querySelector("#accountCreate");
 const accountCheckoutLink = document.querySelector("#accountCheckoutLink");
@@ -171,6 +179,7 @@ const checkoutStatus = pageParams.get("checkout");
 const checkoutSessionId = pageParams.get("session_id");
 const authHashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
 const isMagicLinkAuthReturn = pageParams.get("auth") === "magiclink" || authHashParams.get("type") === "magiclink";
+const isPasswordRecoveryReturn = pageParams.get("auth") === "password-recovery" || authHashParams.get("type") === "recovery";
 const isCheckoutActivationReturn = checkoutStatus === "success" && Boolean(checkoutSessionId);
 const checkoutPlans = new Set(["monthly", "annual", "early", "pack100", "pack250"]);
 const defaultCheckoutPlan = "pack100";
@@ -249,6 +258,12 @@ const serverEventNames = new Set([
   "account_magic_link_sent",
   "account_magic_link_failed",
   "account_magic_link_authenticated",
+  "account_password_recovery_requested",
+  "account_password_recovery_sent",
+  "account_password_recovery_failed",
+  "account_password_recovery_authenticated",
+  "account_password_setup_succeeded",
+  "account_password_setup_failed",
 ]);
 let debugList;
 let supabaseClient = null;
@@ -266,6 +281,8 @@ let hasTrackedAccountFormInteraction = false;
 let lastCheckoutLinkSentPlan = "";
 let usePasswordForActivation = false;
 let hasTrackedMagicLinkAuthentication = false;
+let passwordSetupOpen = isPasswordRecoveryReturn;
+let hasTrackedPasswordRecoveryAuthentication = false;
 
 const supportedExtensions = [
   ".jpg",
@@ -438,6 +455,25 @@ const baseTranslation = {
   accountUsePassword: "Já tenho password",
   accountUseMagicLink: "Voltar ao link de acesso",
   accountPasswordFallbackText: "Use esta opção apenas se já tiver uma conta BatchCutout com password.",
+  accountPasswordResetRequest: "Definir ou recuperar password",
+  accountPasswordResetSending: "A enviar recuperação...",
+  accountPasswordResetSent: "Se existir uma conta com este email, receberá um link para definir uma nova password.",
+  accountPasswordResetInvalid: "Introduza o email da conta para definir ou recuperar a password.",
+  accountPasswordResetError: "Não foi possível enviar a recuperação agora. Tente novamente dentro de instantes.",
+  accountPasswordRecoveryReady: "Link confirmado. Defina agora a password que quer usar nos próximos logins.",
+  accountPasswordRecoveryInvalid: "Este link de recuperação expirou ou já foi utilizado. Peça um novo link abaixo.",
+  accountPasswordSetupOpen: "Definir ou alterar password",
+  accountPasswordSetupTitle: "Definir nova password",
+  accountPasswordSetupText: "Use pelo menos 6 caracteres. Depois poderá entrar sempre com email e password.",
+  accountNewPasswordPlaceholder: "Nova password (mín. 6 caracteres)",
+  accountConfirmPasswordPlaceholder: "Confirmar nova password",
+  accountPasswordSave: "Guardar password",
+  accountPasswordSaving: "A guardar password...",
+  accountPasswordCancel: "Cancelar",
+  accountPasswordMismatch: "As duas passwords não coincidem.",
+  accountPasswordInvalid: "A password deve ter pelo menos 6 caracteres.",
+  accountPasswordSaved: "Password guardada. Já pode entrar com o seu email e esta password.",
+  accountPasswordSaveError: "Não foi possível guardar a password agora. Peça um novo link de recuperação e tente novamente.",
   accountSubmit: "Entrar",
   accountSubmitCheckout: "Entrar e continuar",
   accountSubmitSending: "A entrar...",
@@ -683,6 +719,25 @@ const translations = {
     accountUsePassword: "I already have a password",
     accountUseMagicLink: "Back to access link",
     accountPasswordFallbackText: "Use this option only if you already have a BatchCutout account with a password.",
+    accountPasswordResetRequest: "Set or recover password",
+    accountPasswordResetSending: "Sending recovery...",
+    accountPasswordResetSent: "If an account exists for this email, you will receive a link to set a new password.",
+    accountPasswordResetInvalid: "Enter the account email to set or recover the password.",
+    accountPasswordResetError: "We could not send the recovery email right now. Try again shortly.",
+    accountPasswordRecoveryReady: "Link confirmed. Set the password you want to use for future sign-ins.",
+    accountPasswordRecoveryInvalid: "This recovery link has expired or has already been used. Request a new link below.",
+    accountPasswordSetupOpen: "Set or change password",
+    accountPasswordSetupTitle: "Set a new password",
+    accountPasswordSetupText: "Use at least 6 characters. You can then always sign in with email and password.",
+    accountNewPasswordPlaceholder: "New password (min. 6 characters)",
+    accountConfirmPasswordPlaceholder: "Confirm new password",
+    accountPasswordSave: "Save password",
+    accountPasswordSaving: "Saving password...",
+    accountPasswordCancel: "Cancel",
+    accountPasswordMismatch: "The two passwords do not match.",
+    accountPasswordInvalid: "The password must contain at least 6 characters.",
+    accountPasswordSaved: "Password saved. You can now sign in with your email and this password.",
+    accountPasswordSaveError: "We could not save the password right now. Request a new recovery link and try again.",
     accountSubmit: "Sign in",
     accountSubmitCheckout: "Sign in and continue",
     accountSubmitSending: "Signing in...",
@@ -1325,6 +1380,25 @@ const translatedAddons = {
     accountUsePassword: "Ya tengo contraseña",
     accountUseMagicLink: "Volver al enlace de acceso",
     accountPasswordFallbackText: "Usa esta opción solo si ya tienes una cuenta BatchCutout con contraseña.",
+    accountPasswordResetRequest: "Definir o recuperar contraseña",
+    accountPasswordResetSending: "Enviando recuperación...",
+    accountPasswordResetSent: "Si existe una cuenta con este email, recibirás un enlace para definir una nueva contraseña.",
+    accountPasswordResetInvalid: "Introduce el email de la cuenta para definir o recuperar la contraseña.",
+    accountPasswordResetError: "No se pudo enviar la recuperación ahora. Inténtalo de nuevo en unos instantes.",
+    accountPasswordRecoveryReady: "Enlace confirmado. Define ahora la contraseña que quieres usar en los próximos accesos.",
+    accountPasswordRecoveryInvalid: "Este enlace de recuperación ha caducado o ya se utilizó. Solicita uno nuevo abajo.",
+    accountPasswordSetupOpen: "Definir o cambiar contraseña",
+    accountPasswordSetupTitle: "Definir nueva contraseña",
+    accountPasswordSetupText: "Usa al menos 6 caracteres. Después podrás entrar siempre con email y contraseña.",
+    accountNewPasswordPlaceholder: "Nueva contraseña (mín. 6 caracteres)",
+    accountConfirmPasswordPlaceholder: "Confirmar nueva contraseña",
+    accountPasswordSave: "Guardar contraseña",
+    accountPasswordSaving: "Guardando contraseña...",
+    accountPasswordCancel: "Cancelar",
+    accountPasswordMismatch: "Las dos contraseñas no coinciden.",
+    accountPasswordInvalid: "La contraseña debe tener al menos 6 caracteres.",
+    accountPasswordSaved: "Contraseña guardada. Ya puedes entrar con tu email y esta contraseña.",
+    accountPasswordSaveError: "No se pudo guardar la contraseña ahora. Solicita un nuevo enlace de recuperación e inténtalo de nuevo.",
     accountSubmit: "Entrar",
     accountSubmitCheckout: "Entrar y continuar",
     accountSubmitSending: "Entrando...",
@@ -1761,6 +1835,12 @@ const analyticsEvents = {
   account_magic_link_sent: { category: "account", label: "magic_link_sent" },
   account_magic_link_failed: { category: "account", label: "magic_link_failed" },
   account_magic_link_authenticated: { category: "account", label: "magic_link_authenticated" },
+  account_password_recovery_requested: { category: "account", label: "password_recovery_requested" },
+  account_password_recovery_sent: { category: "account", label: "password_recovery_sent" },
+  account_password_recovery_failed: { category: "account", label: "password_recovery_failed" },
+  account_password_recovery_authenticated: { category: "account", label: "password_recovery_authenticated" },
+  account_password_setup_succeeded: { category: "account", label: "password_setup_succeeded" },
+  account_password_setup_failed: { category: "account", label: "password_setup_failed" },
   photos_selected: { category: "upload", label: "photos_selected" },
   upload_rejected: { category: "upload", label: "upload_rejected" },
   upload: { category: "funnel", label: "upload", step: 1 },
@@ -2526,6 +2606,34 @@ function togglePasswordVisibility(input, button) {
   input.focus({ preventScroll: true });
 }
 
+function updatePasswordSetupToggle() {
+  if (!accountNewPassword || !accountConfirmPassword || !accountNewPasswordToggle) return;
+  const visible = accountNewPassword.type === "text";
+  accountNewPasswordToggle.textContent = t(visible ? "passwordHide" : "passwordShow");
+  accountNewPasswordToggle.setAttribute("aria-pressed", String(visible));
+}
+
+function togglePasswordSetupVisibility() {
+  if (!accountNewPassword || !accountConfirmPassword) return;
+  const nextType = accountNewPassword.type === "password" ? "text" : "password";
+  accountNewPassword.type = nextType;
+  accountConfirmPassword.type = nextType;
+  updatePasswordSetupToggle();
+  accountNewPassword.focus({ preventScroll: true });
+}
+
+function clearAccountPasswordSetup() {
+  if (accountNewPassword) {
+    accountNewPassword.value = "";
+    accountNewPassword.type = "password";
+  }
+  if (accountConfirmPassword) {
+    accountConfirmPassword.value = "";
+    accountConfirmPassword.type = "password";
+  }
+  updatePasswordSetupToggle();
+}
+
 function applyLanguage() {
   document.documentElement.lang = languageNames[currentLanguage] || currentLanguage;
   document.title = t("pageTitle");
@@ -2551,6 +2659,7 @@ function applyLanguage() {
 
   languageSelect.value = currentLanguage;
   updatePasswordToggle(accountPassword, accountPasswordToggle);
+  updatePasswordSetupToggle();
   refreshStatusText();
   updateAccountUi();
   render();
@@ -2693,6 +2802,28 @@ function syncAccountActivationControls() {
   }
   if (accountMagicLink && !accountMagicLink.disabled) {
     accountMagicLink.textContent = t("accountMagicLink");
+  }
+}
+
+function syncAccountPasswordUi() {
+  const activationPending = Boolean(!currentAccount && isCheckoutActivationReturn && authConfig?.configured);
+  const waitingPlan = checkoutPlanWaitingForAuth();
+  const resetAvailable = Boolean(
+    !currentAccount &&
+    authConfig?.configured &&
+    (!checkoutPlanIsPack(waitingPlan) || (activationPending && usePasswordForActivation)) &&
+    (!activationPending || usePasswordForActivation)
+  );
+  const setupVisible = Boolean(currentAccount && passwordSetupOpen);
+
+  accountPasswordResetRequest?.classList.toggle("hidden", !resetAvailable);
+  accountPasswordSetup?.classList.toggle("hidden", !setupVisible);
+  accountPasswordSetupOpen?.classList.toggle("hidden", !currentAccount || setupVisible);
+  if (accountPasswordResetRequest && !accountPasswordResetRequest.disabled) {
+    accountPasswordResetRequest.textContent = t("accountPasswordResetRequest");
+  }
+  if (accountPasswordSave && !accountPasswordSave.disabled) {
+    accountPasswordSave.textContent = t("accountPasswordSave");
   }
 }
 
@@ -2912,6 +3043,7 @@ function updateAccountUi() {
     updateAccountUsageUi({});
     if (accountCreate) accountCreate.textContent = t("accountCreate");
     if (accountSubmit) accountSubmit.textContent = t("accountSubmit");
+    syncAccountPasswordUi();
     syncPaidAccessUi();
     updateControls();
     return;
@@ -2935,6 +3067,7 @@ function updateAccountUi() {
       updateAccountUsageUi({});
       syncAccountAuthButtons();
       syncAccountActivationControls();
+      syncAccountPasswordUi();
       syncPaidAccessUi();
       updateControls();
       return;
@@ -2970,6 +3103,7 @@ function updateAccountUi() {
     updateAccountUsageUi({});
     syncAccountAuthButtons();
     syncAccountActivationControls();
+    syncAccountPasswordUi();
     syncPaidAccessUi();
     updateControls();
     return;
@@ -3004,6 +3138,7 @@ function updateAccountUi() {
   billingActions?.classList.toggle("hidden", access.accessType === "pro");
   billingPortal?.classList.toggle("hidden", access.accessType !== "pro" || !currentAccount?.billing?.hasStripeCustomer);
   updateAccountUsageUi(access);
+  syncAccountPasswordUi();
   syncPaidAccessUi();
   updateControls();
 }
@@ -3088,6 +3223,25 @@ function completeMagicLinkAuthentication() {
   window.setTimeout(() => accountPanel?.scrollIntoView({ behavior: "smooth", block: "start" }), 120);
 }
 
+function completePasswordRecoveryAuthentication() {
+  if (!isPasswordRecoveryReturn || !currentAccount || hasTrackedPasswordRecoveryAuthentication) return false;
+  hasTrackedPasswordRecoveryAuthentication = true;
+  passwordSetupOpen = true;
+  trackEvent("account_password_recovery_authenticated", {
+    source: isCheckoutActivationReturn ? "pack_activation_return" : "account_panel",
+    checkout_return: isCheckoutActivationReturn,
+  });
+
+  const cleanUrl = new URL(window.location.href);
+  cleanUrl.searchParams.delete("auth");
+  cleanUrl.hash = "accountTitle";
+  window.history.replaceState({}, "", `${cleanUrl.pathname}${cleanUrl.search}${cleanUrl.hash}`);
+  updateAccountUi();
+  setAccountMessage("accountPasswordRecoveryReady");
+  window.setTimeout(() => accountNewPassword?.focus({ preventScroll: true }), 120);
+  return true;
+}
+
 async function initAuth() {
   await fetchAuthConfig();
   if (!supabaseClient) return;
@@ -3095,9 +3249,17 @@ async function initAuth() {
   await refreshAccount();
   await showCheckoutReturnMessage();
   completeMagicLinkAuthentication();
+  const recoveredPasswordSession = completePasswordRecoveryAuthentication();
+  if (isPasswordRecoveryReturn && !recoveredPasswordSession && !currentAccount) {
+    passwordSetupOpen = false;
+    if (isCheckoutActivationReturn) usePasswordForActivation = true;
+    updateAccountUi();
+    setAccountMessage("accountPasswordRecoveryInvalid");
+  }
   await maybeStartRequestedCheckout();
 
-  supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+  supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    if (event === "PASSWORD_RECOVERY") passwordSetupOpen = true;
     if (!session?.access_token) {
       currentAccount = null;
       updateAccountUi();
@@ -3105,8 +3267,9 @@ async function initAuth() {
     }
 
     await refreshAccount();
-    if (isMagicLinkAuthReturn) await syncCheckoutReturnAfterAuth();
+    if (isMagicLinkAuthReturn || isPasswordRecoveryReturn) await syncCheckoutReturnAfterAuth();
     completeMagicLinkAuthentication();
+    completePasswordRecoveryAuthentication();
     await maybeStartRequestedCheckout();
   });
 }
@@ -3170,9 +3333,124 @@ function handleAccountPasswordMode() {
   usePasswordForActivation = !usePasswordForActivation;
   setAccountMessage();
   syncAccountActivationControls();
+  syncAccountPasswordUi();
   window.setTimeout(() => {
     (usePasswordForActivation ? accountPassword : accountEmail)?.focus({ preventScroll: true });
   }, 0);
+}
+
+async function handleAccountPasswordResetRequest(event) {
+  event?.preventDefault();
+  if (!supabaseClient || !accountEmail || !accountPasswordResetRequest) {
+    setAccountMessage("accountStatusConfigMissing");
+    return;
+  }
+
+  const email = normalizeEmail(accountEmail.value);
+  if (!accountEmail.checkValidity() || !isValidEmail(email)) {
+    setAccountMessage("accountPasswordResetInvalid");
+    accountEmail.focus();
+    return;
+  }
+
+  rememberAccountEmail(email);
+  accountPasswordResetRequest.disabled = true;
+  accountPasswordResetRequest.textContent = t("accountPasswordResetSending");
+  setAccountMessage();
+  const source = isCheckoutActivationReturn ? "pack_activation_return" : "account_panel";
+  trackEvent("account_password_recovery_requested", {
+    source,
+    checkout_return: isCheckoutActivationReturn,
+  });
+
+  try {
+    const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+      redirectTo: accountPasswordRecoveryRedirectUrl(),
+    });
+    if (error) throw error;
+
+    trackEvent("account_password_recovery_sent", {
+      source,
+      checkout_return: isCheckoutActivationReturn,
+    });
+    setAccountMessage("accountPasswordResetSent");
+  } catch (error) {
+    trackEvent("account_password_recovery_failed", {
+      source,
+      checkout_return: isCheckoutActivationReturn,
+      reason: authFailureReason(error),
+    });
+    setAccountMessage("accountPasswordResetError");
+  } finally {
+    accountPasswordResetRequest.disabled = false;
+    syncAccountPasswordUi();
+  }
+}
+
+function handleAccountPasswordSetupOpen() {
+  if (!currentAccount) return;
+  passwordSetupOpen = true;
+  setAccountMessage();
+  updateAccountUi();
+  window.setTimeout(() => accountNewPassword?.focus({ preventScroll: true }), 0);
+}
+
+async function handleAccountPasswordCancel() {
+  passwordSetupOpen = false;
+  clearAccountPasswordSetup();
+  updateAccountUi();
+  setAccountMessage();
+  await maybeStartRequestedCheckout();
+}
+
+async function handleAccountPasswordSave(event) {
+  event?.preventDefault();
+  if (!supabaseClient || !currentAccount || !accountNewPassword || !accountConfirmPassword || !accountPasswordSave) {
+    setAccountMessage("accountStatusConfigMissing");
+    return;
+  }
+
+  const password = accountNewPassword.value;
+  const confirmation = accountConfirmPassword.value;
+  if (password.length < 6 || !accountNewPassword.checkValidity()) {
+    setAccountMessage("accountPasswordInvalid");
+    accountNewPassword.focus();
+    return;
+  }
+  if (password !== confirmation) {
+    setAccountMessage("accountPasswordMismatch");
+    accountConfirmPassword.focus();
+    return;
+  }
+
+  accountPasswordSave.disabled = true;
+  accountPasswordSave.textContent = t("accountPasswordSaving");
+  setAccountMessage();
+
+  try {
+    const { error } = await supabaseClient.auth.updateUser({ password });
+    if (error) throw error;
+
+    trackEvent("account_password_setup_succeeded", {
+      source: isPasswordRecoveryReturn ? "password_recovery" : "account_settings",
+      checkout_return: isCheckoutActivationReturn,
+    });
+    clearAccountPasswordSetup();
+    passwordSetupOpen = false;
+    updateAccountUi();
+    setAccountMessage("accountPasswordSaved");
+    await maybeStartRequestedCheckout();
+  } catch (error) {
+    trackEvent("account_password_setup_failed", {
+      source: isPasswordRecoveryReturn ? "password_recovery" : "account_settings",
+      checkout_return: isCheckoutActivationReturn,
+      reason: authFailureReason(error),
+    });
+    setAccountMessage("accountPasswordSaveError");
+  } finally {
+    accountPasswordSave.disabled = false;
+    syncAccountPasswordUi();
+  }
 }
 
 function handleAccountFormSubmit(event) {
@@ -3416,6 +3694,8 @@ async function handleAccountLogout() {
   await supabaseClient.auth.signOut();
   clearPendingCheckoutPlan();
   currentAccount = null;
+  passwordSetupOpen = false;
+  clearAccountPasswordSetup();
   updateAccountUi();
   setAccountMessage("accountLoggedOut");
 }
@@ -3503,6 +3783,13 @@ function accountEmailRedirectUrl(plan = "") {
 function accountMagicLinkRedirectUrl() {
   const url = new URL(accountEmailRedirectUrl());
   url.searchParams.set("auth", "magiclink");
+  url.hash = "";
+  return url.toString();
+}
+
+function accountPasswordRecoveryRedirectUrl() {
+  const url = new URL(accountEmailRedirectUrl());
+  url.searchParams.set("auth", "password-recovery");
   url.hash = "";
   return url.toString();
 }
@@ -3770,6 +4057,7 @@ async function showCheckoutReturnMessage() {
 }
 
 async function maybeStartRequestedCheckout() {
+  if (passwordSetupOpen) return;
   const planToStart = checkoutPlanWaitingForAuth();
   if (hasStartedRequestedCheckout || !checkoutPlans.has(planToStart || "")) return;
   if (!currentAccount) {
@@ -4904,6 +5192,11 @@ accountForm?.addEventListener("submit", handleAccountFormSubmit);
 accountMagicLink?.addEventListener("click", handleAccountMagicLink);
 accountPasswordMode?.addEventListener("click", handleAccountPasswordMode);
 accountPasswordToggle?.addEventListener("click", () => togglePasswordVisibility(accountPassword, accountPasswordToggle));
+accountPasswordResetRequest?.addEventListener("click", handleAccountPasswordResetRequest);
+accountPasswordSetup?.addEventListener("submit", handleAccountPasswordSave);
+accountPasswordSetupOpen?.addEventListener("click", handleAccountPasswordSetupOpen);
+accountPasswordCancel?.addEventListener("click", handleAccountPasswordCancel);
+accountNewPasswordToggle?.addEventListener("click", togglePasswordSetupVisibility);
 accountSubmit?.addEventListener("click", handleAccountLogin);
 accountCheckoutLink?.addEventListener("click", handleAccountCheckoutLinkCapture);
 accountRefresh?.addEventListener("click", refreshAccount);
