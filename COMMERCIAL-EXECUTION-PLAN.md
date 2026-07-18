@@ -325,6 +325,10 @@ Decision rules:
 - Existing activation-page links now offer a fresh access link by email, so the first buyer can complete activation without creating a password. Password login remains available only as an alternative for customers who already have one.
 - Added `/admin` counters for access links requested, sent, failed and successfully authenticated.
 - Verified the production return flow and the authenticated admin panel in Chrome without sending a test email. The normal account form remains unchanged outside a paid Pack return.
+- Deployed permanent password access on 2026-07-18. An authenticated customer can now define or change a password from the account panel and later sign in with email and password.
+- A signed-out customer can request a Supabase password-recovery email. The recovery return opens the password form directly; an expired link exposes the request option again.
+- Added `/admin` counters for recovery requests, recovery emails, opened recovery links, passwords defined and password failures. No password value is stored in analytics.
+- Verified the guest, Pack password-alternative and expired-recovery states in production Chrome without sending a recovery email; no BatchCutout page errors were detected.
 - Do not count this one-time Pack payment as a subscription or MRR.
 
 ## First revenue targets
