@@ -249,3 +249,5 @@ Decision rule:
 - 0 purchases and fewer than 3 Stripe sessions after the sample target or deadline: stop paid investment and decide between archiving the product or repositioning it as a catalogue-preparation workflow.
 
 The post-download question now measures four concrete objections: no immediate photo volume, insufficient cutout quality, missing catalogue-ready finish, or insufficient value at 5 EUR. `/admin` shows the experiment period, progress, Stripe activity, purchases, and the leading objection without mixing the cohort with the older subscription-first history.
+
+The admin now separates the minimum offer-change gate (30 completed free tests plus 7 full days, counted from 2026-07-12) from the broader validation sprint (50 completed tests plus 3 genuine Pack purchases from 2026-07-14 to 2026-08-13). Gate counts remain anchored to the rollout date even when the dashboard is opened with a shorter reporting window.

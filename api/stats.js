@@ -8,6 +8,12 @@ const corsHeaders = {
 
 const defaultStatsTimeZone = "Europe/Lisbon";
 const legacyPostDownloadPackClickedEvent = ["post", "download", "found" + "er", "clicked"].join("_");
+const offerChangeGateConfig = Object.freeze({
+  id: "free_total_2_offer_gate",
+  startDate: "2026-07-12",
+  targetCompletedTests: 30,
+  minimumFullDays: 7,
+});
 const validationExperimentConfig = Object.freeze({
   id: "pack100_30d_20260714",
   startDate: "2026-07-14",
@@ -632,17 +638,23 @@ function dateKeyDistance(fromDateKey, toDateKey) {
 }
 
 export function validationExperimentSummary(events, timeZone, today) {
-  const stages = new Map();
+  const sprintStages = new Map();
+  const offerGateStages = new Map();
   const latestFeedbackByVisitor = new Map();
   const stripeSessionIds = new Set();
   const paidPackSessionIds = new Set();
 
   for (const event of events) {
     const date = toLocalDate(event.occurred_at, timeZone);
-    if (!date || date < validationExperimentConfig.startDate || date > validationExperimentConfig.endDate) continue;
+    if (!date || date > today) continue;
 
     const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
-    updatePackVisitorFunnel(stages, event, detail);
+    if (date >= offerChangeGateConfig.startDate) {
+      updatePackVisitorFunnel(offerGateStages, event, detail);
+    }
+    if (date < validationExperimentConfig.startDate || date > validationExperimentConfig.endDate) continue;
+
+    updatePackVisitorFunnel(sprintStages, event, detail);
 
     const stripeSessionId = asCleanText(
       detail.stripe_session_id || (event.event_name === "pack_purchase_paid" ? event.event_label : ""),
@@ -662,9 +674,10 @@ export function validationExperimentSummary(events, timeZone, today) {
     }
   }
 
-  const funnel = packVisitorFunnelSummary(stages);
+  const funnel = packVisitorFunnelSummary(sprintStages);
+  const offerGateFunnel = packVisitorFunnelSummary(offerGateStages);
   for (const visitorId of latestFeedbackByVisitor.keys()) {
-    if (!stages.get(visitorId)?.freeTestCompleted) latestFeedbackByVisitor.delete(visitorId);
+    if (!sprintStages.get(visitorId)?.freeTestCompleted) latestFeedbackByVisitor.delete(visitorId);
   }
   const feedback = Object.fromEntries(validationFeedbackAnswers.map((answer) => [answer, 0]));
   for (const answer of latestFeedbackByVisitor.values()) feedback[answer] += 1;
@@ -676,6 +689,9 @@ export function validationExperimentSummary(events, timeZone, today) {
   const deadlinePassed = today > validationExperimentConfig.endDate;
   const sampleReached = funnel.completed >= validationExperimentConfig.targetCompletedTests;
   const purchaseTargetReached = packPurchases >= validationExperimentConfig.targetPackPurchases;
+  const offerGateFullDaysElapsed = Math.max(dateKeyDistance(offerChangeGateConfig.startDate, today), 0);
+  const offerGateSampleReached = offerGateFunnel.completed >= offerChangeGateConfig.targetCompletedTests;
+  const offerGateTimeReached = offerGateFullDaysElapsed >= offerChangeGateConfig.minimumFullDays;
   let status = "collecting";
 
   if (purchaseTargetReached) {
@@ -693,6 +709,16 @@ export function validationExperimentSummary(events, timeZone, today) {
     sampleReached,
     purchaseTargetReached,
     daysRemaining: Math.max(dateKeyDistance(today, validationExperimentConfig.endDate), 0),
+    offerChangeGate: {
+      ...offerChangeGateConfig,
+      completedTests: offerGateFunnel.completed,
+      fullDaysElapsed: offerGateFullDaysElapsed,
+      sampleReached: offerGateSampleReached,
+      timeReached: offerGateTimeReached,
+      reached: offerGateSampleReached && offerGateTimeReached,
+      remainingTests: Math.max(offerChangeGateConfig.targetCompletedTests - offerGateFunnel.completed, 0),
+      remainingDays: Math.max(offerChangeGateConfig.minimumFullDays - offerGateFullDaysElapsed, 0),
+    },
     uniqueVariantVisitors: funnel.uniqueVariantVisitors,
     resultReady: funnel.resultReady,
     completedTests: funnel.completed,
@@ -837,7 +863,7 @@ export default async function handler(request, response) {
   const startDate = dateKeyOffset(today, days - 1) || today;
   const rollingSince = new Date(Date.now() - (days + 1) * 24 * 60 * 60 * 1000);
   rollingSince.setUTCHours(0, 0, 0, 0);
-  const validationSince = new Date(`${validationExperimentConfig.startDate}T00:00:00Z`);
+  const validationSince = new Date(`${offerChangeGateConfig.startDate}T00:00:00Z`);
   const keepValidationWindow = today <= dateKeyOffset(validationExperimentConfig.endDate, -14);
   const since = keepValidationWindow && validationSince < rollingSince ? validationSince : rollingSince;
   const query = new URLSearchParams({

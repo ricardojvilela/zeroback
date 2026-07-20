@@ -111,6 +111,8 @@ Cliques repetidos da mesma pessoa contam uma unica vez nas etapas principais.
 ### Regra de decisao
 Nao alterar preco nem oferta antes de 30 pessoas unicas concluirem o novo teste ou 7 dias completos de trafego, o que acontecer mais tarde.
 
+Este e o gate minimo para permitir alteracoes a preco/oferta. Nao substitui a validacao comercial alargada de 14/07 a 13/08, que procura 50 testes concluidos e 3 compras Pack reais. O painel `/admin` apresenta os dois marcos separadamente e preserva a contagem do gate desde 12/07, independentemente do intervalo diario selecionado.
+
 Depois dessa amostra:
 - se teste -> clique Pack ficar abaixo de 5%, rever apenas mensagem e posicao do CTA;
 - se houver cliques Pack mas menos de 60% chegarem a Stripe, corrigir email/checkout antes de mexer no preco;

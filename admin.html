@@ -386,7 +386,7 @@
 
       .validation-progress-grid {
         display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(3, minmax(0, 1fr));
         gap: 12px;
         margin-bottom: 14px;
       }
@@ -845,7 +845,15 @@
         <div class="validation-progress-grid">
           <article class="validation-progress-item">
             <div class="validation-progress-label">
-              <strong>Testes concluídos</strong>
+              <strong>Gate mínimo da oferta</strong>
+              <span id="validationGateTestsLabel">0 / 30</span>
+            </div>
+            <progress id="validationGateTestsProgress" value="0" max="30">0 de 30</progress>
+            <span class="note" id="validationGateDaysLabel">0 de 7 dias completos</span>
+          </article>
+          <article class="validation-progress-item">
+            <div class="validation-progress-label">
+              <strong>Amostra da validação</strong>
               <span id="validationTestsLabel">0 / 50</span>
             </div>
             <progress id="validationTestsProgress" value="0" max="50">0 de 50</progress>
@@ -2195,7 +2203,7 @@
         setDailyMetric("#dailyRevenue", "#dailyRevenueDelta", rowValue(today, "revenue"), rowValue(yesterday, "revenue"), { currency: true });
       }
 
-      function funnelDiagnosis(totals = {}, packVisitorFunnel = {}) {
+      function funnelDiagnosis(totals = {}, packVisitorFunnel = {}, offerChangeGate = {}) {
         const uploads = Number(totals.uploadsStarted || 0) || 0;
         const downloads = Number(totals.downloads || 0) || 0;
         const resultReady = Number(totals.downloadReadyShown || 0) || 0;
@@ -2284,6 +2292,14 @@
           }
           if (uniquePackClicks > 0) {
             return "Gargalo principal: pessoas do novo teste clicaram no Pack mas ainda não chegaram à Stripe. Prioridade: validar email e abertura do checkout antes de aumentar tráfego.";
+          }
+          if (offerChangeGate.reached !== true) {
+            const remainingTests = Number(offerChangeGate.remainingTests || 0) || 0;
+            const remainingDays = Number(offerChangeGate.remainingDays || 0) || 0;
+            const timeStatus = remainingDays > 0
+              ? `faltam também ${remainingDays} dias completos`
+              : "o requisito temporal já foi cumprido";
+            return `Gate mínimo bloqueado: faltam ${remainingTests} testes concluídos e ${timeStatus}. Manter preço, oferta e percurso até cumprir os dois requisitos.`;
           }
           if (uniqueExhausted > 0) {
             return "Gargalo principal: há pessoas a tentar continuar depois das 2 imagens, mas ainda sem clique Pack. Prioridade: observar e melhorar apenas a mensagem desse bloqueio.";
@@ -2390,7 +2406,7 @@
         return "Diagnóstico: ainda falta volume suficiente para escolher um único gargalo. Continue a observar uploads, downloads, cliques Pack/Pro e sessões Stripe.";
       }
 
-      function packFunnelRecommendation(totals = {}, packVisitorFunnel = {}) {
+      function packFunnelRecommendation(totals = {}, packVisitorFunnel = {}, offerChangeGate = {}) {
         const resultReady = Number(totals.downloadReadyShown || 0) || 0;
         const packToolClicks = Number(totals.postDownloadPackClicks || 0) || 0;
         const packPricingClicks = Number(totals.packCtaClicks || 0) || 0;
@@ -2434,6 +2450,13 @@
           }
           if (uniquePackClicks > 0) {
             return "O novo teste já gera cliques Pack, mas ainda não abre Stripe. Próximo passo: verificar o passo do email e a criação da sessão.";
+          }
+          if (offerChangeGate.reached !== true) {
+            const remainingTests = Number(offerChangeGate.remainingTests || 0) || 0;
+            const remainingDays = Number(offerChangeGate.remainingDays || 0) || 0;
+            return remainingDays > 0
+              ? `Gate mínimo ainda bloqueado: faltam ${remainingTests} testes e ${remainingDays} dias completos. Manter preço e oferta.`
+              : `Gate mínimo ainda bloqueado: faltam ${remainingTests} testes concluídos. Manter preço e oferta.`;
           }
           if (uniqueExhausted > 0) {
             return "Há pessoas a tentar continuar depois do teste sem clicar no Pack. Próximo passo: concentrar a próxima melhoria na mensagem de teste concluído.";
@@ -2827,6 +2850,11 @@
         const targetPurchases = Number(experiment.targetPackPurchases || 3) || 3;
         const completedTests = Number(experiment.completedTests || 0) || 0;
         const packPurchases = Number(experiment.packPurchases || 0) || 0;
+        const offerGate = experiment.offerChangeGate || {};
+        const gateTargetTests = Number(offerGate.targetCompletedTests || 30) || 30;
+        const gateMinimumDays = Number(offerGate.minimumFullDays || 7) || 7;
+        const gateCompletedTests = Number(offerGate.completedTests || 0) || 0;
+        const gateFullDays = Number(offerGate.fullDaysElapsed || 0) || 0;
         const feedback = experiment.feedback || {};
         const statusViews = {
           collecting: { label: "A recolher dados", tone: "muted" },
@@ -2841,7 +2869,8 @@
 
         const periodStart = formatDate(experiment.startDate || "2026-07-14");
         const periodEnd = formatDate(experiment.endDate || "2026-08-13");
-        document.querySelector("#validationPeriod").textContent = `${periodStart} a ${periodEnd}. Decisão baseada em utilização e pagamentos reais.`;
+        const gateStart = formatDate(offerGate.startDate || "2026-07-12");
+        document.querySelector("#validationPeriod").textContent = `Gate mínimo desde ${gateStart}; validação comercial de ${periodStart} a ${periodEnd}.`;
         document.querySelector("#validationDaysRemaining").textContent = Number(experiment.daysRemaining || 0) || 0;
         document.querySelector("#validationResultReady").textContent = Number(experiment.resultReady || 0) || 0;
         document.querySelector("#validationExhausted").textContent = Number(experiment.exhaustedAfterTest || 0) || 0;
@@ -2852,6 +2881,13 @@
         document.querySelector("#validationFeedbackQuality").textContent = Number(feedback.needs_quality || 0) || 0;
         document.querySelector("#validationFeedbackCatalog").textContent = Number(feedback.needs_catalog_finish || 0) || 0;
         document.querySelector("#validationFeedbackPrice").textContent = Number(feedback.price_not_worth_it || 0) || 0;
+
+        const gateTestsProgress = document.querySelector("#validationGateTestsProgress");
+        gateTestsProgress.max = gateTargetTests;
+        gateTestsProgress.value = Math.min(gateCompletedTests, gateTargetTests);
+        gateTestsProgress.textContent = `${gateCompletedTests} de ${gateTargetTests}`;
+        document.querySelector("#validationGateTestsLabel").textContent = `${gateCompletedTests} / ${gateTargetTests}`;
+        document.querySelector("#validationGateDaysLabel").textContent = `${gateFullDays} dias completos; mínimo ${gateMinimumDays}`;
 
         const testsProgress = document.querySelector("#validationTestsProgress");
         testsProgress.max = targetTests;
@@ -2874,9 +2910,16 @@
         const leadingFeedback = feedbackLabels[experiment.leadingFeedback] || "";
         const remainingTests = Math.max(targetTests - completedTests, 0);
         const remainingPurchases = Math.max(targetPurchases - packPurchases, 0);
+        const gateRemainingTests = Math.max(gateTargetTests - gateCompletedTests, 0);
+        const gateRemainingDays = Math.max(gateMinimumDays - gateFullDays, 0);
         let decision = `A recolher dados: faltam ${remainingTests} testes concluídos e ${remainingPurchases} compras Pack para atingir os critérios definidos.`;
 
-        if (experiment.status === "validated") {
+        if (offerGate.reached !== true) {
+          const timeRequirement = gateRemainingDays > 0
+            ? ` e ${gateRemainingDays} dias completos`
+            : "; o requisito temporal já está cumprido";
+          decision = `Gate mínimo bloqueado: faltam ${gateRemainingTests} testes concluídos${timeRequirement}. Não alterar preço nem oferta até cumprir os dois requisitos.`;
+        } else if (experiment.status === "validated") {
           decision = "Validação positiva: o objetivo de compras reais foi atingido. Próximo passo: repetir as origens que converteram e medir recompra.";
         } else if (experiment.status === "stop_candidate") {
           decision = "Critério de paragem atingido: a amostra ou o prazo terminou sem compras nem chegadas suficientes à Stripe. Parar investimento pago e decidir entre arquivo ou reposicionamento.";
@@ -3043,7 +3086,8 @@
           totals.packCheckoutSessions,
         ));
         document.querySelector("#packFunnelRevenue").textContent = formatCurrency(totals.packRevenue || 0);
-        document.querySelector("#packFunnelAction").textContent = packFunnelRecommendation(totals, packVisitorFunnel);
+        const offerChangeGate = data.validationExperiment?.offerChangeGate || {};
+        document.querySelector("#packFunnelAction").textContent = packFunnelRecommendation(totals, packVisitorFunnel, offerChangeGate);
         packSourceRowsBody.innerHTML = data.packSourceBreakdown?.length
           ? data.packSourceBreakdown.map((row) => {
               const sourcePackClicks = (Number(row.postDownloadPackClicks || 0) || 0) +
@@ -3107,7 +3151,7 @@
         document.querySelector("#liveBillingPortalOpens").textContent = totals.billingPortalOpens || 0;
         const accountEntrants = Math.max((totals.accountSignups || 0) - (totals.accountEmailConfirmations || 0), 0) + (totals.accountLogins || 0);
         document.querySelector("#liveAccountCheckoutGap").textContent = Math.max(accountEntrants - (totals.checkoutStarts || 0), 0);
-        document.querySelector("#liveFunnelDiagnosis").textContent = funnelDiagnosis(totals, packVisitorFunnel);
+        document.querySelector("#liveFunnelDiagnosis").textContent = funnelDiagnosis(totals, packVisitorFunnel, offerChangeGate);
 
         liveRowsBody.innerHTML = data.rows?.length
           ? data.rows.slice().reverse().map((row) => {
