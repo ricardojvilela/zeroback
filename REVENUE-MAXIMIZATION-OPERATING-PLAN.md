@@ -257,3 +257,9 @@ The admin now separates the minimum offer-change gate (30 completed free tests p
 The authenticated 14-day review showed 113 unique visitors, 28 uploads, 19 downloads, two Pack Stripe sessions, one genuine Pack purchase and 9 EUR revenue. The support inbox had no unresolved messages. The offer gate remained blocked at 5 of 30 completed free tests, with the time requirement already met.
 
 Campaign reporting was splitting one paid journey across two rows: `pro launch` showed 49 landing visitors and no uploads, while the landing page's hard-coded `bulk_background_remover` campaign received the downstream tool activity. Internal landing links now retain incoming paid source, medium, campaign, content, term and click IDs instead of replacing them with page defaults. The page's own CTA campaign is kept separately as `cta_campaign` for click analysis. Prices, offers, campaign settings and budgets were not changed.
+
+## Checkout and Google Ads audit - 2026-07-21
+
+The grouped `cannot_access_waitingplan_before_initialization` account failures were last recorded on 2026-07-17 before commit `2fb1ff0` corrected checkout-plan initialization. No newer instance was present in the authenticated review. A regression test now requires the pending plan to be initialized before signup tracking, redirect generation or existing-account recovery can use it.
+
+Google Ads reported 65 clicks, 584 impressions, 176.45 EUR cost and 2.71 EUR average CPC for 2026-07-07 through 2026-07-20. The `Purchase` goal is a primary conversion action active for all three campaigns and contains the genuine 9 EUR purchase. The 400 EUR spend promotion and the 250 EUR conversion-tracking promotion both remained `Processing`; the latter requires a qualifying website conversion by 2026-08-16. The visible search terms were high-intent background-removal searches, so no defensible negative keyword or campaign change was made. Budgets remained unchanged.

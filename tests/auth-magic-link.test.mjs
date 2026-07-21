@@ -116,3 +116,18 @@ test("keeps password recovery and authenticated password setup wired without tra
   assert.match(script, /updateUser\(\{ password \}\)/);
   assert.doesNotMatch(script, /trackEvent\([^)]*password\s*[,}:]/s);
 });
+
+test("initializes the requested checkout plan before account creation uses it", async () => {
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const script = await readFile(path.join(root, "script.js"), "utf8");
+  const handlerStart = script.indexOf("async function handleAccountCreate");
+  const handlerEnd = script.indexOf("async function handleAccountCheckoutLinkCapture", handlerStart);
+  const handler = script.slice(handlerStart, handlerEnd);
+  const declaration = handler.indexOf("const waitingPlan = checkoutPlanWaitingForAuth()");
+
+  assert.ok(handlerStart >= 0 && handlerEnd > handlerStart);
+  assert.ok(declaration >= 0);
+  assert.ok(declaration < handler.indexOf('trackEvent("account_signup_started"'));
+  assert.ok(declaration < handler.indexOf("accountEmailRedirectUrl(waitingPlan)"));
+  assert.ok(declaration < handler.indexOf("continueExistingAccountAfterSignup(email, password, waitingPlan)"));
+});
