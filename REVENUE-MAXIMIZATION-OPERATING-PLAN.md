@@ -275,3 +275,9 @@ The coverage snapshot, last updated by Google on 2026-07-10, contained 45 indexe
 Search Console showed that the Portuguese `/product-photo-background-remover/` page received 60 impressions, zero clicks and average position 80.7; 48 of those impressions came from the United States and the visible queries were English. The English equivalent received only 19 impressions at average position 92.8. All three reciprocal PT, EN and ES pages declared the Portuguese URL as `x-default`, which made it the fallback for international searches.
 
 The reciprocal locale group now uses the English product-photo page as `x-default` while retaining explicit `pt-PT`, `en` and `es` alternates. The sitemap dates for the three pages were updated and an automated test protects the complete alternate set. Titles, offers, prices and page copy were left unchanged so the language-targeting correction can be measured independently.
+
+## Bulk remover locale targeting - 2026-07-21
+
+Search Console showed that `/bulk-background-remover/` received 63 impressions, one click and average position 78; 41 impressions came from the United States and every visible query was in English. The English equivalent received only four impressions at average position 49.8. Both reciprocal PT and EN pages declared the Portuguese URL as `x-default`.
+
+The reciprocal locale group now uses the English bulk-remover page as `x-default` while retaining explicit `pt-PT` and `en` alternates. The sitemap dates for both pages were updated and an automated test protects the complete alternate set. Titles, offers, prices and page copy were left unchanged so the language-targeting correction can be measured independently.

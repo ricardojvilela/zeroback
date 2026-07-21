@@ -93,3 +93,25 @@ test("product photo locale pages use the English page as the global default", as
     assert.deepEqual(alternates, expectedAlternates, relativePath);
   }
 });
+
+test("bulk remover locale pages use the English page as the global default", async () => {
+  const localePages = [
+    "bulk-background-remover/index.html",
+    "en/bulk-background-remover/index.html",
+  ];
+  const expectedAlternates = {
+    "pt-PT": "https://batchcutout.com/bulk-background-remover/",
+    en: "https://batchcutout.com/en/bulk-background-remover/",
+    "x-default": "https://batchcutout.com/en/bulk-background-remover/",
+  };
+
+  for (const relativePath of localePages) {
+    const html = await readRepoFile(relativePath);
+    const alternates = Object.fromEntries(
+      [...html.matchAll(/<link\s+rel="alternate"\s+hreflang="([^"]+)"\s+href="([^"]+)"/g)]
+        .map((match) => [match[1], match[2]]),
+    );
+
+    assert.deepEqual(alternates, expectedAlternates, relativePath);
+  }
+});
