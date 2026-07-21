@@ -85,6 +85,7 @@
       target_source: params.get("utm_source") || "",
       target_medium: params.get("utm_medium") || "",
       target_campaign: params.get("utm_campaign") || "",
+      cta_campaign: link.dataset.batchcutoutCtaCampaign || "",
       checkout_plan: params.get("checkout_plan") || "",
     };
   }
@@ -98,9 +99,12 @@
       const url = new URL(link.getAttribute("href"), window.location.origin);
       if (url.origin !== window.location.origin) return;
 
+      const ctaCampaign = url.searchParams.get("utm_campaign") || "";
+      if (ctaCampaign) link.dataset.batchcutoutCtaCampaign = ctaCampaign;
+
       let changed = false;
       preservedParams.forEach((key) => {
-        if (sourceParams.has(key) && !url.searchParams.has(key)) {
+        if (sourceParams.has(key) && url.searchParams.get(key) !== sourceParams.get(key)) {
           url.searchParams.set(key, sourceParams.get(key));
           changed = true;
         }

@@ -251,3 +251,9 @@ Decision rule:
 The post-download question now measures four concrete objections: no immediate photo volume, insufficient cutout quality, missing catalogue-ready finish, or insufficient value at 5 EUR. `/admin` shows the experiment period, progress, Stripe activity, purchases, and the leading objection without mixing the cohort with the older subscription-first history.
 
 The admin now separates the minimum offer-change gate (30 completed free tests plus 7 full days, counted from 2026-07-12) from the broader validation sprint (50 completed tests plus 3 genuine Pack purchases from 2026-07-14 to 2026-08-13). Gate counts remain anchored to the rollout date even when the dashboard is opened with a shorter reporting window.
+
+## Paid campaign attribution repair - 2026-07-21
+
+The authenticated 14-day review showed 113 unique visitors, 28 uploads, 19 downloads, two Pack Stripe sessions, one genuine Pack purchase and 9 EUR revenue. The support inbox had no unresolved messages. The offer gate remained blocked at 5 of 30 completed free tests, with the time requirement already met.
+
+Campaign reporting was splitting one paid journey across two rows: `pro launch` showed 49 landing visitors and no uploads, while the landing page's hard-coded `bulk_background_remover` campaign received the downstream tool activity. Internal landing links now retain incoming paid source, medium, campaign, content, term and click IDs instead of replacing them with page defaults. The page's own CTA campaign is kept separately as `cta_campaign` for click analysis. Prices, offers, campaign settings and budgets were not changed.
