@@ -299,3 +299,9 @@ The remaining 44 indexable PT/EN/ES documents now use their declared English alt
 The repository contains no remaining `Product` schema or fabricated `aggregateRating` or `review` data. The authenticated Search Console reports, last updated on 2026-07-20, showed zero invalid and zero affected items for both Product snippets and Merchant listings. The historical optional-warning rows for ratings, reviews, shipping details and merchant return policy each contained zero items.
 
 No validation request or further markup was necessary. BatchCutout remains described as a software application/service with real offers, avoiding physical-product shipping metadata and customer-rating claims that do not apply.
+
+## Google Ads promotion status - 2026-07-21
+
+The authenticated Promotions report confirmed that the 250 EUR conversion-tracking credit is `Active`: Google states that it has been applied to the account and is financing the campaigns. It was redeemed on 2026-07-17 and expires on 2026-09-19; the amount spent from the credit was not yet available in the report.
+
+The separate 400 EUR spend promotion remained `Processing`, with Google confirming that its criteria were met and that the credit should be applied soon. No campaign or budget setting was changed during this verification.
