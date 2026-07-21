@@ -293,3 +293,9 @@ The reciprocal locale group now uses the English transparent-PNG page as `x-defa
 After Search Console exposed the same international-to-Portuguese mismatch on the product-photo, bulk-remover and transparent-PNG page groups, the complete localized HTML set was audited. Of 56 documents with an English alternate, only 11 already used that English URL as `x-default`; 45 still used the Portuguese URL.
 
 The remaining 44 indexable PT/EN/ES documents now use their declared English alternate as the global fallback, including the home, platform, competitor, legal and white-background groups. Their sitemap dates were updated. `/pricing/` remains the single intentional exception because its PT/EN/ES variants share one canonical URL and switch language through a query parameter. A repository-wide automated test now protects this rule. No page copy, price, offer or campaign setting changed.
+
+## Structured data resolution - 2026-07-21
+
+The repository contains no remaining `Product` schema or fabricated `aggregateRating` or `review` data. The authenticated Search Console reports, last updated on 2026-07-20, showed zero invalid and zero affected items for both Product snippets and Merchant listings. The historical optional-warning rows for ratings, reviews, shipping details and merchant return policy each contained zero items.
+
+No validation request or further markup was necessary. BatchCutout remains described as a software application/service with real offers, avoiding physical-product shipping metadata and customer-rating claims that do not apply.
