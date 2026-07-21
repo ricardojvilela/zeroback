@@ -281,3 +281,9 @@ The reciprocal locale group now uses the English product-photo page as `x-defaul
 Search Console showed that `/bulk-background-remover/` received 63 impressions, one click and average position 78; 41 impressions came from the United States and every visible query was in English. The English equivalent received only four impressions at average position 49.8. Both reciprocal PT and EN pages declared the Portuguese URL as `x-default`.
 
 The reciprocal locale group now uses the English bulk-remover page as `x-default` while retaining explicit `pt-PT` and `en` alternates. The sitemap dates for both pages were updated and an automated test protects the complete alternate set. Titles, offers, prices and page copy were left unchanged so the language-targeting correction can be measured independently.
+
+## Transparent PNG locale targeting - 2026-07-21
+
+Search Console showed that `/transparent-png-batch/` received 15 impressions, one click, 6.7% CTR and average position 15.7. Its visible queries were English and the reported countries were India, Lithuania and the United States. The English equivalent was confirmed as indexed and eligible to appear in Google, but both reciprocal pages declared the Portuguese URL as `x-default`.
+
+The reciprocal locale group now uses the English transparent-PNG page as `x-default` while retaining explicit `pt-PT` and `en` alternates. The sitemap dates for both pages were updated and an automated test protects the complete alternate set. Titles, offers, prices and page copy were left unchanged so the language-targeting correction can be measured independently.

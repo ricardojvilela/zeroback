@@ -115,3 +115,25 @@ test("bulk remover locale pages use the English page as the global default", asy
     assert.deepEqual(alternates, expectedAlternates, relativePath);
   }
 });
+
+test("transparent PNG locale pages use the English page as the global default", async () => {
+  const localePages = [
+    "transparent-png-batch/index.html",
+    "en/transparent-png-batch-converter/index.html",
+  ];
+  const expectedAlternates = {
+    "pt-PT": "https://batchcutout.com/transparent-png-batch/",
+    en: "https://batchcutout.com/en/transparent-png-batch-converter/",
+    "x-default": "https://batchcutout.com/en/transparent-png-batch-converter/",
+  };
+
+  for (const relativePath of localePages) {
+    const html = await readRepoFile(relativePath);
+    const alternates = Object.fromEntries(
+      [...html.matchAll(/<link\s+rel="alternate"\s+hreflang="([^"]+)"\s+href="([^"]+)"/g)]
+        .map((match) => [match[1], match[2]]),
+    );
+
+    assert.deepEqual(alternates, expectedAlternates, relativePath);
+  }
+});
