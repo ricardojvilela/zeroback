@@ -269,3 +269,9 @@ Google Ads reported 65 clicks, 584 impressions, 176.45 EUR cost and 2.71 EUR ave
 The authenticated URL-prefix property reported 215 impressions, two organic clicks, 0.9% CTR and average position 63.9 over the available three-month period. The strongest pages were `/bulk-background-remover/` with one click and 63 impressions, and `/transparent-png-batch/` with one click, 15 impressions and average position 15.7.
 
 The coverage snapshot, last updated by Google on 2026-07-10, contained 45 indexed and 28 non-indexed URLs: 21 discovered but not indexed, one crawled but not indexed, three redirects and three correct canonical alternatives. `/sitemap.xml` remained successful with 62 discovered pages and was resubmitted on 2026-07-21. Validation was started for both the 21 discovered URLs and the single crawled URL. The three redirect examples were obsolete `.html` or tracking-parameter URLs that correctly redirect to clean canonical paths, so no attempt was made to index them.
+
+## Product photo locale targeting - 2026-07-21
+
+Search Console showed that the Portuguese `/product-photo-background-remover/` page received 60 impressions, zero clicks and average position 80.7; 48 of those impressions came from the United States and the visible queries were English. The English equivalent received only 19 impressions at average position 92.8. All three reciprocal PT, EN and ES pages declared the Portuguese URL as `x-default`, which made it the fallback for international searches.
+
+The reciprocal locale group now uses the English product-photo page as `x-default` while retaining explicit `pt-PT`, `en` and `es` alternates. The sitemap dates for the three pages were updated and an automated test protects the complete alternate set. Titles, offers, prices and page copy were left unchanged so the language-targeting correction can be measured independently.
