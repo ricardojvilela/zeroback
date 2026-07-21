@@ -287,3 +287,9 @@ The reciprocal locale group now uses the English bulk-remover page as `x-default
 Search Console showed that `/transparent-png-batch/` received 15 impressions, one click, 6.7% CTR and average position 15.7. Its visible queries were English and the reported countries were India, Lithuania and the United States. The English equivalent was confirmed as indexed and eligible to appear in Google, but both reciprocal pages declared the Portuguese URL as `x-default`.
 
 The reciprocal locale group now uses the English transparent-PNG page as `x-default` while retaining explicit `pt-PT` and `en` alternates. The sitemap dates for both pages were updated and an automated test protects the complete alternate set. Titles, offers, prices and page copy were left unchanged so the language-targeting correction can be measured independently.
+
+## Global locale fallback audit - 2026-07-21
+
+After Search Console exposed the same international-to-Portuguese mismatch on the product-photo, bulk-remover and transparent-PNG page groups, the complete localized HTML set was audited. Of 56 documents with an English alternate, only 11 already used that English URL as `x-default`; 45 still used the Portuguese URL.
+
+The remaining 44 indexable PT/EN/ES documents now use their declared English alternate as the global fallback, including the home, platform, competitor, legal and white-background groups. Their sitemap dates were updated. `/pricing/` remains the single intentional exception because its PT/EN/ES variants share one canonical URL and switch language through a query parameter. A repository-wide automated test now protects this rule. No page copy, price, offer or campaign setting changed.

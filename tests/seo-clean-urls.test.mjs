@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -23,6 +23,24 @@ const cleanLegalUrlPattern = /\/(?:contacto|contact|termos|terms|terminos|privac
 
 function readRepoFile(relativePath) {
   return readFile(path.join(repoRoot, relativePath), "utf8");
+}
+
+async function listHtmlFiles(relativeDir = "") {
+  const entries = await readdir(path.join(repoRoot, relativeDir), { withFileTypes: true });
+  const htmlFiles = [];
+
+  for (const entry of entries) {
+    const relativePath = path.join(relativeDir, entry.name);
+    if (entry.isDirectory()) {
+      if (![".git", ".vercel", "node_modules"].includes(entry.name)) {
+        htmlFiles.push(...await listHtmlFiles(relativePath));
+      }
+    } else if (entry.name.endsWith(".html")) {
+      htmlFiles.push(relativePath.replaceAll("\\", "/"));
+    }
+  }
+
+  return htmlFiles;
 }
 
 test("sitemap submits only final URLs when Vercel clean URLs are enabled", async () => {
@@ -136,4 +154,31 @@ test("transparent PNG locale pages use the English page as the global default", 
 
     assert.deepEqual(alternates, expectedAlternates, relativePath);
   }
+});
+
+test("translated pages use English as the global fallback", async () => {
+  const htmlFiles = await listHtmlFiles();
+  let localizedPages = 0;
+
+  for (const relativePath of htmlFiles) {
+    const html = await readRepoFile(relativePath);
+    const englishAlternate = html.match(
+      /<link\s+rel="alternate"\s+hreflang="en"\s+href="([^"]+)"/,
+    );
+    if (!englishAlternate) continue;
+
+    localizedPages++;
+    const defaultAlternate = html.match(
+      /<link\s+rel="alternate"\s+hreflang="x-default"\s+href="([^"]+)"/,
+    );
+    assert.ok(defaultAlternate, `${relativePath} must declare x-default`);
+
+    if (relativePath === "pricing/index.html") {
+      assert.equal(defaultAlternate[1], "https://batchcutout.com/pricing/", relativePath);
+    } else {
+      assert.equal(defaultAlternate[1], englishAlternate[1], relativePath);
+    }
+  }
+
+  assert.ok(localizedPages >= 56, "expected the complete localized page set");
 });
