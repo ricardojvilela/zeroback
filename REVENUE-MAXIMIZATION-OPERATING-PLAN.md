@@ -305,3 +305,11 @@ No validation request or further markup was necessary. BatchCutout remains descr
 The authenticated Promotions report confirmed that the 250 EUR conversion-tracking credit is `Active`: Google states that it has been applied to the account and is financing the campaigns. It was redeemed on 2026-07-17 and expires on 2026-09-19; the amount spent from the credit was not yet available in the report.
 
 The separate 400 EUR spend promotion remained `Processing`, with Google confirming that its criteria were met and that the credit should be applied soon. No campaign or budget setting was changed during this verification.
+
+## Daily commercial review - 2026-07-22
+
+Production returned HTTP 200 for the public site, pricing and admin routes, and the repository was clean before this checkpoint. The authenticated dashboard reported 112 unique visitors, 28 uploads, 23 ready results, 19 downloads, two Pack Stripe sessions, one genuine Pack purchase and 9 EUR revenue over 14 days. The same period contained five completed `free_total_2` tests, so the offer-change gate remains blocked at 5 of 30 despite the seven-day requirement being met. There were no processing, ZIP or checkout failures, no unresolved support messages, no paying renewable subscription and zero real MRR.
+
+The genuine Pack 250 customer remains active with all 250 credits available, so no paid usage has occurred yet. The activation email must not be resent. The 250 EUR Google Ads credit remains active and financing the campaigns, with 7.99 EUR used, while the separate 400 EUR credit remains processing after its criteria were met.
+
+Google Ads reported 563 impressions, 63 clicks, 178.93 EUR cost and one purchase conversion from 2026-07-08 through 2026-07-21. Over the trailing 30 days it reported 2,828 impressions, 162 clicks, 272.31 EUR cost and the same single conversion. The authorized budgets remain 8 EUR/day for Pro Launch and 2 EUR/day for Alternatives, and Campaign #1 remains paused. No budget increase is justified before the repaired attribution and current free-test cohort produce enough post-click activation data.
