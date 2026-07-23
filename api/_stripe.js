@@ -291,6 +291,80 @@ async function insertCommercialEvent(settings, row) {
   }
 }
 
+async function selectPackPurchaseEventsByIdentity(settings, identityKey, identityValue) {
+  if (!identityKey || !identityValue) return [];
+  const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
+  const query = new URLSearchParams({
+    event_name: "eq.pack_purchase_paid",
+    select: "event_label,detail",
+    [`detail->>${identityKey}`]: `eq.${identityValue}`,
+    limit: "1000",
+  });
+  const response = await fetch(`${settings.supabaseUrl.replace(/\/$/, "")}/rest/v1/${tableName}?${query}`, {
+    headers: {
+      apikey: settings.serviceRoleKey,
+      Authorization: `Bearer ${settings.serviceRoleKey}`,
+    },
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    throw new Error(`pack_purchase_ledger_read_failed:${response.status}:${detail.slice(0, 300)}`);
+  }
+
+  const rows = await response.json().catch(() => []);
+  return Array.isArray(rows) ? rows : [];
+}
+
+function packPurchaseIdentities(profile, session) {
+  const metadata = session?.metadata || {};
+  const identities = new Map();
+  const addIdentity = (key, value) => {
+    const raw = text(value, 320).trim();
+    const normalized = key === "customer_email" ? raw.toLowerCase() : raw;
+    if (normalized) identities.set(`${key}:${normalized}`, { key, value: normalized });
+  };
+
+  addIdentity("supabase_user_id", profile?.user_id);
+  addIdentity("supabase_user_id", metadata.supabase_user_id);
+  addIdentity("stripe_customer_id", profile?.stripe_customer_id);
+  addIdentity("stripe_customer_id", customerIdFromSession(session));
+  addIdentity("customer_email", profile?.email);
+  addIdentity(
+    "customer_email",
+    metadata.batchcutout_pending_email ||
+      metadata.customer_email ||
+      session?.customer_details?.email ||
+      session?.customer_email,
+  );
+
+  return Array.from(identities.values());
+}
+
+export function packCreditEntitlementFromEvents(events = []) {
+  const purchases = new Map();
+  for (const event of events) {
+    const sessionId = text(event?.event_label, 120);
+    const detail = event?.detail || {};
+    const pack = getPackOffer(detail.price_plan || detail.plan);
+    if (!sessionId || !pack) continue;
+    purchases.set(sessionId, pack.images);
+  }
+
+  return {
+    credits: Array.from(purchases.values()).reduce((total, credits) => total + credits, 0),
+    sessionIds: Array.from(purchases.keys()),
+  };
+}
+
+async function getPackCreditEntitlement(settings, profile, session) {
+  const identities = packPurchaseIdentities(profile, session);
+  const results = await Promise.all(
+    identities.map(({ key, value }) => selectPackPurchaseEventsByIdentity(settings, key, value)),
+  );
+  return packCreditEntitlementFromEvents(results.flat());
+}
+
 function packAttributionFromSession(session) {
   const metadata = session?.metadata || {};
   const keys = [
@@ -353,18 +427,18 @@ function amountFromSession(session, pack) {
   };
 }
 
-function patchForPackPurchase(profile, session, pack) {
+export function packProfilePatchForEntitlement(profile, session, entitlementCredits) {
   const now = new Date().toISOString();
   const stripeCustomerId = customerIdFromSession(session) || profile.stripe_customer_id || null;
-  const currentLimit = Number(profile.monthly_image_limit || 0) || 0;
   const currentUsed = Math.max(Number(profile.monthly_images_used || 0) || 0, 0);
+  const entitledLimit = Math.max(Number(entitlementCredits || 0) || 0, currentUsed);
 
   if (profile.plan === "pro" && canUsePro(profile)) {
     return {
       plan: "pro",
       plan_status: profile.plan_status || "active",
       batch_limit: Math.max(Number(profile.batch_limit || 100) || 100, 100),
-      monthly_image_limit: currentLimit + pack.images,
+      monthly_image_limit: Math.max(2000 + (Number(entitlementCredits || 0) || 0), currentUsed),
       monthly_images_used: currentUsed,
       current_period_start: profile.current_period_start || now,
       current_period_end: profile.current_period_end || packAccessPeriodEnd,
@@ -378,7 +452,7 @@ function patchForPackPurchase(profile, session, pack) {
       plan: "pack",
       plan_status: "active",
       batch_limit: 100,
-      monthly_image_limit: currentLimit + pack.images,
+      monthly_image_limit: entitledLimit,
       monthly_images_used: currentUsed,
       current_period_start: profile.current_period_start || now,
       current_period_end: packAccessPeriodEnd,
@@ -391,13 +465,58 @@ function patchForPackPurchase(profile, session, pack) {
     plan: "pack",
     plan_status: "active",
     batch_limit: 100,
-    monthly_image_limit: pack.images,
-    monthly_images_used: 0,
+    monthly_image_limit: entitledLimit,
+    monthly_images_used: currentUsed,
     current_period_start: now,
     current_period_end: packAccessPeriodEnd,
     stripe_customer_id: stripeCustomerId,
     stripe_subscription_id: profile.stripe_subscription_id || null,
   };
+}
+
+function profileNeedsPackReconciliation(profile, patch) {
+  return Object.entries(patch).some(([key, value]) => {
+    if (["batch_limit", "monthly_image_limit", "monthly_images_used"].includes(key)) {
+      return Number(profile[key] || 0) !== Number(value || 0);
+    }
+    return (profile[key] || null) !== (value || null);
+  });
+}
+
+async function reconcilePackProfileToEntitlement(settings, profile, session, initialEntitlement) {
+  let currentProfile = profile;
+  let entitlement = initialEntitlement;
+  let reconciled = false;
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const patch = packProfilePatchForEntitlement(currentProfile, session, entitlement.credits);
+    if (profileNeedsPackReconciliation(currentProfile, patch)) {
+      const updated = await supabaseUpdateByUserId({
+        ...settings,
+        userId: currentProfile.user_id,
+        patch,
+      });
+      currentProfile = normalizeProfile(updated, { id: updated.user_id, email: updated.email });
+      reconciled = true;
+    }
+
+    const verifiedEntitlement = await getPackCreditEntitlement(settings, currentProfile, session);
+    if (!verifiedEntitlement.sessionIds.includes(session.id)) {
+      throw new Error("stripe_pack_purchase_ledger_missing");
+    }
+    if (verifiedEntitlement.credits === entitlement.credits) {
+      return { profile: currentProfile, entitlement: verifiedEntitlement, reconciled };
+    }
+
+    entitlement = verifiedEntitlement;
+    const refreshedProfile = await findProfileForStripe(settings, { userId: currentProfile.user_id });
+    if (!refreshedProfile?.user_id) {
+      throw new Error("stripe_pack_profile_not_found");
+    }
+    currentProfile = refreshedProfile;
+  }
+
+  throw new Error("stripe_pack_purchase_ledger_changed");
 }
 
 async function recordPackPurchaseEvent(settings, { event = null, session, profile, pack, credited }) {
@@ -446,7 +565,7 @@ async function recordPackPurchaseEvent(settings, { event = null, session, profil
   });
 }
 
-async function recordPackCreditsAppliedEvent(settings, { session, profile, pack }) {
+async function recordPackCreditsAppliedEvent(settings, { session, profile, pack, entitlementCredits }) {
   const sessionId = text(session?.id, 120);
   if (!sessionId) return;
   const attribution = packAttributionFromSession(session);
@@ -470,6 +589,8 @@ async function recordPackCreditsAppliedEvent(settings, { session, profile, pack 
       plan: pack.plan,
       purchase_type: "pack",
       credits_added: pack.images,
+      entitled_credits_total: entitlementCredits,
+      resulting_credit_limit: Number(profile?.monthly_image_limit || 0) || 0,
     },
     occurred_at: new Date().toISOString(),
   });
@@ -494,41 +615,49 @@ export async function applyPackPurchaseFromSession(settings, session, event = nu
     email: text(metadata.batchcutout_pending_email || metadata.customer_email || session?.customer_details?.email, 320),
   });
 
-  if (!profile?.user_id) {
-    if (!paymentAlreadyStored) {
-      await recordPackPurchaseEvent(settings, {
-        event,
-        session,
-        profile: null,
-        pack,
-        credited: false,
-      });
-    }
-    throw new Error("stripe_pack_profile_not_found");
-  }
-
-  const creditsAlreadyApplied = await commercialEventExists(settings, "pack_credits_applied", sessionId);
-  if (creditsAlreadyApplied) {
-    return { profile, pack, credited: false, alreadyStored: true };
-  }
-
-  const updated = await supabaseUpdateByUserId({
-    ...settings,
-    userId: profile.user_id,
-    patch: patchForPackPurchase(profile, session, pack),
-  });
-  const normalized = normalizeProfile(updated, { id: updated.user_id, email: updated.email });
-
   if (!paymentAlreadyStored) {
     await recordPackPurchaseEvent(settings, {
       event,
       session,
-      profile: normalized,
+      profile,
       pack,
-      credited: true,
+      credited: false,
     });
   }
-  await recordPackCreditsAppliedEvent(settings, { session, profile: normalized, pack });
 
-  return { profile: normalized, pack, credited: true, alreadyStored: false };
+  if (!profile?.user_id) {
+    throw new Error("stripe_pack_profile_not_found");
+  }
+
+  const entitlement = await getPackCreditEntitlement(settings, profile, session);
+  if (!entitlement.sessionIds.includes(sessionId)) {
+    throw new Error("stripe_pack_purchase_ledger_missing");
+  }
+
+  const creditsAlreadyApplied = await commercialEventExists(settings, "pack_credits_applied", sessionId);
+  const reconciliation = await reconcilePackProfileToEntitlement(
+    settings,
+    profile,
+    session,
+    entitlement,
+  );
+  const normalized = reconciliation.profile;
+
+  if (!creditsAlreadyApplied) {
+    await recordPackCreditsAppliedEvent(settings, {
+      session,
+      profile: normalized,
+      pack,
+      entitlementCredits: reconciliation.entitlement.credits,
+    });
+  }
+
+  return {
+    profile: normalized,
+    pack,
+    credited: !creditsAlreadyApplied,
+    alreadyStored: creditsAlreadyApplied,
+    reconciled: reconciliation.reconciled,
+    entitlementCredits: reconciliation.entitlement.credits,
+  };
 }
