@@ -313,3 +313,9 @@ Production returned HTTP 200 for the public site, pricing and admin routes, and 
 The genuine Pack 250 customer remains active with all 250 credits available, so no paid usage has occurred yet. The activation email must not be resent. The 250 EUR Google Ads credit remains active and financing the campaigns, with 7.99 EUR used, while the separate 400 EUR credit remains processing after its criteria were met.
 
 Google Ads reported 563 impressions, 63 clicks, 178.93 EUR cost and one purchase conversion from 2026-07-08 through 2026-07-21. Over the trailing 30 days it reported 2,828 impressions, 162 clicks, 272.31 EUR cost and the same single conversion. The authorized budgets remain 8 EUR/day for Pro Launch and 2 EUR/day for Alternatives, and Campaign #1 remains paused. No budget increase is justified before the repaired attribution and current free-test cohort produce enough post-click activation data.
+
+## Result-ready Pack checkout consolidation - 2026-07-23
+
+The Pack 100 buttons beside the download controls, in the result-ready sticky bar and in the post-download panel still sent anonymous visitors without a known email to the account/password panel. Those three high-intent actions now share the existing email-only Pack checkout path. A visitor without an email is focused on the result-ready email field with explicit no-password guidance; a visitor with a known email proceeds directly to Stripe.
+
+The existing Pack-click event remains intact, email-missing attempts and checkout failures retain their separate diagnostics, and each Stripe request records its exact result-stage source. No price, offer, free-test limit or campaign setting changed. Automated coverage protects all three entry points, and a local browser validation confirmed the complete image-processing and checkout handoff on desktop and mobile.

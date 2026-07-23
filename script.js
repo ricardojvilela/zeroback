@@ -4770,6 +4770,43 @@ function focusResultReadyLeadCapture(source = "result_ready") {
   leadCaptureEmail?.focus({ preventScroll: true });
 }
 
+async function continueResultReadyPackCheckout(source, triggerButton, buttonLabelKey) {
+  if (!resultReadyEmail || !resultReadyEmailForm) {
+    await startCheckout("pack100", triggerButton);
+    return;
+  }
+
+  const email = normalizeEmail(
+    resultReadyEmail.value
+      || currentAccount?.email
+      || getCapturedLeadEmail()
+      || accountEmail?.value
+      || "",
+  );
+
+  if (!isValidEmail(email)) {
+    trackEvent("pro_checkout_email_required", {
+      plan: "pack100",
+      source,
+      purchase_type: "pack",
+    });
+    if (resultReadyEmailMessage) resultReadyEmailMessage.textContent = t("billingPackEmailRequired");
+    resultReadyEmailForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    resultReadyEmail.focus({ preventScroll: true });
+    return;
+  }
+
+  resultReadyEmail.value = email;
+  if (resultReadyEmailMessage) resultReadyEmailMessage.textContent = "";
+  const started = await startEmailPackCheckout("pack100", email, triggerButton, {
+    source,
+    buttonLabelKey,
+  });
+  if (!started && resultReadyEmailMessage) {
+    resultReadyEmailMessage.textContent = t("billingCheckoutError");
+  }
+}
+
 function showPostDownloadFeedback(downloadType, count) {
   showPostDownloadNext(downloadType, count);
   if (canUsePaidAccess() || !isFreeTestComplete()) {
@@ -5096,7 +5133,7 @@ actionsPackCta?.addEventListener("click", () => {
     free_limit: maxFilesPerBatch,
   };
   trackEvent("post_download_pack_clicked", detail);
-  startCheckout("pack100", actionsPackCta);
+  continueResultReadyPackCheckout("actions_result_ready_pack", actionsPackCta, "actionsPackCta");
 });
 clearButton.addEventListener("click", clearAll);
 proPromptButton.addEventListener("click", () => {
@@ -5146,7 +5183,7 @@ resultReadyStickyPro?.addEventListener("click", () => {
     free_limit: maxFilesPerBatch,
   };
   trackEvent("post_download_pack_clicked", detail);
-  startCheckout("pack100", resultReadyStickyPro);
+  continueResultReadyPackCheckout("result_ready_sticky", resultReadyStickyPro, "resultReadyStickyProCta");
 });
 postDownloadPackCta?.addEventListener("click", () => {
   const downloadType = postDownloadNextPanel?.dataset.downloadType || "unknown";
@@ -5161,7 +5198,7 @@ postDownloadPackCta?.addEventListener("click", () => {
     free_limit: maxFilesPerBatch,
   };
   trackEvent("post_download_pack_clicked", detail);
-  startCheckout("pack100", postDownloadPackCta);
+  continueResultReadyPackCheckout("post_download_next_pack", postDownloadPackCta, "postDownloadPackCta");
 });
 resultReadySaveLinkCta?.addEventListener("click", handleResultReadySaveLink);
 resultReadyStickyLead?.addEventListener("click", () => focusResultReadyLeadCapture("result_ready_sticky"));
