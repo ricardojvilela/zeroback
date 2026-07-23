@@ -331,3 +331,9 @@ Three new operational signals distinguish access from real use: paid workspace r
 Paid usage previously reserved credits for every pending image before background removal started. A per-image processing failure after that reservation could therefore consume a Pack credit without producing a downloadable result. Paid batches now process into temporary local outputs first, reserve only the number of successful results through the authenticated usage API, and expose the PNGs only after the server confirms the balance update.
 
 The current account balance is still checked before processing, while an authoritative reservation failure keeps the original images ready for retry and exposes a separate admin counter instead of consuming or displaying unconfirmed output. The free path remains unchanged; a browser validation confirmed background removal and enabled PNG/ZIP downloads after this change.
+
+## Stripe delayed-payment reconciliation - 2026-07-23
+
+The fulfillment audit found that the webhook handled immediate `checkout.session.completed` events but not `checkout.session.async_payment_succeeded`, which Stripe uses when a delayed payment method confirms later. Pack credit application now has its own payment-status guard, both immediate and delayed successful Checkout events use the same idempotent reconciliation path, and authenticated checkout sync refuses to alter Pack or subscription access while the session remains unpaid.
+
+Asynchronous payment failures and expired Checkout sessions are stored as operational events, and `/admin` now includes expired sessions alongside failed-payment counts and value. The enabled production webhook was audited directly on Stripe; delayed success, delayed failure, session expiration and invoice payment failure were the four missing event subscriptions and were added without removing the existing events. No price, offer, email campaign or advertising setting changed.

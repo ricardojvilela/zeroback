@@ -1097,6 +1097,10 @@
             <strong id="livePackCheckoutSessions">0</strong>
           </article>
           <article class="live-card">
+            <span>Sessões expiradas</span>
+            <strong id="liveCheckoutSessionsExpired">0</strong>
+          </article>
+          <article class="live-card">
             <span>Packs pagos</span>
             <strong id="livePackPurchases">0</strong>
           </article>
@@ -3127,6 +3131,7 @@
           : `<tr><td class="empty" colspan="11">Ainda não há atividade Pack atribuída a uma origem.</td></tr>`;
         document.querySelector("#livePaymentFailures").textContent = totals.paymentFailures || 0;
         document.querySelector("#livePaymentFailureValue").textContent = formatCurrency(totals.paymentFailureValue || 0);
+        document.querySelector("#liveCheckoutSessionsExpired").textContent = totals.checkoutSessionsExpired || 0;
         document.querySelector("#liveSubscriptionCancelScheduled").textContent = totals.subscriptionCancelScheduled || 0;
         document.querySelector("#liveSubscriptionCanceledEvents").textContent = totals.subscriptionCanceled || 0;
         document.querySelector("#liveCheckoutLoginRequired").textContent = totals.checkoutLoginRequired || 0;

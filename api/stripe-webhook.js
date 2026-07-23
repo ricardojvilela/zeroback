@@ -1,5 +1,10 @@
 import { getSupabaseSettings } from "./_pro.js";
-import { applyPackPurchaseFromSession, getStripeClient, updateProfileFromSubscription } from "./_stripe.js";
+import {
+  applyPackPurchaseFromSession,
+  getStripeClient,
+  isPaidCheckoutSession,
+  updateProfileFromSubscription,
+} from "./_stripe.js";
 import { sendPackActivationEmail } from "./pro-users.js";
 import { Resend } from "resend";
 
@@ -43,6 +48,10 @@ const attributionKeys = [
   "limit_variant",
   "free_limit",
 ];
+const checkoutFulfillmentEventTypes = new Set([
+  "checkout.session.completed",
+  "checkout.session.async_payment_succeeded",
+]);
 
 function webhookJson(status, data) {
   return Response.json(data, { status });
@@ -356,7 +365,15 @@ async function recordProWelcomeEvent(settings, tableName, eventName, session, de
   });
 }
 
-async function recordRevenueRiskEvent(settings, event, eventName, eventLabel, detail = {}, value = 0) {
+async function recordRevenueRiskEvent(
+  settings,
+  event,
+  eventName,
+  eventLabel,
+  detail = {},
+  value = 0,
+  campaign = "subscription_lifecycle",
+) {
   const tableName = process.env.SUPABASE_EVENTS_TABLE || "batchcutout_events";
   const label = asText(eventLabel, 120);
   if (!label) return { stored: false, skipped: true, reason: "missing_event_label" };
@@ -374,7 +391,7 @@ async function recordRevenueRiskEvent(settings, event, eventName, eventLabel, de
     session_id: asText(detail.session_id, 80),
     visitor_id: asText(detail.visitor_id, 80),
     source: "stripe",
-    campaign: "subscription_lifecycle",
+    campaign,
     free_limit: null,
     value: Number(value || 0) || 0,
     detail,
@@ -382,6 +399,42 @@ async function recordRevenueRiskEvent(settings, event, eventName, eventLabel, de
   });
 
   return { stored: true, skipped: false };
+}
+
+async function recordCheckoutLifecycleEvent(settings, event, eventName) {
+  const session = event.data.object;
+  const metadata = session?.metadata || {};
+  const attribution = attributionFromMetadata(metadata);
+  const amountCents = Number(session?.amount_total || 0) || 0;
+  const detail = {
+    ...attribution,
+    stripe_event_id: asText(event?.id, 120),
+    stripe_session_id: asText(session?.id, 120),
+    stripe_customer_id: stripeCustomerId(session?.customer),
+    customer_email: normalizeEmail(
+      session?.customer_details?.email ||
+      session?.customer_email ||
+      metadata.batchcutout_pending_email ||
+      metadata.customer_email ||
+      "",
+    ),
+    purchase_type: asText(metadata.batchcutout_purchase_type || session?.mode || "", 80),
+    plan: asText(metadata.batchcutout_price_plan || "", 80),
+    payment_status: asText(session?.payment_status, 80),
+    status: asText(session?.status, 80),
+    amount_cents: amountCents,
+    currency: asText(session?.currency || "eur", 20).toUpperCase(),
+  };
+
+  return recordRevenueRiskEvent(
+    settings,
+    event,
+    eventName,
+    detail.stripe_session_id || event?.id,
+    detail,
+    eventName === "checkout_payment_failed" ? amountCents / 100 : 0,
+    "checkout_lifecycle",
+  );
 }
 
 async function recordInvoicePaymentFailure(settings, event) {
@@ -529,6 +582,10 @@ async function getSubscriptionFromCheckout(stripe, session) {
   return session.subscription;
 }
 
+export function isCheckoutFulfillmentEvent(eventType) {
+  return checkoutFulfillmentEventTypes.has(String(eventType || ""));
+}
+
 async function handleStripeEvent(event) {
   const settings = getSupabaseSettings();
   if (!settings.supabaseUrl || !settings.serviceRoleKey) {
@@ -541,8 +598,12 @@ async function handleStripeEvent(event) {
   }
 
   try {
-    if (event.type === "checkout.session.completed") {
+    if (isCheckoutFulfillmentEvent(event.type)) {
       const session = event.data.object;
+      if (!isPaidCheckoutSession(session)) {
+        return webhookJson(200, { ok: true, received: true, awaitingPayment: true });
+      }
+
       if (session.mode === "payment" && session.metadata?.batchcutout_purchase_type === "pack") {
         try {
           await applyPackPurchaseFromSession(settings, session, event);
@@ -557,7 +618,7 @@ async function handleStripeEvent(event) {
             throw error;
           }
         }
-      } else {
+      } else if (session.mode === "subscription") {
         const subscription = await getSubscriptionFromCheckout(stripe, session);
         if (subscription) {
           const profile = await updateProfileFromSubscription(settings, subscription, session.client_reference_id);
@@ -572,6 +633,22 @@ async function handleStripeEvent(event) {
             console.error("BatchCutout pro welcome email failed", error);
           }
         }
+      }
+    }
+
+    if (event.type === "checkout.session.async_payment_failed") {
+      try {
+        await recordCheckoutLifecycleEvent(settings, event, "checkout_payment_failed");
+      } catch (error) {
+        console.error("BatchCutout checkout payment failure event failed", error);
+      }
+    }
+
+    if (event.type === "checkout.session.expired") {
+      try {
+        await recordCheckoutLifecycleEvent(settings, event, "checkout_session_expired");
+      } catch (error) {
+        console.error("BatchCutout checkout expiration event failed", error);
       }
     }
 

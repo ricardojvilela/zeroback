@@ -126,6 +126,7 @@ function emptyDay(date) {
     checkoutCancelledReturns: 0,
     checkoutContinueErrors: 0,
     checkoutSessionsCreated: 0,
+    checkoutSessionsExpired: 0,
     checkoutSessionFailures: 0,
     checkoutLinkEmailsSent: 0,
     checkoutLinkEmailClicks: 0,
@@ -358,6 +359,7 @@ function emptySourceRow(source) {
     checkoutCancelledReturns: 0,
     checkoutContinueErrors: 0,
     checkoutSessionsCreated: 0,
+    checkoutSessionsExpired: 0,
     checkoutSessionFailures: 0,
     checkoutLinkEmailsSent: 0,
     checkoutLinkEmailClicks: 0,
@@ -1242,6 +1244,10 @@ export default async function handler(request, response) {
             sourceRow.packEmailCheckoutSessions += 1;
           }
           break;
+        case "checkout_session_expired":
+          row.checkoutSessionsExpired += 1;
+          sourceRow.checkoutSessionsExpired += 1;
+          break;
         case "pro_checkout_session_failed":
           row.checkoutSessionFailures += 1;
           sourceRow.checkoutSessionFailures += 1;
@@ -1273,6 +1279,7 @@ export default async function handler(request, response) {
           sourceRow.revenue += Number(event.value || 0) || 0;
           break;
         case "pro_payment_failed":
+        case "checkout_payment_failed":
           row.paymentFailures += 1;
           sourceRow.paymentFailures += 1;
           row.paymentFailureValue += Number(event.value || 0) || 0;

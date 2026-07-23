@@ -214,9 +214,13 @@ Ativar/configurar o Stripe Customer Portal para permitir gestão de cartão, fat
 Eventos a enviar:
 
 - `checkout.session.completed`
+- `checkout.session.async_payment_succeeded`
+- `checkout.session.async_payment_failed`
+- `checkout.session.expired`
 - `customer.subscription.created`
 - `customer.subscription.updated`
 - `customer.subscription.deleted`
+- `invoice.payment_failed`
 
 O Checkout e o Customer Portal usam estes endpoints:
 
@@ -245,10 +249,10 @@ Depois de adicionar as variáveis na Vercel, fazer novo deploy para publicar:
 - Plano fundador: 15 EUR/mês
 - Pro Mensal: 19 EUR/mês
 - Pro Anual: 190 EUR/ano
-- O site reserva o consumo antes de começar a processar
+- O site confirma o saldo antes do lote e reserva apenas os créditos correspondentes a resultados processados com sucesso
 - Packs nao renovam mensalmente; os creditos acabam quando forem consumidos
 - O login é por email e password via Supabase
 - Novas contas precisam de confirmar o email antes do primeiro login
 - O pagamento é feito por Stripe Checkout
-- O webhook Stripe ativa/remove acesso Pro automaticamente e credita packs pagos
+- O webhook Stripe ativa/remove acesso Pro automaticamente, credita apenas checkouts pagos e reconcilia pagamentos com confirmação diferida
 - O painel `/admin` permite listar contas e mudar entre `Free`, `Pro` e `Reset uso`

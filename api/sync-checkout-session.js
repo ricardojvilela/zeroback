@@ -5,7 +5,13 @@ import {
   readRequestBody,
   sendJson,
 } from "./_pro.js";
-import { applyPackPurchaseFromSession, getPackOffer, getStripeClient, updateProfileFromSubscription } from "./_stripe.js";
+import {
+  applyPackPurchaseFromSession,
+  getPackOffer,
+  getStripeClient,
+  isPaidCheckoutSession,
+  updateProfileFromSubscription,
+} from "./_stripe.js";
 
 async function getSessionSubscription(stripe, sessionId) {
   const session = await stripe.checkout.sessions.retrieve(sessionId, {
@@ -115,10 +121,10 @@ export default async function handler(request, response) {
   if (!accessToken) {
     try {
       const { session, subscription } = await getSessionSubscription(stripe, sessionId);
-      if (session.mode === "payment" && session.payment_status === "paid" && session.metadata?.batchcutout_purchase_type === "pack") {
+      if (session.mode === "payment" && isPaidCheckoutSession(session) && session.metadata?.batchcutout_purchase_type === "pack") {
         return sendJson(response, 200, packConversionPayload(session));
       }
-      if (session.mode !== "subscription" || session.payment_status !== "paid" || !subscription) {
+      if (session.mode !== "subscription" || !isPaidCheckoutSession(session) || !subscription) {
         return sendJson(response, 409, { ok: false, error: "checkout_not_paid" });
       }
 
@@ -160,7 +166,7 @@ export default async function handler(request, response) {
     }
 
     if (isPackSession) {
-      if (session.payment_status !== "paid") {
+      if (!isPaidCheckoutSession(session)) {
         return sendJson(response, 409, { ok: false, error: "checkout_not_paid" });
       }
 
@@ -191,6 +197,9 @@ export default async function handler(request, response) {
 
     if (!subscription) {
       return sendJson(response, 409, { ok: false, error: "checkout_subscription_missing" });
+    }
+    if (!isPaidCheckoutSession(session)) {
+      return sendJson(response, 409, { ok: false, error: "checkout_not_paid" });
     }
 
     const profile = await updateProfileFromSubscription(settings, subscription, user.id);

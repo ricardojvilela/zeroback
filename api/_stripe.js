@@ -104,6 +104,10 @@ export function getCheckoutOffering(plan) {
   };
 }
 
+export function isPaidCheckoutSession(session) {
+  return session?.payment_status === "paid";
+}
+
 export function getPlanLabel(plan) {
   if (plan === "annual") return "Pro Annual";
   if (plan === "early") return "Pro Recurring Campaign";
@@ -477,6 +481,9 @@ export async function applyPackPurchaseFromSession(settings, session, event = nu
   const pack = purchaseType === "pack" ? getPackOffer(metadata.batchcutout_price_plan) : null;
   if (!pack) {
     throw new Error("stripe_pack_not_found");
+  }
+  if (!isPaidCheckoutSession(session)) {
+    throw new Error("stripe_checkout_not_paid");
   }
 
   const sessionId = text(session?.id, 120);
