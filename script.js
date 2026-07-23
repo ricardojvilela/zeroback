@@ -258,6 +258,9 @@ const serverEventNames = new Set([
   "account_magic_link_sent",
   "account_magic_link_failed",
   "account_magic_link_authenticated",
+  "paid_workspace_ready",
+  "pack_first_batch_started",
+  "pack_first_batch_completed",
   "account_password_recovery_requested",
   "account_password_recovery_sent",
   "account_password_recovery_failed",
@@ -281,6 +284,7 @@ let hasTrackedAccountFormInteraction = false;
 let lastCheckoutLinkSentPlan = "";
 let usePasswordForActivation = false;
 let hasTrackedMagicLinkAuthentication = false;
+let hasTrackedPaidWorkspaceReady = false;
 let passwordSetupOpen = isPasswordRecoveryReturn;
 let hasTrackedPasswordRecoveryAuthentication = false;
 
@@ -1835,6 +1839,9 @@ const analyticsEvents = {
   account_magic_link_sent: { category: "account", label: "magic_link_sent" },
   account_magic_link_failed: { category: "account", label: "magic_link_failed" },
   account_magic_link_authenticated: { category: "account", label: "magic_link_authenticated" },
+  paid_workspace_ready: { category: "activation", label: "paid_workspace_ready", step: 13 },
+  pack_first_batch_started: { category: "activation", label: "pack_first_batch_started", step: 14 },
+  pack_first_batch_completed: { category: "activation", label: "pack_first_batch_completed", step: 15 },
   account_password_recovery_requested: { category: "account", label: "password_recovery_requested" },
   account_password_recovery_sent: { category: "account", label: "password_recovery_sent" },
   account_password_recovery_failed: { category: "account", label: "password_recovery_failed" },
@@ -3207,6 +3214,38 @@ async function refreshAccount() {
   return currentAccount;
 }
 
+function focusPaidWorkspaceAfterAuthentication(source = "account_auth") {
+  const access = currentAccount?.access || {};
+  if (!access.canUsePro || checkoutPlanWaitingForAuth()) return false;
+
+  const isPack = Boolean(access.isCreditPack);
+  if (!hasTrackedPaidWorkspaceReady) {
+    hasTrackedPaidWorkspaceReady = true;
+    trackEvent("paid_workspace_ready", {
+      source,
+      access_type: isPack ? "pack" : "pro",
+      batch_limit: access.batchLimit || defaultProBatchLimit,
+      credits_remaining: isPack ? access.monthlyRemaining ?? access.monthlyLimit ?? 0 : 0,
+      monthly_remaining: isPack ? 0 : access.monthlyRemaining ?? access.monthlyLimit ?? 0,
+    });
+  }
+
+  const cleanUrl = new URL(window.location.href);
+  cleanUrl.searchParams.delete("auth");
+  if (isCheckoutActivationReturn && isPack) {
+    cleanUrl.searchParams.delete("checkout");
+    cleanUrl.searchParams.delete("session_id");
+    cleanUrl.searchParams.delete("checkout_plan");
+  }
+  cleanUrl.hash = "tool";
+  window.history.replaceState({}, "", `${cleanUrl.pathname}${cleanUrl.search}${cleanUrl.hash}`);
+  window.setTimeout(() => {
+    dropzone?.scrollIntoView({ behavior: "smooth", block: "center" });
+    dropzone?.focus({ preventScroll: true });
+  }, 120);
+  return true;
+}
+
 function completeMagicLinkAuthentication() {
   if (!isMagicLinkAuthReturn || !currentAccount || hasTrackedMagicLinkAuthentication) return;
   hasTrackedMagicLinkAuthentication = true;
@@ -3215,6 +3254,10 @@ function completeMagicLinkAuthentication() {
     checkout_return: isCheckoutActivationReturn,
     purchase_type: isCheckoutActivationReturn ? "pack" : "",
   });
+
+  if (focusPaidWorkspaceAfterAuthentication(isCheckoutActivationReturn ? "pack_activation_link" : "magic_link_login")) {
+    return;
+  }
 
   const cleanUrl = new URL(window.location.href);
   cleanUrl.searchParams.delete("auth");
@@ -3497,7 +3540,9 @@ async function handleAccountLogin(event) {
     setAccountMessage("accountMagicLinkSent");
     await refreshAccount();
     await syncCheckoutReturnAfterAuth();
-    await maybeStartRequestedCheckout();
+    if (!focusPaidWorkspaceAfterAuthentication(isCheckoutActivationReturn ? "pack_activation_password" : "password_login")) {
+      await maybeStartRequestedCheckout();
+    }
   } catch (error) {
     const waitingPlan = checkoutPlanWaitingForAuth();
     if (isEmailConfirmationRequiredError(error)) {
@@ -4407,6 +4452,12 @@ function addFiles(fileList) {
 async function processImages() {
   const pendingItems = items.filter((item) => !item.outputBlob);
   const pendingCount = pendingItems.length;
+  const accessBeforeProcessing = currentAccount?.access || {};
+  const isFirstPackBatch = Boolean(
+    accessBeforeProcessing.canUsePro
+      && accessBeforeProcessing.isCreditPack
+      && (Number(accessBeforeProcessing.monthlyUsed || 0) || 0) === 0,
+  );
 
   if (!pendingCount) {
     updateControls();
@@ -4459,6 +4510,13 @@ async function processImages() {
       render();
       updateControls();
       return;
+    }
+    if (isFirstPackBatch) {
+      trackEvent("pack_first_batch_started", {
+        count: pendingCount,
+        credits_before: accessBeforeProcessing.monthlyRemaining ?? accessBeforeProcessing.monthlyLimit ?? 0,
+        batch_limit: accessBeforeProcessing.batchLimit || defaultProBatchLimit,
+      });
     }
   }
 
@@ -4521,6 +4579,14 @@ async function processImages() {
   setStatus(failures ? "statusFailures" : "statusReadyZip", 100, { count: failures });
   trackEvent("background_removal_finished", { count: items.length, completed, failures });
   trackEvent("tool_processing_completed", { count: items.length, completed, failures });
+  if (isFirstPackBatch && completed > 0) {
+    trackEvent("pack_first_batch_completed", {
+      count: pendingCount,
+      completed,
+      failures,
+      credits_remaining: currentAccount?.access?.monthlyRemaining ?? 0,
+    });
+  }
   syncPaidAccessUi();
   updateControls();
 }

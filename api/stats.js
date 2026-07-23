@@ -153,6 +153,9 @@ function emptyDay(date) {
     accountMagicLinksSent: 0,
     accountMagicLinkFailures: 0,
     accountMagicLinkAuthentications: 0,
+    paidWorkspaceReady: 0,
+    packFirstBatchesStarted: 0,
+    packFirstBatchesCompleted: 0,
     accountPasswordRecoveryRequests: 0,
     accountPasswordRecoveryEmailsSent: 0,
     accountPasswordRecoveryAuthentications: 0,
@@ -381,6 +384,9 @@ function emptySourceRow(source) {
     accountMagicLinksSent: 0,
     accountMagicLinkFailures: 0,
     accountMagicLinkAuthentications: 0,
+    paidWorkspaceReady: 0,
+    packFirstBatchesStarted: 0,
+    packFirstBatchesCompleted: 0,
     accountPasswordRecoveryRequests: 0,
     accountPasswordRecoveryEmailsSent: 0,
     accountPasswordRecoveryAuthentications: 0,
@@ -1325,6 +1331,18 @@ export default async function handler(request, response) {
         case "account_magic_link_authenticated":
           row.accountMagicLinkAuthentications += 1;
           sourceRow.accountMagicLinkAuthentications += 1;
+          break;
+        case "paid_workspace_ready":
+          row.paidWorkspaceReady += 1;
+          sourceRow.paidWorkspaceReady += 1;
+          break;
+        case "pack_first_batch_started":
+          row.packFirstBatchesStarted += 1;
+          sourceRow.packFirstBatchesStarted += 1;
+          break;
+        case "pack_first_batch_completed":
+          row.packFirstBatchesCompleted += 1;
+          sourceRow.packFirstBatchesCompleted += 1;
           break;
         case "account_password_recovery_requested":
           row.accountPasswordRecoveryRequests += 1;

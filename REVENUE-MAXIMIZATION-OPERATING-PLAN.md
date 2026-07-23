@@ -319,3 +319,9 @@ Google Ads reported 563 impressions, 63 clicks, 178.93 EUR cost and one purchase
 The Pack 100 buttons beside the download controls, in the result-ready sticky bar and in the post-download panel still sent anonymous visitors without a known email to the account/password panel. Those three high-intent actions now share the existing email-only Pack checkout path. A visitor without an email is focused on the result-ready email field with explicit no-password guidance; a visitor with a known email proceeds directly to Stripe.
 
 The existing Pack-click event remains intact, email-missing attempts and checkout failures retain their separate diagnostics, and each Stripe request records its exact result-stage source. No price, offer, free-test limit or campaign setting changed. Automated coverage protects all three entry points, and a local browser validation confirmed the complete image-processing and checkout handoff on desktop and mobile.
+
+## Paid customer first-use activation - 2026-07-23
+
+Authenticated Pack and Pro customers previously finished magic-link or password authentication at the account panel even when paid access was already active. Paid authentication now lands directly on the working upload area, focuses the upload control and removes completed Pack activation parameters, including the Stripe session identifier, from the visible URL. Account and credit information remains available above the tool without interrupting the first-use path.
+
+Three new operational signals distinguish access from real use: paid workspace ready, first Pack batch started after usage reservation, and first Pack batch completed with at least one successful result. These counters are visible in `/admin` and preserve their acquisition source. The change does not send email, alter prices or change paid limits.
