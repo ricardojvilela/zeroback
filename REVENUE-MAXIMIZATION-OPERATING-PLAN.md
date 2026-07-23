@@ -324,4 +324,10 @@ The existing Pack-click event remains intact, email-missing attempts and checkou
 
 Authenticated Pack and Pro customers previously finished magic-link or password authentication at the account panel even when paid access was already active. Paid authentication now lands directly on the working upload area, focuses the upload control and removes completed Pack activation parameters, including the Stripe session identifier, from the visible URL. Account and credit information remains available above the tool without interrupting the first-use path.
 
-Three new operational signals distinguish access from real use: paid workspace ready, first Pack batch started after usage reservation, and first Pack batch completed with at least one successful result. These counters are visible in `/admin` and preserve their acquisition source. The change does not send email, alter prices or change paid limits.
+Three new operational signals distinguish access from real use: paid workspace ready, first Pack batch started, and first Pack batch completed with at least one successful result. These counters are visible in `/admin` and preserve their acquisition source. The change does not send email, alter prices or change paid limits.
+
+## Successful-output credit reservation - 2026-07-23
+
+Paid usage previously reserved credits for every pending image before background removal started. A per-image processing failure after that reservation could therefore consume a Pack credit without producing a downloadable result. Paid batches now process into temporary local outputs first, reserve only the number of successful results through the authenticated usage API, and expose the PNGs only after the server confirms the balance update.
+
+The current account balance is still checked before processing, while an authoritative reservation failure keeps the original images ready for retry and exposes a separate admin counter instead of consuming or displaying unconfirmed output. The free path remains unchanged; a browser validation confirmed background removal and enabled PNG/ZIP downloads after this change.

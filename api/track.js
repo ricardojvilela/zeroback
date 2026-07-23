@@ -68,6 +68,7 @@ const allowedEvents = new Set([
   "paid_workspace_ready",
   "pack_first_batch_started",
   "pack_first_batch_completed",
+  "paid_usage_reservation_failed",
   "account_password_recovery_requested",
   "account_password_recovery_sent",
   "account_password_recovery_failed",

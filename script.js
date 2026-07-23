@@ -261,6 +261,7 @@ const serverEventNames = new Set([
   "paid_workspace_ready",
   "pack_first_batch_started",
   "pack_first_batch_completed",
+  "paid_usage_reservation_failed",
   "account_password_recovery_requested",
   "account_password_recovery_sent",
   "account_password_recovery_failed",
@@ -1842,6 +1843,7 @@ const analyticsEvents = {
   paid_workspace_ready: { category: "activation", label: "paid_workspace_ready", step: 13 },
   pack_first_batch_started: { category: "activation", label: "pack_first_batch_started", step: 14 },
   pack_first_batch_completed: { category: "activation", label: "pack_first_batch_completed", step: 15 },
+  paid_usage_reservation_failed: { category: "activation", label: "paid_usage_reservation_failed", step: 15 },
   account_password_recovery_requested: { category: "account", label: "password_recovery_requested" },
   account_password_recovery_sent: { category: "account", label: "password_recovery_sent" },
   account_password_recovery_failed: { category: "account", label: "password_recovery_failed" },
@@ -4453,8 +4455,9 @@ async function processImages() {
   const pendingItems = items.filter((item) => !item.outputBlob);
   const pendingCount = pendingItems.length;
   const accessBeforeProcessing = currentAccount?.access || {};
+  const paidAccessAtStart = Boolean(accessBeforeProcessing.canUsePro);
   const isFirstPackBatch = Boolean(
-    accessBeforeProcessing.canUsePro
+    paidAccessAtStart
       && accessBeforeProcessing.isCreditPack
       && (Number(accessBeforeProcessing.monthlyUsed || 0) || 0) === 0,
   );
@@ -4462,6 +4465,31 @@ async function processImages() {
   if (!pendingCount) {
     updateControls();
     return;
+  }
+
+  if (paidAccessAtStart) {
+    const creditsRemaining = Math.max(
+      Number(accessBeforeProcessing.monthlyRemaining ?? accessBeforeProcessing.monthlyLimit ?? 0) || 0,
+      0,
+    );
+    if (pendingCount > creditsRemaining) {
+      const isPack = Boolean(accessBeforeProcessing.isCreditPack);
+      if (!isPack) {
+        trackEvent("monthly_limit_reached", {
+          source: "tool_monthly_limit",
+          monthly_limit: accessBeforeProcessing.monthlyLimit || defaultProMonthlyLimit,
+          monthly_remaining: creditsRemaining,
+          pending: pendingCount,
+          account_email: currentAccount?.email || "",
+        });
+      }
+      setStatus(isPack ? "accountPackCreditsDepleted" : "accountMonthlyLimitReached", 0, {
+        monthlyLimit: accessBeforeProcessing.monthlyLimit || defaultProMonthlyLimit,
+      });
+      render();
+      updateControls();
+      return;
+    }
   }
 
   processButton.disabled = true;
@@ -4485,39 +4513,12 @@ async function processImages() {
     return;
   }
 
-  if (canUsePaidAccess()) {
-    const reservation = await reserveMonthlyUsage(pendingCount);
-    if (!reservation.ok) {
-      const monthlyLimit = currentAccount?.access?.monthlyLimit || defaultProMonthlyLimit;
-      if (reservation.error === "monthly_limit_reached") {
-        trackEvent("monthly_limit_reached", {
-          source: "tool_monthly_limit",
-          monthly_limit: monthlyLimit,
-          monthly_remaining: currentAccount?.access?.monthlyRemaining ?? 0,
-          pending: pendingCount,
-          account_email: currentAccount?.email || "",
-        });
-      }
-      setStatus(
-        reservation.error === "monthly_limit_reached"
-          ? "accountMonthlyLimitReached"
-          : reservation.error === "pack_credits_depleted"
-            ? "accountPackCreditsDepleted"
-            : "accountReserveError",
-        0,
-        { monthlyLimit },
-      );
-      render();
-      updateControls();
-      return;
-    }
-    if (isFirstPackBatch) {
-      trackEvent("pack_first_batch_started", {
-        count: pendingCount,
-        credits_before: accessBeforeProcessing.monthlyRemaining ?? accessBeforeProcessing.monthlyLimit ?? 0,
-        batch_limit: accessBeforeProcessing.batchLimit || defaultProBatchLimit,
-      });
-    }
+  if (isFirstPackBatch) {
+    trackEvent("pack_first_batch_started", {
+      count: pendingCount,
+      credits_before: accessBeforeProcessing.monthlyRemaining ?? accessBeforeProcessing.monthlyLimit ?? 0,
+      batch_limit: accessBeforeProcessing.batchLimit || defaultProBatchLimit,
+    });
   }
 
   trackEvent("tool_processing_started", {
@@ -4529,6 +4530,7 @@ async function processImages() {
 
   const total = pendingCount;
   let processedIndex = 0;
+  const paidOutputs = [];
 
   for (const [index, item] of items.entries()) {
     if (item.outputBlob) {
@@ -4552,12 +4554,16 @@ async function processImages() {
       });
       const output = await ensureMinimumPngResolution(removedBackground);
 
-      item.outputBlob = output;
-      URL.revokeObjectURL(item.previewUrl);
-      item.previewUrl = URL.createObjectURL(output);
-      item.statusKey = "statusProcessed";
-      item.statusClass = "ready";
-      recordFreeTestSuccess(item);
+      if (paidAccessAtStart) {
+        paidOutputs.push({ item, output });
+      } else {
+        item.outputBlob = output;
+        URL.revokeObjectURL(item.previewUrl);
+        item.previewUrl = URL.createObjectURL(output);
+        item.statusKey = "statusProcessed";
+        item.statusClass = "ready";
+        recordFreeTestSuccess(item);
+      }
       engineHasLoaded = true;
     } catch (error) {
       console.error(error);
@@ -4574,16 +4580,63 @@ async function processImages() {
     render();
   }
 
+  if (paidAccessAtStart && paidOutputs.length) {
+    const reservation = await reserveMonthlyUsage(paidOutputs.length);
+    if (!reservation.ok) {
+      const monthlyLimit = currentAccount?.access?.monthlyLimit || defaultProMonthlyLimit;
+      for (const { item } of paidOutputs) {
+        item.statusKey = "statusReady";
+        item.statusClass = "";
+      }
+      if (reservation.error === "monthly_limit_reached") {
+        trackEvent("monthly_limit_reached", {
+          source: "tool_monthly_limit",
+          monthly_limit: monthlyLimit,
+          monthly_remaining: currentAccount?.access?.monthlyRemaining ?? 0,
+          pending: paidOutputs.length,
+          account_email: currentAccount?.email || "",
+        });
+      }
+      trackEvent("paid_usage_reservation_failed", {
+        requested: paidOutputs.length,
+        pending: pendingCount,
+        reason: reservation.error || "reserve_failed",
+        access_type: accessBeforeProcessing.isCreditPack ? "pack" : "pro",
+      });
+      setStatus(
+        reservation.error === "monthly_limit_reached"
+          ? "accountMonthlyLimitReached"
+          : reservation.error === "pack_credits_depleted"
+            ? "accountPackCreditsDepleted"
+            : "accountReserveError",
+        0,
+        { monthlyLimit },
+      );
+      render();
+      updateControls();
+      return;
+    }
+
+    for (const { item, output } of paidOutputs) {
+      item.outputBlob = output;
+      URL.revokeObjectURL(item.previewUrl);
+      item.previewUrl = URL.createObjectURL(output);
+      item.statusKey = "statusProcessed";
+      item.statusClass = "ready";
+    }
+    render();
+  }
+
   const failures = items.filter((item) => !item.outputBlob).length;
   const completed = items.length - failures;
   setStatus(failures ? "statusFailures" : "statusReadyZip", 100, { count: failures });
   trackEvent("background_removal_finished", { count: items.length, completed, failures });
   trackEvent("tool_processing_completed", { count: items.length, completed, failures });
-  if (isFirstPackBatch && completed > 0) {
+  if (isFirstPackBatch && paidOutputs.length > 0) {
     trackEvent("pack_first_batch_completed", {
       count: pendingCount,
-      completed,
-      failures,
+      completed: paidOutputs.length,
+      failures: pendingCount - paidOutputs.length,
       credits_remaining: currentAccount?.access?.monthlyRemaining ?? 0,
     });
   }

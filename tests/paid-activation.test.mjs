@@ -110,7 +110,15 @@ test("tracks the first real Pack batch from processing start to completion", asy
   assert.match(processHandler, /accessBeforeProcessing\.monthlyUsed/);
   assert.match(processHandler, /trackEvent\("pack_first_batch_started"/);
   assert.match(processHandler, /trackEvent\("pack_first_batch_completed"/);
-  assert.match(processHandler, /isFirstPackBatch && completed > 0/);
+  assert.match(processHandler, /const paidOutputs = \[\]/);
+  assert.match(processHandler, /reserveMonthlyUsage\(paidOutputs\.length\)/);
+  assert.match(processHandler, /trackEvent\("paid_usage_reservation_failed"/);
+  assert.match(processHandler, /isFirstPackBatch && paidOutputs\.length > 0/);
+  assert.ok(
+    processHandler.indexOf("await removeBackground") < processHandler.indexOf("reserveMonthlyUsage(paidOutputs.length)"),
+    "paid usage must be reserved only after successful local processing",
+  );
+  assert.doesNotMatch(processHandler, /reserveMonthlyUsage\(pendingCount\)/);
 });
 
 test("accepts and reports paid activation events in the admin dashboard", async () => {
@@ -124,6 +132,7 @@ test("accepts and reports paid activation events in the admin dashboard", async 
     "paid_workspace_ready",
     "pack_first_batch_started",
     "pack_first_batch_completed",
+    "paid_usage_reservation_failed",
   ]) {
     assert.match(trackApi, new RegExp(`"${eventName}"`));
     assert.match(statsApi, new RegExp(`case "${eventName}"`));
@@ -132,4 +141,5 @@ test("accepts and reports paid activation events in the admin dashboard", async 
   assert.match(admin, /id="livePaidWorkspaceReady"/);
   assert.match(admin, /id="livePackFirstBatchesStarted"/);
   assert.match(admin, /id="livePackFirstBatchesCompleted"/);
+  assert.match(admin, /id="livePaidUsageReservationFailures"/);
 });

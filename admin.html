@@ -1201,6 +1201,10 @@
             <strong id="livePackFirstBatchesCompleted">0</strong>
           </article>
           <article class="live-card">
+            <span>Falhas reserva créditos</span>
+            <strong id="livePaidUsageReservationFailures">0</strong>
+          </article>
+          <article class="live-card">
             <span>Recuperações pedidas</span>
             <strong id="liveAccountPasswordRecoveryRequests">0</strong>
           </article>
@@ -3143,6 +3147,7 @@
         document.querySelector("#livePaidWorkspaceReady").textContent = totals.paidWorkspaceReady || 0;
         document.querySelector("#livePackFirstBatchesStarted").textContent = totals.packFirstBatchesStarted || 0;
         document.querySelector("#livePackFirstBatchesCompleted").textContent = totals.packFirstBatchesCompleted || 0;
+        document.querySelector("#livePaidUsageReservationFailures").textContent = totals.paidUsageReservationFailures || 0;
         document.querySelector("#liveAccountPasswordRecoveryRequests").textContent = totals.accountPasswordRecoveryRequests || 0;
         document.querySelector("#liveAccountPasswordRecoveryEmailsSent").textContent = totals.accountPasswordRecoveryEmailsSent || 0;
         document.querySelector("#liveAccountPasswordRecoveryAuthentications").textContent = totals.accountPasswordRecoveryAuthentications || 0;

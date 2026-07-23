@@ -156,6 +156,7 @@ function emptyDay(date) {
     paidWorkspaceReady: 0,
     packFirstBatchesStarted: 0,
     packFirstBatchesCompleted: 0,
+    paidUsageReservationFailures: 0,
     accountPasswordRecoveryRequests: 0,
     accountPasswordRecoveryEmailsSent: 0,
     accountPasswordRecoveryAuthentications: 0,
@@ -387,6 +388,7 @@ function emptySourceRow(source) {
     paidWorkspaceReady: 0,
     packFirstBatchesStarted: 0,
     packFirstBatchesCompleted: 0,
+    paidUsageReservationFailures: 0,
     accountPasswordRecoveryRequests: 0,
     accountPasswordRecoveryEmailsSent: 0,
     accountPasswordRecoveryAuthentications: 0,
@@ -1343,6 +1345,10 @@ export default async function handler(request, response) {
         case "pack_first_batch_completed":
           row.packFirstBatchesCompleted += 1;
           sourceRow.packFirstBatchesCompleted += 1;
+          break;
+        case "paid_usage_reservation_failed":
+          row.paidUsageReservationFailures += 1;
+          sourceRow.paidUsageReservationFailures += 1;
           break;
         case "account_password_recovery_requested":
           row.accountPasswordRecoveryRequests += 1;
