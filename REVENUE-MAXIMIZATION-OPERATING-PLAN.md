@@ -389,3 +389,17 @@ The authenticated Search Console performance report contained 225 impressions, t
 The current English product-photo page now answers that question directly with a three-step upload, removal and download workflow, while its primary action remains the two-image free test. Its H1 was aligned with batch product-photo removal, the sitemap date was updated and automated coverage protects the search-intent copy and acquisition link.
 
 Production was verified after deployment at commit `5c8b0dd`. Search Console's live test confirmed that the English URL is available to Google and can be indexed, and the subsequent indexing request was accepted into the priority crawl queue. No price, allowance, offer, campaign or budget changed.
+
+## Intraday commercial review - 2026-07-25 11:17 Europe/Lisbon
+
+Production returned HTTP 200 for the public site, pricing and admin routes, and the repository was clean at commit `807d3ae`. Today had two unique visitors, 12 page views and one SEO CTA click, but no upload, result, download, checkout or revenue. The complete days from 2026-07-22 through 2026-07-24 had 14 visitors and 16 page views with no product use; including today's partial data, 16 visitors generated no upload over that interval.
+
+Over 14 days the authenticated dashboard reported 104 unique visitors, 19 uploads, 15 ready results, 11 downloads, five completed `free_total_2` tests, one attempt to continue, two Pack Stripe sessions, one genuine Pack purchase and 9 EUR revenue. The current offer gate remains blocked at five of 30 completed tests after 13 full days. The same-day 30-day snapshot contained 271 unique visitors, 114 uploads, 79 ready results, 70 downloads and the same single purchase. There were no engine, ZIP, checkout, payment or paid-credit reservation failures.
+
+The genuine Pack customer remains active with all 250 credits unused and has not started a first paid batch. Real renewable MRR remains zero; all three Stripe subscriptions terminate at period end and must not be counted as future revenue. The support mailbox contained two closed messages and zero unresolved messages, with no new buying objection, opt-out or support request.
+
+Google Ads reported 34 impressions, four clicks, 11.85 EUR cost and zero conversions on 2026-07-24. Over 14 complete days it reported 521 impressions, 62 clicks and 189.24 EUR cost; over 30 complete days it reported 2,907 impressions, 170 clicks and 305.17 EUR cost, with the one genuine Pack conversion. Pro Launch remains active at 8 EUR/day, Alternatives at 2 EUR/day and Campaign #1 remains paused. The 250 EUR credit is active with 35.79 EUR spent; the separate 400 EUR credit remains processing after its criteria were met.
+
+Search Console, last updated through 2026-07-22, reported 28 impressions and zero clicks over seven days, 78 impressions and zero clicks over 28 days, and 225 impressions with two clicks over three months. The product-photo search-intent update deployed today is therefore not represented in those delayed figures.
+
+The largest demonstrated bottleneck is activation before the free test, not Stripe or price: only five of 104 visitors completed the test, while one of two Pack Stripe sessions paid. The recent English paid-landing correction has too little post-change traffic to judge. Prices, offers, campaigns, keywords and budgets were left unchanged; the next decision requires a measurable post-change sample rather than another simultaneous intervention.
