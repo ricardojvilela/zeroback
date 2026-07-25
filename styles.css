@@ -3797,6 +3797,11 @@ progress::-moz-progress-bar {
   background: rgba(255, 255, 255, 0.74);
 }
 
+.seo-links-section[hidden],
+.seo-link-grid a[hidden] {
+  display: none;
+}
+
 .seo-links-section h2 {
   margin-bottom: 12px;
   color: var(--charcoal);

@@ -170,6 +170,9 @@ const accountLogout = document.querySelector("#accountLogout");
 const billingActions = document.querySelector("#billingActions");
 const billingPortal = document.querySelector("#billingPortal");
 const batchLimitNote = document.querySelector("[data-i18n='batchLimitNote']");
+const workflowLinksSection = document.querySelector(".seo-links-section");
+const workflowLinksTitle = document.querySelector("#workflow-links-title");
+const workflowCards = Array.from(document.querySelectorAll("[data-workflow-key]"));
 
 const defaultMaxFilesPerBatch = 2;
 const freeTestImageLimit = 2;
@@ -211,6 +214,157 @@ const localizedPolicyLinks = {
   pt: "/privacidade",
   en: "/en/privacy",
   es: "/es/privacidad",
+};
+const defaultWorkflowContent = {
+  title: workflowLinksTitle?.textContent.trim() || "",
+  cards: Object.fromEntries(
+    workflowCards.map((link) => [
+      link.dataset.workflowKey,
+      {
+        href: link.getAttribute("href") || "/",
+        title: link.querySelector("strong")?.textContent.trim() || "",
+        text: link.querySelector("span")?.textContent.trim() || "",
+      },
+    ]),
+  ),
+};
+const workflowContentByLanguage = {
+  pt: defaultWorkflowContent,
+  en: {
+    title: "Ecommerce workflows",
+    cards: {
+      shopify: {
+        href: "/en/remove-background-for-shopify/",
+        title: "Shopify product photos",
+        text: "Remove backgrounds before uploading product images to Shopify.",
+      },
+      etsy: {
+        href: "/en/etsy-product-photo-background-remover/",
+        title: "Etsy listing photos",
+        text: "Prepare cleaner cutouts for listings, bundles, and shop updates.",
+      },
+      woocommerce: {
+        href: "/en/woocommerce-product-background-remover/",
+        title: "WooCommerce catalogues",
+        text: "Process products, variants, and category images in batches.",
+      },
+      ebay: {
+        href: "/en/ebay-product-background-remover/",
+        title: "eBay listing photos",
+        text: "Prepare cleaner marketplace photos for resale listings.",
+      },
+      amazon: {
+        href: "/en/amazon-product-background-remover/",
+        title: "Amazon product photos",
+        text: "Clean product batches before updating Amazon listings.",
+      },
+      editor: {
+        href: "/en/product-photo-background-remover/",
+        title: "Bulk product photo tool",
+        text: "Remove backgrounds and export transparent PNGs or one ZIP.",
+      },
+      "white-background": {
+        href: "/en/remove-white-background-from-product-photos/",
+        title: "Remove white backgrounds",
+        text: "Turn white-background product photos into transparent PNGs.",
+      },
+      "remove-bg": {
+        href: "/en/remove-bg-alternative-for-bulk-product-photos/",
+        title: "remove.bg alternative",
+        text: "Compare a product-batch workflow with PNG and ZIP export.",
+      },
+      photoroom: {
+        href: "/en/photoroom-alternative-for-ecommerce/",
+        title: "Photoroom alternative",
+        text: "For ecommerce teams that need cutouts without a full creative suite.",
+      },
+      pixelcut: {
+        href: "/en/pixelcut-alternative-for-product-photos/",
+        title: "Pixelcut alternative",
+        text: "Prepare product batches with transparent output and organized export.",
+      },
+      canva: {
+        href: "/en/canva-background-remover-alternative-for-product-photos/",
+        title: "Canva alternative",
+        text: "Remove product backgrounds in batches without designing each image.",
+      },
+      results: {
+        href: "/en/customer-results/",
+        title: "Customer results",
+        text: "See how the workflow prepares product photos for PNG and ZIP.",
+      },
+      partners: {
+        href: "/en/ecommerce-agency-product-photo-workflow/",
+        title: "Ecommerce agency workflow",
+        text: "For photographers, assistants, and agencies handling product photos.",
+      },
+      resources: {
+        href: "/en/",
+        title: "All ecommerce resources",
+        text: "Shopify, WooCommerce, Etsy, eBay, Amazon, and batch photo workflows.",
+      },
+    },
+  },
+  es: {
+    title: "Flujos para ecommerce",
+    cards: {
+      shopify: {
+        href: "/es/quitar-fondo-fotos-shopify/",
+        title: "Fotos de producto para Shopify",
+        text: "Quita fondos antes de subir imágenes de producto a Shopify.",
+      },
+      etsy: {
+        href: "/es/quitar-fondo-fotos-etsy/",
+        title: "Fotos para anuncios de Etsy",
+        text: "Prepara recortes más limpios para anuncios y actualizaciones de tienda.",
+      },
+      woocommerce: {
+        href: "/es/quitar-fondo-fotos-woocommerce/",
+        title: "Catálogos WooCommerce",
+        text: "Procesa productos, variantes e imágenes de categoría por lotes.",
+      },
+      ebay: {
+        href: "/es/quitar-fondo-fotos-ebay/",
+        title: "Fotos para anuncios de eBay",
+        text: "Prepara fotos más limpias para reventa y marketplaces.",
+      },
+      amazon: {
+        href: "/es/quitar-fondo-fotos-amazon/",
+        title: "Fotos de producto para Amazon",
+        text: "Limpia lotes de producto antes de actualizar anuncios de Amazon.",
+      },
+      editor: {
+        href: "/es/quitar-fondo-fotos-producto-lote/",
+        title: "Herramienta de fotos por lotes",
+        text: "Quita fondos y exporta PNG transparentes o un ZIP.",
+      },
+      "remove-bg": {
+        href: "/es/alternativa-remove-bg-fotos-producto-lote/",
+        title: "Alternativa a remove.bg",
+        text: "Compara un flujo de lotes de producto con exportación PNG y ZIP.",
+      },
+      photoroom: {
+        href: "/es/alternativa-photoroom-ecommerce/",
+        title: "Alternativa a Photoroom",
+        text: "Para ecommerce que necesita recortes sin una suite creativa completa.",
+      },
+      pixelcut: {
+        href: "/es/alternativa-pixelcut-fotos-producto/",
+        title: "Alternativa a Pixelcut",
+        text: "Prepara lotes de producto con salida transparente y organizada.",
+      },
+      canva: {
+        href: "/es/alternativa-canva-remover-fondo-fotos-producto/",
+        title: "Alternativa a Canva",
+        text: "Quita fondos por lotes sin diseñar cada imagen por separado.",
+      },
+      resources: {
+        href: "/es/",
+        title: "Todos los recursos ecommerce",
+        text: "Shopify, WooCommerce, Etsy, eBay, Amazon y flujos de fotos por lotes.",
+      },
+    },
+  },
 };
 const serverEventNames = new Set([
   "tool_page_view",
@@ -2643,6 +2797,28 @@ function clearAccountPasswordSetup() {
   updatePasswordSetupToggle();
 }
 
+function applyWorkflowLanguage() {
+  if (!workflowLinksSection || !workflowLinksTitle || !workflowCards.length) return;
+
+  const content = workflowContentByLanguage[currentLanguage];
+  workflowLinksSection.hidden = !content;
+  if (!content) return;
+
+  workflowLinksTitle.textContent = content.title;
+
+  for (const link of workflowCards) {
+    const card = content.cards[link.dataset.workflowKey];
+    link.hidden = !card;
+    if (!card) continue;
+
+    link.setAttribute("href", card.href);
+    const title = link.querySelector("strong");
+    const text = link.querySelector("span");
+    if (title) title.textContent = card.title;
+    if (text) text.textContent = card.text;
+  }
+}
+
 function applyLanguage() {
   document.documentElement.lang = languageNames[currentLanguage] || currentLanguage;
   document.title = t("pageTitle");
@@ -2665,6 +2841,7 @@ function applyLanguage() {
   for (const element of document.querySelectorAll("[data-policy-link]")) {
     element.setAttribute("href", localizedPolicyLinks[currentLanguage] || localizedPolicyLinks.en);
   }
+  applyWorkflowLanguage();
 
   languageSelect.value = currentLanguage;
   updatePasswordToggle(accountPassword, accountPasswordToggle);
