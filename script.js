@@ -713,6 +713,7 @@ const languageAliases = {
   nb: "no",
   nn: "no",
 };
+const supportedUiLanguages = new Set(["pt", "en", "es"]);
 
 const translations = {
   pt: {
@@ -1946,7 +1947,8 @@ Object.assign(translations.es, {
 
 let items = [];
 let freeTestImagesUsed = readFreeTestImagesUsed();
-let currentLanguage = getRequestedLanguage() || safeLocalStorageGet("language") || detectLanguage();
+let currentLanguage = getRequestedLanguage() || normalizeUiLanguage(safeLocalStorageGet("language")) || detectLanguage();
+normalizeUnsupportedLanguageUrl();
 let engineHasLoaded = false;
 let hasTrackedDragIntent = false;
 let hasTrackedDownloadReady = false;
@@ -2671,20 +2673,33 @@ function detectLanguage() {
   const browserLanguages = navigator.languages?.length ? navigator.languages : [navigator.language];
 
   for (const browserLanguage of browserLanguages) {
-    const languageCode = browserLanguage.toLowerCase().split("-")[0];
-    const normalizedCode = languageAliases[languageCode] || languageCode;
+    const normalizedCode = normalizeUiLanguage(browserLanguage);
 
-    if (translations[normalizedCode]) {
-      return normalizedCode;
-    }
+    if (normalizedCode) return normalizedCode;
   }
 
   return "en";
 }
 
+function normalizeUiLanguage(language = "") {
+  const languageCode = String(language).toLowerCase().split("-")[0];
+  const normalizedCode = languageAliases[languageCode] || languageCode;
+  return supportedUiLanguages.has(normalizedCode) ? normalizedCode : "";
+}
+
 function getRequestedLanguage() {
+  const requestedLanguage = normalizeUiLanguage(pageParams.get("lang"));
+  if (requestedLanguage) return requestedLanguage;
+  return pageParams.has("lang") ? "en" : "";
+}
+
+function normalizeUnsupportedLanguageUrl() {
   const requestedLanguage = pageParams.get("lang");
-  return translations[requestedLanguage] ? requestedLanguage : "";
+  if (!requestedLanguage || normalizeUiLanguage(requestedLanguage)) return;
+
+  const normalizedUrl = new URL(window.location.href);
+  normalizedUrl.searchParams.set("lang", "en");
+  window.history.replaceState({}, "", `${normalizedUrl.pathname}${normalizedUrl.search}${normalizedUrl.hash}`);
 }
 
 function t(key, params = {}) {
