@@ -381,3 +381,11 @@ Production now sends that conversion once when the second successful free result
 The main tool exposed 12 language options, but only Portuguese, English and Spanish had complete current translations for the free test, Pack offer, account access, password recovery and result-stage conversion flow. The other nine options mixed an older translated tool surface with newer English commercial content; the pricing page already supported only PT, EN and ES.
 
 The tool selector now matches the three complete commercial locales. Requests and saved preferences for unsupported locales fall back to a fully English interface, and legacy `lang` URLs are normalized to `lang=en` while retaining attribution parameters and the page anchor. Production was verified for PT, EN, ES and a legacy FR request after deployment at commit `0bc7c2a`. No price, offer, campaign or budget changed.
+
+## Product-photo search-intent response - 2026-07-25
+
+The authenticated Search Console performance report contained 225 impressions, two clicks, 0.9% CTR and average position 64 over the available three-month period. The commercially relevant query `how to i remove a background with a product image?` had two impressions, zero clicks and average position 12. Its historical impressions were attributed to the Portuguese product-photo URL before the 2026-07-21 international fallback correction.
+
+The current English product-photo page now answers that question directly with a three-step upload, removal and download workflow, while its primary action remains the two-image free test. Its H1 was aligned with batch product-photo removal, the sitemap date was updated and automated coverage protects the search-intent copy and acquisition link.
+
+Production was verified after deployment at commit `5c8b0dd`. Search Console's live test confirmed that the English URL is available to Google and can be indexed, and the subsequent indexing request was accepted into the priority crawl queue. No price, allowance, offer, campaign or budget changed.
