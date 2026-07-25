@@ -369,3 +369,9 @@ The clearest current acquisition defect is a language mismatch in Pro Launch. It
 The active Bulk Background Remover ad was confirmed to use the English `/en/bulk-background-remover/` landing page and to preserve its Google Ads source, medium, campaign and content parameters when opening the upload tool. The landing and upload flow were in English, but the ecommerce workflow section below the tool still displayed 14 Portuguese cards and linked visitors back to Portuguese pages.
 
 The tool now renders 14 English workflow cards with English destinations and 11 Spanish cards where Spanish destinations exist. In languages without a complete matching workflow set, the promotional section is hidden instead of showing content in another language. Production was verified in English, Spanish and French after deployment at commit `a571f3e`; the English ad-to-tool transition retained all campaign parameters. No price, offer, budget or live-ad setting changed.
+
+## Free-test Google Ads measurement - 2026-07-25
+
+The Google Ads conversion audit found one recorded Pack purchase, seven ZIP-download conversions and three batch-limit conversions over the displayed 30-day period, but no action dedicated to completion of the current two-image free test. `Free Test Completed BatchCutout` was created under Sign-up as a secondary, one-per-click, zero-value conversion that is not included in account-level goals.
+
+Production now sends that conversion once when the second successful free result records `free_test_completed`. The action remained secondary after deployment at commit `cfc4c88`, and the live site loaded the matching tagged script. No campaign, budget, bid strategy, primary conversion, price or offer changed.
