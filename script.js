@@ -196,6 +196,7 @@ const defaultProBatchLimit = 100;
 const defaultProMonthlyLimit = 2000;
 const downloadZipConversionId = "AW-18177126609/2EdRCMzF7bMcENHhw9tD";
 const batchLimitConversionId = "AW-18177126609/prPXCPXD8LMcENHhw9tD";
+const freeTestCompletedConversionId = "AW-18177126609/ZdXVCLmckNYcENHhw9tD";
 const paidSubscriptionConversionId = "AW-18177126609/fpcoCP2kmMgcENHhw9tD";
 const packPurchaseConversionId = "AW-18177126609/MVG_CLHb0dAcENHhw9tD";
 const campaignParamKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "source", "campaign", "gclid", "gbraid", "wbraid"];
@@ -3107,6 +3108,7 @@ function recordFreeTestSuccess(item) {
       free_limit: freeTestImageLimit,
       free_remaining: 0,
     });
+    trackGoogleAdsConversion(freeTestCompletedConversionId, { value: 0 });
   }
 }
 
