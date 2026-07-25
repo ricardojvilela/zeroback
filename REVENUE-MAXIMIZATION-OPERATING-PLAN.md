@@ -375,3 +375,9 @@ The tool now renders 14 English workflow cards with English destinations and 11 
 The Google Ads conversion audit found one recorded Pack purchase, seven ZIP-download conversions and three batch-limit conversions over the displayed 30-day period, but no action dedicated to completion of the current two-image free test. `Free Test Completed BatchCutout` was created under Sign-up as a secondary, one-per-click, zero-value conversion that is not included in account-level goals.
 
 Production now sends that conversion once when the second successful free result records `free_test_completed`. The action remained secondary after deployment at commit `cfc4c88`, and the live site loaded the matching tagged script. No campaign, budget, bid strategy, primary conversion, price or offer changed.
+
+## Commercial locale consistency - 2026-07-25
+
+The main tool exposed 12 language options, but only Portuguese, English and Spanish had complete current translations for the free test, Pack offer, account access, password recovery and result-stage conversion flow. The other nine options mixed an older translated tool surface with newer English commercial content; the pricing page already supported only PT, EN and ES.
+
+The tool selector now matches the three complete commercial locales. Requests and saved preferences for unsupported locales fall back to a fully English interface, and legacy `lang` URLs are normalized to `lang=en` while retaining attribution parameters and the page anchor. Production was verified for PT, EN, ES and a legacy FR request after deployment at commit `0bc7c2a`. No price, offer, campaign or budget changed.
