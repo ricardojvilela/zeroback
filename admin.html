@@ -973,6 +973,14 @@
             <strong id="livePaidLandingToolRedirects">0</strong>
           </article>
           <article class="live-card">
+            <span>Ferramenta aberta</span>
+            <strong id="liveToolPageViews">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Seletor de ficheiros</span>
+            <strong id="liveFilePickerOpens">0</strong>
+          </article>
+          <article class="live-card">
             <span>Launch diretórios</span>
             <strong id="liveDirectoryLaunchViews">0</strong>
           </article>
@@ -3021,6 +3029,8 @@
         document.querySelector("#liveSeoLandingViews").textContent = totals.seoLandingViews || 0;
         document.querySelector("#liveSeoLandingCtaClicks").textContent = totals.seoLandingCtaClicks || 0;
         document.querySelector("#livePaidLandingToolRedirects").textContent = totals.paidLandingToolRedirects || 0;
+        document.querySelector("#liveToolPageViews").textContent = totals.toolPageViews || 0;
+        document.querySelector("#liveFilePickerOpens").textContent = totals.filePickerOpens || 0;
         document.querySelector("#liveDirectoryLaunchViews").textContent = totals.directoryLaunchPageViews || 0;
         document.querySelector("#liveDirectoryLaunchCtaClicks").textContent = totals.directoryLaunchCtaClicks || 0;
         document.querySelector("#liveDirectoryLaunchRate").textContent = formatPercent(conversionRate(

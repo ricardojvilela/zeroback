@@ -79,6 +79,8 @@ function emptyDay(date) {
     date,
     visitors: 0,
     pageViews: 0,
+    toolPageViews: 0,
+    filePickerOpens: 0,
     seoLandingViews: 0,
     seoLandingCtaClicks: 0,
     paidLandingToolRedirects: 0,
@@ -316,6 +318,8 @@ function emptySourceRow(source) {
     source,
     visitors: 0,
     pageViews: 0,
+    toolPageViews: 0,
+    filePickerOpens: 0,
     seoLandingViews: 0,
     seoLandingCtaClicks: 0,
     paidLandingToolRedirects: 0,
@@ -1070,9 +1074,18 @@ export default async function handler(request, response) {
           }
           break;
         case "pro_page_view":
-        case "tool_page_view":
           row.pageViews += 1;
           sourceRow.pageViews += 1;
+          break;
+        case "tool_page_view":
+          row.pageViews += 1;
+          row.toolPageViews += 1;
+          sourceRow.pageViews += 1;
+          sourceRow.toolPageViews += 1;
+          break;
+        case "tool_file_picker_opened":
+          row.filePickerOpens += 1;
+          sourceRow.filePickerOpens += 1;
           break;
         case "tool_upload_started":
           row.uploadsStarted += 1;

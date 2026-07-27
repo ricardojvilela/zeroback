@@ -369,6 +369,7 @@ const workflowContentByLanguage = {
 };
 const serverEventNames = new Set([
   "tool_page_view",
+  "tool_file_picker_opened",
   "tool_drag_upload_intent",
   "tool_upload_started",
   "tool_upload_added",
@@ -1958,6 +1959,7 @@ let hasTrackedFreeTestExhausted = false;
 
 const analyticsEvents = {
   tool_page_view: { category: "funnel", label: "page_view", step: 0 },
+  tool_file_picker_opened: { category: "funnel", label: "file_picker_opened", step: 1 },
   brand_cta_clicked: { category: "engagement", label: "start_free" },
   tool_drag_upload_intent: { category: "upload", label: "drag_upload_intent", step: 1 },
   tool_upload_started: { category: "funnel", label: "upload_started", step: 1 },
@@ -5595,7 +5597,9 @@ dropzone.addEventListener("click", (event) => {
     showFreeTestUpgrade("dropzone_click");
     return;
   }
-  if (event.target !== fileInput) fileInput.click();
+  if (event.target === fileInput) return;
+  trackEvent("tool_file_picker_opened", { source: "dropzone_click" });
+  fileInput.click();
 });
 
 dropzone.addEventListener("keydown", (event) => {
@@ -5605,6 +5609,7 @@ dropzone.addEventListener("keydown", (event) => {
     showFreeTestUpgrade("dropzone_keyboard");
     return;
   }
+  trackEvent("tool_file_picker_opened", { source: "dropzone_keyboard" });
   fileInput.click();
 });
 
