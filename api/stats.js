@@ -81,6 +81,7 @@ function emptyDay(date) {
     pageViews: 0,
     seoLandingViews: 0,
     seoLandingCtaClicks: 0,
+    paidLandingToolRedirects: 0,
     directoryLaunchPageViews: 0,
     directoryLaunchCtaClicks: 0,
     uploadsStarted: 0,
@@ -317,6 +318,7 @@ function emptySourceRow(source) {
     pageViews: 0,
     seoLandingViews: 0,
     seoLandingCtaClicks: 0,
+    paidLandingToolRedirects: 0,
     directoryLaunchPageViews: 0,
     directoryLaunchCtaClicks: 0,
     uploadsStarted: 0,
@@ -967,6 +969,7 @@ export default async function handler(request, response) {
       if ([
         "seo_landing_view",
         "seo_landing_cta_clicked",
+        "paid_landing_tool_redirect",
         "directory_launch_page_view",
         "directory_launch_cta_clicked",
       ].includes(event.event_name)) {
@@ -1019,6 +1022,10 @@ export default async function handler(request, response) {
               sourceRow.subscriptionCtaClicks += 1;
             }
           }
+          break;
+        case "paid_landing_tool_redirect":
+          row.paidLandingToolRedirects += 1;
+          sourceRow.paidLandingToolRedirects += 1;
           break;
         case "directory_launch_page_view":
           row.pageViews += 1;

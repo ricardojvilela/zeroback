@@ -8,6 +8,16 @@
     ".landing-panel a",
     ".landing-nav a:not(.landing-logo)",
   ].join(",");
+  const preservedCampaignParams = [
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_content",
+    "utm_term",
+    "gclid",
+    "gbraid",
+    "wbraid",
+  ];
 
   function stableId(storage, key) {
     try {
@@ -92,8 +102,7 @@
 
   function preserveCampaignParams() {
     const sourceParams = new URLSearchParams(window.location.search);
-    const preservedParams = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term", "gclid", "gbraid", "wbraid"];
-    if (!preservedParams.some((key) => sourceParams.has(key))) return;
+    if (!preservedCampaignParams.some((key) => sourceParams.has(key))) return;
 
     document.querySelectorAll("a[href]").forEach((link) => {
       const url = new URL(link.getAttribute("href"), window.location.origin);
@@ -103,7 +112,7 @@
       if (ctaCampaign) link.dataset.batchcutoutCtaCampaign = ctaCampaign;
 
       let changed = false;
-      preservedParams.forEach((key) => {
+      preservedCampaignParams.forEach((key) => {
         if (sourceParams.has(key) && url.searchParams.get(key) !== sourceParams.get(key)) {
           url.searchParams.set(key, sourceParams.get(key));
           changed = true;
@@ -127,11 +136,46 @@
     }
   }
 
+  function isPaidSearchVisit(params) {
+    if (params.has("gclid") || params.has("gbraid") || params.has("wbraid")) return true;
+
+    const source = (params.get("utm_source") || "").toLowerCase();
+    const medium = (params.get("utm_medium") || "").toLowerCase();
+    return ["google", "google_ads", "adwords"].includes(source)
+      && ["cpc", "ppc", "paid", "paid_search"].includes(medium);
+  }
+
+  function redirectPaidSearchToTool() {
+    const directToolTarget = document.body?.dataset?.paidDirectTool || "";
+    const sourceParams = new URLSearchParams(window.location.search);
+    if (!directToolTarget || !isPaidSearchVisit(sourceParams)) return false;
+
+    const target = new URL(directToolTarget, window.location.origin);
+    preservedCampaignParams.forEach((key) => {
+      const value = sourceParams.get(key);
+      if (value) target.searchParams.set(key, value);
+    });
+
+    send("paid_landing_tool_redirect", {
+      landing_type: "paid_search",
+      target: "tool",
+      target_path: target.pathname,
+      target_hash: target.hash,
+      target_source: target.searchParams.get("utm_source") || "",
+      target_medium: target.searchParams.get("utm_medium") || "",
+      target_campaign: target.searchParams.get("utm_campaign") || "",
+    });
+    window.location.replace(target.toString());
+    return true;
+  }
+
   preserveCampaignParams();
 
   if (markPageViewOnce()) {
     send("seo_landing_view", { landing_type: "seo" });
   }
+
+  if (redirectPaidSearchToTool()) return;
 
   document.addEventListener("click", (event) => {
     const link = event.target.closest?.(trackedCtaSelector);

@@ -969,6 +969,10 @@
             <strong id="liveSeoLandingCtaClicks">0</strong>
           </article>
           <article class="live-card">
+            <span>Entrada paga direta</span>
+            <strong id="livePaidLandingToolRedirects">0</strong>
+          </article>
+          <article class="live-card">
             <span>Launch diretórios</span>
             <strong id="liveDirectoryLaunchViews">0</strong>
           </article>
@@ -3016,6 +3020,7 @@
         document.querySelector("#liveZipGenerationFailures").textContent = totals.zipGenerationFailures || 0;
         document.querySelector("#liveSeoLandingViews").textContent = totals.seoLandingViews || 0;
         document.querySelector("#liveSeoLandingCtaClicks").textContent = totals.seoLandingCtaClicks || 0;
+        document.querySelector("#livePaidLandingToolRedirects").textContent = totals.paidLandingToolRedirects || 0;
         document.querySelector("#liveDirectoryLaunchViews").textContent = totals.directoryLaunchPageViews || 0;
         document.querySelector("#liveDirectoryLaunchCtaClicks").textContent = totals.directoryLaunchCtaClicks || 0;
         document.querySelector("#liveDirectoryLaunchRate").textContent = formatPercent(conversionRate(
