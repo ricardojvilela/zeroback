@@ -485,3 +485,5 @@ The authenticated three-month Search Console report exposed one impression for a
 Pricing CTAs now expose only the functional `checkout_plan`, language when needed and account-section anchor. CTA placement and campaign labels remain attached to the click event, while incoming external campaign attribution is persisted before a clean same-page plan link reloads. Campaign parameters still propagate to other internal destinations where they support acquisition measurement, but are not appended to pricing self-links.
 
 Automated coverage prevents pricing self-links from regaining internal UTM parameters and verifies that plan selection plus CTA attribution remain present. No price, offer, free allowance, campaign, keyword, budget or email action changed.
+
+Production was verified after deployment at commit `535ced6`. Search Console confirmed that the clean pricing URL was already indexed and served through HTTPS, then accepted a new indexing request into the priority crawl queue.
