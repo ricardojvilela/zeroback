@@ -104,6 +104,31 @@ test("public navigation does not link to redirected legal HTML URLs", async () =
   }
 });
 
+test("pricing self-links select a plan without crawlable campaign parameters", async () => {
+  const html = await readRepoFile("pricing/index.html");
+  const selfLinkTags = [...html.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>/g)]
+    .filter(([, href]) => {
+      const url = new URL(href, "https://batchcutout.com");
+      return url.pathname.replace(/\/+$/, "") === "/pricing"
+        && url.searchParams.has("checkout_plan");
+    });
+
+  assert.equal(selfLinkTags.length, 4);
+  for (const [tag, href] of selfLinkTags) {
+    const url = new URL(href, "https://batchcutout.com");
+    assert.equal(url.searchParams.get("utm_source"), null, href);
+    assert.equal(url.searchParams.get("utm_medium"), null, href);
+    assert.equal(url.searchParams.get("utm_campaign"), null, href);
+    assert.match(tag, /\bdata-pricing-cta-source="pricing"/);
+    assert.match(tag, /\bdata-pricing-cta-medium="[^"]+"/);
+    assert.match(tag, /\bdata-pricing-cta-campaign="[^"]+"/);
+  }
+
+  assert.match(html, /if \(isPricingSelfLink\(url\)\) return;/);
+  assert.match(html, /persistPricingPageAttribution\(\);\s+preservePricingCampaignParams\(\);/);
+  assert.match(html, /cta_campaign: cta\.dataset\.pricingCtaCampaign \|\| ""/);
+});
+
 test("product photo locale pages use the English page as the global default", async () => {
   const localePages = [
     "product-photo-background-remover/index.html",
