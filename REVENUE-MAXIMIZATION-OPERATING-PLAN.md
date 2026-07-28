@@ -455,3 +455,11 @@ Google Ads reported six impressions, one click, 6.39 EUR cost and no conversion 
 Today's search-term report exposed `photoshop batch remove background` and `remove bg change background`, both with impressions and no click; the query responsible for the reported click was not yet available. The active Pro Launch ad still points to the English bulk-remover page. In the 14-day application funnel, the historical Pro Launch path had 44 visitors but only three unique uploaders, while the remove.bg alternative page had 19 visitors, five uploaders and three downloaders. This confirms that activation before the first upload remains the largest demonstrated constraint.
 
 Search Console, with performance data through 2026-07-25, remained at 28 impressions and zero clicks over seven days, 90 impressions and zero clicks over 28 days, and 240 impressions with two clicks over the available three-month report. The paid direct-entry and search-quality changes made on 2026-07-27 have only one incomplete day and one paid click of observation. No price, offer, campaign, keyword, budget or email changed; the next paid-search decision remains the later of seven complete days or 30 new paid clicks from that checkpoint.
+
+## Touch-friendly first-upload action - 2026-07-28
+
+A desktop and mobile review of the direct upload workspace confirmed that the dropzone is visible without an extra navigation step, but its primary instruction led with dragging photos. That action is not natural on a touch screen and created avoidable ambiguity at the largest measured funnel loss, before the first upload.
+
+The Portuguese, English and Spanish upload instructions now lead with selecting photos while preserving drag-and-drop as the second option. Desktop and 390-pixel mobile browser checks confirmed that the shorter copy remains legible and correctly contained. Automated coverage protects all three commercial translations. No price, offer, free allowance, campaign, keyword, budget or email setting changed.
+
+The next measurement is the direct workspace sequence from tool page view to file-picker open, upload and completed free test. Conversion impact must be evaluated only after post-deployment traffic is available.
