@@ -463,3 +463,11 @@ A desktop and mobile review of the direct upload workspace confirmed that the dr
 The Portuguese, English and Spanish upload instructions now lead with selecting photos while preserving drag-and-drop as the second option. Desktop and 390-pixel mobile browser checks confirmed that the shorter copy remains legible and correctly contained. Automated coverage protects all three commercial translations. No price, offer, free allowance, campaign, keyword, budget or email setting changed.
 
 The next measurement is the direct workspace sequence from tool page view to file-picker open, upload and completed free test. Conversion impact must be evaluated only after post-deployment traffic is available.
+
+## Activation measurement integrity - 2026-07-28
+
+The activation audit found that `tool_file_picker_opened` was sent by the browser but rejected by the tracking API, so the historical file-picker counter was artificially zero. Five other operational events were accepted by the API and used by the dashboard but omitted from the browser's server-event list: engine and ZIP failures, account confirmation resends, and the required-email and failed-email steps before checkout. Their historical zero values must not be treated as evidence that those conditions never occurred.
+
+The browser and API event contracts are now aligned and protected by an automated consistency test. New tool events include a non-identifying screen-format context based on viewport dimensions and input mode; no user agent, personal data or new persistent identifier is collected.
+
+The admin dashboard now reports unique visitors through tool view, file picker, accepted upload, completed free test and download for mobile, tablet and desktop. Historical events without screen-format context are intentionally excluded from this breakdown, so measurement begins with this deployment. No price, offer, free allowance, campaign, keyword, budget or email action changed.

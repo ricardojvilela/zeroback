@@ -468,6 +468,65 @@ function updateCampaignVisitorStages(stages, eventName, detail, visitorId) {
   if (["pro_subscription_paid", "pack_purchase_paid"].includes(eventName)) stages.purchase.add(visitorId);
 }
 
+const activationDeviceTypes = ["mobile", "tablet", "desktop"];
+
+function emptyDeviceActivationStages(deviceType) {
+  return {
+    deviceType,
+    tool: new Set(),
+    filePicker: new Set(),
+    upload: new Set(),
+    completedTest: new Set(),
+    download: new Set(),
+  };
+}
+
+export function deviceActivationSummary(events = []) {
+  const byDevice = new Map();
+
+  for (const event of events) {
+    const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+    const deviceType = asCleanText(detail.device_type, 20).toLowerCase();
+    const visitorId = asCleanText(event.visitor_id || detail.visitor_id, 80);
+    if (!activationDeviceTypes.includes(deviceType) || !visitorId) continue;
+
+    if (!byDevice.has(deviceType)) {
+      byDevice.set(deviceType, emptyDeviceActivationStages(deviceType));
+    }
+    const stages = byDevice.get(deviceType);
+
+    if (event.event_name === "tool_page_view") stages.tool.add(visitorId);
+    if (event.event_name === "tool_file_picker_opened") stages.filePicker.add(visitorId);
+    if (event.event_name === "tool_upload_added") stages.upload.add(visitorId);
+    if (event.event_name === "free_test_completed") stages.completedTest.add(visitorId);
+    if (["tool_download_png", "tool_download_zip"].includes(event.event_name)) stages.download.add(visitorId);
+  }
+
+  return activationDeviceTypes
+    .filter((deviceType) => byDevice.has(deviceType))
+    .map((deviceType) => {
+      const stages = byDevice.get(deviceType);
+      const toolVisitors = stages.tool.size;
+      const filePickerVisitors = stages.filePicker.size;
+      const uploadVisitors = stages.upload.size;
+      const completedTestVisitors = stages.completedTest.size;
+      const downloadVisitors = stages.download.size;
+
+      return {
+        deviceType,
+        toolVisitors,
+        filePickerVisitors,
+        uploadVisitors,
+        completedTestVisitors,
+        downloadVisitors,
+        filePickerRate: toolVisitors ? filePickerVisitors / toolVisitors : 0,
+        uploadRate: toolVisitors ? uploadVisitors / toolVisitors : 0,
+        completedTestRate: toolVisitors ? completedTestVisitors / toolVisitors : 0,
+        downloadRate: toolVisitors ? downloadVisitors / toolVisitors : 0,
+      };
+    });
+}
+
 function numericSnapshot(row) {
   return Object.fromEntries(
     Object.entries(row).filter(([, value]) => typeof value === "number"),
@@ -929,12 +988,14 @@ export default async function handler(request, response) {
     const byLandingPage = new Map();
     const visitorsByLandingPage = new Map();
     const packVisitorStages = new Map();
+    const eventsInWindow = [];
     let eventCount = 0;
 
     for (const event of events) {
       const date = toLocalDate(event.occurred_at, timeZone);
       if (!date) continue;
       if (date < startDate || date > today) continue;
+      eventsInWindow.push(event);
       eventCount += 1;
 
       if (!byDay.has(date)) byDay.set(date, emptyDay(date));
@@ -1561,6 +1622,7 @@ export default async function handler(request, response) {
       rows,
       totals,
       packVisitorFunnel: packVisitorFunnelSummary(packVisitorStages),
+      deviceActivationBreakdown: deviceActivationSummary(eventsInWindow),
       validationExperiment: validationExperimentSummary(events, timeZone, today),
       accountFailureBreakdown: accountFailureBreakdown(events),
       sourceBreakdown,

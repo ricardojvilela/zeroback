@@ -379,6 +379,8 @@ const serverEventNames = new Set([
   "free_test_exhausted",
   "tool_processing_started",
   "tool_processing_completed",
+  "tool_engine_load_failed",
+  "tool_zip_generation_failed",
   "tool_download_png",
   "tool_download_zip",
   "post_download_next_shown",
@@ -395,6 +397,8 @@ const serverEventNames = new Set([
   "account_checkout_panel_shown",
   "account_form_interacted",
   "pro_checkout_login_required",
+  "pro_checkout_email_required",
+  "pro_checkout_email_failed",
   "pro_checkout_started",
   "pro_purchase_conversion_sent",
   "pack_purchase_conversion_sent",
@@ -406,6 +410,7 @@ const serverEventNames = new Set([
   "account_signup_started",
   "account_signup_succeeded",
   "account_email_confirmation_required",
+  "account_email_confirmation_resent",
   "account_form_validation_failed",
   "account_signup_failed",
   "account_login_succeeded",
@@ -2050,6 +2055,7 @@ function trackEvent(name, detail = {}) {
     funnel_step: config.step || detail.funnel_step || undefined,
     value: Number.isFinite(numericValue) ? numericValue : 0,
     language: currentLanguage,
+    ...getDeviceAnalyticsContext(),
     ...attributionParams,
     ...detail,
   };
@@ -2066,6 +2072,30 @@ function trackEvent(name, detail = {}) {
   }
   recordDebugEvent(name, eventParams);
   return sendServerEvent(name, eventParams);
+}
+
+function getDeviceAnalyticsContext() {
+  const viewportWidth = Math.max(0, Math.round(Number(window.innerWidth || document.documentElement?.clientWidth || 0)));
+  const viewportHeight = Math.max(0, Math.round(Number(window.innerHeight || document.documentElement?.clientHeight || 0)));
+  const deviceType = !viewportWidth
+    ? "unknown"
+    : viewportWidth <= 767
+      ? "mobile"
+      : viewportWidth <= 1040
+        ? "tablet"
+        : "desktop";
+  const inputMode = window.matchMedia?.("(pointer: coarse)")?.matches
+    ? "coarse"
+    : window.matchMedia?.("(pointer: fine)")?.matches
+      ? "fine"
+      : "unknown";
+
+  return {
+    device_type: deviceType,
+    input_mode: inputMode,
+    viewport_width: viewportWidth,
+    viewport_height: viewportHeight,
+  };
 }
 
 function createStableId() {

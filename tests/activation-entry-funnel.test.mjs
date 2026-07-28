@@ -3,23 +3,94 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+import { deviceActivationSummary } from "../api/stats.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const [index, script, stats, admin] = await Promise.all([
+const [index, script, apiTrack, stats, admin] = await Promise.all([
   readFile(path.join(root, "index.html"), "utf8"),
   readFile(path.join(root, "script.js"), "utf8"),
+  readFile(path.join(root, "api", "track.js"), "utf8"),
   readFile(path.join(root, "api", "stats.js"), "utf8"),
   readFile(path.join(root, "admin.html"), "utf8"),
 ]);
+
+function stringLiteralsInSet(source, marker) {
+  const start = source.indexOf(marker);
+  assert.notEqual(start, -1, `${marker} was not found`);
+  const end = source.indexOf("]);", start);
+  assert.notEqual(end, -1, `${marker} does not have a closing set`);
+  return new Set(
+    [...source.slice(start, end).matchAll(/"([a-z0-9_]+)"/g)].map((match) => match[1]),
+  );
+}
 
 test("measures the activation steps before a visitor selects files", () => {
   assert.match(script, /"tool_file_picker_opened"/);
   assert.match(script, /trackEvent\("tool_file_picker_opened", \{ source: "dropzone_click" \}\)/);
   assert.match(script, /trackEvent\("tool_file_picker_opened", \{ source: "dropzone_keyboard" \}\)/);
+  assert.match(apiTrack, /"tool_file_picker_opened"/);
   assert.match(stats, /case "tool_file_picker_opened":/);
   assert.match(stats, /filePickerOpens \+= 1/);
   assert.match(admin, /id="liveToolPageViews"/);
   assert.match(admin, /id="liveFilePickerOpens"/);
+});
+
+test("keeps browser events aligned with the tracking API", () => {
+  const serverEvents = stringLiteralsInSet(script, "const serverEventNames");
+  const apiEvents = stringLiteralsInSet(apiTrack, "const allowedEvents");
+  const directTrackedEvents = new Set(
+    [...script.matchAll(/trackEvent\("([a-z0-9_]+)"/g)].map((match) => match[1]),
+  );
+
+  for (const eventName of serverEvents) {
+    assert.ok(apiEvents.has(eventName), `${eventName} is sent by the browser but rejected by the API`);
+  }
+  for (const eventName of directTrackedEvents) {
+    if (!apiEvents.has(eventName)) continue;
+    assert.ok(serverEvents.has(eventName), `${eventName} is accepted by the API but never sent by the browser`);
+  }
+});
+
+test("summarizes activation by screen format using unique visitors", () => {
+  const events = [
+    { event_name: "tool_page_view", visitor_id: "mobile-1", detail: { device_type: "mobile" } },
+    { event_name: "tool_page_view", visitor_id: "mobile-1", detail: { device_type: "mobile" } },
+    { event_name: "tool_page_view", visitor_id: "mobile-2", detail: { device_type: "mobile" } },
+    { event_name: "tool_file_picker_opened", visitor_id: "mobile-1", detail: { device_type: "mobile" } },
+    { event_name: "tool_upload_added", visitor_id: "mobile-1", detail: { device_type: "mobile" } },
+    { event_name: "free_test_completed", visitor_id: "mobile-1", detail: { device_type: "mobile" } },
+    { event_name: "tool_download_png", visitor_id: "mobile-1", detail: { device_type: "mobile" } },
+    { event_name: "tool_page_view", visitor_id: "desktop-1", detail: { device_type: "desktop" } },
+    { event_name: "tool_upload_added", visitor_id: "desktop-1", detail: { device_type: "desktop" } },
+    { event_name: "tool_page_view", visitor_id: "ignored", detail: {} },
+  ];
+
+  const summary = deviceActivationSummary(events);
+  assert.deepEqual(summary.find((row) => row.deviceType === "mobile"), {
+    deviceType: "mobile",
+    toolVisitors: 2,
+    filePickerVisitors: 1,
+    uploadVisitors: 1,
+    completedTestVisitors: 1,
+    downloadVisitors: 1,
+    filePickerRate: 0.5,
+    uploadRate: 0.5,
+    completedTestRate: 0.5,
+    downloadRate: 0.5,
+  });
+  assert.deepEqual(summary.find((row) => row.deviceType === "desktop"), {
+    deviceType: "desktop",
+    toolVisitors: 1,
+    filePickerVisitors: 0,
+    uploadVisitors: 1,
+    completedTestVisitors: 0,
+    downloadVisitors: 0,
+    filePickerRate: 0,
+    uploadRate: 1,
+    completedTestRate: 0,
+    downloadRate: 0,
+  });
+  assert.equal(summary.some((row) => row.deviceType === "tablet"), false);
 });
 
 test("the upload action starts with a touch-friendly instruction in every commercial locale", () => {

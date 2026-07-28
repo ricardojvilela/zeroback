@@ -1298,6 +1298,34 @@
           </article>
         </div>
         <p class="funnel-diagnosis" id="liveFunnelDiagnosis">A carregar diagnóstico do funil...</p>
+        <section class="source-live-block" aria-label="Ativação por formato de ecrã">
+          <div class="panel-head compact">
+            <div>
+              <h3>Ativação por formato de ecrã</h3>
+              <p class="note">Pessoas únicas desde a publicação desta medição. Mobile corresponde a até 767 px, tablet a 768-1040 px e desktop a mais de 1040 px.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Formato</th>
+                  <th>Ferramenta</th>
+                  <th>Seletor</th>
+                  <th>Ferramenta → seletor</th>
+                  <th>Upload aceite</th>
+                  <th>Ferramenta → upload</th>
+                  <th>Teste concluído</th>
+                  <th>Ferramenta → teste</th>
+                  <th>Download</th>
+                </tr>
+              </thead>
+              <tbody id="deviceActivationRowsBody">
+                <tr><td class="empty" colspan="9">A carregar ativação por formato.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
         <section class="source-live-block" aria-label="Falhas de acesso">
           <div class="panel-head compact">
             <div>
@@ -1925,6 +1953,7 @@
       const authForm = document.querySelector("#authForm");
       const authError = document.querySelector("#authError");
       const liveRowsBody = document.querySelector("#liveRowsBody");
+      const deviceActivationRowsBody = document.querySelector("#deviceActivationRowsBody");
       const accountFailureRowsBody = document.querySelector("#accountFailureRowsBody");
       const accountFailureStatus = document.querySelector("#accountFailureStatus");
       const campaignRowsBody = document.querySelector("#campaignRowsBody");
@@ -2594,6 +2623,14 @@
         return value || "-";
       }
 
+      function deviceFormatLabel(value) {
+        return {
+          mobile: "Mobile",
+          tablet: "Tablet",
+          desktop: "Desktop",
+        }[value] || value || "-";
+      }
+
       function campaignLabel(value) {
         if (value === "google_ads_auto_tagged") return "Google Ads sem nome UTM";
         return String(value || "-").replace(/[_-]+/g, " ");
@@ -3192,6 +3229,21 @@
         const accountEntrants = Math.max((totals.accountSignups || 0) - (totals.accountEmailConfirmations || 0), 0) + (totals.accountLogins || 0);
         document.querySelector("#liveAccountCheckoutGap").textContent = Math.max(accountEntrants - (totals.checkoutStarts || 0), 0);
         document.querySelector("#liveFunnelDiagnosis").textContent = funnelDiagnosis(totals, packVisitorFunnel, offerChangeGate);
+        deviceActivationRowsBody.innerHTML = data.deviceActivationBreakdown?.length
+          ? data.deviceActivationBreakdown.map((row) => `
+              <tr>
+                <td><strong>${escapeHtml(deviceFormatLabel(row.deviceType))}</strong></td>
+                <td>${row.toolVisitors || 0}</td>
+                <td>${row.filePickerVisitors || 0}</td>
+                <td>${formatPercent(row.filePickerRate || 0)}</td>
+                <td>${row.uploadVisitors || 0}</td>
+                <td>${formatPercent(row.uploadRate || 0)}</td>
+                <td>${row.completedTestVisitors || 0}</td>
+                <td>${formatPercent(row.completedTestRate || 0)}</td>
+                <td>${row.downloadVisitors || 0}</td>
+              </tr>
+            `).join("")
+          : `<tr><td class="empty" colspan="9">Ainda não há eventos com formato de ecrã neste período.</td></tr>`;
 
         liveRowsBody.innerHTML = data.rows?.length
           ? data.rows.slice().reverse().map((row) => {
@@ -4220,6 +4272,7 @@
             document.body.classList.add("locked");
           }
           liveRowsBody.innerHTML = `<tr><td class="empty" colspan="33">Não foi possível carregar atividade.</td></tr>`;
+          deviceActivationRowsBody.innerHTML = `<tr><td class="empty" colspan="9">Não foi possível carregar a ativação por formato.</td></tr>`;
           accountFailureRowsBody.innerHTML = `<tr><td class="empty" colspan="7">Não foi possível carregar o diagnóstico de acesso.</td></tr>`;
           accountFailureStatus.textContent = "Erro ao carregar falhas de registo e login.";
           campaignRowsBody.innerHTML = `<tr><td class="empty" colspan="15">Não foi possível carregar campanhas.</td></tr>`;

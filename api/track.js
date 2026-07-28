@@ -4,6 +4,7 @@ const legacyPostDownloadPackClickedEvent = ["post", "download", "found" + "er", 
 
 const allowedEvents = new Set([
   "tool_page_view",
+  "tool_file_picker_opened",
   "seo_landing_view",
   "seo_landing_cta_clicked",
   "tool_drag_upload_intent",
