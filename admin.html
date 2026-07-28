@@ -3023,9 +3023,19 @@
           unknown: "Sem motivo registado",
         };
         const totalAttempts = rows.reduce((sum, row) => sum + (Number(row.attempts || 0) || 0), 0);
-        accountFailureStatus.textContent = totalAttempts
-          ? `${totalAttempts} falha(s) agrupadas por motivo nos últimos 14 dias.`
-          : "Sem falhas de registo ou login nos últimos 14 dias.";
+        const latestFailureAt = rows.reduce((latest, row) => {
+          const occurredAt = new Date(row.lastAt || 0).getTime();
+          return Number.isFinite(occurredAt) ? Math.max(latest, occurredAt) : latest;
+        }, 0);
+        const hasRecentFailure = latestFailureAt >= Date.now() - 7 * 24 * 60 * 60 * 1000;
+        const latestFailureLabel = latestFailureAt
+          ? new Date(latestFailureAt).toLocaleString("pt-PT")
+          : "";
+        accountFailureStatus.textContent = !totalAttempts
+          ? "Sem falhas de registo ou login nos últimos 14 dias."
+          : hasRecentFailure
+            ? `${totalAttempts} falha(s) agrupadas por motivo nos últimos 14 dias. Última em ${latestFailureLabel}.`
+            : `Sem falhas nos últimos 7 dias. O histórico dos últimos 14 dias contém ${totalAttempts} tentativa(s); última em ${latestFailureLabel}.`;
         accountFailureRowsBody.innerHTML = rows.length
           ? rows.map((row) => {
               const reasonLabel = reasonLabels[row.reason] || row.reason || "-";

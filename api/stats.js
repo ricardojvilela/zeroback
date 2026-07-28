@@ -1624,7 +1624,7 @@ export default async function handler(request, response) {
       packVisitorFunnel: packVisitorFunnelSummary(packVisitorStages),
       deviceActivationBreakdown: deviceActivationSummary(eventsInWindow),
       validationExperiment: validationExperimentSummary(events, timeZone, today),
-      accountFailureBreakdown: accountFailureBreakdown(events),
+      accountFailureBreakdown: accountFailureBreakdown(eventsInWindow),
       sourceBreakdown,
       packSourceBreakdown,
       campaignBreakdown,

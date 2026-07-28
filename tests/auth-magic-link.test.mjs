@@ -124,10 +124,23 @@ test("initializes the requested checkout plan before account creation uses it", 
   const handlerEnd = script.indexOf("async function handleAccountCheckoutLinkCapture", handlerStart);
   const handler = script.slice(handlerStart, handlerEnd);
   const declaration = handler.indexOf("const waitingPlan = checkoutPlanWaitingForAuth()");
+  const declarations = handler.match(/const waitingPlan = checkoutPlanWaitingForAuth\(\)/g) || [];
 
   assert.ok(handlerStart >= 0 && handlerEnd > handlerStart);
   assert.ok(declaration >= 0);
+  assert.equal(declarations.length, 1);
   assert.ok(declaration < handler.indexOf('trackEvent("account_signup_started"'));
   assert.ok(declaration < handler.indexOf("accountEmailRedirectUrl(waitingPlan)"));
   assert.ok(declaration < handler.indexOf("continueExistingAccountAfterSignup(email, password, waitingPlan)"));
+});
+
+test("scopes account failure diagnostics and distinguishes historical failures", async () => {
+  const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const [stats, admin] = await Promise.all([
+    readFile(path.join(root, "api", "stats.js"), "utf8"),
+    readFile(path.join(root, "admin.html"), "utf8"),
+  ]);
+
+  assert.match(stats, /accountFailureBreakdown: accountFailureBreakdown\(eventsInWindow\)/);
+  assert.match(admin, /Sem falhas nos últimos 7 dias\./);
 });

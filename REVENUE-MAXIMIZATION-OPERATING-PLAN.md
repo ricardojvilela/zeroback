@@ -471,3 +471,9 @@ The activation audit found that `tool_file_picker_opened` was sent by the browse
 The browser and API event contracts are now aligned and protected by an automated consistency test. New tool events include a non-identifying screen-format context based on viewport dimensions and input mode; no user agent, personal data or new persistent identifier is collected.
 
 The admin dashboard now reports unique visitors through tool view, file picker, accepted upload, completed free test and download for mobile, tablet and desktop. Historical events without screen-format context are intentionally excluded from this breakdown, so measurement begins with this deployment. No price, offer, free allowance, campaign, keyword, budget or email action changed.
+
+## Account-failure recency audit - 2026-07-28
+
+The eight `cannot_access_waitingplan_before_initialization` signup failures shown in the 14-day dashboard came from one visitor and ended on 2026-07-17 at 16:16 Europe/Lisbon. The duplicate checkout-plan declaration that caused this error was removed later that day in commit `2fb1ff0`; the error did not recur during the following 11 days. The five invalid-login attempts were from the same visitor at the same time, and the final temporary rate-limit event was recorded on 2026-07-17 at 17:41.
+
+This is historical evidence of a resolved incident, not a current account blocker. The dashboard now states when there have been no access failures in the latest seven days while retaining the 14-day history below. Account failure groups are also limited to the requested reporting window instead of the longer event window retained for the Pack validation experiment. Automated coverage requires exactly one checkout-plan declaration in the signup handler. No price, offer, campaign, budget or email action changed.
