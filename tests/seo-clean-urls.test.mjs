@@ -58,6 +58,22 @@ test("sitemap submits only final URLs when Vercel clean URLs are enabled", async
   );
 });
 
+test("internal API routes are excluded from search indexing", async () => {
+  const [robots, vercelConfig] = await Promise.all([
+    readRepoFile("robots.txt"),
+    readRepoFile("vercel.json").then(JSON.parse),
+  ]);
+
+  assert.match(robots, /^Disallow: \/api\/$/m);
+
+  const apiHeaders = vercelConfig.headers.find((rule) => rule.source === "/api/(.*)")?.headers;
+  assert.ok(apiHeaders, "Vercel must define headers for API routes");
+  assert.equal(
+    apiHeaders.find((header) => header.key === "X-Robots-Tag")?.value,
+    "noindex, nofollow",
+  );
+});
+
 test("legal pages expose final canonical and hreflang URLs", async () => {
   for (const relativePath of legalPages) {
     const html = await readRepoFile(relativePath);
