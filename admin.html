@@ -796,6 +796,21 @@
               <em id="dailyVisitorsDelta">igual a ontem</em>
             </article>
             <article class="daily-metric">
+              <span>Entrada paga direta</span>
+              <strong id="dailyPaidEntries">0</strong>
+              <em id="dailyPaidEntriesDelta">igual a ontem</em>
+            </article>
+            <article class="daily-metric">
+              <span>Ferramenta aberta</span>
+              <strong id="dailyToolViews">0</strong>
+              <em id="dailyToolViewsDelta">igual a ontem</em>
+            </article>
+            <article class="daily-metric">
+              <span>Seletor de ficheiros</span>
+              <strong id="dailyFilePickerOpens">0</strong>
+              <em id="dailyFilePickerOpensDelta">igual a ontem</em>
+            </article>
+            <article class="daily-metric">
               <span>Uploads</span>
               <strong id="dailyUploads">0</strong>
               <em id="dailyUploadsDelta">igual a ontem</em>
@@ -2154,6 +2169,9 @@
 
       function dailyDecision(today = {}, yesterday = {}, sourceBreakdown = []) {
         const visitors = rowValue(today, "visitors");
+        const paidEntries = rowValue(today, "paidLandingToolRedirects");
+        const toolViews = rowValue(today, "toolPageViews");
+        const filePickerOpens = rowValue(today, "filePickerOpens");
         const uploads = rowValue(today, "uploadsStarted");
         const downloads = rowValue(today, "downloads");
         const resultReady = rowValue(today, "downloadReadyShown");
@@ -2166,7 +2184,7 @@
         const stickyDecisions = rowValue(today, "resultReadyStickyPackClicks") + rowValue(today, "resultReadyStickySaveLinkClicks");
         const visitorDelta = visitors - rowValue(yesterday, "visitors");
         const topSource = sourceBreakdown.find((row) => row.visitors > 0)?.source || "sem origem dominante";
-        const summary = `Hoje: ${pluralPt(visitors, "visitante", "visitantes")} (${visitorDelta >= 0 ? "+" : ""}${visitorDelta} vs ontem), ${pluralPt(uploads, "upload", "uploads")}, ${pluralPt(downloads, "download", "downloads")}, ${pluralPt(intent, "sinal pago/lead", "sinais pagos/leads")} e ${pluralPt(checkoutSessions, "sessão Stripe", "sessões Stripe")}. Origem mais forte dos últimos 14 dias: ${sourceLabel(topSource)}.`;
+        const summary = `Hoje: ${pluralPt(visitors, "visitante", "visitantes")} (${visitorDelta >= 0 ? "+" : ""}${visitorDelta} vs ontem), ${pluralPt(paidEntries, "entrada paga direta", "entradas pagas diretas")}, ${pluralPt(toolViews, "abertura da ferramenta", "aberturas da ferramenta")}, ${pluralPt(filePickerOpens, "abertura do seletor", "aberturas do seletor")}, ${pluralPt(uploads, "upload", "uploads")}, ${pluralPt(downloads, "download", "downloads")} e ${pluralPt(checkoutSessions, "sessão Stripe", "sessões Stripe")}. Origem mais forte dos últimos 14 dias: ${sourceLabel(topSource)}.`;
 
         if (paid > 0 || revenue > 0) {
           return {
@@ -2195,6 +2213,26 @@
             title: "Há leads captados para transformar em conversa.",
             summary,
             action: "Ação: responder/acompanhar leads hoje com foco em lote real, Pack 100 e Pro recorrente quando houver recorrência.",
+          };
+        }
+
+        if (paidEntries >= 3 && filePickerOpens === 0) {
+          return {
+            label: "Ativação paga",
+            className: "danger",
+            title: "O tráfego pago chega à ferramenta, mas não escolhe ficheiros.",
+            summary,
+            action: "Ação: rever a primeira ação de upload e o alinhamento entre o anúncio e a ferramenta antes de aumentar orçamento.",
+          };
+        }
+
+        if (toolViews >= 5 && filePickerOpens === 0) {
+          return {
+            label: "Ativação",
+            className: "warning",
+            title: "A ferramenta é aberta, mas o teste não é iniciado.",
+            summary,
+            action: "Ação: rever a primeira ação de escolha de fotos antes de mexer no preço ou no checkout.",
           };
         }
 
@@ -2287,6 +2325,9 @@
         document.querySelector("#dailyBriefAction").textContent = decision.action;
 
         setDailyMetric("#dailyVisitors", "#dailyVisitorsDelta", rowValue(today, "visitors"), rowValue(yesterday, "visitors"));
+        setDailyMetric("#dailyPaidEntries", "#dailyPaidEntriesDelta", rowValue(today, "paidLandingToolRedirects"), rowValue(yesterday, "paidLandingToolRedirects"));
+        setDailyMetric("#dailyToolViews", "#dailyToolViewsDelta", rowValue(today, "toolPageViews"), rowValue(yesterday, "toolPageViews"));
+        setDailyMetric("#dailyFilePickerOpens", "#dailyFilePickerOpensDelta", rowValue(today, "filePickerOpens"), rowValue(yesterday, "filePickerOpens"));
         setDailyMetric("#dailyUploads", "#dailyUploadsDelta", rowValue(today, "uploadsStarted"), rowValue(yesterday, "uploadsStarted"));
         setDailyMetric("#dailyDownloads", "#dailyDownloadsDelta", rowValue(today, "downloads"), rowValue(yesterday, "downloads"));
         setDailyMetric("#dailyResultReady", "#dailyResultReadyDelta", rowValue(today, "downloadReadyShown"), rowValue(yesterday, "downloadReadyShown"));

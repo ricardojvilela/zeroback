@@ -34,6 +34,11 @@ test("measures the activation steps before a visitor selects files", () => {
   assert.match(stats, /filePickerOpens \+= 1/);
   assert.match(admin, /id="liveToolPageViews"/);
   assert.match(admin, /id="liveFilePickerOpens"/);
+  assert.match(admin, /id="dailyPaidEntries"/);
+  assert.match(admin, /id="dailyToolViews"/);
+  assert.match(admin, /id="dailyFilePickerOpens"/);
+  assert.match(admin, /paidEntries >= 3 && filePickerOpens === 0/);
+  assert.match(admin, /toolViews >= 5 && filePickerOpens === 0/);
 });
 
 test("keeps browser events aligned with the tracking API", () => {
