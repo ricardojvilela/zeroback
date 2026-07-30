@@ -493,3 +493,9 @@ Production was verified after deployment at commit `535ced6`. Search Console con
 The authenticated same-day funnel contained two Google Ads visitors attributed to the active English bulk-remover landing and two tool views, but zero `paid_landing_tool_redirect` events. The redirect was functioning, while the implementation audit confirmed that the landing script emitted this event and the dashboard consumed it, but the tracking API did not include it in its allowed-event contract.
 
 The tracking API now accepts the direct paid-landing handoff and automated coverage requires the browser, API and dashboard sides of that event to remain connected. The two historical handoffs cannot be backfilled and remain excluded from the direct-entry counter; measurement starts with the production deployment. No price, offer, free allowance, campaign, keyword, budget or email action changed.
+
+## Paid direct-entry activation cohort - 2026-07-30
+
+The stats API now joins each recorded paid direct-entry visitor to their later tool view, file-picker use, accepted upload, completed free test, download, paid intent, Stripe session and purchase. Only activity after the first recorded redirect is counted, with a one-minute delivery-order tolerance for the landing beacon and the following tool page request.
+
+The admin panel exposes these stages as unique people and reports direct-entry conversion rates to file picker, upload and completed test. This separates a paid visitor who reaches the workspace but does not choose files from one who uploads but does not finish the test, without mixing the two historical handoffs that could not be recorded. Automated coverage protects unique-person counting and excludes earlier activity from the same browser. No price, offer, free allowance, campaign, keyword, budget or email action changed.

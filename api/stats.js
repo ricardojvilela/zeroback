@@ -527,6 +527,96 @@ export function deviceActivationSummary(events = []) {
     });
 }
 
+function eventTimeMs(event = {}) {
+  const parsed = Date.parse(event.created_at || event.createdAt || "");
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+export function paidDirectActivationSummary(events = []) {
+  const deliveryOrderToleranceMs = 60 * 1000;
+  const redirectAtByVisitor = new Map();
+
+  for (const event of events) {
+    if (event.event_name !== "paid_landing_tool_redirect") continue;
+    const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+    const visitorId = asCleanText(event.visitor_id || detail.visitor_id, 80);
+    if (!visitorId) continue;
+
+    const redirectAt = eventTimeMs(event);
+    const previous = redirectAtByVisitor.get(visitorId);
+    if (previous === undefined || (redirectAt !== null && (previous === null || redirectAt < previous))) {
+      redirectAtByVisitor.set(visitorId, redirectAt);
+    }
+  }
+
+  const stages = {
+    tool: new Set(),
+    filePicker: new Set(),
+    upload: new Set(),
+    completedTest: new Set(),
+    download: new Set(),
+    paidIntent: new Set(),
+    checkout: new Set(),
+    purchase: new Set(),
+  };
+
+  for (const event of events) {
+    const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+    const visitorId = asCleanText(event.visitor_id || detail.visitor_id, 80);
+    if (!visitorId || !redirectAtByVisitor.has(visitorId)) continue;
+
+    const redirectAt = redirectAtByVisitor.get(visitorId);
+    const currentTime = eventTimeMs(event);
+    if (
+      redirectAt !== null &&
+      currentTime !== null &&
+      currentTime < redirectAt - deliveryOrderToleranceMs
+    ) {
+      continue;
+    }
+
+    const eventName = String(event.event_name || "");
+    if (eventName === "tool_page_view") stages.tool.add(visitorId);
+    if (eventName === "tool_file_picker_opened") stages.filePicker.add(visitorId);
+    if (eventName === "tool_upload_added") stages.upload.add(visitorId);
+    if (eventName === "free_test_completed") stages.completedTest.add(visitorId);
+    if (["tool_download_png", "tool_download_zip"].includes(eventName)) stages.download.add(visitorId);
+    if (
+      (eventName === "tool_pro_clicked" && isCheckoutPlan(detail.checkout_plan || detail.plan || detail.price_plan)) ||
+      eventName === "pro_cta_clicked" ||
+      isPackIntentEvent(eventName, detail)
+    ) {
+      stages.paidIntent.add(visitorId);
+    }
+    if (["pro_checkout_session_created", "pack_checkout_session_created"].includes(eventName)) {
+      stages.checkout.add(visitorId);
+    }
+    if (["pro_subscription_paid", "pack_purchase_paid"].includes(eventName)) {
+      stages.purchase.add(visitorId);
+    }
+  }
+
+  const directVisitors = redirectAtByVisitor.size;
+  const rate = (count) => directVisitors ? count / directVisitors : 0;
+
+  return {
+    directVisitors,
+    toolVisitors: stages.tool.size,
+    filePickerVisitors: stages.filePicker.size,
+    uploadVisitors: stages.upload.size,
+    completedTestVisitors: stages.completedTest.size,
+    downloadVisitors: stages.download.size,
+    paidIntentVisitors: stages.paidIntent.size,
+    checkoutVisitors: stages.checkout.size,
+    purchaseVisitors: stages.purchase.size,
+    filePickerRate: rate(stages.filePicker.size),
+    uploadRate: rate(stages.upload.size),
+    completedTestRate: rate(stages.completedTest.size),
+    checkoutRate: rate(stages.checkout.size),
+    purchaseRate: rate(stages.purchase.size),
+  };
+}
+
 function numericSnapshot(row) {
   return Object.fromEntries(
     Object.entries(row).filter(([, value]) => typeof value === "number"),
@@ -1622,6 +1712,7 @@ export default async function handler(request, response) {
       rows,
       totals,
       packVisitorFunnel: packVisitorFunnelSummary(packVisitorStages),
+      paidDirectActivation: paidDirectActivationSummary(eventsInWindow),
       deviceActivationBreakdown: deviceActivationSummary(eventsInWindow),
       validationExperiment: validationExperimentSummary(events, timeZone, today),
       accountFailureBreakdown: accountFailureBreakdown(eventsInWindow),

@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { deviceActivationSummary } from "../api/stats.js";
+import { deviceActivationSummary, paidDirectActivationSummary } from "../api/stats.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const [index, script, apiTrack, stats, admin] = await Promise.all([
@@ -91,6 +91,47 @@ test("summarizes activation by screen format using unique visitors", () => {
     downloadRate: 0,
   });
   assert.equal(summary.some((row) => row.deviceType === "tablet"), false);
+});
+
+test("summarizes post-redirect activation for paid direct visitors", () => {
+  const events = [
+    { event_name: "paid_landing_tool_redirect", visitor_id: "paid-1", created_at: "2026-07-30T09:00:00Z" },
+    { event_name: "tool_page_view", visitor_id: "paid-1", created_at: "2026-07-30T09:00:01Z" },
+    { event_name: "tool_file_picker_opened", visitor_id: "paid-1", created_at: "2026-07-30T09:00:02Z" },
+    { event_name: "tool_file_picker_opened", visitor_id: "paid-1", created_at: "2026-07-30T09:00:03Z" },
+    { event_name: "tool_upload_added", visitor_id: "paid-1", created_at: "2026-07-30T09:00:04Z" },
+    { event_name: "free_test_completed", visitor_id: "paid-1", created_at: "2026-07-30T09:00:05Z" },
+    { event_name: "tool_download_zip", visitor_id: "paid-1", created_at: "2026-07-30T09:00:06Z" },
+    {
+      event_name: "pro_cta_clicked",
+      visitor_id: "paid-1",
+      created_at: "2026-07-30T09:00:07Z",
+      detail: { checkout_plan: "pack100" },
+    },
+    { event_name: "pack_checkout_session_created", visitor_id: "paid-1", created_at: "2026-07-30T09:00:08Z" },
+    { event_name: "pack_purchase_paid", visitor_id: "paid-1", created_at: "2026-07-30T09:00:09Z" },
+    { event_name: "tool_upload_added", visitor_id: "paid-2", created_at: "2026-07-30T09:57:59Z" },
+    { event_name: "paid_landing_tool_redirect", visitor_id: "paid-2", created_at: "2026-07-30T10:00:00Z" },
+    { event_name: "tool_page_view", visitor_id: "paid-2", created_at: "2026-07-30T10:00:01Z" },
+    { event_name: "tool_page_view", visitor_id: "organic", created_at: "2026-07-30T10:00:02Z" },
+  ];
+
+  assert.deepEqual(paidDirectActivationSummary(events), {
+    directVisitors: 2,
+    toolVisitors: 2,
+    filePickerVisitors: 1,
+    uploadVisitors: 1,
+    completedTestVisitors: 1,
+    downloadVisitors: 1,
+    paidIntentVisitors: 1,
+    checkoutVisitors: 1,
+    purchaseVisitors: 1,
+    filePickerRate: 0.5,
+    uploadRate: 0.5,
+    completedTestRate: 0.5,
+    checkoutRate: 0.5,
+    purchaseRate: 0.5,
+  });
 });
 
 test("the upload action starts with a touch-friendly instruction in every commercial locale", () => {

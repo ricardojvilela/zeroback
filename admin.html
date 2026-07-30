@@ -1298,6 +1298,37 @@
           </article>
         </div>
         <p class="funnel-diagnosis" id="liveFunnelDiagnosis">A carregar diagnóstico do funil...</p>
+        <section class="source-live-block" aria-label="Ativação da entrada paga direta">
+          <div class="panel-head compact">
+            <div>
+              <h3>Ativação da entrada paga direta</h3>
+              <p class="note">Pessoas únicas após o redirecionamento automático da landing paga. As taxas usam a entrada direta como base e não incluem os dois acessos históricos que não foram registados.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Entrada direta</th>
+                  <th>Ferramenta</th>
+                  <th>Seletor</th>
+                  <th>Entrada → seletor</th>
+                  <th>Upload aceite</th>
+                  <th>Entrada → upload</th>
+                  <th>Teste concluído</th>
+                  <th>Entrada → teste</th>
+                  <th>Download</th>
+                  <th>Intenção paga</th>
+                  <th>Checkout</th>
+                  <th>Compra</th>
+                </tr>
+              </thead>
+              <tbody id="paidDirectActivationRowsBody">
+                <tr><td class="empty" colspan="12">A carregar a ativação da entrada paga direta.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
         <section class="source-live-block" aria-label="Ativação por formato de ecrã">
           <div class="panel-head compact">
             <div>
@@ -1953,6 +1984,7 @@
       const authForm = document.querySelector("#authForm");
       const authError = document.querySelector("#authError");
       const liveRowsBody = document.querySelector("#liveRowsBody");
+      const paidDirectActivationRowsBody = document.querySelector("#paidDirectActivationRowsBody");
       const deviceActivationRowsBody = document.querySelector("#deviceActivationRowsBody");
       const accountFailureRowsBody = document.querySelector("#accountFailureRowsBody");
       const accountFailureStatus = document.querySelector("#accountFailureStatus");
@@ -3239,6 +3271,25 @@
         const accountEntrants = Math.max((totals.accountSignups || 0) - (totals.accountEmailConfirmations || 0), 0) + (totals.accountLogins || 0);
         document.querySelector("#liveAccountCheckoutGap").textContent = Math.max(accountEntrants - (totals.checkoutStarts || 0), 0);
         document.querySelector("#liveFunnelDiagnosis").textContent = funnelDiagnosis(totals, packVisitorFunnel, offerChangeGate);
+        const paidDirect = data.paidDirectActivation || {};
+        paidDirectActivationRowsBody.innerHTML = paidDirect.directVisitors
+          ? `
+              <tr>
+                <td><strong>${paidDirect.directVisitors || 0}</strong></td>
+                <td>${paidDirect.toolVisitors || 0}</td>
+                <td>${paidDirect.filePickerVisitors || 0}</td>
+                <td>${formatPercent(paidDirect.filePickerRate || 0)}</td>
+                <td>${paidDirect.uploadVisitors || 0}</td>
+                <td>${formatPercent(paidDirect.uploadRate || 0)}</td>
+                <td>${paidDirect.completedTestVisitors || 0}</td>
+                <td>${formatPercent(paidDirect.completedTestRate || 0)}</td>
+                <td>${paidDirect.downloadVisitors || 0}</td>
+                <td>${paidDirect.paidIntentVisitors || 0}</td>
+                <td>${paidDirect.checkoutVisitors || 0}</td>
+                <td>${paidDirect.purchaseVisitors || 0}</td>
+              </tr>
+            `
+          : `<tr><td class="empty" colspan="12">Ainda não há entradas pagas diretas registadas após a reparação.</td></tr>`;
         deviceActivationRowsBody.innerHTML = data.deviceActivationBreakdown?.length
           ? data.deviceActivationBreakdown.map((row) => `
               <tr>
@@ -4282,6 +4333,7 @@
             document.body.classList.add("locked");
           }
           liveRowsBody.innerHTML = `<tr><td class="empty" colspan="33">Não foi possível carregar atividade.</td></tr>`;
+          paidDirectActivationRowsBody.innerHTML = `<tr><td class="empty" colspan="12">Não foi possível carregar a ativação paga direta.</td></tr>`;
           deviceActivationRowsBody.innerHTML = `<tr><td class="empty" colspan="9">Não foi possível carregar a ativação por formato.</td></tr>`;
           accountFailureRowsBody.innerHTML = `<tr><td class="empty" colspan="7">Não foi possível carregar o diagnóstico de acesso.</td></tr>`;
           accountFailureStatus.textContent = "Erro ao carregar falhas de registo e login.";
