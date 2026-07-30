@@ -1498,6 +1498,7 @@
           <p class="live-status" id="packFunnelAction">A carregar recomendação Pack 100...</p>
         </section>
         <p class="live-status" id="liveStatus">A carregar atividade...</p>
+        <output id="internalValidationDiagnostics" hidden aria-hidden="true"></output>
         <section class="source-live-block" aria-label="Pagamentos Pack Stripe">
           <div class="panel-head compact">
             <div>
@@ -2026,6 +2027,7 @@
       let emailConfirmationRecoveries = [];
       let sentRecoveryEmailKeys = new Set();
       const liveStatus = document.querySelector("#liveStatus");
+      const internalValidationDiagnostics = document.querySelector("#internalValidationDiagnostics");
 
       function getAdminToken() {
         const token = localStorage.getItem(adminTokenStorageKey) || "";
@@ -3132,6 +3134,7 @@
 
       function renderLiveStats(data) {
         const totals = data.totals || {};
+        internalValidationDiagnostics.textContent = JSON.stringify(data.internalValidationDiagnostics || {});
         renderDailyBrief(data);
         renderValidationExperiment(data.validationExperiment || {});
         renderAccountFailures(data.accountFailureBreakdown || []);

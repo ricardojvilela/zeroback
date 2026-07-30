@@ -177,6 +177,8 @@ test("reports internal validation delivery without mixing it into commercial met
       { campaign: "paid_redirect_probe", count: 2, latestAt: "2026-07-30T15:10:47.000Z" },
     ],
   });
+  assert.match(admin, /id="internalValidationDiagnostics" hidden aria-hidden="true"/);
+  assert.match(admin, /internalValidationDiagnostics\.textContent = JSON\.stringify\(data\.internalValidationDiagnostics \|\| \{\}\)/);
 });
 
 test("the upload action starts with a touch-friendly instruction in every commercial locale", () => {
