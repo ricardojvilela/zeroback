@@ -15,7 +15,8 @@ test("keeps every result-ready Pack action on the email-only checkout path", asy
   assert.ok(helperStart >= 0 && helperEnd > helperStart);
   assert.match(helper, /startEmailPackCheckout\("pack100", email, triggerButton/);
   assert.match(helper, /pro_checkout_email_required/);
-  assert.match(helper, /resultReadyEmailForm\.scrollIntoView/);
+  assert.match(helper, /const emailInput = fields\.emailInput \|\| resultReadyEmail/);
+  assert.match(helper, /emailForm\.scrollIntoView/);
 
   const actionsHandler = script.slice(
     script.indexOf('actionsPackCta?.addEventListener("click"'),
@@ -32,8 +33,28 @@ test("keeps every result-ready Pack action on the email-only checkout path", asy
 
   assert.match(actionsHandler, /continueResultReadyPackCheckout\("actions_result_ready_pack"/);
   assert.match(stickyHandler, /continueResultReadyPackCheckout\("result_ready_sticky"/);
-  assert.match(postDownloadHandler, /continueResultReadyPackCheckout\("post_download_next_pack"/);
+  assert.match(postDownloadHandler, /continueResultReadyPackCheckout\(/);
+  assert.match(postDownloadHandler, /emailInput: postDownloadEmail/);
+  assert.match(postDownloadHandler, /emailForm: postDownloadEmailForm/);
+  assert.match(postDownloadHandler, /emailMessage: postDownloadEmailMessage/);
   assert.doesNotMatch(actionsHandler, /startCheckout\(/);
   assert.doesNotMatch(stickyHandler, /startCheckout\(/);
   assert.doesNotMatch(postDownloadHandler, /startCheckout\(/);
+});
+
+test("replaces the pre-download offers with one post-download Pack action", async () => {
+  const script = await readFile(path.join(root, "script.js"), "utf8");
+  const showStart = script.indexOf("function showPostDownloadNext");
+  const showEnd = script.indexOf("function focusPostDownloadLeadCapture", showStart);
+  const showPostDownloadNext = script.slice(showStart, showEnd);
+  const feedbackStart = script.indexOf("function showPostDownloadFeedback");
+  const feedbackEnd = script.indexOf("function shouldShowLeadCapture", feedbackStart);
+  const showPostDownloadFeedback = script.slice(feedbackStart, feedbackEnd);
+
+  assert.ok(showStart >= 0 && showEnd > showStart);
+  assert.match(showPostDownloadNext, /downloadReadyHint\?\.classList\.add\("hidden"\)/);
+  assert.match(showPostDownloadNext, /actionsPackCta\?\.classList\.add\("hidden"\)/);
+  assert.match(showPostDownloadNext, /resultReadyStickyCta\?\.classList\.add\("hidden"\)/);
+  assert.match(showPostDownloadNext, /postDownloadEmail\.value = normalizeEmail/);
+  assert.match(showPostDownloadFeedback, /proInterestPanel\?\.classList\.add\("hidden"\)/);
 });

@@ -4456,18 +4456,21 @@ function updateControls() {
   const running = items.some((item) => item.statusKey === "statusProcessing");
   const downloadReady = !running && (allReady || singleReady);
   const paidAccess = canUsePaidAccess();
+  const postDownloadOfferVisible = Boolean(
+    postDownloadNextPanel && !postDownloadNextPanel.classList.contains("hidden"),
+  );
 
   processButton.disabled = !hasItems || !hasPendingItems || running;
   pngButton.disabled = !singleReady || running;
   zipButton.disabled = !allReady || running;
-  actionsPackCta?.classList.toggle("hidden", paidAccess || !downloadReady || running);
+  actionsPackCta?.classList.toggle("hidden", paidAccess || !downloadReady || running || postDownloadOfferVisible);
   clearButton.disabled = !hasItems || running;
   clearButton.classList.toggle("hidden", !hasItems);
   const hasLeadContact = Boolean(currentAccount?.email || getCapturedLeadEmail());
   const readyCount = items.filter((item) => item.outputBlob).length;
-  const shouldShowResultReadyCheckout = !paidAccess && downloadReady && !running;
+  const shouldShowResultReadyCheckout = !paidAccess && downloadReady && !running && !postDownloadOfferVisible;
   const shouldShowResultReadyLeadOption = shouldShowResultReadyCheckout && !hasLeadContact;
-  downloadReadyHint?.classList.toggle("hidden", paidAccess || !downloadReady);
+  downloadReadyHint?.classList.toggle("hidden", paidAccess || !downloadReady || postDownloadOfferVisible);
   const shouldShowResultReadySticky = shouldShowResultReadyCheckout && !resultReadyOfferIsVisible();
   resultReadySaveLinkCta?.classList.toggle("hidden", !shouldShowResultReadyLeadOption);
   resultReadyEmailForm?.classList.toggle("hidden", !shouldShowResultReadyCheckout);
@@ -5057,11 +5060,23 @@ function showPostDownloadNext(downloadType, count) {
 
   const wasHidden = postDownloadNextPanel.classList.contains("hidden");
   postDownloadNextPanel.classList.remove("hidden");
+  downloadReadyHint?.classList.add("hidden");
+  actionsPackCta?.classList.add("hidden");
+  resultReadyStickyCta?.classList.add("hidden");
   postDownloadNextPanel.dataset.downloadType = downloadType;
   postDownloadNextPanel.dataset.downloadCount = String(count);
   const hasLeadContact = Boolean(currentAccount?.email || getCapturedLeadEmail());
   postDownloadSaveLinkCta?.classList.toggle("hidden", hasLeadContact);
   postDownloadEmailForm?.classList.toggle("hidden", hasLeadContact);
+  if (postDownloadEmail && !postDownloadEmail.value.trim()) {
+    postDownloadEmail.value = normalizeEmail(
+      currentAccount?.email
+        || getCapturedLeadEmail()
+        || resultReadyEmail?.value
+        || accountEmail?.value
+        || "",
+    );
+  }
   if (postDownloadEmailMessage) postDownloadEmailMessage.textContent = "";
 
   if (wasHidden) {
@@ -5116,14 +5131,18 @@ function focusResultReadyLeadCapture(source = "result_ready") {
   leadCaptureEmail?.focus({ preventScroll: true });
 }
 
-async function continueResultReadyPackCheckout(source, triggerButton, buttonLabelKey) {
-  if (!resultReadyEmail || !resultReadyEmailForm) {
+async function continueResultReadyPackCheckout(source, triggerButton, buttonLabelKey, fields = {}) {
+  const emailInput = fields.emailInput || resultReadyEmail;
+  const emailForm = fields.emailForm || resultReadyEmailForm;
+  const emailMessage = fields.emailMessage || resultReadyEmailMessage;
+
+  if (!emailInput || !emailForm) {
     await startCheckout("pack100", triggerButton);
     return;
   }
 
   const email = normalizeEmail(
-    resultReadyEmail.value
+    emailInput.value
       || currentAccount?.email
       || getCapturedLeadEmail()
       || accountEmail?.value
@@ -5136,28 +5155,35 @@ async function continueResultReadyPackCheckout(source, triggerButton, buttonLabe
       source,
       purchase_type: "pack",
     });
-    if (resultReadyEmailMessage) resultReadyEmailMessage.textContent = t("billingPackEmailRequired");
-    resultReadyEmailForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    resultReadyEmail.focus({ preventScroll: true });
+    if (emailMessage) emailMessage.textContent = t("billingPackEmailRequired");
+    emailForm.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    emailInput.focus({ preventScroll: true });
     return;
   }
 
-  resultReadyEmail.value = email;
-  if (resultReadyEmailMessage) resultReadyEmailMessage.textContent = "";
+  emailInput.value = email;
+  if (emailMessage) emailMessage.textContent = "";
   const started = await startEmailPackCheckout("pack100", email, triggerButton, {
     source,
     buttonLabelKey,
   });
-  if (!started && resultReadyEmailMessage) {
-    resultReadyEmailMessage.textContent = t("billingCheckoutError");
+  if (!started && emailMessage) {
+    emailMessage.textContent = t("billingCheckoutError");
   }
 }
 
 function showPostDownloadFeedback(downloadType, count) {
   showPostDownloadNext(downloadType, count);
+  const hasPostDownloadOffer = Boolean(
+    postDownloadNextPanel && !postDownloadNextPanel.classList.contains("hidden"),
+  );
   if (canUsePaidAccess() || !isFreeTestComplete()) {
     postDownloadFeedback?.classList.add("hidden");
-    showProPrompt(`post_download_${downloadType}`, { scroll: false });
+    if (hasPostDownloadOffer) {
+      proInterestPanel?.classList.add("hidden");
+    } else {
+      showProPrompt(`post_download_${downloadType}`, { scroll: false });
+    }
     return;
   }
 
@@ -5165,7 +5191,11 @@ function showPostDownloadFeedback(downloadType, count) {
   postDownloadFeedback?.setAttribute("data-download-type", downloadType);
   postDownloadFeedback?.setAttribute("data-download-count", String(count));
   if (!postDownloadEmailForm) showLeadCapture(downloadType, count, "post_download");
-  showProPrompt(`post_download_${downloadType}`, { scroll: false });
+  if (hasPostDownloadOffer) {
+    proInterestPanel?.classList.add("hidden");
+  } else {
+    showProPrompt(`post_download_${downloadType}`, { scroll: false });
+  }
 }
 
 function shouldShowLeadCapture() {
@@ -5544,7 +5574,16 @@ postDownloadPackCta?.addEventListener("click", () => {
     free_limit: maxFilesPerBatch,
   };
   trackEvent("post_download_pack_clicked", detail);
-  continueResultReadyPackCheckout("post_download_next_pack", postDownloadPackCta, "postDownloadPackCta");
+  continueResultReadyPackCheckout(
+    "post_download_next_pack",
+    postDownloadPackCta,
+    "postDownloadPackCta",
+    {
+      emailInput: postDownloadEmail,
+      emailForm: postDownloadEmailForm,
+      emailMessage: postDownloadEmailMessage,
+    },
+  );
 });
 resultReadySaveLinkCta?.addEventListener("click", handleResultReadySaveLink);
 resultReadyStickyLead?.addEventListener("click", () => focusResultReadyLeadCapture("result_ready_sticky"));

@@ -505,3 +505,9 @@ The admin panel exposes these stages as unique people and reports direct-entry c
 A 390-pixel review of the direct upload workspace found that the disabled Clear control occupied a full-width row before the first useful action, while the free-test badge overlapped the central upload icon. The Clear control is now absent until at least one image is present, and the mobile dropzone reserves a separate centered row for the badge above the upload icon.
 
 The corrected first viewport shows the upload action without a competing disabled control or overlapping labels. A browser interaction check confirmed that the full dropzone still opens the native multi-file chooser, and automated coverage protects the initial hidden state plus the mobile spacing. No price, offer, free allowance, campaign, keyword, budget or email action changed.
+
+## Mobile post-download Pack handoff - 2026-07-30
+
+An end-to-end 390-pixel browser test processed two real repository images, enabled the ZIP export and reached the Pack offer. The test exposed two conversion defects after the ZIP download: the Pack button validated a different email field in an earlier, off-screen offer, and four overlapping Pack prompts remained visible in the same journey.
+
+The post-download Pack button now uses its adjacent email field and displays validation in the same panel. That panel replaces the earlier result-ready button, full offer, sticky offer and lower generic upgrade prompt, leaving one primary Pack path after download. A second end-to-end mobile run confirmed successful processing, ZIP activation, one post-download offer and correctly focused inline email validation. Automated coverage protects the field mapping and offer handoff. No price, offer, free allowance, campaign, keyword, budget or email action changed.
