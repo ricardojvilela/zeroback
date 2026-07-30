@@ -1001,6 +1001,40 @@ function isInternalValidationEvent(event) {
   );
 }
 
+export function internalValidationDiagnostics(events = []) {
+  const byEvent = new Map();
+  const byCampaign = new Map();
+  let total = 0;
+  let latestAt = "";
+
+  for (const event of events) {
+    if (!isInternalValidationEvent(event)) continue;
+    total += 1;
+    const occurredAt = asCleanText(event.occurred_at, 80);
+    if (occurredAt && occurredAt > latestAt) latestAt = occurredAt;
+
+    const eventName = asCleanText(event.event_name, 120) || "unknown";
+    const eventRow = byEvent.get(eventName) || { eventName, count: 0, latestAt: "" };
+    eventRow.count += 1;
+    if (occurredAt && occurredAt > eventRow.latestAt) eventRow.latestAt = occurredAt;
+    byEvent.set(eventName, eventRow);
+
+    const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+    const campaign = asCleanText(event.campaign || detail.utm_campaign, 160) || "uncategorized";
+    const campaignRow = byCampaign.get(campaign) || { campaign, count: 0, latestAt: "" };
+    campaignRow.count += 1;
+    if (occurredAt && occurredAt > campaignRow.latestAt) campaignRow.latestAt = occurredAt;
+    byCampaign.set(campaign, campaignRow);
+  }
+
+  return {
+    total,
+    latestAt,
+    eventCounts: Array.from(byEvent.values()).sort((a, b) => b.count - a.count || a.eventName.localeCompare(b.eventName)),
+    campaignCounts: Array.from(byCampaign.values()).sort((a, b) => b.count - a.count || a.campaign.localeCompare(b.campaign)),
+  };
+}
+
 export default async function handler(request, response) {
   if (request.method === "OPTIONS") {
     return sendJson(response, 200, { ok: true });
@@ -1039,6 +1073,7 @@ export default async function handler(request, response) {
 
   try {
     const events = [];
+    const internalValidationEvents = [];
     const pageSize = 1000;
     const maxEvents = 20000;
 
@@ -1063,7 +1098,13 @@ export default async function handler(request, response) {
       }
 
       const pageEvents = await supabaseResponse.json();
-      events.push(...pageEvents.filter((event) => !isInternalValidationEvent(event)));
+      for (const event of pageEvents) {
+        if (isInternalValidationEvent(event)) {
+          internalValidationEvents.push(event);
+        } else {
+          events.push(event);
+        }
+      }
       if (pageEvents.length < pageSize) break;
     }
 
@@ -1715,6 +1756,7 @@ export default async function handler(request, response) {
       paidDirectActivation: paidDirectActivationSummary(eventsInWindow),
       deviceActivationBreakdown: deviceActivationSummary(eventsInWindow),
       validationExperiment: validationExperimentSummary(events, timeZone, today),
+      internalValidationDiagnostics: internalValidationDiagnostics(internalValidationEvents),
       accountFailureBreakdown: accountFailureBreakdown(eventsInWindow),
       sourceBreakdown,
       packSourceBreakdown,

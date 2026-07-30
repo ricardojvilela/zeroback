@@ -3,7 +3,11 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
-import { deviceActivationSummary, paidDirectActivationSummary } from "../api/stats.js";
+import {
+  deviceActivationSummary,
+  internalValidationDiagnostics,
+  paidDirectActivationSummary,
+} from "../api/stats.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const [index, script, styles, apiTrack, stats, admin] = await Promise.all([
@@ -137,6 +141,41 @@ test("summarizes post-redirect activation for paid direct visitors", () => {
     completedTestRate: 0.5,
     checkoutRate: 0.5,
     purchaseRate: 0.5,
+  });
+});
+
+test("reports internal validation delivery without mixing it into commercial metrics", () => {
+  const diagnostics = internalValidationDiagnostics([
+    {
+      event_name: "paid_landing_tool_redirect",
+      source: "codex_validation",
+      campaign: "paid_redirect_probe",
+      occurred_at: "2026-07-30T15:10:47.000Z",
+    },
+    {
+      event_name: "seo_landing_view",
+      source: "codex_validation",
+      detail: { utm_campaign: "paid_redirect_probe" },
+      occurred_at: "2026-07-30T15:10:46.000Z",
+    },
+    {
+      event_name: "tool_page_view",
+      source: "google_ads",
+      campaign: "bulk_background_remover",
+      occurred_at: "2026-07-30T15:10:48.000Z",
+    },
+  ]);
+
+  assert.deepEqual(diagnostics, {
+    total: 2,
+    latestAt: "2026-07-30T15:10:47.000Z",
+    eventCounts: [
+      { eventName: "paid_landing_tool_redirect", count: 1, latestAt: "2026-07-30T15:10:47.000Z" },
+      { eventName: "seo_landing_view", count: 1, latestAt: "2026-07-30T15:10:46.000Z" },
+    ],
+    campaignCounts: [
+      { campaign: "paid_redirect_probe", count: 2, latestAt: "2026-07-30T15:10:47.000Z" },
+    ],
   });
 });
 
