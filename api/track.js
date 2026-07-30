@@ -7,6 +7,7 @@ const allowedEvents = new Set([
   "tool_file_picker_opened",
   "seo_landing_view",
   "seo_landing_cta_clicked",
+  "paid_landing_tool_redirect",
   "tool_drag_upload_intent",
   "tool_upload_started",
   "tool_upload_added",

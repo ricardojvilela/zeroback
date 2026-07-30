@@ -487,3 +487,9 @@ Pricing CTAs now expose only the functional `checkout_plan`, language when neede
 Automated coverage prevents pricing self-links from regaining internal UTM parameters and verifies that plan selection plus CTA attribution remain present. No price, offer, free allowance, campaign, keyword, budget or email action changed.
 
 Production was verified after deployment at commit `535ced6`. Search Console confirmed that the clean pricing URL was already indexed and served through HTTPS, then accepted a new indexing request into the priority crawl queue.
+
+## Paid direct-entry measurement repair - 2026-07-30
+
+The authenticated same-day funnel contained two Google Ads visitors attributed to the active English bulk-remover landing and two tool views, but zero `paid_landing_tool_redirect` events. The redirect was functioning, while the implementation audit confirmed that the landing script emitted this event and the dashboard consumed it, but the tracking API did not include it in its allowed-event contract.
+
+The tracking API now accepts the direct paid-landing handoff and automated coverage requires the browser, API and dashboard sides of that event to remain connected. The two historical handoffs cannot be backfilled and remain excluded from the direct-entry counter; measurement starts with the production deployment. No price, offer, free allowance, campaign, keyword, budget or email action changed.

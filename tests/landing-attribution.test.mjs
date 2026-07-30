@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const landingTrackSource = await readFile(path.join(repoRoot, "landing-track.js"), "utf8");
+const trackSource = await readFile(path.join(repoRoot, "api", "track.js"), "utf8");
 const statsSource = await readFile(path.join(repoRoot, "api", "stats.js"), "utf8");
 const adminSource = await readFile(path.join(repoRoot, "admin.html"), "utf8");
 
@@ -136,6 +137,12 @@ test("organic visitors remain on the English bulk landing", () => {
 });
 
 test("reports direct paid landing handoffs in the admin dashboard", () => {
+  const allowedEventsStart = trackSource.indexOf("const allowedEvents = new Set([");
+  const allowedEventsEnd = trackSource.indexOf("]);", allowedEventsStart);
+  const allowedEventsSource = trackSource.slice(allowedEventsStart, allowedEventsEnd);
+
+  assert.ok(allowedEventsStart >= 0 && allowedEventsEnd > allowedEventsStart);
+  assert.match(allowedEventsSource, /"paid_landing_tool_redirect"/);
   assert.match(statsSource, /case "paid_landing_tool_redirect":/);
   assert.match(statsSource, /paidLandingToolRedirects \+= 1/);
   assert.match(adminSource, /id="livePaidLandingToolRedirects"/);
