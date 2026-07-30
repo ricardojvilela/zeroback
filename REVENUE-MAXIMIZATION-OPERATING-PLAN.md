@@ -499,3 +499,9 @@ The tracking API now accepts the direct paid-landing handoff and automated cover
 The stats API now joins each recorded paid direct-entry visitor to their later tool view, file-picker use, accepted upload, completed free test, download, paid intent, Stripe session and purchase. Only activity after the first recorded redirect is counted, with a one-minute delivery-order tolerance for the landing beacon and the following tool page request.
 
 The admin panel exposes these stages as unique people and reports direct-entry conversion rates to file picker, upload and completed test. This separates a paid visitor who reaches the workspace but does not choose files from one who uploads but does not finish the test, without mixing the two historical handoffs that could not be recorded. Automated coverage protects unique-person counting and excludes earlier activity from the same browser. No price, offer, free allowance, campaign, keyword, budget or email action changed.
+
+## Mobile first-upload cleanup - 2026-07-30
+
+A 390-pixel review of the direct upload workspace found that the disabled Clear control occupied a full-width row before the first useful action, while the free-test badge overlapped the central upload icon. The Clear control is now absent until at least one image is present, and the mobile dropzone reserves a separate centered row for the badge above the upload icon.
+
+The corrected first viewport shows the upload action without a competing disabled control or overlapping labels. A browser interaction check confirmed that the full dropzone still opens the native multi-file chooser, and automated coverage protects the initial hidden state plus the mobile spacing. No price, offer, free allowance, campaign, keyword, budget or email action changed.

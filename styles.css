@@ -4212,7 +4212,14 @@ progress::-moz-progress-bar {
   }
 
   .dropzone {
-    min-height: 270px;
+    min-height: 300px;
+    padding: 68px 16px 24px;
+  }
+
+  .dropzone-badge {
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
   }
 
   .info-list,

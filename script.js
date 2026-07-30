@@ -4462,6 +4462,7 @@ function updateControls() {
   zipButton.disabled = !allReady || running;
   actionsPackCta?.classList.toggle("hidden", paidAccess || !downloadReady || running);
   clearButton.disabled = !hasItems || running;
+  clearButton.classList.toggle("hidden", !hasItems);
   const hasLeadContact = Boolean(currentAccount?.email || getCapturedLeadEmail());
   const readyCount = items.filter((item) => item.outputBlob).length;
   const shouldShowResultReadyCheckout = !paidAccess && downloadReady && !running;

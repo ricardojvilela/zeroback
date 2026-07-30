@@ -6,9 +6,10 @@ import { fileURLToPath } from "node:url";
 import { deviceActivationSummary, paidDirectActivationSummary } from "../api/stats.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const [index, script, apiTrack, stats, admin] = await Promise.all([
+const [index, script, styles, apiTrack, stats, admin] = await Promise.all([
   readFile(path.join(root, "index.html"), "utf8"),
   readFile(path.join(root, "script.js"), "utf8"),
+  readFile(path.join(root, "styles.css"), "utf8"),
   readFile(path.join(root, "api", "track.js"), "utf8"),
   readFile(path.join(root, "api", "stats.js"), "utf8"),
   readFile(path.join(root, "admin.html"), "utf8"),
@@ -139,4 +140,11 @@ test("the upload action starts with a touch-friendly instruction in every commer
   assert.match(script, /selectPhotos: "Selecione ou arraste fotos"/);
   assert.match(script, /selectPhotos: "Choose or drag photos here"/);
   assert.match(script, /selectPhotos: "Selecciona o arrastra fotos"/);
+});
+
+test("keeps the first mobile upload action clear of inactive controls", () => {
+  assert.match(index, /class="ghost-button hidden" id="clearButton"/);
+  assert.match(script, /clearButton\.classList\.toggle\("hidden", !hasItems\)/);
+  assert.match(styles, /min-height: 300px;\s+padding: 68px 16px 24px;/);
+  assert.match(styles, /left: 50%;\s+transform: translateX\(-50%\);\s+white-space: nowrap;/);
 });
