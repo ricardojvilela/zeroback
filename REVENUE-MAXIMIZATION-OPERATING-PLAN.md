@@ -545,3 +545,11 @@ The 250 EUR Google Ads promotion is active and has financed 91.61 EUR, or 36.64%
 Paid acquisition still loses the largest measurable share before the first upload. In the 14-day attributed campaign panel, Pro Launch had three unique uploaders from 38 visitors and Alternatives had four from 19. In the newer screen-format cohort, only one of six unique tool visitors opened the file selector; the sample is still too small to justify another public workflow change after the recent mobile and wording fixes. The repaired paid-direct-entry cohort also remains at zero real visitors, so its post-redirect activation cannot yet be judged.
 
 The admin dashboard now provides authenticated 1, 14 and 30-day selectors for the same application metrics, with labels and status text tied to the selected range. This removes manual inference from daily reviews without changing product behavior or commercial data. Automated coverage passed all 53 tests, and production was verified at commit `bf1d339`. No ad, budget, price, offer or email action changed.
+
+## Paid acquisition pause - 2026-07-31
+
+Following explicit approval, `Search - BatchCutout - Pro Launch` and `Search - BatchCutout - Alternatives` were changed from active to paused in the authenticated Google Ads account. The final campaign table showed both campaigns as `Em pausa`; `Campaign #1` remained paused and was not selected for the change.
+
+The decision used the latest complete-window evidence: 57 clicks, 502 impressions, 166.56 EUR cost and zero conversions over 14 complete days, and 126 clicks, 1,128 impressions, 327.23 EUR cost and one genuine 9 EUR Pack conversion over 30 complete days. No campaign budget, bid strategy, ad, keyword, price, offer or email setting changed.
+
+The pause stops new campaign delivery, subject to Google Ads reporting and billing latency. It does not remove the already accrued 177.01 EUR payable balance or the automatic payment shown for 2026-08-01. At the pause checkpoint, the 250 EUR promotion remained active with 91.61 EUR used and the separate 400 EUR promotion remained processing. No campaign restart is authorized by this action.
