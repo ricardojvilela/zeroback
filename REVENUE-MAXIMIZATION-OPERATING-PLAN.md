@@ -553,3 +553,11 @@ Following explicit approval, `Search - BatchCutout - Pro Launch` and `Search - B
 The decision used the latest complete-window evidence: 57 clicks, 502 impressions, 166.56 EUR cost and zero conversions over 14 complete days, and 126 clicks, 1,128 impressions, 327.23 EUR cost and one genuine 9 EUR Pack conversion over 30 complete days. No campaign budget, bid strategy, ad, keyword, price, offer or email setting changed.
 
 The pause stops new campaign delivery, subject to Google Ads reporting and billing latency. It does not remove the already accrued 177.01 EUR payable balance or the automatic payment shown for 2026-08-01. At the pause checkpoint, the 250 EUR promotion remained active with 91.61 EUR used and the separate 400 EUR promotion remained processing. No campaign restart is authorized by this action.
+
+## Organic product-photo opportunity - 2026-07-31
+
+The authenticated Search Console report through 2026-07-29 showed 116 impressions, one click, 0.9% CTR and average position 54.6 over the latest 28 days. The largest qualified query without a click was `product photo background remover`, with 26 impressions, zero clicks and average position 93.7. All 26 impressions were attributed to `https://batchcutout.com/en/product-photo-background-remover/`. The related query `product photo background removal` added six impressions, zero clicks and average position 94.8.
+
+The English product-photo page now leads its title and H1 with that demonstrated intent, explains the batch, transparent PNG and ZIP workflow in more depth, answers three visible purchase/use questions, and exposes matching BreadcrumbList and FAQPage structured data. Five relevant English acquisition pages now link contextually to it, including the bulk, ecommerce, Shopify, transparent PNG and WooCommerce workflows. The page's sitemap `lastmod` was updated to 2026-07-31.
+
+Desktop at 1440 by 900 pixels and mobile at 390 by 844 pixels were checked after the update. The content remained contained and the added grids were balanced at both widths. The next measurement gate is Search Console recrawl followed by at least 14 complete days of query data; compare impressions, average position and clicks for the two product-photo queries before making another change to this page. No price, offer, campaign, budget or email action changed.
