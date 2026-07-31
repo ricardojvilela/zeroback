@@ -1,6 +1,6 @@
 # BatchCutout - directory wave 2
 
-Updated: 2026-07-05
+Updated: 2026-07-31
 
 Goal: add a second acquisition wave without mass-submitting to weak directories. Use only platforms with relevant audience, durable listing value, or comparison-search intent.
 
@@ -110,3 +110,15 @@ Use only if the form accepts browser-based AI/image utilities. Position BatchCut
 - If visitors arrive but do not upload, revise the launch-page hero copy.
 - If uploads happen but pricing clicks do not, revise post-download and pricing CTAs.
 - If pricing clicks happen but checkout does not, inspect pricing-page friction before adding more directories.
+
+## Execution status - 2026-07-31
+
+The existing SaaSHub profile was verified through `support@batchcutout.com` and its public product details were corrected. The verified profile now describes the ecommerce batch workflow, transparent PNG and ZIP exports, the two-image free test, and Pack 100 at 5 EUR as a one-off purchase. The official pricing link points to `https://batchcutout.com/pricing/`. SaaSHub's separate automated editorial paragraph still contains generic wording that is not part of the verified product fields.
+
+Startup Stash accepted the ecommerce submission form, then sent only paid listing options starting at 199 USD/year. No listing was purchased and the platform is not part of the no-cost acquisition plan unless it later offers a genuinely free publication route.
+
+The Uneed product preview and brand account form are prepared with `support@batchcutout.com`, but account creation remains blocked by Cloudflare's human-verification checkbox. No account or product listing has been created yet. AlternativeTo also remains unsubmitted because a new account requires human verification and must be at least seven days old before suggesting an application.
+
+Product Hunt was not submitted because publishing requires a personal maker account through LinkedIn, GitHub or X, which conflicts with the company-account-only operating rule. Launching Next redirected its submission form through an anti-bot challenge to a 404 page, so no submission was recorded there either.
+
+The two resulting operational emails from SaaSHub and Startup Stash were reviewed in the authenticated BatchCutout panel and marked resolved. `support@batchcutout.com` ended this action with four closed messages and zero unresolved messages. No commercial email was sent, no advertisement was activated and no money was spent.
