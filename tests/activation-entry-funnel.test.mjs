@@ -181,6 +181,17 @@ test("reports internal validation delivery without mixing it into commercial met
   assert.match(admin, /internalValidationDiagnostics\.textContent = JSON\.stringify\(data\.internalValidationDiagnostics \|\| \{\}\)/);
 });
 
+test("lets the authenticated dashboard compare 1, 14 and 30 day windows", () => {
+  assert.match(admin, /<select id="statsDays">/);
+  assert.match(admin, /<option value="1">1 dia<\/option>/);
+  assert.match(admin, /<option value="14" selected>14 dias<\/option>/);
+  assert.match(admin, /<option value="30">30 dias<\/option>/);
+  assert.match(admin, /fetch\(`\/api\/stats\?days=\$\{days\}&timezone=Europe%2FLisbon`/);
+  assert.match(admin, /statsDays\.addEventListener\("change", loadLiveStats\)/);
+  assert.match(admin, /Visitantes únicos \$\{rangeLabel\}/);
+  assert.match(admin, /eventos lidos em \$\{rangeLabel\}/);
+});
+
 test("the upload action starts with a touch-friendly instruction in every commercial locale", () => {
   assert.match(index, /data-i18n="selectPhotos">Selecione ou arraste fotos</);
   assert.match(script, /selectPhotos: "Selecione ou arraste fotos"/);

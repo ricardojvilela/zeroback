@@ -758,11 +758,11 @@
 
       <section class="metrics-grid" aria-label="Resumo">
         <article class="metric">
-          <span>Visitantes únicos 14 dias</span>
+          <span id="dashboardVisitorsLabel">Visitantes únicos 14 dias</span>
           <strong id="dashboardVisitors">0</strong>
         </article>
         <article class="metric">
-          <span>Uploads 14 dias</span>
+          <span id="dashboardUploadsLabel">Uploads 14 dias</span>
           <strong id="dashboardUploads">0</strong>
         </article>
         <article class="metric">
@@ -932,9 +932,17 @@
         <div class="panel-head">
           <div>
             <h2>Operação BatchCutout</h2>
-            <p class="note">Subscrições, acessos e eventos recolhidos automaticamente nos últimos 14 dias.</p>
+            <p class="note" id="liveRangeNote">Subscrições, acessos e eventos recolhidos automaticamente nos últimos 14 dias.</p>
           </div>
           <div class="actions">
+            <label class="outreach-controls">
+              <span class="sr-only">Período das métricas</span>
+              <select id="statsDays">
+                <option value="1">1 dia</option>
+                <option value="14" selected>14 dias</option>
+                <option value="30">30 dias</option>
+              </select>
+            </label>
             <button class="secondary" type="button" id="refreshLive">Atualizar</button>
           </div>
         </div>
@@ -2020,6 +2028,7 @@
       const packPaymentsStatus = document.querySelector("#packPaymentsStatus");
       const subscriptionsRowsBody = document.querySelector("#subscriptionsRowsBody");
       const subscriptionsStatus = document.querySelector("#subscriptionsStatus");
+      const statsDays = document.querySelector("#statsDays");
       let outreachProspects = [];
       let recoveryUsers = [];
       let capturedLeads = [];
@@ -3134,6 +3143,11 @@
 
       function renderLiveStats(data) {
         const totals = data.totals || {};
+        const days = [1, 14, 30].includes(Number(data.days)) ? Number(data.days) : 14;
+        const rangeLabel = days === 1 ? "1 dia" : `${days} dias`;
+        document.querySelector("#dashboardVisitorsLabel").textContent = `Visitantes únicos ${rangeLabel}`;
+        document.querySelector("#dashboardUploadsLabel").textContent = `Uploads ${rangeLabel}`;
+        document.querySelector("#liveRangeNote").textContent = `Subscrições, acessos e eventos recolhidos automaticamente nos últimos ${rangeLabel}.`;
         internalValidationDiagnostics.textContent = JSON.stringify(data.internalValidationDiagnostics || {});
         renderDailyBrief(data);
         renderValidationExperiment(data.validationExperiment || {});
@@ -3501,7 +3515,7 @@
           : `<tr><td class="empty" colspan="9">Ainda não existem páginas SEO com eventos no período.</td></tr>`;
 
         const generatedAt = data.generatedAt ? new Date(data.generatedAt).toLocaleString() : "";
-        liveStatus.textContent = `${data.eventCount || 0} eventos lidos. Última atualização: ${generatedAt}`;
+        liveStatus.textContent = `${data.eventCount || 0} eventos lidos em ${rangeLabel}. Última atualização: ${generatedAt}`;
       }
 
       function renderProUsers(users) {
@@ -4350,7 +4364,8 @@
 
         liveStatus.textContent = "A carregar atividade...";
         try {
-          const response = await fetch("/api/stats?days=14&timezone=Europe%2FLisbon", {
+          const days = [1, 14, 30].includes(Number(statsDays.value)) ? Number(statsDays.value) : 14;
+          const response = await fetch(`/api/stats?days=${days}&timezone=Europe%2FLisbon`, {
             headers: {
               Accept: "application/json",
               Authorization: `Bearer ${token}`,
@@ -4398,6 +4413,7 @@
       }
 
       document.querySelector("#refreshLive").addEventListener("click", loadLiveStats);
+      statsDays.addEventListener("change", loadLiveStats);
       document.querySelector("#refreshProUsers").addEventListener("click", loadProUsers);
       document.querySelector("#refreshSubscriptions").addEventListener("click", loadSubscriptions);
       document.querySelector("#refreshPackPayments").addEventListener("click", loadPackPayments);
