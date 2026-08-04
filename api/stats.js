@@ -1001,13 +1001,15 @@ function verifyAdminToken(request) {
 
 function isInternalValidationEvent(event) {
   const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+  const pageLocation = String(event.page_location || detail.page_location || "");
   return (
     detail.event_category === "validation" ||
     detail.source === "codex_validation" ||
     event.source === "codex_validation" ||
     event.visitor_id === "codex-validation-visitor" ||
     event.visitor_id === "validation-probe" ||
-    String(event.session_id || "").startsWith("validation-")
+    String(event.session_id || "").startsWith("validation-") ||
+    /[?&]qa=activation-[^&#]+/i.test(pageLocation)
   );
 }
 

@@ -187,17 +187,25 @@ test("reports internal validation delivery without mixing it into commercial met
       campaign: "bulk_background_remover",
       occurred_at: "2026-07-30T15:10:48.000Z",
     },
+    {
+      event_name: "tool_dropzone_viewed",
+      source: "direct",
+      detail: { page_location: "https://batchcutout.com/?qa=activation-913c36e" },
+      occurred_at: "2026-08-04T11:20:00.000Z",
+    },
   ]);
 
   assert.deepEqual(diagnostics, {
-    total: 2,
-    latestAt: "2026-07-30T15:10:47.000Z",
+    total: 3,
+    latestAt: "2026-08-04T11:20:00.000Z",
     eventCounts: [
       { eventName: "paid_landing_tool_redirect", count: 1, latestAt: "2026-07-30T15:10:47.000Z" },
       { eventName: "seo_landing_view", count: 1, latestAt: "2026-07-30T15:10:46.000Z" },
+      { eventName: "tool_dropzone_viewed", count: 1, latestAt: "2026-08-04T11:20:00.000Z" },
     ],
     campaignCounts: [
       { campaign: "paid_redirect_probe", count: 2, latestAt: "2026-07-30T15:10:47.000Z" },
+      { campaign: "uncategorized", count: 1, latestAt: "2026-08-04T11:20:00.000Z" },
     ],
   });
   assert.match(admin, /id="internalValidationDiagnostics" hidden aria-hidden="true"/);
