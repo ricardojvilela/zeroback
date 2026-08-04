@@ -801,9 +801,14 @@
               <em id="dailyPaidEntriesDelta">igual a ontem</em>
             </article>
             <article class="daily-metric">
-              <span>Ferramenta aberta</span>
+              <span>Página ferramenta</span>
               <strong id="dailyToolViews">0</strong>
               <em id="dailyToolViewsDelta">igual a ontem</em>
+            </article>
+            <article class="daily-metric">
+              <span>Zona upload vista</span>
+              <strong id="dailyDropzoneViews">0</strong>
+              <em id="dailyDropzoneViewsDelta">igual a ontem</em>
             </article>
             <article class="daily-metric">
               <span>Seletor de ficheiros</span>
@@ -996,8 +1001,12 @@
             <strong id="livePaidLandingToolRedirects">0</strong>
           </article>
           <article class="live-card">
-            <span>Ferramenta aberta</span>
+            <span>Página ferramenta</span>
             <strong id="liveToolPageViews">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Zona upload vista</span>
+            <strong id="liveDropzoneViews">0</strong>
           </article>
           <article class="live-card">
             <span>Seletor de ficheiros</span>
@@ -1356,7 +1365,7 @@
           <div class="panel-head compact">
             <div>
               <h3>Ativação por formato de ecrã</h3>
-              <p class="note">Pessoas únicas desde a publicação desta medição. Mobile corresponde a até 767 px, tablet a 768-1040 px e desktop a mais de 1040 px.</p>
+              <p class="note">Pessoas únicas recolhidas apenas com a nova medição da zona de upload. Mobile corresponde a até 767 px, tablet a 768-1040 px e desktop a mais de 1040 px.</p>
             </div>
           </div>
           <div class="table-wrap">
@@ -1364,18 +1373,20 @@
               <thead>
                 <tr>
                   <th>Formato</th>
-                  <th>Ferramenta</th>
+                  <th>Página</th>
+                  <th>Zona upload</th>
+                  <th>Página → zona</th>
                   <th>Seletor</th>
-                  <th>Ferramenta → seletor</th>
+                  <th>Zona → seletor</th>
                   <th>Upload aceite</th>
-                  <th>Ferramenta → upload</th>
+                  <th>Zona → upload</th>
                   <th>Teste concluído</th>
-                  <th>Ferramenta → teste</th>
+                  <th>Página → teste</th>
                   <th>Download</th>
                 </tr>
               </thead>
               <tbody id="deviceActivationRowsBody">
-                <tr><td class="empty" colspan="9">A carregar ativação por formato.</td></tr>
+                <tr><td class="empty" colspan="11">A carregar ativação por formato.</td></tr>
               </tbody>
             </table>
           </div>
@@ -2182,6 +2193,7 @@
         const visitors = rowValue(today, "visitors");
         const paidEntries = rowValue(today, "paidLandingToolRedirects");
         const toolViews = rowValue(today, "toolPageViews");
+        const dropzoneViews = rowValue(today, "dropzoneViews");
         const filePickerOpens = rowValue(today, "filePickerOpens");
         const uploads = rowValue(today, "uploadsStarted");
         const downloads = rowValue(today, "downloads");
@@ -2195,7 +2207,7 @@
         const stickyDecisions = rowValue(today, "resultReadyStickyPackClicks") + rowValue(today, "resultReadyStickySaveLinkClicks");
         const visitorDelta = visitors - rowValue(yesterday, "visitors");
         const topSource = sourceBreakdown.find((row) => row.visitors > 0)?.source || "sem origem dominante";
-        const summary = `Hoje: ${pluralPt(visitors, "visitante", "visitantes")} (${visitorDelta >= 0 ? "+" : ""}${visitorDelta} vs ontem), ${pluralPt(paidEntries, "entrada paga direta", "entradas pagas diretas")}, ${pluralPt(toolViews, "abertura da ferramenta", "aberturas da ferramenta")}, ${pluralPt(filePickerOpens, "abertura do seletor", "aberturas do seletor")}, ${pluralPt(uploads, "upload", "uploads")}, ${pluralPt(downloads, "download", "downloads")} e ${pluralPt(checkoutSessions, "sessão Stripe", "sessões Stripe")}. Origem mais forte dos últimos 14 dias: ${sourceLabel(topSource)}.`;
+        const summary = `Hoje: ${pluralPt(visitors, "visitante", "visitantes")} (${visitorDelta >= 0 ? "+" : ""}${visitorDelta} vs ontem), ${pluralPt(paidEntries, "entrada paga direta", "entradas pagas diretas")}, ${pluralPt(toolViews, "visita à página da ferramenta", "visitas à página da ferramenta")}, ${pluralPt(dropzoneViews, "exposição à zona de upload", "exposições à zona de upload")}, ${pluralPt(filePickerOpens, "abertura do seletor", "aberturas do seletor")}, ${pluralPt(uploads, "upload", "uploads")}, ${pluralPt(downloads, "download", "downloads")} e ${pluralPt(checkoutSessions, "sessão Stripe", "sessões Stripe")}. Origem mais forte dos últimos 14 dias: ${sourceLabel(topSource)}.`;
 
         if (paid > 0 || revenue > 0) {
           return {
@@ -2227,7 +2239,7 @@
           };
         }
 
-        if (paidEntries >= 3 && filePickerOpens === 0) {
+        if (paidEntries >= 3 && dropzoneViews > 0 && filePickerOpens === 0 && uploads === 0) {
           return {
             label: "Ativação paga",
             className: "danger",
@@ -2237,11 +2249,21 @@
           };
         }
 
-        if (toolViews >= 5 && filePickerOpens === 0) {
+        if (toolViews >= 5 && dropzoneViews === 0) {
+          return {
+            label: "Chegada à ferramenta",
+            className: "warning",
+            title: "A página é visitada, mas a zona de upload não chega a ser vista.",
+            summary,
+            action: "Ação: rever a chegada à primeira ação e o alinhamento dos CTAs antes de mexer no preço ou no checkout.",
+          };
+        }
+
+        if (dropzoneViews >= 3 && filePickerOpens === 0 && uploads === 0) {
           return {
             label: "Ativação",
             className: "warning",
-            title: "A ferramenta é aberta, mas o teste não é iniciado.",
+            title: "A zona de upload é vista, mas o teste não é iniciado.",
             summary,
             action: "Ação: rever a primeira ação de escolha de fotos antes de mexer no preço ou no checkout.",
           };
@@ -2338,6 +2360,7 @@
         setDailyMetric("#dailyVisitors", "#dailyVisitorsDelta", rowValue(today, "visitors"), rowValue(yesterday, "visitors"));
         setDailyMetric("#dailyPaidEntries", "#dailyPaidEntriesDelta", rowValue(today, "paidLandingToolRedirects"), rowValue(yesterday, "paidLandingToolRedirects"));
         setDailyMetric("#dailyToolViews", "#dailyToolViewsDelta", rowValue(today, "toolPageViews"), rowValue(yesterday, "toolPageViews"));
+        setDailyMetric("#dailyDropzoneViews", "#dailyDropzoneViewsDelta", rowValue(today, "dropzoneViews"), rowValue(yesterday, "dropzoneViews"));
         setDailyMetric("#dailyFilePickerOpens", "#dailyFilePickerOpensDelta", rowValue(today, "filePickerOpens"), rowValue(yesterday, "filePickerOpens"));
         setDailyMetric("#dailyUploads", "#dailyUploadsDelta", rowValue(today, "uploadsStarted"), rowValue(yesterday, "uploadsStarted"));
         setDailyMetric("#dailyDownloads", "#dailyDownloadsDelta", rowValue(today, "downloads"), rowValue(yesterday, "downloads"));
@@ -3167,6 +3190,7 @@
         document.querySelector("#liveSeoLandingCtaClicks").textContent = totals.seoLandingCtaClicks || 0;
         document.querySelector("#livePaidLandingToolRedirects").textContent = totals.paidLandingToolRedirects || 0;
         document.querySelector("#liveToolPageViews").textContent = totals.toolPageViews || 0;
+        document.querySelector("#liveDropzoneViews").textContent = totals.dropzoneViews || 0;
         document.querySelector("#liveFilePickerOpens").textContent = totals.filePickerOpens || 0;
         document.querySelector("#liveDirectoryLaunchViews").textContent = totals.directoryLaunchPageViews || 0;
         document.querySelector("#liveDirectoryLaunchCtaClicks").textContent = totals.directoryLaunchCtaClicks || 0;
@@ -3353,16 +3377,18 @@
               <tr>
                 <td><strong>${escapeHtml(deviceFormatLabel(row.deviceType))}</strong></td>
                 <td>${row.toolVisitors || 0}</td>
+                <td>${row.dropzoneVisitors || 0}</td>
+                <td>${formatPercent(row.dropzoneViewRate || 0)}</td>
                 <td>${row.filePickerVisitors || 0}</td>
-                <td>${formatPercent(row.filePickerRate || 0)}</td>
+                <td>${formatPercent(row.dropzoneFilePickerRate || 0)}</td>
                 <td>${row.uploadVisitors || 0}</td>
-                <td>${formatPercent(row.uploadRate || 0)}</td>
+                <td>${formatPercent(row.dropzoneUploadRate || 0)}</td>
                 <td>${row.completedTestVisitors || 0}</td>
                 <td>${formatPercent(row.completedTestRate || 0)}</td>
                 <td>${row.downloadVisitors || 0}</td>
               </tr>
             `).join("")
-          : `<tr><td class="empty" colspan="9">Ainda não há eventos com formato de ecrã neste período.</td></tr>`;
+          : `<tr><td class="empty" colspan="11">Ainda não há eventos com formato de ecrã neste período.</td></tr>`;
 
         liveRowsBody.innerHTML = data.rows?.length
           ? data.rows.slice().reverse().map((row) => {

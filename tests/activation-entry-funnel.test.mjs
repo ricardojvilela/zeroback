@@ -30,19 +30,27 @@ function stringLiteralsInSet(source, marker) {
 }
 
 test("measures the activation steps before a visitor selects files", () => {
+  assert.match(script, /"tool_dropzone_viewed"/);
   assert.match(script, /"tool_file_picker_opened"/);
-  assert.match(script, /trackEvent\("tool_file_picker_opened", \{ source: "dropzone_click" \}\)/);
-  assert.match(script, /trackEvent\("tool_file_picker_opened", \{ source: "dropzone_keyboard" \}\)/);
+  assert.match(script, /trackEvent\("tool_file_picker_opened", \{ source \}\)/);
+  assert.match(script, /openToolFilePicker\("dropzone_click"\)/);
+  assert.match(script, /openToolFilePicker\("primary_upload_button"\)/);
+  assert.match(index, /id="selectPhotosButton"/);
+  assert.match(apiTrack, /"tool_dropzone_viewed"/);
   assert.match(apiTrack, /"tool_file_picker_opened"/);
+  assert.match(stats, /case "tool_dropzone_viewed":/);
   assert.match(stats, /case "tool_file_picker_opened":/);
+  assert.match(stats, /dropzoneViews \+= 1/);
   assert.match(stats, /filePickerOpens \+= 1/);
+  assert.match(admin, /id="liveDropzoneViews"/);
   assert.match(admin, /id="liveToolPageViews"/);
   assert.match(admin, /id="liveFilePickerOpens"/);
   assert.match(admin, /id="dailyPaidEntries"/);
   assert.match(admin, /id="dailyToolViews"/);
+  assert.match(admin, /id="dailyDropzoneViews"/);
   assert.match(admin, /id="dailyFilePickerOpens"/);
-  assert.match(admin, /paidEntries >= 3 && filePickerOpens === 0/);
-  assert.match(admin, /toolViews >= 5 && filePickerOpens === 0/);
+  assert.match(admin, /paidEntries >= 3 && dropzoneViews > 0 && filePickerOpens === 0 && uploads === 0/);
+  assert.match(admin, /toolViews >= 5 && dropzoneViews === 0/);
 });
 
 test("keeps browser events aligned with the tracking API", () => {
@@ -62,41 +70,56 @@ test("keeps browser events aligned with the tracking API", () => {
 });
 
 test("summarizes activation by screen format using unique visitors", () => {
+  const deviceDetail = (deviceType) => ({
+    device_type: deviceType,
+    activation_funnel_version: "dropzone_v1",
+  });
   const events = [
-    { event_name: "tool_page_view", visitor_id: "mobile-1", detail: { device_type: "mobile" } },
-    { event_name: "tool_page_view", visitor_id: "mobile-1", detail: { device_type: "mobile" } },
-    { event_name: "tool_page_view", visitor_id: "mobile-2", detail: { device_type: "mobile" } },
-    { event_name: "tool_file_picker_opened", visitor_id: "mobile-1", detail: { device_type: "mobile" } },
-    { event_name: "tool_upload_added", visitor_id: "mobile-1", detail: { device_type: "mobile" } },
-    { event_name: "free_test_completed", visitor_id: "mobile-1", detail: { device_type: "mobile" } },
-    { event_name: "tool_download_png", visitor_id: "mobile-1", detail: { device_type: "mobile" } },
-    { event_name: "tool_page_view", visitor_id: "desktop-1", detail: { device_type: "desktop" } },
-    { event_name: "tool_upload_added", visitor_id: "desktop-1", detail: { device_type: "desktop" } },
+    { event_name: "tool_page_view", visitor_id: "mobile-1", detail: deviceDetail("mobile") },
+    { event_name: "tool_page_view", visitor_id: "mobile-1", detail: deviceDetail("mobile") },
+    { event_name: "tool_page_view", visitor_id: "mobile-2", detail: deviceDetail("mobile") },
+    { event_name: "tool_dropzone_viewed", visitor_id: "mobile-1", detail: deviceDetail("mobile") },
+    { event_name: "tool_file_picker_opened", visitor_id: "mobile-1", detail: deviceDetail("mobile") },
+    { event_name: "tool_upload_added", visitor_id: "mobile-1", detail: deviceDetail("mobile") },
+    { event_name: "free_test_completed", visitor_id: "mobile-1", detail: deviceDetail("mobile") },
+    { event_name: "tool_download_png", visitor_id: "mobile-1", detail: deviceDetail("mobile") },
+    { event_name: "tool_page_view", visitor_id: "desktop-1", detail: deviceDetail("desktop") },
+    { event_name: "tool_dropzone_viewed", visitor_id: "desktop-1", detail: deviceDetail("desktop") },
+    { event_name: "tool_upload_added", visitor_id: "desktop-1", detail: deviceDetail("desktop") },
     { event_name: "tool_page_view", visitor_id: "ignored", detail: {} },
+    { event_name: "tool_page_view", visitor_id: "legacy", detail: { device_type: "desktop" } },
   ];
 
   const summary = deviceActivationSummary(events);
   assert.deepEqual(summary.find((row) => row.deviceType === "mobile"), {
     deviceType: "mobile",
     toolVisitors: 2,
+    dropzoneVisitors: 1,
     filePickerVisitors: 1,
     uploadVisitors: 1,
     completedTestVisitors: 1,
     downloadVisitors: 1,
+    dropzoneViewRate: 0.5,
     filePickerRate: 0.5,
     uploadRate: 0.5,
+    dropzoneFilePickerRate: 1,
+    dropzoneUploadRate: 1,
     completedTestRate: 0.5,
     downloadRate: 0.5,
   });
   assert.deepEqual(summary.find((row) => row.deviceType === "desktop"), {
     deviceType: "desktop",
     toolVisitors: 1,
+    dropzoneVisitors: 1,
     filePickerVisitors: 0,
     uploadVisitors: 1,
     completedTestVisitors: 0,
     downloadVisitors: 0,
+    dropzoneViewRate: 1,
     filePickerRate: 0,
     uploadRate: 1,
+    dropzoneFilePickerRate: 0,
+    dropzoneUploadRate: 1,
     completedTestRate: 0,
     downloadRate: 0,
   });
@@ -193,10 +216,10 @@ test("lets the authenticated dashboard compare 1, 14 and 30 day windows", () => 
 });
 
 test("the upload action starts with a touch-friendly instruction in every commercial locale", () => {
-  assert.match(index, /data-i18n="selectPhotos">Selecione ou arraste fotos</);
-  assert.match(script, /selectPhotos: "Selecione ou arraste fotos"/);
-  assert.match(script, /selectPhotos: "Choose or drag photos here"/);
-  assert.match(script, /selectPhotos: "Selecciona o arrastra fotos"/);
+  assert.match(index, /data-i18n="selectPhotosButton">\s*Selecionar fotos/);
+  assert.match(script, /selectPhotosButton: "Selecionar fotos"/);
+  assert.match(script, /selectPhotosButton: "Choose photos"/);
+  assert.match(script, /dropzoneHelper: "No account needed\. Images are processed in your browser\."/);
 });
 
 test("keeps the first mobile upload action clear of inactive controls", () => {

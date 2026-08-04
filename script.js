@@ -71,6 +71,7 @@ const dropzone = document.querySelector("#dropzone");
 const dropzoneBadge = document.querySelector(".dropzone-badge");
 const dropzoneIcon = document.querySelector(".dropzone-icon");
 const dropzoneTitle = document.querySelector(".dropzone-title");
+const selectPhotosButton = document.querySelector("#selectPhotosButton");
 const dropzoneMeta = document.querySelector(".dropzone-meta");
 const dropzoneHelper = document.querySelector(".dropzone-helper");
 const languageSelect = document.querySelector("#languageSelect");
@@ -369,6 +370,7 @@ const workflowContentByLanguage = {
 };
 const serverEventNames = new Set([
   "tool_page_view",
+  "tool_dropzone_viewed",
   "tool_file_picker_opened",
   "tool_drag_upload_intent",
   "tool_upload_started",
@@ -734,8 +736,9 @@ const translations = {
     startNow: "Começar agora",
     uploadTitle: "Carregue as suas fotos",
     clear: "Limpar",
-    selectPhotos: "Selecione ou arraste fotos",
-    fileTypes: "Processa no browser. Exporta PNG ou ZIP.",
+    selectPhotos: "Teste o recorte nas suas fotos de produto",
+    selectPhotosButton: "Selecionar fotos",
+    fileTypes: "Ou arraste JPG, PNG ou WebP para aqui",
     removeBackgrounds: "Remover fundos",
     downloadPng: "Descarregar PNG",
     downloadZip: "Descarregar ZIP",
@@ -993,8 +996,9 @@ const translations = {
     startNow: "Start now",
     uploadTitle: "Upload your photos",
     clear: "Clear",
-    selectPhotos: "Choose or drag photos here",
-    fileTypes: "Processed in your browser. Export PNG or ZIP.",
+    selectPhotos: "Test the cutout on your product photos",
+    selectPhotosButton: "Choose photos",
+    fileTypes: "Or drag JPG, PNG, or WebP files here",
     removeBackgrounds: "Remove backgrounds",
     downloadPng: "Download PNG",
     downloadZip: "Download ZIP",
@@ -1038,8 +1042,9 @@ const translations = {
     startNow: "Empezar ahora",
     uploadTitle: "Sube tus fotos",
     clear: "Limpiar",
-    selectPhotos: "Selecciona o arrastra fotos",
-    fileTypes: "JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG, HEIC o HEIF",
+    selectPhotos: "Prueba el recorte con tus fotos de producto",
+    selectPhotosButton: "Seleccionar fotos",
+    fileTypes: "O arrastra archivos JPG, PNG o WebP aquí",
     removeBackgrounds: "Quitar fondos",
     downloadPng: "Descargar PNG",
     downloadZip: "Descargar ZIP",
@@ -1811,7 +1816,7 @@ const proTranslations = {
     freeLimitBadgeRemaining: "Resta 1 imagem grátis",
     freeLimitBadgeComplete: "Teste grátis concluído",
     proLimitBadge: "Até {limit} imagens por lote",
-    dropzoneHelper: "Use {limit} imagens para confirmar a qualidade. O Pack 100 é para um lote real.",
+    dropzoneHelper: "Sem conta. As imagens são processadas no seu navegador.",
     dropzoneHelperRemaining: "Use a última imagem grátis para confirmar a qualidade do recorte.",
     dropzoneHelperComplete: "Continue com 100 créditos por 5 EUR, sem subscrição.",
     selectPhotosFreeComplete: "Continuar com Pack 100",
@@ -1888,7 +1893,7 @@ const proTranslations = {
     freeLimitBadgeRemaining: "1 free image remaining",
     freeLimitBadgeComplete: "Free test complete",
     proLimitBadge: "Up to {limit} images per batch",
-    dropzoneHelper: "Use {limit} images to check the cutout quality. Pack 100 is for a real batch.",
+    dropzoneHelper: "No account needed. Images are processed in your browser.",
     dropzoneHelperRemaining: "Use the last free image to check the cutout quality.",
     dropzoneHelperComplete: "Continue with 100 credits for EUR 5, no subscription.",
     selectPhotosFreeComplete: "Continue with Pack 100",
@@ -1934,7 +1939,7 @@ Object.assign(translations.es, {
   freeLimitBadge: "Prueba gratis: 2 imágenes en total",
   freeLimitBadgeRemaining: "Queda 1 imagen gratis",
   freeLimitBadgeComplete: "Prueba gratis completada",
-  dropzoneHelper: "Usa 2 imágenes para comprobar la calidad. Pack 100 es para un lote real.",
+  dropzoneHelper: "Sin cuenta. Las imágenes se procesan en tu navegador.",
   dropzoneHelperRemaining: "Usa la última imagen gratis para comprobar la calidad del recorte.",
   dropzoneHelperComplete: "Continúa con 100 créditos por 5 EUR, sin suscripción.",
   selectPhotosFreeComplete: "Continuar con Pack 100",
@@ -1964,6 +1969,7 @@ let hasTrackedFreeTestExhausted = false;
 
 const analyticsEvents = {
   tool_page_view: { category: "funnel", label: "page_view", step: 0 },
+  tool_dropzone_viewed: { category: "funnel", label: "dropzone_viewed", step: 1 },
   tool_file_picker_opened: { category: "funnel", label: "file_picker_opened", step: 1 },
   brand_cta_clicked: { category: "engagement", label: "start_free" },
   tool_drag_upload_intent: { category: "upload", label: "drag_upload_intent", step: 1 },
@@ -2055,6 +2061,7 @@ function trackEvent(name, detail = {}) {
     funnel_step: config.step || detail.funnel_step || undefined,
     value: Number.isFinite(numericValue) ? numericValue : 0,
     language: currentLanguage,
+    activation_funnel_version: "dropzone_v1",
     ...getDeviceAnalyticsContext(),
     ...attributionParams,
     ...detail,
@@ -3196,6 +3203,9 @@ function syncPaidAccessUi() {
   if (fileInput) fileInput.disabled = false;
   if (dropzoneIcon) dropzoneIcon.textContent = freeTestComplete ? "100" : "+";
   if (dropzoneTitle) dropzoneTitle.textContent = t(freeTestComplete ? "selectPhotosFreeComplete" : "selectPhotos");
+  if (selectPhotosButton) {
+    selectPhotosButton.textContent = t(freeTestComplete ? "selectPhotosFreeComplete" : "selectPhotosButton");
+  }
   if (dropzoneMeta) dropzoneMeta.textContent = t(freeTestComplete ? "dropzoneMetaComplete" : "fileTypes");
   brandProLink?.classList.toggle("hidden", paidAccess);
   freeTestFlow?.classList.toggle("hidden", paidAccess);
@@ -5661,27 +5671,40 @@ resultReadyOfferObserver?.observe(downloadReadyHint);
 
 initAuth();
 
-dropzone.addEventListener("click", (event) => {
+function openToolFilePicker(source) {
   if (isFreeTestComplete()) {
-    event.preventDefault();
-    showFreeTestUpgrade("dropzone_click");
+    showFreeTestUpgrade(source);
     return;
   }
-  if (event.target === fileInput) return;
-  trackEvent("tool_file_picker_opened", { source: "dropzone_click" });
+
+  trackEvent("tool_file_picker_opened", { source });
   fileInput.click();
+}
+
+selectPhotosButton?.addEventListener("click", (event) => {
+  event.stopPropagation();
+  openToolFilePicker("primary_upload_button");
 });
 
-dropzone.addEventListener("keydown", (event) => {
-  if (!["Enter", " "].includes(event.key)) return;
-  event.preventDefault();
-  if (isFreeTestComplete()) {
-    showFreeTestUpgrade("dropzone_keyboard");
-    return;
-  }
-  trackEvent("tool_file_picker_opened", { source: "dropzone_keyboard" });
-  fileInput.click();
+dropzone.addEventListener("click", (event) => {
+  if (event.target === fileInput || event.target.closest("button")) return;
+  openToolFilePicker("dropzone_click");
 });
+
+let hasTrackedDropzoneView = false;
+const dropzoneViewObserver = "IntersectionObserver" in window
+  ? new IntersectionObserver((entries, observer) => {
+      const visibleEntry = entries.find((entry) => entry.isIntersecting && entry.intersectionRatio >= 0.35);
+      if (!visibleEntry || hasTrackedDropzoneView) return;
+      hasTrackedDropzoneView = true;
+      trackEvent("tool_dropzone_viewed", {
+        entry_source: window.location.hash === "#tool" ? "tool_hash" : "page_scroll",
+        visible_ratio: Math.round(visibleEntry.intersectionRatio * 100),
+      });
+      observer.disconnect();
+    }, { threshold: [0.35] })
+  : null;
+dropzoneViewObserver?.observe(dropzone);
 
 for (const eventName of ["dragenter", "dragover", "dragleave", "drop"]) {
   document.addEventListener(eventName, (event) => {

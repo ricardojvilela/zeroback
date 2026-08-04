@@ -80,6 +80,7 @@ function emptyDay(date) {
     visitors: 0,
     pageViews: 0,
     toolPageViews: 0,
+    dropzoneViews: 0,
     filePickerOpens: 0,
     seoLandingViews: 0,
     seoLandingCtaClicks: 0,
@@ -319,6 +320,7 @@ function emptySourceRow(source) {
     visitors: 0,
     pageViews: 0,
     toolPageViews: 0,
+    dropzoneViews: 0,
     filePickerOpens: 0,
     seoLandingViews: 0,
     seoLandingCtaClicks: 0,
@@ -474,6 +476,7 @@ function emptyDeviceActivationStages(deviceType) {
   return {
     deviceType,
     tool: new Set(),
+    dropzone: new Set(),
     filePicker: new Set(),
     upload: new Set(),
     completedTest: new Set(),
@@ -486,6 +489,7 @@ export function deviceActivationSummary(events = []) {
 
   for (const event of events) {
     const detail = event.detail && typeof event.detail === "object" ? event.detail : {};
+    if (detail.activation_funnel_version !== "dropzone_v1") continue;
     const deviceType = asCleanText(detail.device_type, 20).toLowerCase();
     const visitorId = asCleanText(event.visitor_id || detail.visitor_id, 80);
     if (!activationDeviceTypes.includes(deviceType) || !visitorId) continue;
@@ -496,6 +500,7 @@ export function deviceActivationSummary(events = []) {
     const stages = byDevice.get(deviceType);
 
     if (event.event_name === "tool_page_view") stages.tool.add(visitorId);
+    if (event.event_name === "tool_dropzone_viewed") stages.dropzone.add(visitorId);
     if (event.event_name === "tool_file_picker_opened") stages.filePicker.add(visitorId);
     if (event.event_name === "tool_upload_added") stages.upload.add(visitorId);
     if (event.event_name === "free_test_completed") stages.completedTest.add(visitorId);
@@ -507,6 +512,7 @@ export function deviceActivationSummary(events = []) {
     .map((deviceType) => {
       const stages = byDevice.get(deviceType);
       const toolVisitors = stages.tool.size;
+      const dropzoneVisitors = stages.dropzone.size;
       const filePickerVisitors = stages.filePicker.size;
       const uploadVisitors = stages.upload.size;
       const completedTestVisitors = stages.completedTest.size;
@@ -515,12 +521,16 @@ export function deviceActivationSummary(events = []) {
       return {
         deviceType,
         toolVisitors,
+        dropzoneVisitors,
         filePickerVisitors,
         uploadVisitors,
         completedTestVisitors,
         downloadVisitors,
+        dropzoneViewRate: toolVisitors ? dropzoneVisitors / toolVisitors : 0,
         filePickerRate: toolVisitors ? filePickerVisitors / toolVisitors : 0,
         uploadRate: toolVisitors ? uploadVisitors / toolVisitors : 0,
+        dropzoneFilePickerRate: dropzoneVisitors ? filePickerVisitors / dropzoneVisitors : 0,
+        dropzoneUploadRate: dropzoneVisitors ? uploadVisitors / dropzoneVisitors : 0,
         completedTestRate: toolVisitors ? completedTestVisitors / toolVisitors : 0,
         downloadRate: toolVisitors ? downloadVisitors / toolVisitors : 0,
       };
@@ -1274,6 +1284,10 @@ export default async function handler(request, response) {
           row.toolPageViews += 1;
           sourceRow.pageViews += 1;
           sourceRow.toolPageViews += 1;
+          break;
+        case "tool_dropzone_viewed":
+          row.dropzoneViews += 1;
+          sourceRow.dropzoneViews += 1;
           break;
         case "tool_file_picker_opened":
           row.filePickerOpens += 1;

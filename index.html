@@ -409,18 +409,22 @@
           </button>
         </div>
 
-        <div class="dropzone" id="dropzone" role="button" tabindex="0">
+        <div class="dropzone" id="dropzone" role="group" aria-labelledby="dropzoneTitle">
           <input
             id="fileInput"
             type="file"
+            hidden
             accept="image/*,.jpg,.jpeg,.jfif,.pjpeg,.pjp,.png,.apng,.webp,.avif,.gif,.bmp,.tif,.tiff,.svg,.heic,.heif,.ico,.cur"
             multiple
           />
           <span class="dropzone-badge" data-i18n="freeLimitBadge">Teste grátis: 2 imagens no total</span>
           <span class="dropzone-icon" aria-hidden="true">+</span>
-          <span class="dropzone-title" data-i18n="selectPhotos">Selecione ou arraste fotos</span>
-          <span class="dropzone-meta" data-i18n="fileTypes">JPG, PNG ou WebP em lote</span>
-          <span class="dropzone-helper" data-i18n="dropzoneHelper">Use 2 imagens para confirmar a qualidade. O Pack 100 é para um lote real.</span>
+          <span class="dropzone-title" id="dropzoneTitle" data-i18n="selectPhotos">Teste o recorte nas suas fotos de produto</span>
+          <button class="dropzone-select-button" id="selectPhotosButton" type="button" data-i18n="selectPhotosButton">
+            Selecionar fotos
+          </button>
+          <span class="dropzone-meta" data-i18n="fileTypes">Ou arraste JPG, PNG ou WebP para aqui</span>
+          <span class="dropzone-helper" data-i18n="dropzoneHelper">Sem conta. As imagens são processadas no seu navegador.</span>
         </div>
 
         <section class="results tool-results" data-i18n-aria="resultsLabel" aria-label="Fotos processadas">
