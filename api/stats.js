@@ -106,6 +106,7 @@ function emptyDay(date) {
     resultReadyStickyShown: 0,
     resultReadyStickyPackClicks: 0,
     resultReadyStickySaveLinkClicks: 0,
+    postDownloadFeedbackViews: 0,
     postDownloadFeedbacks: 0,
     postDownloadLargerBatchFeedbacks: 0,
     postDownloadNoMorePhotosFeedbacks: 0,
@@ -343,6 +344,7 @@ function emptySourceRow(source) {
     resultReadyStickyShown: 0,
     resultReadyStickyPackClicks: 0,
     resultReadyStickySaveLinkClicks: 0,
+    postDownloadFeedbackViews: 0,
     postDownloadFeedbacks: 0,
     postDownloadLargerBatchFeedbacks: 0,
     postDownloadNoMorePhotosFeedbacks: 0,
@@ -1364,6 +1366,10 @@ export default async function handler(request, response) {
             row.resultReadyStickySaveLinkClicks += 1;
             sourceRow.resultReadyStickySaveLinkClicks += 1;
           }
+          break;
+        case "post_download_feedback_shown":
+          row.postDownloadFeedbackViews += 1;
+          sourceRow.postDownloadFeedbackViews += 1;
           break;
         case "post_download_feedback_selected":
           row.postDownloadFeedbacks += 1;

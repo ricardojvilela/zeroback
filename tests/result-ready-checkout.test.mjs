@@ -43,7 +43,13 @@ test("keeps every result-ready Pack action on the email-only checkout path", asy
 });
 
 test("replaces the pre-download offers with one post-download Pack action", async () => {
-  const script = await readFile(path.join(root, "script.js"), "utf8");
+  const [index, script, apiTrack, stats, admin] = await Promise.all([
+    readFile(path.join(root, "index.html"), "utf8"),
+    readFile(path.join(root, "script.js"), "utf8"),
+    readFile(path.join(root, "api", "track.js"), "utf8"),
+    readFile(path.join(root, "api", "stats.js"), "utf8"),
+    readFile(path.join(root, "admin.html"), "utf8"),
+  ]);
   const showStart = script.indexOf("function showPostDownloadNext");
   const showEnd = script.indexOf("function focusPostDownloadLeadCapture", showStart);
   const showPostDownloadNext = script.slice(showStart, showEnd);
@@ -57,4 +63,15 @@ test("replaces the pre-download offers with one post-download Pack action", asyn
   assert.match(showPostDownloadNext, /resultReadyStickyCta\?\.classList\.add\("hidden"\)/);
   assert.match(showPostDownloadNext, /postDownloadEmail\.value = normalizeEmail/);
   assert.match(showPostDownloadFeedback, /proInterestPanel\?\.classList\.add\("hidden"\)/);
+
+  const postDownloadPanel = index.slice(
+    index.indexOf('id="postDownloadNextPanel"'),
+    index.indexOf('class="status-panel"'),
+  );
+  assert.match(postDownloadPanel, /id="postDownloadFeedback"/);
+  assert.match(script, /trackEvent\("post_download_feedback_shown"/);
+  assert.match(apiTrack, /"post_download_feedback_shown"/);
+  assert.match(stats, /case "post_download_feedback_shown":/);
+  assert.match(admin, /id="livePostDownloadFeedbackViews"/);
+  assert.match(admin, /id="livePostDownloadFeedbackRate"/);
 });

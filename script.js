@@ -388,6 +388,7 @@ const serverEventNames = new Set([
   "post_download_next_shown",
   "post_download_pack_clicked",
   "post_download_save_link_clicked",
+  "post_download_feedback_shown",
   "post_download_feedback_selected",
   "tool_pro_clicked",
   "pro_cta_clicked",
@@ -482,8 +483,8 @@ const baseTranslation = {
   feedbackQuality: "Testar qualidade",
   feedbackCompare: "Comparar ferramentas",
   feedbackThanks: "Obrigado. Isto ajuda-nos a melhorar a ferramenta.",
-  postDownloadKicker: "Decisão do Pack 100",
-  postDownloadTitle: "Se não comprar hoje, qual é o principal motivo?",
+  postDownloadKicker: "Ajude-nos a melhorar",
+  postDownloadTitle: "O que falta para o Pack 100 fazer sentido?",
   postDownloadNoMorePhotos: "Não tenho mais fotos agora",
   postDownloadNeedsQuality: "O recorte precisa melhorar",
   postDownloadNeedsCatalogFinish: "Falta fundo e tamanho final",
@@ -773,8 +774,8 @@ const translations = {
     feedbackQuality: "Test quality",
     feedbackCompare: "Compare tools",
     feedbackThanks: "Thanks. This helps us improve the tool.",
-    postDownloadKicker: "Pack 100 decision",
-    postDownloadTitle: "If you do not buy today, what is the main reason?",
+    postDownloadKicker: "Help us improve",
+    postDownloadTitle: "What would make the 100 image pack useful to you?",
     postDownloadNoMorePhotos: "I do not have more photos now",
     postDownloadNeedsQuality: "The cutout needs to improve",
     postDownloadNeedsCatalogFinish: "I need the final background and size",
@@ -1464,8 +1465,8 @@ const translatedAddons = {
     privacyNote: "Las imágenes se procesan en tu dispositivo y no se suben a nuestros servidores.",
     formatNote: "Algunos formatos pueden depender del soporte del navegador.",
     batchLimitNote: "Prueba gratis de {limit} imágenes en total. Para más volumen, empieza con Pack 100.",
-    postDownloadKicker: "Decisión del Pack 100",
-    postDownloadTitle: "Si no compras hoy, ¿cuál es el motivo principal?",
+    postDownloadKicker: "Ayúdanos a mejorar",
+    postDownloadTitle: "¿Qué falta para que Pack 100 te resulte útil?",
     postDownloadNoMorePhotos: "No tengo más fotos ahora",
     postDownloadNeedsQuality: "El recorte necesita mejorar",
     postDownloadNeedsCatalogFinish: "Falta el fondo y tamaño final",
@@ -1966,6 +1967,7 @@ let hasTrackedDownloadReady = false;
 let activeProPromptReason = "";
 let activeProPromptParams = {};
 let hasTrackedFreeTestExhausted = false;
+let hasTrackedPostDownloadFeedbackShown = false;
 
 const analyticsEvents = {
   tool_page_view: { category: "funnel", label: "page_view", step: 0 },
@@ -2035,6 +2037,7 @@ const analyticsEvents = {
   zip_downloaded: { category: "download", label: "zip" },
   pro_interest_prompt_clicked: { category: "commercial_intent", label: "pro_interest" },
   feedback_goal_selected: { category: "feedback", label: "visitor_goal" },
+  post_download_feedback_shown: { category: "feedback", label: "post_download_shown" },
   post_download_feedback_selected: { category: "feedback", label: "post_download" },
 };
 
@@ -5200,6 +5203,15 @@ function showPostDownloadFeedback(downloadType, count) {
   postDownloadFeedback?.classList.remove("hidden");
   postDownloadFeedback?.setAttribute("data-download-type", downloadType);
   postDownloadFeedback?.setAttribute("data-download-count", String(count));
+  if (!hasTrackedPostDownloadFeedbackShown) {
+    hasTrackedPostDownloadFeedbackShown = true;
+    trackEvent("post_download_feedback_shown", {
+      downloadType,
+      count,
+      totalInQueue: items.length,
+      free_limit: maxFilesPerBatch,
+    });
+  }
   if (!postDownloadEmailForm) showLeadCapture(downloadType, count, "post_download");
   if (hasPostDownloadOffer) {
     proInterestPanel?.classList.add("hidden");

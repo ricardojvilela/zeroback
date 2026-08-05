@@ -1061,8 +1061,16 @@
             <strong id="liveResultReadyStickyRate">0%</strong>
           </article>
           <article class="live-card">
-            <span>Feedback pós-download</span>
+            <span>Pergunta feedback vista</span>
+            <strong id="livePostDownloadFeedbackViews">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Respostas feedback</span>
             <strong id="livePostDownloadFeedbacks">0</strong>
+          </article>
+          <article class="live-card">
+            <span>Taxa resposta feedback</span>
+            <strong id="livePostDownloadFeedbackRate">0%</strong>
           </article>
           <article class="live-card">
             <span>Pediu lote maior</span>
@@ -3213,7 +3221,12 @@
           (totals.resultReadyStickyPackClicks || 0) + (totals.resultReadyStickySaveLinkClicks || 0),
           totals.resultReadyStickyShown,
         ));
+        document.querySelector("#livePostDownloadFeedbackViews").textContent = totals.postDownloadFeedbackViews || 0;
         document.querySelector("#livePostDownloadFeedbacks").textContent = totals.postDownloadFeedbacks || 0;
+        document.querySelector("#livePostDownloadFeedbackRate").textContent = formatPercent(conversionRate(
+          totals.postDownloadFeedbacks,
+          totals.postDownloadFeedbackViews,
+        ));
         document.querySelector("#livePostDownloadLargerBatch").textContent = totals.postDownloadLargerBatchFeedbacks || 0;
         document.querySelector("#liveProofPageViews").textContent = totals.proofPageViews || 0;
         document.querySelector("#liveProofCtaClicks").textContent = totals.proofCtaClicks || 0;

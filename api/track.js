@@ -26,6 +26,7 @@ const allowedEvents = new Set([
   "post_download_pack_clicked",
   legacyPostDownloadPackClickedEvent,
   "post_download_save_link_clicked",
+  "post_download_feedback_shown",
   "post_download_feedback_selected",
   "tool_pro_clicked",
   "monthly_limit_reached",

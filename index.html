@@ -532,6 +532,29 @@
             <p class="post-download-email-message" id="postDownloadEmailMessage" aria-live="polite"></p>
           </div>
           <p class="post-download-next-note" data-i18n="postDownloadNextNote">Sem cartão no teste grátis. Pack único ou Pro pagos por Stripe quando quiser aumentar o lote.</p>
+          <section class="post-download-feedback hidden" id="postDownloadFeedback" aria-labelledby="post-download-title">
+            <div>
+              <p class="section-kicker" data-i18n="postDownloadKicker">Ajude-nos a melhorar</p>
+              <h2 id="post-download-title" data-i18n="postDownloadTitle">O que falta para o Pack 100 fazer sentido?</h2>
+            </div>
+            <div class="post-download-options" id="postDownloadOptions">
+              <button type="button" data-post-download-feedback="no_more_photos" data-i18n="postDownloadNoMorePhotos">
+                Não tenho mais fotos agora
+              </button>
+              <button type="button" data-post-download-feedback="needs_quality" data-i18n="postDownloadNeedsQuality">
+                O recorte precisa melhorar
+              </button>
+              <button type="button" data-post-download-feedback="needs_catalog_finish" data-i18n="postDownloadNeedsCatalogFinish">
+                Falta fundo e tamanho final
+              </button>
+              <button type="button" data-post-download-feedback="price_not_worth_it" data-i18n="postDownloadPriceNotWorthIt">
+                5 EUR ainda não compensa
+              </button>
+            </div>
+            <p class="post-download-thanks hidden" id="postDownloadThanks" data-i18n="postDownloadThanks">
+              Obrigado. Esta resposta conta para a decisão sobre o próximo passo do BatchCutout.
+            </p>
+          </section>
         </section>
 
         <div class="status-panel" aria-live="polite">
@@ -547,30 +570,6 @@
           >Falar sobre volume maior</a>
           <progress id="progressBar" value="0" max="100"></progress>
         </div>
-
-        <section class="post-download-feedback hidden" id="postDownloadFeedback" aria-labelledby="post-download-title">
-          <div>
-            <p class="section-kicker" data-i18n="postDownloadKicker">Decisão do Pack 100</p>
-            <h2 id="post-download-title" data-i18n="postDownloadTitle">Se não comprar hoje, qual é o principal motivo?</h2>
-          </div>
-          <div class="post-download-options" id="postDownloadOptions">
-            <button type="button" data-post-download-feedback="no_more_photos" data-i18n="postDownloadNoMorePhotos">
-              Não tenho mais fotos agora
-            </button>
-            <button type="button" data-post-download-feedback="needs_quality" data-i18n="postDownloadNeedsQuality">
-              O recorte precisa melhorar
-            </button>
-            <button type="button" data-post-download-feedback="needs_catalog_finish" data-i18n="postDownloadNeedsCatalogFinish">
-              Falta fundo e tamanho final
-            </button>
-            <button type="button" data-post-download-feedback="price_not_worth_it" data-i18n="postDownloadPriceNotWorthIt">
-              5 EUR ainda não compensa
-            </button>
-          </div>
-          <p class="post-download-thanks hidden" id="postDownloadThanks" data-i18n="postDownloadThanks">
-            Obrigado. Esta resposta conta para a decisão sobre o próximo passo do BatchCutout.
-          </p>
-        </section>
 
         <section class="lead-capture hidden" id="leadCapturePanel" aria-labelledby="lead-capture-title">
           <div>
