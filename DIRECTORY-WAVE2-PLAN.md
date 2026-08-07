@@ -125,7 +125,11 @@ The Uneed company account `batchcutoutapp` was created with `support@batchcutout
 
 The free Uneed waiting line scheduled publication for 2027-01-04. Paid date selection, fast-track and multi-directory auto-submission were declined. Until launch, the public page shows the product identity and countdown; the full listing content becomes available through Uneed's launch lifecycle.
 
-The AlternativeTo company account `batchcutoutapp` was created with `support@batchcutout.com` on 2026-07-31 and its email was confirmed. Its public profile at `https://alternativeto.net/user/batchcutoutapp/` identifies NexaFlow Labs and describes BatchCutout's ecommerce batch workflow. The application remains unsubmitted because AlternativeTo requires new accounts to be at least seven days old; submission becomes eligible no earlier than 2026-08-07. No paid option was selected and no money was spent.
+The AlternativeTo company account `batchcutoutapp` was created with `support@batchcutout.com` on 2026-07-31 and its email was confirmed. Its public profile at `https://alternativeto.net/user/batchcutoutapp/` identifies NexaFlow Labs and describes BatchCutout's ecommerce batch workflow.
+
+BatchCutout was submitted on 2026-08-07 after the seven-day account gate elapsed. Submission ID: `eb7abd1f-8df4-4b5f-95a3-d730aa960bf3`. The listing includes the tracked AlternativeTo destination, Freemium pricing, purchase and subscription models, English/Portuguese/Spanish support, Online and SaaS platforms, three validated screenshots, the real NexaFlow Labs YouTube workflow and NexaFlow Labs as the Portugal-based author. Remove.bg and PhotoRoom were added as genuine alternatives so the listing is not isolated.
+
+The application is in the normal free review queue, which AlternativeTo currently describes as taking a few months. Only the submitting account can see `https://alternativeto.net/software/batchcutout/` until approval, so do not distribute that URL yet. The paid `Get reviewed sooner` option was not selected and no money was spent.
 
 Product Hunt was not submitted because publishing requires a personal maker account through LinkedIn, GitHub or X, which conflicts with the company-account-only operating rule. Launching Next redirected its submission form through an anti-bot challenge to a 404 page, so no submission was recorded there either.
 
