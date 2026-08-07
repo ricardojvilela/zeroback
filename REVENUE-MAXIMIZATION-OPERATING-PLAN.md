@@ -601,3 +601,11 @@ The authenticated dashboard identified the first interaction with the tool as th
 The main `Testar grátis com 2 imagens` CTA previously scrolled to the upload area and focused the hidden input, requiring a second click on `Selecionar fotos`. It now opens the multiple-image file picker directly from the original user action while preserving the existing completed-test upgrade path. The existing `tool_file_picker_opened` event records `brand_cta` as the source, allowing the effect to be measured without adding another event family.
 
 All 57 automated tests and the static build passed. A clean local origin confirmed that the main CTA opens a multiple-file chooser in one click. Production served the cache-busted script and the direct picker handler after commit `fd0f216`. Ads remain paused, prices and allowances are unchanged, and no commercial email was sent. Compare new upload-zone exposure to file-picker and upload rates after a minimum of seven complete days or 30 new upload-zone visitors, whichever occurs later.
+
+## Shared image delivery optimization - 2026-08-07
+
+A production crawl returned HTTP 200 for all 63 sitemap URLs, with no redirecting or broken sitemap entry. The 63 public HTML pages all have a sitemap entry, a sitemap-aligned canonical URL, a meta description and exactly one H1. All 58 JSON-LD blocks parsed successfully, and the internal-link audit found no unresolved BatchCutout route.
+
+The shared `product-before-after-v5.png` commercial example was 2,016,875 bytes and was referenced 70 times across 46 public pages. An equivalent 1,672 by 941 WebP was generated at 140,136 bytes, reducing transfer size by about 93% while preserving the displayed composition. All public HTML and structured-data references now use the WebP; the original PNG remains available for existing external directory assets and video generation.
+
+A regression test limits the optimized asset to 200 KB and rejects public HTML that reintroduces the heavy PNG. All 58 automated tests and the static build passed. Production confirmed the WebP on the homepage, English and Spanish product-photo landings and pricing page, and served the asset with the correct `image/webp` content type after commit `c61e90e`. No price, offer, campaign, advertisement or email action changed.
