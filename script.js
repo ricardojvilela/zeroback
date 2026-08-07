@@ -5565,8 +5565,8 @@ brandCta.addEventListener("click", () => {
     return;
   }
   dropzone.scrollIntoView({ behavior: "smooth", block: "center" });
-  fileInput.focus({ preventScroll: true });
   trackEvent("brand_cta_clicked");
+  openToolFilePicker("brand_cta");
 });
 inlineProCta.addEventListener("click", () => showProInterest("inline_pro_cta"));
 resultReadyStickyPro?.addEventListener("click", () => {

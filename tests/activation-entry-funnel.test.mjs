@@ -35,6 +35,7 @@ test("measures the activation steps before a visitor selects files", () => {
   assert.match(script, /trackEvent\("tool_file_picker_opened", \{ source \}\)/);
   assert.match(script, /openToolFilePicker\("dropzone_click"\)/);
   assert.match(script, /openToolFilePicker\("primary_upload_button"\)/);
+  assert.match(script, /openToolFilePicker\("brand_cta"\)/);
   assert.match(index, /id="selectPhotosButton"/);
   assert.match(apiTrack, /"tool_dropzone_viewed"/);
   assert.match(apiTrack, /"tool_file_picker_opened"/);
@@ -51,6 +52,17 @@ test("measures the activation steps before a visitor selects files", () => {
   assert.match(admin, /id="dailyFilePickerOpens"/);
   assert.match(admin, /paidEntries >= 3 && dropzoneViews > 0 && filePickerOpens === 0 && uploads === 0/);
   assert.match(admin, /toolViews >= 5 && dropzoneViews === 0/);
+});
+
+test("the main free-test CTA opens the file picker without a second click", () => {
+  const handlerStart = script.indexOf('brandCta.addEventListener("click"');
+  const handlerEnd = script.indexOf('inlineProCta.addEventListener', handlerStart);
+  const handler = script.slice(handlerStart, handlerEnd);
+
+  assert.ok(handlerStart >= 0 && handlerEnd > handlerStart);
+  assert.match(handler, /trackEvent\("brand_cta_clicked"\)/);
+  assert.match(handler, /openToolFilePicker\("brand_cta"\)/);
+  assert.doesNotMatch(handler, /fileInput\.focus/);
 });
 
 test("keeps browser events aligned with the tracking API", () => {
