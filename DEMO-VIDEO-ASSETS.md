@@ -11,7 +11,7 @@ The current public demo is an actual BatchCutout production workflow. It records
 - Input: `assets/demo/headphones-input.png`
 - Downloaded output: `assets/demo/headphones-output.png`
 - Format: H.264 MP4, 1440 x 900, 18.4 seconds, no audio.
-- YouTube: `https://youtu.be/rwLI4TsguXQ`
+- YouTube: `https://youtu.be/u-F4J-idMkY`
 
 ## Where it is used
 

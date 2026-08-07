@@ -7,7 +7,7 @@ Date: 2026-08-07
 The real product workflow is public on the NexaFlow Labs YouTube channel:
 
 ```text
-https://youtu.be/rwLI4TsguXQ
+https://youtu.be/u-F4J-idMkY
 ```
 
 Title: `Real product photo background removal in BatchCutout`
@@ -37,7 +37,7 @@ Test 2 product photos free, with no account or card:
 https://batchcutout.com/?lang=en&utm_source=linkedin&utm_medium=organic_social&utm_campaign=real_demo_aug7#tool
 
 Watch the real workflow:
-https://youtu.be/rwLI4TsguXQ
+https://youtu.be/u-F4J-idMkY
 ```
 
 ## Prepared community reply
