@@ -123,7 +123,7 @@ Startup Stash accepted the ecommerce submission form, then sent only paid listin
 
 The Uneed company account `batchcutoutapp` was created with `support@batchcutout.com`, email-confirmed and used to submit BatchCutout. The product is complete with its logo, `assets/social-preview.png`, `assets/product-before-after-v5.png` and `assets/use-cases-proof.webp`. Its public pre-launch page is `https://www.uneed.best/tool/batchcutout`, and the tracked product destination remains the prepared `utm_source=uneed` launch URL.
 
-The free Uneed waiting line scheduled publication for 2027-01-04. Paid date selection, fast-track and multi-directory auto-submission were declined. Until launch, the public page shows the product identity and countdown; the full listing content becomes available through Uneed's launch lifecycle.
+The free Uneed waiting line initially scheduled publication for 2027-01-04. On 2026-08-03, Uneed emailed `support@batchcutout.com` to say it would not publish BatchCutout because it declines categories it considers saturated or generic. Uneed is therefore rejected, not pending or live. No appeal was sent, paid date selection, fast-track and multi-directory auto-submission remain declined, and no money was spent.
 
 The AlternativeTo company account `batchcutoutapp` was created with `support@batchcutout.com` on 2026-07-31 and its email was confirmed. Its public profile at `https://alternativeto.net/user/batchcutoutapp/` identifies NexaFlow Labs and describes BatchCutout's ecommerce batch workflow.
 
@@ -133,4 +133,4 @@ The application is in the normal free review queue, which AlternativeTo currentl
 
 Product Hunt was not submitted because publishing requires a personal maker account through LinkedIn, GitHub or X, which conflicts with the company-account-only operating rule. Launching Next redirected its submission form through an anti-bot challenge to a 404 page, so no submission was recorded there either.
 
-The operational emails from SaaSHub, Startup Stash, Uneed, Smol Launch and AlternativeTo were reviewed in the authenticated BatchCutout panel and marked resolved. `support@batchcutout.com` ended this action with nine closed messages and zero unresolved messages. No commercial email was sent, no advertisement was activated and no money was spent.
+The authenticated `support@batchcutout.com` inbox was reviewed and contained no customer or buyer reply requiring action. Three non-customer notifications were marked resolved: the Uneed newsletter, Smol Launch weekly newsletter and SitePatent solicitation. Five non-customer operational messages remained unresolved: the Uneed rejection, MEDIAPRONET and CodeTrendy solicitations, and two Smol Launch submission notices. None requires a reply. No commercial email was sent, no advertisement was activated and no money was spent.
