@@ -8,9 +8,10 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const readRepoFile = (relativePath) => readFile(path.join(root, relativePath), "utf8");
 
 test("customer result pages show the real input, output, and recorded browser workflow", async () => {
-  const [portuguese, english, inputAsset, outputAsset, videoAsset, posterAsset] = await Promise.all([
+  const [portuguese, english, sitemap, inputAsset, outputAsset, videoAsset, posterAsset] = await Promise.all([
     readRepoFile("customer-results/index.html"),
     readRepoFile("en/customer-results/index.html"),
+    readRepoFile("sitemap.xml"),
     stat(path.join(root, "assets/demo/headphones-input.png")),
     stat(path.join(root, "assets/demo/headphones-output.png")),
     stat(path.join(root, "assets/video/batchcutout-real-flow-2026-08-07.mp4")),
@@ -23,7 +24,13 @@ test("customer result pages show the real input, output, and recorded browser wo
     assert.match(page, /batchcutout-real-flow-2026-08-07\.mp4/);
     assert.match(page, /"@type": "VideoObject"/);
     assert.match(page, /uploadDate": "2026-08-07"/);
+    assert.match(page, /"embedUrl": "https:\/\/www\.youtube\.com\/embed\/u-F4J-idMkY"/);
   }
+
+  assert.match(sitemap, /xmlns:video="http:\/\/www\.google\.com\/schemas\/sitemap-video\/1\.1"/);
+  assert.equal((sitemap.match(/<video:video>/g) ?? []).length, 2);
+  assert.equal((sitemap.match(/<video:content_loc>https:\/\/batchcutout\.com\/assets\/video\/batchcutout-real-flow-2026-08-07\.mp4<\/video:content_loc>/g) ?? []).length, 2);
+  assert.equal((sitemap.match(/<video:player_loc>https:\/\/www\.youtube\.com\/embed\/u-F4J-idMkY<\/video:player_loc>/g) ?? []).length, 2);
 
   for (const asset of [inputAsset, outputAsset, videoAsset, posterAsset]) {
     assert.ok(asset.size > 100_000, "proof assets must not be empty placeholders");

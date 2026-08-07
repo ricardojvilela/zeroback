@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   <url>
     <loc>https://batchcutout.com/</loc>
     <lastmod>2026-07-21</lastmod>
@@ -171,10 +172,36 @@
   <url>
     <loc>https://batchcutout.com/customer-results/</loc>
     <lastmod>2026-08-07</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://batchcutout.com/assets/video/batchcutout-real-flow-poster.png</video:thumbnail_loc>
+      <video:title>Processamento real de uma foto no BatchCutout</video:title>
+      <video:description>Gravacao encurtada do carregamento, remocao de fundo e download do PNG transparente no BatchCutout.</video:description>
+      <video:content_loc>https://batchcutout.com/assets/video/batchcutout-real-flow-2026-08-07.mp4</video:content_loc>
+      <video:player_loc>https://www.youtube.com/embed/u-F4J-idMkY</video:player_loc>
+      <video:duration>18</video:duration>
+      <video:publication_date>2026-08-07</video:publication_date>
+      <video:family_friendly>yes</video:family_friendly>
+      <video:requires_subscription>no</video:requires_subscription>
+      <video:uploader info="https://batchcutout.com/">NexaFlow Labs</video:uploader>
+      <video:live>no</video:live>
+    </video:video>
   </url>
   <url>
     <loc>https://batchcutout.com/en/customer-results/</loc>
     <lastmod>2026-08-07</lastmod>
+    <video:video>
+      <video:thumbnail_loc>https://batchcutout.com/assets/video/batchcutout-real-flow-poster.png</video:thumbnail_loc>
+      <video:title>Processing a real product photo in BatchCutout</video:title>
+      <video:description>A shortened recording of the upload, background removal, result preview and transparent PNG download in BatchCutout.</video:description>
+      <video:content_loc>https://batchcutout.com/assets/video/batchcutout-real-flow-2026-08-07.mp4</video:content_loc>
+      <video:player_loc>https://www.youtube.com/embed/u-F4J-idMkY</video:player_loc>
+      <video:duration>18</video:duration>
+      <video:publication_date>2026-08-07</video:publication_date>
+      <video:family_friendly>yes</video:family_friendly>
+      <video:requires_subscription>no</video:requires_subscription>
+      <video:uploader info="https://batchcutout.com/">NexaFlow Labs</video:uploader>
+      <video:live>no</video:live>
+    </video:video>
   </url>
   <url>
     <loc>https://batchcutout.com/partners/</loc>
