@@ -26,7 +26,7 @@ Do not position it as a replacement for professional editing, photography, or de
 Use this page when approaching partners:
 
 ```text
-https://batchcutout.com/partners/?utm_source=partner_outreach&utm_medium=email&utm_campaign=partner_first
+https://batchcutout.com/en/partners/?utm_source=partner_outreach&utm_medium=email&utm_campaign=partner_first
 ```
 
 The current partner offer is a pilot:
@@ -53,7 +53,7 @@ https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=partner_referr
 Partner page:
 
 ```text
-https://batchcutout.com/partners/?utm_source=partner_referral&utm_medium=partner&utm_campaign=partner_[name]
+https://batchcutout.com/en/partners/?utm_source=partner_referral&utm_medium=partner&utm_campaign=partner_[name]
 ```
 
 ## First partner email
@@ -67,20 +67,23 @@ Hi,
 
 I saw that you work with ecommerce/product visuals.
 
-We built BatchCutout as a simple batch background remover for product photo workflows. It is not a full design suite; it is focused on repeat cutouts, transparent PNGs, and ZIP export.
+We built BatchCutout as a focused batch background remover for repetitive client and catalog work: transparent PNGs, up to 100 images per batch, and one ZIP export. It is not intended to replace professional photography or detailed retouching.
 
-It may be useful when a client needs to process many simple product shots before final editing, marketplace listing, or catalogue upload.
+We are testing a small tracked partner pilot. Would you be open to testing 2 representative images and telling us whether it could fit your standard or overflow workflow?
+
+Real recorded workflow:
+https://batchcutout.com/en/customer-results/?utm_source=partner_outreach&utm_medium=email&utm_campaign=partner_first_demo
 
 You can test 2 images free here:
 https://batchcutout.com/?utm_source=partner_outreach&utm_medium=email&utm_campaign=partner_first#tool
 
 Partner overview:
-https://batchcutout.com/partners/?utm_source=partner_outreach&utm_medium=email&utm_campaign=partner_first
+https://batchcutout.com/en/partners/?utm_source=partner_outreach&utm_medium=email&utm_campaign=partner_first
 
 If this is not relevant, reply "no thanks" and I will not contact you again.
 
 Thanks,
-Ricardo
+BatchCutout Partnerships
 NexaFlow Labs
 
 ## Promo codes
@@ -104,5 +107,6 @@ Suggested first private code if needed:
 
 - Track partner traffic in `/admin` under Top origens.
 - Keep notes in the prospect CSV.
+- Use a unique `utm_campaign=partner_[name]` for each first contact.
 - Ask converting partners what audience and wording worked.
 - Do not promise commission until attribution and payment flow are stable.

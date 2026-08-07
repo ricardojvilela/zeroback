@@ -2945,13 +2945,27 @@
           email_pet_accessories: `I found ${name} and noticed your pet product photos could benefit from a faster way to create clean, consistent catalog images.`,
           email_custom_gifts: `I found ${name} and noticed your custom product photos could benefit from a faster way to create clean, consistent catalog images.`,
           email_handmade_home: `I found ${name} and noticed your handmade/home decor photos could benefit from a faster way to create clean, consistent catalog images.`,
-          email_partner: "I saw that you work with product photography / ecommerce visuals.",
+          email_partner: `I found ${name} and saw that you work with product photography or ecommerce visuals.`,
         };
         return intros[key] || `I found ${name} and noticed you have product photos that likely need repeat editing for new listings.`;
       }
 
+      function outreachCampaignSlug(value) {
+        return String(value || "")
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9]+/g, "_")
+          .replace(/^_+|_+$/g, "")
+          .slice(0, 48);
+      }
+
       function outreachCampaign(prospect) {
         const key = outreachTemplateKey(prospect).replace(/^email_/, "");
+        if (key === "partner") {
+          const partnerSlug = outreachCampaignSlug(prospect.name);
+          return partnerSlug ? `partner_${partnerSlug}` : "partner_outreach";
+        }
         return key === "store_owner" ? "pack100_first_customers" : key;
       }
 
@@ -2961,7 +2975,7 @@
         const trackedCampaign = campaign === "partner" ? "partner_outreach" : campaign;
         const toolUrl = `https://batchcutout.com/?utm_source=manual_outreach&utm_medium=email&utm_campaign=${trackedCampaign}#tool`;
         const demoUrl = `https://batchcutout.com/en/customer-results/?utm_source=manual_outreach&utm_medium=email&utm_campaign=${trackedCampaign}_demo`;
-        const agencyUrl = `https://batchcutout.com/en/ecommerce-agency-product-photo-workflow/?utm_source=manual_outreach&utm_medium=email&utm_campaign=${trackedCampaign}`;
+        const partnerUrl = `https://batchcutout.com/en/partners/?utm_source=manual_outreach&utm_medium=email&utm_campaign=${trackedCampaign}`;
         const packUrl = `https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=manual_outreach&utm_medium=email&utm_campaign=${trackedCampaign}#pricing-account-title`;
         const proUrl = `https://batchcutout.com/pricing/?checkout_plan=early&utm_source=manual_outreach&utm_medium=email&utm_campaign=${trackedCampaign}#pricing-account-title`;
         const usesDemo = prospect.outreach_variant === "demo_video";
@@ -2971,12 +2985,12 @@
         if (key === "email_partner") {
           return {
             subject: "Batch background removal for ecommerce photo workflows",
-            body: `Hi,\n\n${outreachIntro(prospect)}\n\nBatchCutout is a simple batch background remover for product photo workflows. It is not a full design suite; it is focused on repeat cutouts, transparent PNGs, and ZIP export for client or catalog handoff.${demoBlock}\n\nI made a short agency workflow page here:\n${agencyUrl}\n\nYou can also test 2 images free here, no card needed:\n${toolUrl}\n\nIf it fits the workflow, the lowest-friction paid step is Pack 100: 100 image credits, one purchase, no subscription:\n${packUrl}\n\nFor recurring client/catalog volume, Pro includes 2,000 images/month:\n${proUrl}\n\nIf this is not relevant, reply "no thanks" and I will not contact you again.\n\nThanks,\nRicardo\nNexaFlow Labs`,
+            body: `Hi,\n\n${outreachIntro(prospect)}\n\nBatchCutout is a focused batch background remover for repetitive client and catalog work: transparent PNGs, up to 100 images per batch, and one ZIP export. It is not intended to replace professional photography or detailed retouching.${demoBlock}\n\nWe are testing a small tracked partner pilot. The overview is here:\n${partnerUrl}\n\nWould you be open to testing 2 representative images and telling us whether it could fit your standard or overflow workflow? No account or card is needed:\n${toolUrl}\n\nIf this is not relevant, reply "no thanks" and we will not contact you again.\n\nThanks,\nBatchCutout Partnerships\nNexaFlow Labs`,
           };
         }
         return {
           subject: "Quick way to clean product photos in batches",
-          body: `Hi,\n\n${outreachIntro(prospect)}\n\nBatchCutout removes backgrounds from product photos in batches, exports transparent PNGs, and downloads everything as one ZIP.${demoBlock}\n\nYou can test 2 images free here, no account or card needed:\n${toolUrl}\n\nIf the result fits your store, Pack 100 gives you 100 image credits for 5 EUR in one purchase:\n${packUrl}\n\nIf you need this every month, Pro includes 2,000 images/month:\n${proUrl}\n\nIf this is not relevant, reply "no thanks" and I will not contact you again.\n\nThanks,\nRicardo\nNexaFlow Labs`,
+          body: `Hi,\n\n${outreachIntro(prospect)}\n\nBatchCutout removes backgrounds from product photos in batches, exports transparent PNGs, and downloads everything as one ZIP.${demoBlock}\n\nYou can test 2 images free here, no account or card needed:\n${toolUrl}\n\nIf the result fits your store, Pack 100 gives you 100 image credits for 5 EUR in one purchase:\n${packUrl}\n\nIf you need this every month, Pro includes 2,000 images/month:\n${proUrl}\n\nIf this is not relevant, reply "no thanks" and we will not contact you again.\n\nThanks,\nBatchCutout Team\nNexaFlow Labs`,
         };
       }
 
@@ -2987,9 +3001,9 @@
           ? ` I put together a visual proof page here: https://batchcutout.com/en/customer-results/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${trackedCampaign}_demo`
           : "";
         const agencyLine = campaign === "partner"
-          ? ` Agency workflow page: https://batchcutout.com/en/ecommerce-agency-product-photo-workflow/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${trackedCampaign}`
+          ? ` Partner pilot: https://batchcutout.com/en/partners/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${trackedCampaign}`
           : "";
-        return `Hi, ${outreachIntro(prospect)} BatchCutout removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP.${demoLine}${agencyLine} You can test 2 images free, no account or card needed: https://batchcutout.com/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${trackedCampaign}#tool If it fits, Pack 100 is 5 EUR for 100 image credits, one purchase, no subscription: https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${trackedCampaign}#pricing-account-title - Ricardo, NexaFlow Labs`;
+        return `Hi, ${outreachIntro(prospect)} BatchCutout removes backgrounds from product photos in batches and exports transparent PNGs or one ZIP.${demoLine}${agencyLine} You can test 2 images free, no account or card needed: https://batchcutout.com/?utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${trackedCampaign}#tool If it fits, Pack 100 is 5 EUR for 100 image credits, one purchase, no subscription: https://batchcutout.com/pricing/?checkout_plan=pack100&utm_source=manual_outreach&utm_medium=contact_form&utm_campaign=${trackedCampaign}#pricing-account-title - BatchCutout Team, NexaFlow Labs`;
       }
 
       function outreachStatusLabel(status) {

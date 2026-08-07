@@ -3,24 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Product Photo Results | BatchCutout</title>
+    <title>Real Product Photo Before and After | BatchCutout</title>
     <meta
       name="description"
-      content="See how BatchCutout turns ecommerce product photos into transparent PNGs and ZIP exports for store and marketplace workflows."
+      content="See one photo processed in BatchCutout, the downloaded transparent PNG, and a real recording of the complete browser workflow."
     />
     <meta property="og:title" content="BatchCutout product photo results" />
-    <meta property="og:image" content="https://batchcutout.com/assets/social-preview.png" />
+    <meta property="og:image" content="https://batchcutout.com/assets/video/batchcutout-real-flow-poster.png" />
     <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:image:width" content="1440" />
+    <meta property="og:image:height" content="900" />
     <meta
       property="og:image:alt"
-      content="BatchCutout before and after product photo background removal preview."
+      content="BatchCutout showing a processed headphones photo ready to download as a transparent PNG."
     />
     <meta name="twitter:card" content="summary_large_image" />
     <meta
       property="og:description"
-      content="Visual proof of batch background removal for ecommerce product photos."
+      content="A real BatchCutout before and after plus a recording of the browser workflow."
     />
     <meta property="og:url" content="https://batchcutout.com/en/customer-results/" />
     <meta property="og:type" content="website" />
@@ -47,22 +47,36 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "WebPage",
-        "name": "BatchCutout product photo results",
-        "url": "https://batchcutout.com/en/customer-results/",
-        "publisher": {
-          "@type": "Organization",
-          "name": "NexaFlow Labs"
-        },
-        "about": {
-          "@type": "SoftwareApplication",
-          "name": "BatchCutout",
-          "applicationCategory": "MultimediaApplication",
-          "operatingSystem": "Web"
-        }
+        "@graph": [
+          {
+            "@type": "WebPage",
+            "name": "Real BatchCutout before and after",
+            "url": "https://batchcutout.com/en/customer-results/",
+            "publisher": {
+              "@type": "Organization",
+              "name": "NexaFlow Labs"
+            },
+            "about": {
+              "@type": "SoftwareApplication",
+              "name": "BatchCutout",
+              "applicationCategory": "MultimediaApplication",
+              "operatingSystem": "Web"
+            }
+          },
+          {
+            "@type": "VideoObject",
+            "name": "Processing a real product photo in BatchCutout",
+            "description": "A shortened recording of the upload, background removal, result preview, and transparent PNG download in BatchCutout.",
+            "thumbnailUrl": "https://batchcutout.com/assets/video/batchcutout-real-flow-poster.png",
+            "uploadDate": "2026-08-07",
+            "contentUrl": "https://batchcutout.com/assets/video/batchcutout-real-flow-2026-08-07.mp4",
+            "duration": "PT18S",
+            "embedUrl": "https://batchcutout.com/en/customer-results/#real-demo"
+          }
+        ]
       }
     </script>
-    <link rel="stylesheet" href="../../styles.css?v=20260705-launch" />
+    <link rel="stylesheet" href="../../styles.css?v=20260807-real-proof" />
     <script defer src="/_vercel/insights/script.js"></script>
   </head>
   <body class="landing-page">
@@ -81,11 +95,11 @@
 
       <section class="landing-hero">
         <div class="landing-copy">
-          <p class="section-kicker">Visual proof</p>
-          <h1>Cleaner product photos for ecommerce workflows</h1>
+          <p class="section-kicker">Real product test</p>
+          <h1>From the original photo to a transparent PNG</h1>
           <p>
-            BatchCutout turns repeated product-photo batches into transparent PNGs
-            and organized ZIP exports for stores, marketplaces and catalog teams.
+            This is the same photo before and after it was processed in BatchCutout.
+            The file on the right is the transparent PNG downloaded from the tool.
           </p>
           <div class="landing-actions">
             <a
@@ -100,44 +114,74 @@
             >100 image pack</a>
           </div>
         </div>
-        <figure class="landing-visual">
-          <img src="../../assets/product-before-after-v5.png" alt="Before and after product photo background removal in BatchCutout" />
+        <figure class="landing-real-pair">
+          <div class="landing-real-frame">
+            <span>Original photo</span>
+            <img src="../../assets/demo/headphones-input.png" alt="Original headphones photo on a cluttered desk" />
+          </div>
+          <div class="landing-real-frame is-transparent">
+            <span>Downloaded PNG</span>
+            <img src="../../assets/demo/headphones-output.png" alt="Headphones with the background removed by BatchCutout" />
+          </div>
+          <figcaption>The same image, processed locally in the browser on August 7, 2026.</figcaption>
         </figure>
+      </section>
+
+      <section class="landing-video-section" id="real-demo" aria-labelledby="real-demo-title">
+        <div>
+          <p class="section-kicker">Recorded workflow</p>
+          <h2 id="real-demo-title">Watch the processing happen</h2>
+          <p>
+            The recording shows the real page: selecting the photo, removing the background,
+            previewing the result, and downloading the PNG. There is no animated scan line
+            or simulated swap between two finished images. Idle periods were removed and
+            the remaining waiting sections were accelerated 2x.
+          </p>
+          <ul class="landing-video-facts">
+            <li>One photo from upload through download.</li>
+            <li>Processing runs in the browser.</li>
+            <li>The result is available as a transparent PNG.</li>
+          </ul>
+        </div>
+        <video controls playsinline preload="metadata" poster="../../assets/video/batchcutout-real-flow-poster.png">
+          <source src="../../assets/video/batchcutout-real-flow-2026-08-07.mp4" type="video/mp4" />
+          Your browser does not support this video.
+        </video>
       </section>
 
       <section class="landing-result-section" aria-labelledby="english-result-proof-title">
         <div class="landing-result-copy">
-          <p class="section-kicker">Ecommerce proof</p>
-          <h2 id="english-result-proof-title">The result should feel ready for store assets</h2>
+          <p class="section-kicker">What was validated</p>
+          <h2 id="english-result-proof-title">A reusable product cutout</h2>
           <p>
-            The proof page focuses on the commercial output: background removal, visual consistency
-            and batch export for product pages, marketplace listings and catalog handoff.
+            The desk background was removed and the product was isolated. The PNG can be placed
+            on white, on a brand color, or inside a marketplace composition.
           </p>
           <ul class="landing-result-list">
-            <li>Test 2 real product photos without a card.</li>
-            <li>Validate transparent PNG output before paying.</li>
-            <li>Buy the 100 image pack when you need to process a real batch.</li>
+            <li>Test 2 of your own images without an account or card.</li>
+            <li>Inspect the edges and openings inside the product.</li>
+            <li>Buy credits only after validating the result.</li>
           </ul>
           <div class="landing-actions">
             <a
               class="landing-button"
               href="/?lang=en&utm_source=customer_results&utm_medium=proof&utm_campaign=static_results#tool"
               data-preserve-utm
-            >Try real photos</a>
+            >Try your own photos</a>
             <a
               class="landing-secondary"
               href="/pricing/?lang=en&checkout_plan=pack100&utm_source=customer_results&utm_medium=proof&utm_campaign=static_results#pricing-account-title"
               data-preserve-utm
-            >Compare Pro</a>
+            >100 image pack</a>
           </div>
         </div>
-        <figure class="landing-result-visual">
+        <figure class="landing-result-visual landing-real-frame is-transparent">
           <img
-            src="../../assets/use-cases-proof.webp"
-            alt="Examples of product photos before and after background removal"
+            src="../../assets/demo/headphones-output.png"
+            alt="Transparent headphones PNG downloaded from BatchCutout"
             loading="lazy"
           />
-          <figcaption>Product photos prepared for catalog, marketplace and ecommerce visual workflows.</figcaption>
+          <figcaption>The PNG downloaded at the end of the recording above. Quality can vary by photo and product.</figcaption>
         </figure>
       </section>
 
@@ -155,18 +199,18 @@
           <p>Download one ZIP when the processed batch needs to be reviewed, delivered or uploaded.</p>
         </article>
         <article>
-          <strong>Real proof policy</strong>
-          <p>Customer examples are published only with explicit permission for image use.</p>
+          <strong>Verifiable proof</strong>
+          <p>The input photo, downloaded PNG, and workflow recording are all published on this page.</p>
         </article>
       </section>
 
       <section class="landing-panel">
         <div>
-          <p class="section-kicker">Start</p>
-          <h2>Use your own product photos as the test</h2>
+          <p class="section-kicker">Decisive test</p>
+          <h2>Check quality with your own product photos</h2>
           <p>
-            The practical test is stronger than a demo: upload two real photos, inspect the output,
-            then buy the 100 image pack if the workflow saves repeated editing time.
+            The example proves the workflow, but the most reliable test is to use two products that
+            represent your catalog. No account or card is required.
           </p>
         </div>
         <a

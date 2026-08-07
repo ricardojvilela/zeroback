@@ -1,61 +1,48 @@
-# BatchCutout - demo video assets
+# BatchCutout - real demo assets
 
-Updated: 2026-07-02
+Updated: 2026-08-07
 
-## Files
+## Current proof
 
-Horizontal website/email version:
+The current public demo is an actual BatchCutout production workflow. It records upload, processing, result preview and PNG download. Idle periods were removed and waiting sections were accelerated 2x; the image transformation itself is not simulated.
 
-- Local: `assets/video/batchcutout-demo-horizontal.mp4`
-- Public: `https://batchcutout.com/assets/video/batchcutout-demo-horizontal.mp4?v=20260702-no-sweep`
-- Poster: `assets/video/batchcutout-demo-horizontal-poster.png`
-- Format: 1920 x 1080, about 22 seconds, no audio.
-
-Vertical social version:
-
-- Local: `assets/video/batchcutout-demo-vertical.mp4`
-- Public: `https://batchcutout.com/assets/video/batchcutout-demo-vertical.mp4?v=20260702-no-sweep`
-- Poster: `assets/video/batchcutout-demo-vertical-poster.png`
-- Format: 1080 x 1920, about 22 seconds, no audio.
-
-Generation script:
-
-- `tools/create-demo-video.mjs`
-- Requires temporary local packages: `playwright-core` and `@ffmpeg-installer/ffmpeg`.
-- It uses Chrome and the existing `assets/product-before-after-v5.png` image.
+- Video: `assets/video/batchcutout-real-flow-2026-08-07.mp4`
+- Poster: `assets/video/batchcutout-real-flow-poster.png`
+- Input: `assets/demo/headphones-input.png`
+- Downloaded output: `assets/demo/headphones-output.png`
+- Format: H.264 MP4, 1440 x 900, 18.4 seconds, no audio.
+- YouTube: `https://youtu.be/rwLI4TsguXQ`
 
 ## Where it is used
 
-- The horizontal MP4 is embedded on `/customer-results/`.
-- `/admin` outreach templates link to `/customer-results/` when a prospect has `outreach_variant=demo_video`.
-- The current 13 ready direct-email prospects are staged with `outreach_variant=demo_video`.
-- Use the vertical MP4 for short-form social posts or direct social messages.
-- Do not attach video files to cold outreach emails while the domain is warming. Prefer linking to the public page or video URL.
+- `/customer-results/`
+- `/en/customer-results/`
+- `/partners/`
+- `/en/partners/`
+- Partner outreach rows marked `outreach_variant=demo_video`.
 
-## Email line
+The proof pages show the original image and the exact downloaded transparent PNG beside the recording. They also state that final quality depends on contrast, shadows and edge complexity.
 
-Short line for manual outreach:
+## Distribution links
 
-> I also made a 22-second demo so you can see the flow before testing it: https://batchcutout.com/customer-results/
+YouTube description:
 
-For measurable manual outreach, use:
+```text
+https://batchcutout.com/?lang=en&utm_source=youtube&utm_medium=organic_video&utm_campaign=real_demo_aug7#tool
+```
 
-`https://batchcutout.com/customer-results/?utm_source=manual_outreach&utm_medium=email&utm_campaign=[niche]_demo`
+Proof page:
 
-## LinkedIn / social caption
+```text
+https://batchcutout.com/en/customer-results/?utm_source=youtube&utm_medium=organic_video&utm_campaign=real_demo_aug7
+```
 
-BatchCutout removes backgrounds from product photos in batches.
+Partner outreach must use a separate campaign per partner:
 
-Free test: 2 images, no card needed.
-Pro: 100 images per batch and 2,000 per month.
+```text
+https://batchcutout.com/en/customer-results/?utm_source=manual_outreach&utm_medium=email&utm_campaign=partner_[name]_demo
+```
 
-https://batchcutout.com/
+## Legacy assets
 
-## Portuguese caption
-
-O BatchCutout remove fundos de fotos de produto em lote.
-
-Teste grátis: 2 imagens, sem cartão.
-Pro: 100 imagens por lote e 2.000 por mês.
-
-https://batchcutout.com/
+The earlier generated horizontal and vertical demos remain in `assets/video/` for historical reference but are not the current proof and should not be distributed. They must not replace the real recording on public pages.
