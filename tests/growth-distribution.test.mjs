@@ -48,8 +48,8 @@ test("partner pilot is available in Portuguese and English without an unsupporte
   assert.match(admin, /function outreachCampaignSlug/);
   assert.match(admin, /return partnerSlug \? `partner_\$\{partnerSlug\}` : "partner_outreach"/);
   assert.match(admin, /Would you be open to testing 2 representative images/);
-  assert.match(prospects, /137,90,Product Photography UK,[^\n]+,ready,email_partner,send_domain_email/);
-  assert.match(prospects, /142,92,27n,[^\n]+,ready,email_partner,send_domain_email/);
+  assert.match(prospects, /137,90,Product Photography UK,[^\n]+,sent_2026-08-07,email_partner,watch_replies/);
+  assert.match(prospects, /142,92,27n,[^\n]+,sent_2026-08-07,email_partner,watch_replies/);
 });
 
 test("IndexNow submission uses the deployed ownership key and sitemap-only URLs", async () => {

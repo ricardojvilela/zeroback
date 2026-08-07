@@ -57,3 +57,16 @@ I work on BatchCutout, which handles that batch cutout and ZIP step in the brows
 - No direct link where community rules prohibit solicitation.
 - Never use Ricardo's personal identity or email for distribution.
 - Measure visits, file-picker opens, uploads and completed tests by UTM source before repeating a channel.
+
+## Partner outreach sent
+
+One first-contact email was sent from `support@batchcutout.com` to each verified business contact on 2026-08-07:
+
+- Product Photography UK
+- Watermill Studio
+- MO Studios
+- Studio Uppix
+- Shooting Ecommerce
+- 27n
+
+Every email used a partner-specific UTM campaign, linked to the real proof page, requested only a two-image workflow test and included a clear opt-out. No follow-up is scheduled; monitor replies and do not send a second message without a separate decision.
