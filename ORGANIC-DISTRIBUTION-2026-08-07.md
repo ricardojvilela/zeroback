@@ -18,6 +18,8 @@ The description links to the free test and proof page with `utm_source=youtube`,
 
 IndexNow is integrated through `tools/submit-indexnow.mjs` and the existing public key file. The sitemap contains the Portuguese and English proof and partner pages. Submit the changed URLs immediately after production deployment.
 
+On 2026-08-10, IndexNow accepted a fresh submission with HTTP 200 for the homepage, both customer-results pages, both partner pages and the English product-photo landing. Do not resubmit these URLs until their public content changes again.
+
 The Portuguese and English proof pages expose the real workflow as a `VideoObject`. Their `embedUrl` now points to the NexaFlow Labs YouTube player, rather than back to the host page, and the main sitemap includes the Google video extension with the public MP4, thumbnail, duration and player URL for both pages.
 
 Bing Webmaster Tools was not connected because the account chooser exposed only Ricardo's personal Google account. No personal account was used. IndexNow does not depend on the Bing dashboard connection.
