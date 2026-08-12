@@ -609,3 +609,13 @@ A production crawl returned HTTP 200 for all 63 sitemap URLs, with no redirectin
 The shared `product-before-after-v5.png` commercial example was 2,016,875 bytes and was referenced 70 times across 46 public pages. An equivalent 1,672 by 941 WebP was generated at 140,136 bytes, reducing transfer size by about 93% while preserving the displayed composition. All public HTML and structured-data references now use the WebP; the original PNG remains available for existing external directory assets and video generation.
 
 A regression test limits the optimized asset to 200 KB and rejects public HTML that reintroduces the heavy PNG. All 58 automated tests and the static build passed. Production confirmed the WebP on the homepage, English and Spanish product-photo landings and pricing page, and served the asset with the correct `image/webp` content type after commit `c61e90e`. No price, offer, campaign, advertisement or email action changed.
+
+## Controlled Google Ads activation test - 2026-08-12
+
+The authenticated `BATCH CUT OUT` Google Ads account confirmed that the 250 EUR conversion-tracking promotion is active and financing campaigns. It had used 101.34 EUR, leaving approximately 148.66 EUR, with credit expiry on 2026-09-19. The separate 400 EUR spend promotion remained processing after its criteria were met.
+
+Following explicit approval, only `Search - BatchCutout - Alternatives` was reactivated and its budget was changed from 2 EUR/day to 5 EUR/day. `Search - BatchCutout - Pro Launch` and `Campaign #1` remain paused. The MarginWatch campaign belongs to another project and was not changed.
+
+The test is capped at 14 days and 70 EUR, fully within the confirmed promotional balance at activation. It must stop earlier when its accumulated cost reaches 70 EUR, when 30 new upload-zone visitors have been collected, when the promotion stops financing the campaign or becomes insufficient, or at the 2026-08-26 daily review. No ad, keyword, bid or targeting change is authorized during this measurement window. The daily automation now monitors the campaign and is authorized to perform only this exact pause.
+
+The 2026-08-12 pre-activation baseline was zero same-day activity. Across the prior post-CTA period beginning 2026-08-07, 12 upload-zone exposures produced zero file-picker opens or uploads. New paid traffic must therefore be measured separately from that baseline through tool view, upload-zone exposure, file-picker open, upload, completed free test, download, Pack intent, Stripe session and purchase.
