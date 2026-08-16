@@ -10,6 +10,10 @@ const landingTrackSource = await readFile(path.join(repoRoot, "landing-track.js"
 const trackSource = await readFile(path.join(repoRoot, "api", "track.js"), "utf8");
 const statsSource = await readFile(path.join(repoRoot, "api", "stats.js"), "utf8");
 const adminSource = await readFile(path.join(repoRoot, "admin.html"), "utf8");
+const removeBgAlternativeSource = await readFile(
+  path.join(repoRoot, "en", "remove-bg-alternative-for-bulk-product-photos", "index.html"),
+  "utf8",
+);
 
 function storage() {
   const values = new Map();
@@ -124,6 +128,11 @@ test("paid English bulk landing sends search traffic directly to the upload tool
   assert.equal(target.searchParams.get("utm_content"), "search");
   assert.equal(target.searchParams.get("gclid"), "test-click");
   assert.equal(target.hash, "#tool");
+});
+
+test("active remove.bg campaign landing enables the direct paid upload path", () => {
+  assert.match(removeBgAlternativeSource, /data-paid-direct-tool="\/\?lang=en#tool"/);
+  assert.match(removeBgAlternativeSource, /landing-track\.js\?v=20260727-paid-direct-tool/);
 });
 
 test("organic visitors remain on the English bulk landing", () => {
