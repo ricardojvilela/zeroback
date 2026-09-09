@@ -24,17 +24,21 @@ test("offers a persistent white-background export for social media", async () =>
   assert.match(script, /safeLocalStorageSet\(exportBackgroundStorageKey, exportBackground\)/);
 });
 
-test("flattens transparent pixels onto opaque white before social export", async () => {
+test("keeps transparent exports alpha-safe and offers opaque white social exports", async () => {
   const script = await readFile(path.join(root, "script.js"), "utf8");
   const helperStart = script.indexOf("async function preparePngForExport");
   const helperEnd = script.indexOf("function triggerBlobDownload", helperStart);
   const helper = script.slice(helperStart, helperEnd);
 
   assert.ok(helperStart >= 0 && helperEnd > helperStart);
-  assert.match(helper, /if \(!isWhiteBackgroundExport\(background\)\) return blob/);
-  assert.match(helper, /context\.fillStyle = "#ffffff"/);
-  assert.ok(helper.indexOf("context.fillRect") < helper.indexOf("context.drawImage"));
-  assert.match(helper, /canvas\.toBlob[\s\S]*"image\/png"/);
+  assert.match(helper, /if \(!isWhiteBackgroundExport\(background\)\) return addWhitePngBackgroundHint\(blob\)/);
+  assert.match(helper, /function addWhitePngBackgroundHint\(blob\)/);
+  assert.match(helper, /new Uint8Array\(\[98, 75, 71, 68\]\)/);
+  const opaqueHelperStart = helper.indexOf("async function prepareOpaqueWhitePng");
+  const opaqueHelper = helper.slice(opaqueHelperStart);
+  assert.match(opaqueHelper, /context\.fillStyle = "#ffffff"/);
+  assert.ok(opaqueHelper.indexOf("context.fillRect") < opaqueHelper.indexOf("context.drawImage"));
+  assert.match(helper, /function canvasToPngBlob[\s\S]*canvas\.toBlob[\s\S]*"image\/png"/);
 });
 
 test("applies the selected background to individual and ZIP downloads", async () => {

@@ -566,7 +566,7 @@ const baseTranslation = {
   exportBackgroundLabel: "Fundo da exportação",
   exportBackgroundTransparent: "Transparente",
   exportBackgroundWhite: "Branco para redes sociais",
-  exportBackgroundHint: "Para Facebook e Instagram, escolha fundo branco para evitar que a transparência apareça preta.",
+  exportBackgroundHint: "O PNG transparente continua adequado ao Shopify. Algumas redes ignoram o fundo sugerido; descarregue a cópia branca quando precisar de o garantir.",
   statusWhitePngReady: "PNG com fundo branco pronto",
   statusExportUnavailable: "Não foi possível preparar a exportação. Tente novamente.",
   cookieText: "Usamos medição simples para perceber visitas e adesões pagas. Pode aceitar ou continuar sem medição.",
@@ -1042,7 +1042,7 @@ const translations = {
     exportBackgroundLabel: "Export background",
     exportBackgroundTransparent: "Transparent",
     exportBackgroundWhite: "White for social media",
-    exportBackgroundHint: "For Facebook and Instagram, choose white to prevent transparency from appearing black.",
+    exportBackgroundHint: "The transparent PNG stays ready for Shopify. Some networks ignore the suggested background; download the white copy when you need it guaranteed.",
     statusWhitePngReady: "White-background PNG ready",
     statusExportUnavailable: "We could not prepare the export. Try again.",
   },
@@ -1096,7 +1096,7 @@ const translations = {
     exportBackgroundLabel: "Fondo de exportación",
     exportBackgroundTransparent: "Transparente",
     exportBackgroundWhite: "Blanco para redes sociales",
-    exportBackgroundHint: "Para Facebook e Instagram, elige fondo blanco para evitar que la transparencia aparezca negra.",
+    exportBackgroundHint: "El PNG transparente sigue listo para Shopify. Algunas redes ignoran el fondo sugerido; descarga la copia blanca cuando necesites garantizarlo.",
     statusWhitePngReady: "PNG con fondo blanco listo",
     statusExportUnavailable: "No se pudo preparar la exportación. Inténtalo de nuevo.",
     passwordShow: "Mostrar",
@@ -4456,8 +4456,118 @@ function exportZipName(background = exportBackground) {
 }
 
 async function preparePngForExport(blob, background = exportBackground) {
-  if (!isWhiteBackgroundExport(background)) return blob;
+  if (!isWhiteBackgroundExport(background)) return addWhitePngBackgroundHint(blob);
+  return prepareOpaqueWhitePng(blob);
+}
 
+function canvasToPngBlob(canvas) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((exportBlob) => {
+      if (exportBlob) {
+        resolve(exportBlob);
+      } else {
+        reject(new Error("PNG export failed"));
+      }
+    }, "image/png");
+  });
+}
+
+function readPngUint32(bytes, offset) {
+  return (
+    (((bytes[offset] << 24) >>> 0)
+      | (bytes[offset + 1] << 16)
+      | (bytes[offset + 2] << 8)
+      | bytes[offset + 3]) >>> 0
+  );
+}
+
+function writePngUint32(bytes, offset, value) {
+  bytes[offset] = (value >>> 24) & 0xff;
+  bytes[offset + 1] = (value >>> 16) & 0xff;
+  bytes[offset + 2] = (value >>> 8) & 0xff;
+  bytes[offset + 3] = value & 0xff;
+}
+
+function pngCrc32(bytes) {
+  let crc = 0xffffffff;
+  for (const byte of bytes) {
+    crc ^= byte;
+    for (let bit = 0; bit < 8; bit += 1) {
+      crc = (crc >>> 1) ^ (crc & 1 ? 0xedb88320 : 0);
+    }
+  }
+  return (crc ^ 0xffffffff) >>> 0;
+}
+
+function createPngChunk(typeBytes, data) {
+  const chunk = new Uint8Array(12 + data.length);
+  writePngUint32(chunk, 0, data.length);
+  chunk.set(typeBytes, 4);
+  chunk.set(data, 8);
+
+  const crcInput = new Uint8Array(typeBytes.length + data.length);
+  crcInput.set(typeBytes);
+  crcInput.set(data, typeBytes.length);
+  writePngUint32(chunk, 8 + data.length, pngCrc32(crcInput));
+  return chunk;
+}
+
+async function addWhitePngBackgroundHint(blob) {
+  // bKGD is only a viewer hint, so the transparent export remains the source of truth.
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+  const pngSignature = [137, 80, 78, 71, 13, 10, 26, 10];
+  if (!pngSignature.every((byte, index) => bytes[index] === byte)) return blob;
+  if (bytes.length < 33 || readPngUint32(bytes, 8) !== 13) return blob;
+  if (bytes[12] !== 73 || bytes[13] !== 72 || bytes[14] !== 68 || bytes[15] !== 82) return blob;
+
+  const bitDepth = bytes[24];
+  const colorType = bytes[25];
+  if (colorType !== 6 || ![8, 16].includes(bitDepth)) return blob;
+
+  let insertAt = null;
+  let offset = 8;
+  while (offset + 12 <= bytes.length) {
+    const dataLength = readPngUint32(bytes, offset);
+    const chunkEnd = offset + 12 + dataLength;
+    if (chunkEnd > bytes.length) return blob;
+
+    const isBackgroundChunk = bytes[offset + 4] === 98
+      && bytes[offset + 5] === 75
+      && bytes[offset + 6] === 71
+      && bytes[offset + 7] === 68;
+    if (isBackgroundChunk) return blob;
+
+    const isImageDataChunk = bytes[offset + 4] === 73
+      && bytes[offset + 5] === 68
+      && bytes[offset + 6] === 65
+      && bytes[offset + 7] === 84;
+    if (isImageDataChunk) {
+      insertAt = offset;
+      break;
+    }
+    offset = chunkEnd;
+  }
+
+  if (insertAt === null) return blob;
+
+  const maxSample = bitDepth === 16 ? 0xffff : (1 << bitDepth) - 1;
+  const background = new Uint8Array([
+    maxSample >>> 8,
+    maxSample & 0xff,
+    maxSample >>> 8,
+    maxSample & 0xff,
+    maxSample >>> 8,
+    maxSample & 0xff,
+  ]);
+  const backgroundChunk = createPngChunk(new Uint8Array([98, 75, 71, 68]), background);
+  const hintedBytes = new Uint8Array(bytes.length + backgroundChunk.length);
+  hintedBytes.set(bytes.subarray(0, insertAt));
+  hintedBytes.set(backgroundChunk, insertAt);
+  hintedBytes.set(bytes.subarray(insertAt), insertAt + backgroundChunk.length);
+  return new Blob([hintedBytes], { type: "image/png" });
+}
+
+async function prepareOpaqueWhitePng(blob) {
   const bitmap = await createImageBitmap(blob);
   const canvas = document.createElement("canvas");
   canvas.width = bitmap.width;
@@ -4469,20 +4579,14 @@ async function preparePngForExport(blob, background = exportBackground) {
     throw new Error("Canvas export context unavailable");
   }
 
-  context.fillStyle = "#ffffff";
-  context.fillRect(0, 0, canvas.width, canvas.height);
-  context.drawImage(bitmap, 0, 0);
-  bitmap.close?.();
-
-  return new Promise((resolve, reject) => {
-    canvas.toBlob((exportBlob) => {
-      if (exportBlob) {
-        resolve(exportBlob);
-      } else {
-        reject(new Error("PNG export failed"));
-      }
-    }, "image/png");
-  });
+  try {
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(bitmap, 0, 0);
+    return canvasToPngBlob(canvas);
+  } finally {
+    bitmap.close?.();
+  }
 }
 
 function triggerBlobDownload(blob, filename) {
