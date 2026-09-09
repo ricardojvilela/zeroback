@@ -439,6 +439,29 @@
           <div class="grid" id="imageGrid"></div>
         </section>
 
+        <fieldset class="export-background hidden" id="exportBackground">
+          <legend data-i18n="exportBackgroundLabel">Fundo da exportação</legend>
+          <div class="export-background-options">
+            <label class="export-background-option">
+              <input type="radio" name="exportBackground" value="transparent" checked />
+              <span class="export-background-option-content">
+                <span class="export-background-swatch is-transparent" aria-hidden="true"></span>
+                <span data-i18n="exportBackgroundTransparent">Transparente</span>
+              </span>
+            </label>
+            <label class="export-background-option">
+              <input type="radio" name="exportBackground" value="white" />
+              <span class="export-background-option-content">
+                <span class="export-background-swatch is-white" aria-hidden="true"></span>
+                <span data-i18n="exportBackgroundWhite">Branco para redes sociais</span>
+              </span>
+            </label>
+          </div>
+          <p class="export-background-hint" data-i18n="exportBackgroundHint">
+            Para Facebook e Instagram, escolha fundo branco para evitar que a transparência apareça preta.
+          </p>
+        </fieldset>
+
         <div class="actions">
           <button id="processButton" type="button" disabled data-i18n="removeBackgrounds">
             Remover fundos
@@ -748,7 +771,7 @@
       </section>
     </main>
 
-    <script type="module" src="./script.js?v=20260807-direct-free-test"></script>
+    <script type="module" src="./script.js?v=20260909-social-export"></script>
   </body>
 </html>
 

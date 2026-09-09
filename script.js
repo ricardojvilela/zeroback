@@ -83,6 +83,8 @@ const proSubscriberPromoBlocks = document.querySelectorAll("[data-pro-subscriber
 const processButton = document.querySelector("#processButton");
 const pngButton = document.querySelector("#pngButton");
 const zipButton = document.querySelector("#zipButton");
+const exportBackgroundFieldset = document.querySelector("#exportBackground");
+const exportBackgroundOptions = Array.from(document.querySelectorAll('input[name="exportBackground"]'));
 const actionsPackCta = document.querySelector("#actionsPackCta");
 const downloadReadyHint = document.querySelector("#downloadReadyHint");
 const clearButton = document.querySelector("#clearButton");
@@ -212,6 +214,8 @@ const leadCaptureEmailStorageKey = "batchcutout_lead_capture_email";
 const leadCaptureDismissedStorageKey = "batchcutout_lead_capture_dismissed";
 const pendingCheckoutPlanStorageKey = "batchcutout_pending_checkout_plan";
 const freeTestUsageStorageKey = "batchcutout_free_test_images_used";
+const exportBackgroundStorageKey = "batchcutout_export_background";
+const supportedExportBackgrounds = new Set(["transparent", "white"]);
 const localizedPolicyLinks = {
   pt: "/privacidade",
   en: "/en/privacy",
@@ -383,6 +387,7 @@ const serverEventNames = new Set([
   "tool_processing_completed",
   "tool_engine_load_failed",
   "tool_zip_generation_failed",
+  "tool_export_generation_failed",
   "tool_download_png",
   "tool_download_zip",
   "post_download_next_shown",
@@ -553,9 +558,17 @@ const baseTranslation = {
   resultReadyStickyProCta: "Comprar 100 - 5 EUR",
   resultReadyStickySaveCta: "Receber link",
   benefitsLabel: "Vantagens do serviço",
-  benefitPng: "PNG transparente",
+  benefitPng: "Transparente ou fundo branco",
   benefitZip: "ZIP pronto para loja",
   fileSuffix: "sem-fundo",
+  whiteBackgroundFileSuffix: "fundo-branco",
+  whiteBackgroundZipFilename: "fotos-fundo-branco.zip",
+  exportBackgroundLabel: "Fundo da exportação",
+  exportBackgroundTransparent: "Transparente",
+  exportBackgroundWhite: "Branco para redes sociais",
+  exportBackgroundHint: "Para Facebook e Instagram, escolha fundo branco para evitar que a transparência apareça preta.",
+  statusWhitePngReady: "PNG com fundo branco pronto",
+  statusExportUnavailable: "Não foi possível preparar a exportação. Tente novamente.",
   cookieText: "Usamos medição simples para perceber visitas e adesões pagas. Pode aceitar ou continuar sem medição.",
   cookieAccept: "Aceitar medição",
   cookieDecline: "Continuar sem medição",
@@ -731,7 +744,7 @@ const translations = {
     languageLabel: "Idioma",
     eyebrow: "Remoção de fundo em massa",
     title: "BatchCutout",
-    lead: "Teste gr\u00e1tis: remova o fundo de {limit} imagens no total. Descarregue PNGs transparentes ou um ZIP pronto para loja.",
+    lead: "Teste gr\u00e1tis: remova o fundo de {limit} imagens no total. Exporte com transparência ou fundo branco para redes sociais.",
     benefitBatch: "V\u00e1rias fotos de uma vez",
     uploadLabel: "Carregar fotos",
     startNow: "Começar agora",
@@ -988,10 +1001,10 @@ const translations = {
     resultReadyStickySaveCta: "Get link",
     eyebrow: "Bulk background removal",
     title: "BatchCutout",
-    lead: "Free test: remove the background from {limit} images total. Download transparent PNGs or a store-ready ZIP.",
+    lead: "Free test: remove the background from {limit} images total. Export with transparency or a social-ready white background.",
     benefitsLabel: "Service benefits",
     benefitBatch: "Multiple photos at once",
-    benefitPng: "Transparent PNG",
+    benefitPng: "Transparent or white background",
     benefitZip: "Store-ready ZIP",
     uploadLabel: "Upload photos",
     startNow: "Start now",
@@ -1024,6 +1037,14 @@ const translations = {
     statusPngReady: "PNG ready",
     zipFilename: "background-removed-photos.zip",
     fileSuffix: "background-removed",
+    whiteBackgroundFileSuffix: "white-background",
+    whiteBackgroundZipFilename: "white-background-photos.zip",
+    exportBackgroundLabel: "Export background",
+    exportBackgroundTransparent: "Transparent",
+    exportBackgroundWhite: "White for social media",
+    exportBackgroundHint: "For Facebook and Instagram, choose white to prevent transparency from appearing black.",
+    statusWhitePngReady: "White-background PNG ready",
+    statusExportUnavailable: "We could not prepare the export. Try again.",
   },
   es: {
     ...baseTranslation,
@@ -1031,10 +1052,10 @@ const translations = {
     languageLabel: "Idioma",
     eyebrow: "Eliminación de fondo en masa",
     title: "BatchCutout",
-    lead: "Prueba gratis: quita el fondo de 2 imágenes en total y comprueba la calidad antes de comprar créditos.",
+    lead: "Prueba gratis: quita el fondo de 2 imágenes en total. Exporta con transparencia o fondo blanco para redes sociales.",
     benefitsLabel: "Ventajas del servicio",
     benefitBatch: "Hecho para muchas fotos",
-    benefitPng: "PNG transparente",
+    benefitPng: "Transparente o fondo blanco",
     benefitZip: "ZIP organizado",
     cookieText: "Usamos medición básica para entender visitas y compras. Puedes aceptar o continuar sin medición.",
     cookieAccept: "Aceptar medición",
@@ -1070,6 +1091,14 @@ const translations = {
     statusPngReady: "PNG listo",
     zipFilename: "fotos-sin-fondo.zip",
     fileSuffix: "sin-fondo",
+    whiteBackgroundFileSuffix: "fondo-blanco",
+    whiteBackgroundZipFilename: "fotos-fondo-blanco.zip",
+    exportBackgroundLabel: "Fondo de exportación",
+    exportBackgroundTransparent: "Transparente",
+    exportBackgroundWhite: "Blanco para redes sociales",
+    exportBackgroundHint: "Para Facebook e Instagram, elige fondo blanco para evitar que la transparencia aparezca negra.",
+    statusWhitePngReady: "PNG con fondo blanco listo",
+    statusExportUnavailable: "No se pudo preparar la exportación. Inténtalo de nuevo.",
     passwordShow: "Mostrar",
     passwordHide: "Ocultar",
   },
@@ -1960,6 +1989,8 @@ Object.assign(translations.es, {
 let items = [];
 let freeTestImagesUsed = readFreeTestImagesUsed();
 let currentLanguage = getRequestedLanguage() || normalizeUiLanguage(safeLocalStorageGet("language")) || detectLanguage();
+const storedExportBackground = safeLocalStorageGet(exportBackgroundStorageKey);
+let exportBackground = supportedExportBackgrounds.has(storedExportBackground) ? storedExportBackground : "transparent";
 normalizeUnsupportedLanguageUrl();
 let engineHasLoaded = false;
 let hasTrackedDragIntent = false;
@@ -2033,6 +2064,7 @@ const analyticsEvents = {
   background_removal_finished: { category: "processing", label: "finished" },
   tool_engine_load_failed: { category: "processing", label: "engine_load_failed" },
   tool_zip_generation_failed: { category: "processing", label: "zip_generation_failed" },
+  tool_export_generation_failed: { category: "processing", label: "export_generation_failed" },
   png_downloaded: { category: "download", label: "single_png" },
   zip_downloaded: { category: "download", label: "zip" },
   pro_interest_prompt_clicked: { category: "commercial_intent", label: "pro_interest" },
@@ -4408,13 +4440,60 @@ function cleanName(name) {
     .toLowerCase();
 }
 
-function exportPngName(fileName, fallback = "imagem") {
-  const baseName = cleanName(fileName) || fallback;
-  return `${baseName}-${t("fileSuffix")}-batchcutout-com.png`;
+function isWhiteBackgroundExport(background = exportBackground) {
+  return background === "white";
 }
 
-function exportZipName() {
-  return t("zipFilename").replace(/\.zip$/i, "-batchcutout-com.zip");
+function exportPngName(fileName, fallback = "imagem", background = exportBackground) {
+  const baseName = cleanName(fileName) || fallback;
+  const suffix = t(isWhiteBackgroundExport(background) ? "whiteBackgroundFileSuffix" : "fileSuffix");
+  return `${baseName}-${suffix}-batchcutout-com.png`;
+}
+
+function exportZipName(background = exportBackground) {
+  const filenameKey = isWhiteBackgroundExport(background) ? "whiteBackgroundZipFilename" : "zipFilename";
+  return t(filenameKey).replace(/\.zip$/i, "-batchcutout-com.zip");
+}
+
+async function preparePngForExport(blob, background = exportBackground) {
+  if (!isWhiteBackgroundExport(background)) return blob;
+
+  const bitmap = await createImageBitmap(blob);
+  const canvas = document.createElement("canvas");
+  canvas.width = bitmap.width;
+  canvas.height = bitmap.height;
+
+  const context = canvas.getContext("2d");
+  if (!context) {
+    bitmap.close?.();
+    throw new Error("Canvas export context unavailable");
+  }
+
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(bitmap, 0, 0);
+  bitmap.close?.();
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((exportBlob) => {
+      if (exportBlob) {
+        resolve(exportBlob);
+      } else {
+        reject(new Error("PNG export failed"));
+      }
+    }, "image/png");
+  });
+}
+
+function triggerBlobDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
 function isSupportedImage(file) {
@@ -4461,6 +4540,17 @@ function resultReadyOfferIsVisible() {
   return visibleHeight / rect.height >= 0.15;
 }
 
+function updateExportBackgroundUi({ visible, disabled } = {}) {
+  exportBackgroundFieldset?.classList.toggle("hidden", visible === false);
+  if (exportBackgroundFieldset && typeof disabled === "boolean") {
+    exportBackgroundFieldset.disabled = disabled;
+  }
+  for (const option of exportBackgroundOptions) {
+    option.checked = option.value === exportBackground;
+  }
+  imageGrid?.classList.toggle("export-background-white", isWhiteBackgroundExport());
+}
+
 function updateControls() {
   const hasItems = items.length > 0;
   const allReady = hasItems && items.every((item) => item.outputBlob);
@@ -4476,6 +4566,7 @@ function updateControls() {
   processButton.disabled = !hasItems || !hasPendingItems || running;
   pngButton.disabled = !singleReady || running;
   zipButton.disabled = !allReady || running;
+  updateExportBackgroundUi({ visible: downloadReady, disabled: running });
   actionsPackCta?.classList.toggle("hidden", paidAccess || !downloadReady || running || postDownloadOfferVisible);
   clearButton.disabled = !hasItems || running;
   clearButton.classList.toggle("hidden", !hasItems);
@@ -4891,29 +4982,29 @@ async function downloadZip() {
   const readyItems = items.filter((item) => item.outputBlob);
   if (!readyItems.length) return;
 
+  const activeBackground = exportBackground;
   setStatus("statusPreparingZip", 100);
   zipButton.disabled = true;
+  if (exportBackgroundFieldset) exportBackgroundFieldset.disabled = true;
 
   try {
     const JSZip = await loadJsZip();
     const zip = new JSZip();
     for (const [index, item] of readyItems.entries()) {
-      zip.file(exportPngName(item.file.name, `imagem-${index + 1}`), item.outputBlob);
+      const outputBlob = await preparePngForExport(item.outputBlob, activeBackground);
+      zip.file(exportPngName(item.file.name, `imagem-${index + 1}`, activeBackground), outputBlob);
     }
 
     const zipBlob = await zip.generateAsync({ type: "blob" });
-    const url = URL.createObjectURL(zipBlob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = exportZipName();
-    link.click();
-    URL.revokeObjectURL(url);
+    triggerBlobDownload(zipBlob, exportZipName(activeBackground));
     setStatus("statusZipReady", 100);
-    trackEvent("zip_downloaded", { count: readyItems.length });
-    trackEvent("download_zip", { count: readyItems.length });
+    trackEvent("zip_downloaded", { count: readyItems.length, background: activeBackground });
+    trackEvent("download_zip", { count: readyItems.length, background: activeBackground });
     trackEvent("tool_download_zip", {
       count: readyItems.length,
       fileType: "zip",
+      imageFileType: "png",
+      background: activeBackground,
       minExportSide,
     });
     trackGoogleAdsConversion(downloadZipConversionId);
@@ -4924,34 +5015,48 @@ async function downloadZip() {
     trackEvent("tool_zip_generation_failed", {
       count: readyItems.length,
       reason: jsZipModulePromise ? "zip_generation" : "module_load",
+      background: activeBackground,
     });
   } finally {
     updateControls();
   }
 }
 
-function downloadSinglePng() {
+async function downloadSinglePng() {
   const item = items[0];
 
   if (!item?.outputBlob) {
     return;
   }
 
-  const url = URL.createObjectURL(item.outputBlob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = exportPngName(item.file.name);
-  link.click();
-  URL.revokeObjectURL(url);
-  setStatus("statusPngReady", 100);
-  trackEvent("png_downloaded", { count: 1 });
-  trackEvent("download_png", { count: 1 });
-  trackEvent("tool_download_png", {
-    count: 1,
-    fileType: "png",
-    minExportSide,
-  });
-  showPostDownloadFeedback("png", 1);
+  const activeBackground = exportBackground;
+  pngButton.disabled = true;
+  if (exportBackgroundFieldset) exportBackgroundFieldset.disabled = true;
+
+  try {
+    const outputBlob = await preparePngForExport(item.outputBlob, activeBackground);
+    triggerBlobDownload(outputBlob, exportPngName(item.file.name, "imagem", activeBackground));
+    setStatus(isWhiteBackgroundExport(activeBackground) ? "statusWhitePngReady" : "statusPngReady", 100);
+    trackEvent("png_downloaded", { count: 1, background: activeBackground });
+    trackEvent("download_png", { count: 1, background: activeBackground });
+    trackEvent("tool_download_png", {
+      count: 1,
+      fileType: "png",
+      background: activeBackground,
+      minExportSide,
+    });
+    showPostDownloadFeedback("png", 1);
+  } catch (error) {
+    console.error(error);
+    setStatus("statusExportUnavailable", 100);
+    trackEvent("tool_export_generation_failed", {
+      count: 1,
+      fileType: "png",
+      background: activeBackground,
+    });
+  } finally {
+    updateControls();
+  }
 }
 
 function clearAll() {
@@ -5515,6 +5620,15 @@ languageSelect.addEventListener("change", (event) => {
   trackEvent("language_changed", { language: currentLanguage });
   applyLanguage();
 });
+for (const option of exportBackgroundOptions) {
+  option.addEventListener("change", (event) => {
+    const nextBackground = event.target.value;
+    if (!event.target.checked || !supportedExportBackgrounds.has(nextBackground)) return;
+    exportBackground = nextBackground;
+    safeLocalStorageSet(exportBackgroundStorageKey, exportBackground);
+    updateExportBackgroundUi();
+  });
+}
 fileInput.addEventListener("change", (event) => addFiles(event.target.files));
 processButton.addEventListener("click", processImages);
 pngButton.addEventListener("click", downloadSinglePng);
