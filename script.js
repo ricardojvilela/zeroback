@@ -4605,6 +4605,36 @@ function isSupportedImage(file) {
   return file.type.startsWith("image/") || supportedExtensions.some((extension) => lowerName.endsWith(extension));
 }
 
+function isAvifFile(file) {
+  return file.type.toLowerCase() === "image/avif" || file.name.toLowerCase().endsWith(".avif");
+}
+
+async function normalizeInputForProcessing(file) {
+  if (!isAvifFile(file)) return file;
+
+  const bitmap = await createImageBitmap(file);
+  const canvas = document.createElement("canvas");
+  canvas.width = bitmap.width;
+  canvas.height = bitmap.height;
+
+  const context = canvas.getContext("2d");
+  if (!context) {
+    bitmap.close?.();
+    throw new Error("AVIF conversion context unavailable");
+  }
+
+  try {
+    context.drawImage(bitmap, 0, 0);
+    const pngBlob = await canvasToPngBlob(canvas);
+    return new File([pngBlob], file.name.replace(/\.avif$/i, ".png"), {
+      type: "image/png",
+      lastModified: file.lastModified,
+    });
+  } finally {
+    bitmap.close?.();
+  }
+}
+
 async function ensureMinimumPngResolution(blob) {
   const bitmap = await createImageBitmap(blob);
   const currentMinSide = Math.min(bitmap.width, bitmap.height);
@@ -4984,7 +5014,8 @@ async function processImages() {
     render();
 
     try {
-      const removedBackground = await removeBackground(item.file, {
+      const inputFile = await normalizeInputForProcessing(item.file);
+      const removedBackground = await removeBackground(inputFile, {
         output: {
           format: "image/png",
           quality: 1,
